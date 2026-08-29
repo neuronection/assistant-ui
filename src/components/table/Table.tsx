@@ -4,11 +4,12 @@ import { cn } from '../../lib/utils'
 export interface TableProps extends React.ComponentProps<'div'> {
   headers: string[]
   rows: React.ReactNode[][]
+  /** Rendered as a full-width row when the table is empty. No default. */
   emptyText?: string
 }
 
 export const Table = React.forwardRef<HTMLDivElement, TableProps>(
-  function Table({ headers, rows, emptyText = 'Nothing here yet', className, ...props }, ref) {
+  function Table({ headers, rows, emptyText, className, ...props }, ref) {
     return (
       <div
         ref={ref}
@@ -31,7 +32,7 @@ export const Table = React.forwardRef<HTMLDivElement, TableProps>(
             </tr>
           </thead>
           <tbody className="divide-y divide-[color-mix(in_srgb,var(--as-border)_55%,transparent)] bg-[var(--as-surface-raised)]">
-            {rows.length === 0 ? (
+            {rows.length === 0 && emptyText ? (
               <tr>
                 <td
                   colSpan={headers.length}

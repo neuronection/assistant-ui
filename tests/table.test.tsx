@@ -27,9 +27,9 @@ describe('Table', () => {
     expect(cell).toHaveAttribute('colspan', '2')
   })
 
-  it('renders a default empty message', () => {
+  it('renders no empty row without emptyText', () => {
     render(<Table headers={['A']} rows={[]} />)
-    expect(screen.getByText('Nothing here yet')).toBeInTheDocument()
+    expect(screen.queryByRole('cell')).not.toBeInTheDocument()
   })
 
   it('accepts node cells and className', () => {
