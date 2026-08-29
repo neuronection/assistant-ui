@@ -4,5 +4,6 @@ dev/
 *.local
 .DS_Store
 *.tsbuildinfo
-.ladle/
+.ladle/cache/
 build/
+.opencode

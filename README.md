@@ -58,6 +58,7 @@ without configuration. Do **not** add this package to your Tailwind
 ## Documentation
 
 - [Local development](./docs/local-development.md) — live-test library changes in the family apps without publishing
+- [Adopting in an app](./docs/adoption.md) — the install/switchover recipe each family app follows
 - [Theming](./docs/theming.md) — tokens, app themes, styling hooks
 - [Publishing](./docs/publishing.md) — the Changesets release flow and CI setup
 - [Adding a component](./docs/adding-a-component.md) — rules, checklist, required companions
