@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "description": "Shared React component library for the Assistant family (career-, study-, health-assistant). Family look by default, app-flavored via CSS-variable tokens.",
   "type": "module",
+  "packageManager": "pnpm@11.22.0",
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
