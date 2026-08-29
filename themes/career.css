@@ -1,5 +1,7 @@
 :root {
-  --as-accent: oklch(0.62 0.15 152);
-  --as-primary-fg: oklch(1 0 0);
+  --as-accent: oklch(0.546 0.245 262.881);
+  --as-accent-strong: oklch(0.488 0.217 264.376);
+  --as-primary: var(--as-accent);
+  --as-focus-ring: var(--as-accent);
   --as-radius: 0.75rem;
 }
