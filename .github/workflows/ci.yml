@@ -1,0 +1,131 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+
+  typecheck-react18:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm add -D @types/react@^18 @types/react-dom@^18
+      - run: pnpm typecheck
+
+  typecheck-react19:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm test
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+      - run: pnpm test
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+  smoke:
+    needs: build
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: react18-tailwind3
+            react: '18'
+            react-dom: '18'
+            types: '@types/react@^18 @types/react-dom@^18'
+            tailwind: 'tailwindcss@^3'
+          - name: react19-tailwind4
+            react: '19'
+            react-dom: '19'
+            types: '@types/react@^19 @types/react-dom@^19'
+            tailwind: 'tailwindcss@^4'
+    name: smoke (${{ matrix.name }})
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+      - run: pnpm pack --pack-destination /tmp
+      - name: Scaffold consumer app
+        run: |
+          mkdir -p /tmp/smoke/src
+          cp scripts/smoke/package.json /tmp/smoke/package.json
+          cp scripts/smoke/smoke.test.tsx /tmp/smoke/src/smoke.test.tsx
+      - name: Install library + app deps
+        working-directory: /tmp/smoke
+        run: |
+          pnpm add "react@${{ matrix.react }}" "react-dom@${{ matrix.react-dom }}" ${{ matrix.types }} ${{ matrix.tailwind }} /tmp/neuronection-assistant-ui-*.tgz
+          pnpm add -D vitest jsdom @testing-library/react @testing-library/user-event
+      - name: Run smoke tests
+        working-directory: /tmp/smoke
+        run: pnpm vitest run
+
+  stories:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build:css
+      - run: pnpm playground:build

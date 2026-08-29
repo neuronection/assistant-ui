@@ -1,0 +1,5 @@
+{
+  "name": "assistant-ui-smoke",
+  "private": true,
+  "type": "module"
+}

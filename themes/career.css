@@ -1,0 +1,5 @@
+:root {
+  --as-accent: oklch(0.62 0.15 152);
+  --as-primary-fg: oklch(1 0 0);
+  --as-radius: 0.75rem;
+}

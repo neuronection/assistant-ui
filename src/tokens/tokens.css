@@ -1,0 +1,94 @@
+@import 'tailwindcss/theme.css' layer(theme);
+@import 'tailwindcss/utilities.css' layer(utilities);
+
+@source '../components';
+
+@layer theme {
+  :root {
+    --as-tone-0: oklch(1 0 0);
+    --as-tone-50: oklch(0.985 0.003 90);
+    --as-tone-100: oklch(0.948 0.005 90);
+    --as-tone-200: oklch(0.902 0.005 90);
+    --as-tone-300: oklch(0.83 0.008 90);
+    --as-tone-500: oklch(0.5 0.012 90);
+    --as-tone-700: oklch(0.37 0.014 90);
+    --as-tone-900: oklch(0.235 0.012 90);
+    --as-accent: oklch(0.55 0.16 258);
+    --as-accent-strong: oklch(0.48 0.18 258);
+    --as-success: oklch(0.62 0.15 152);
+    --as-warning: oklch(0.72 0.15 78);
+    --as-danger: oklch(0.58 0.19 27);
+    --as-ai: oklch(0.541 0.247 293.009);
+
+    --as-primary: var(--as-accent);
+    --as-primary-fg: var(--as-tone-50);
+    --as-secondary: var(--as-tone-100);
+    --as-secondary-fg: var(--as-tone-900);
+    --as-surface: var(--as-tone-50);
+    --as-surface-raised: var(--as-tone-0);
+    --as-border: var(--as-tone-200);
+    --as-fg: var(--as-tone-900);
+    --as-muted: var(--as-tone-100);
+    --as-muted-fg: var(--as-tone-500);
+    --as-success-fg: var(--as-tone-0);
+    --as-warning-fg: var(--as-tone-900);
+    --as-danger-fg: var(--as-tone-0);
+    --as-ai-fg: var(--as-tone-0);
+    --as-focus-ring: var(--as-accent);
+    --as-overlay: oklch(0 0 0 / 0.6);
+
+    --as-radius-sm: calc(var(--as-radius) - 0.25rem);
+    --as-radius: 0.625rem;
+    --as-radius-lg: calc(var(--as-radius) + 0.25rem);
+
+    --as-font-sans: 'Inter Variable', ui-sans-serif, system-ui, sans-serif;
+    --as-font-mono: 'JetBrains Mono', ui-monospace, 'Cascadia Mono', monospace;
+
+    --as-shadow-1: 0 1px 2px 0 oklch(0 0 0 / 0.05);
+    --as-shadow-2: 0 4px 6px -1px oklch(0 0 0 / 0.07), 0 2px 4px -2px oklch(0 0 0 / 0.05);
+    --as-shadow-3: 0 10px 15px -3px oklch(0 0 0 / 0.08), 0 4px 6px -4px oklch(0 0 0 / 0.05);
+  }
+}
+
+@keyframes as-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes as-zoom-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+@keyframes as-pop-in {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.as-anim-fade {
+  animation: as-fade-in 0.15s ease-out;
+}
+
+.as-anim-modal {
+  animation: as-zoom-in 0.15s ease-out;
+}
+
+.as-anim-pop {
+  animation: as-pop-in 0.12s ease-out;
+}
