@@ -19,8 +19,6 @@ const LIBRARY_COMPONENTS = [
   'ModalTitle',
   'ModalDescription',
   'ModalFooter',
-  'Popover',
-  'PopoverContent',
   'Portal',
   'Spinner',
   'ThemeScope',
@@ -57,7 +55,8 @@ const files = await walk(target)
 const findings = []
 for (const file of files) {
   const name = basename(file).replace(/\.(tsx|ts)$/, '')
-  if (LIBRARY_COMPONENTS.includes(name)) {
+  const match = LIBRARY_COMPONENTS.find((c) => c.toLowerCase() === name.toLowerCase())
+  if (match) {
     const source = await readFile(file, 'utf8')
     if (/from ['"]@neuronection\/assistant-ui/.test(source)) continue
     findings.push(file)
