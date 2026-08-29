@@ -1,5 +1,21 @@
 # @neuronection/assistant-ui
 
+## 0.3.0
+
+### Minor Changes
+
+- [`e8a56d3`](https://github.com/neuronection/assistant-ui/commit/e8a56d33427fc2e8e03784fe7959037f24efb95a) Thanks [@constLiakos](https://github.com/constLiakos)! - Add the six components career-assistant's Phase-2 adoption needs, all shared
+  with health-assistant (catalog T1): `ChipInput`, `ChipList` (superset with
+  variants + clickable chips), `Table` (tokenized, with empty state), `RangeBar`
+  (with optional `label`/`valueLabel`), `ScaleSlider` (+ `scaleColorForValue`),
+  and `DatePicker` (Radix popover calendar with days/months/years views, min/max,
+  allowClear, and a roving-tabindex arrow-key day grid — an a11y upgrade over
+  both app copies). New dependency: `date-fns`.
+
+### Patch Changes
+
+- [`e5252f2`](https://github.com/neuronection/assistant-ui/commit/e5252f26d6f8732a2f5ba4a3fe849b4df50b30c2) Thanks [@constLiakos](https://github.com/constLiakos)! - Ship CHANGELOG.md inside the published package so consuming apps (and their agents) can read what changed without visiting GitHub.
+
 ## 0.2.0
 
 ### Minor Changes
