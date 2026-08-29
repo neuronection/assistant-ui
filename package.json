@@ -39,6 +39,14 @@
       "types": "./dist/check-indicator.d.ts",
       "import": "./dist/check-indicator.js"
     },
+    "./chip-input": {
+      "types": "./dist/chip-input.d.ts",
+      "import": "./dist/chip-input.js"
+    },
+    "./chip-list": {
+      "types": "./dist/chip-list.d.ts",
+      "import": "./dist/chip-list.js"
+    },
     "./combobox": {
       "types": "./dist/combobox.d.ts",
       "import": "./dist/combobox.js"
@@ -50,6 +58,10 @@
     "./context-menu": {
       "types": "./dist/context-menu.d.ts",
       "import": "./dist/context-menu.js"
+    },
+    "./date-picker": {
+      "types": "./dist/date-picker.d.ts",
+      "import": "./dist/date-picker.js"
     },
     "./empty-state": {
       "types": "./dist/empty-state.d.ts",
@@ -103,6 +115,14 @@
       "types": "./dist/portal.d.ts",
       "import": "./dist/portal.js"
     },
+    "./range-bar": {
+      "types": "./dist/range-bar.d.ts",
+      "import": "./dist/range-bar.js"
+    },
+    "./scale-slider": {
+      "types": "./dist/scale-slider.d.ts",
+      "import": "./dist/scale-slider.js"
+    },
     "./search-input": {
       "types": "./dist/search-input.d.ts",
       "import": "./dist/search-input.js"
@@ -114,6 +134,10 @@
     "./spinner": {
       "types": "./dist/spinner.d.ts",
       "import": "./dist/spinner.js"
+    },
+    "./table": {
+      "types": "./dist/table.d.ts",
+      "import": "./dist/table.js"
     },
     "./theme-scope": {
       "types": "./dist/theme-scope.d.ts",
@@ -172,6 +196,7 @@
     "@radix-ui/react-tooltip": "^1.2.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "date-fns": "^4.4.0",
     "tailwind-merge": "^3.6.0"
   },
   "devDependencies": {

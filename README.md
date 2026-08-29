@@ -81,6 +81,10 @@ files in the package's `dist/`. Visual reference:
 | `tooltip` | `Tooltip` + parts, `InfoTooltip` |
 | `wizard` | `Wizard` (steps config + `renderStep`, per-step validation gates, modal/drawer variants), `Stepper` (dots/labels) |
 | `input` / `search-input` / `expandable-search` | `Input` (label/hint/error wiring) · `SearchInput` · `ExpandableSearch` |
+| `chip-input` / `chip-list` | `ChipInput` (Enter/comma commit, paste-splits, Backspace-removes) · `ChipList` (variant pills, clickable, removable) |
+| `date-picker` | `DatePicker` (popover calendar: days/months/years views, min/max, `allowClear`, arrow-key day grid) |
+| `range-bar` / `scale-slider` | `RangeBar` (low–high band + value dot) · `ScaleSlider` (+ `scaleColorForValue`) |
+| `table` | `Table` (headers/rows, built-in empty state) |
 | `check-indicator` / `selection-bar` / `view-toggle` | `CheckIndicator` (tri-state) · `SelectionBar` (bulk-select bar) · `ViewToggle` (grid/list) |
 | `error-banner` / `undo-notice` / `empty-state` / `spinner` | presentational feedback: alert banner with `action` slot · undo toast · `EmptyState` · `Spinner` |
 | `info-button` / `field-label` | `InfoButton` (info popover) · `FieldLabel` (label + info affordance) |

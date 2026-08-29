@@ -27,6 +27,12 @@ export {
   CheckIndicator,
   type CheckIndicatorProps,
 } from './components/check-indicator'
+export { ChipInput, type ChipInputProps } from './components/chip-input'
+export {
+  ChipList,
+  type ChipListProps,
+  type ChipVariant,
+} from './components/chip-list'
 export {
   Combobox,
   ComboboxMulti,
@@ -39,6 +45,10 @@ export {
   type ConfirmationModalProps,
 } from './components/confirmation-modal'
 export { ContextMenu, type ContextMenuProps, type ContextMenuItem } from './components/context-menu'
+export {
+  DatePicker,
+  type DatePickerProps,
+} from './components/date-picker'
 export { EmptyState, type EmptyStateProps } from './components/empty-state'
 export { ErrorBanner, type ErrorBannerProps } from './components/error-banner'
 export {
@@ -87,7 +97,6 @@ export {
   modalContentVariants,
   type ModalContentProps,
 } from './components/modal'
-export { PopoverButton, type PopoverButtonProps } from './components/popover-button'
 export {
   Popover,
   PopoverAnchor,
@@ -95,9 +104,17 @@ export {
   PopoverContent,
   PopoverTrigger,
 } from './components/popover'
+export { PopoverButton, type PopoverButtonProps } from './components/popover-button'
+export { RangeBar, type RangeBarProps } from './components/range-bar'
+export {
+  ScaleSlider,
+  scaleColorForValue,
+  type ScaleSliderProps,
+} from './components/scale-slider'
 export { SearchInput, type SearchInputProps } from './components/search-input'
 export { SelectionBar, type SelectionBarProps } from './components/selection-bar'
 export { Spinner, type SpinnerProps } from './components/spinner'
+export { Table, type TableProps } from './components/table'
 export {
   Tooltip,
   TooltipContent,
