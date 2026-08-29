@@ -123,7 +123,7 @@ describe('ScaleSlider', () => {
 
   it('forwards refs to the root', () => {
     const ref = React.createRef<HTMLDivElement>()
-    render(<ScaleSliderDemo ref={ref} />)
+    render(<ScaleSlider min={1} max={5} value={3} onChange={() => {}} ref={ref} />)
     expect(ref.current).toHaveAttribute('data-as', 'scale-slider')
   })
 
