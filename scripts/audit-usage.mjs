@@ -3,6 +3,7 @@ import { join, basename } from 'node:path'
 
 const LIBRARY_COMPONENTS = [
   'Badge',
+  'Breadcrumbs',
   'Button',
   'Card',
   'CardHeader',
@@ -17,6 +18,7 @@ const LIBRARY_COMPONENTS = [
   'ComboboxMulti',
   'ConfirmationModal',
   'ContextMenu',
+  'CopyButton',
   'DatePicker',
   'EmptyState',
   'ErrorBanner',

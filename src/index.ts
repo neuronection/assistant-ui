@@ -14,6 +14,12 @@ export { Portal, type PortalProps } from './components/portal'
 export { ThemeScope, type ThemeScopeProps } from './components/theme-scope'
 
 export { Badge, badgeVariants, type BadgeProps } from './components/badge'
+export {
+  Breadcrumbs,
+  type BreadcrumbItem,
+  type BreadcrumbLinkProps,
+  type BreadcrumbsProps,
+} from './components/breadcrumbs'
 export { Button, buttonVariants, type ButtonProps } from './components/button'
 export {
   Card,
@@ -44,6 +50,7 @@ export {
   ConfirmationModal,
   type ConfirmationModalProps,
 } from './components/confirmation-modal'
+export { CopyButton, type CopyButtonProps } from './components/copy-button'
 export { ContextMenu, type ContextMenuProps, type ContextMenuItem } from './components/context-menu'
 export {
   DatePicker,

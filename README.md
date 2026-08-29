@@ -88,6 +88,7 @@ files in the package's `dist/`. Visual reference:
 | `check-indicator` / `selection-bar` / `view-toggle` | `CheckIndicator` (tri-state) · `SelectionBar` (bulk-select bar) · `ViewToggle` (grid/list) |
 | `error-banner` / `undo-notice` / `empty-state` / `spinner` | presentational feedback: alert banner with `action` slot · undo toast · `EmptyState` · `Spinner` |
 | `info-button` / `field-label` | `InfoButton` (info popover) · `FieldLabel` (label + info affordance) |
+| `copy-button` / `breadcrumbs` | `CopyButton` (clipboard + copied state) · `Breadcrumbs` (SPA links via `linkComponent`) |
 | `marquee` | `useMarquee`, `MarqueeSurface`, `MarqueeBand` (rubber-band selection) |
 | `portal` / `theme-scope` / `tokens` | `Portal` · `ThemeScope` · token name lists + types |
 

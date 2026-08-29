@@ -76,6 +76,38 @@ describe('FormModal', () => {
     expect(screen.getByRole('button', { name: 'Cancel' })).toBeDisabled()
   })
 
+  it('renders header actions next to the title', async () => {
+    render(<DemoForm headerActions={<button type="button">AI assist</button>} />)
+    await screen.findByRole('dialog')
+    expect(screen.getByRole('button', { name: 'AI assist' })).toBeInTheDocument()
+  })
+
+  it('renders a reject button on the left of the footer', async () => {
+    const user = userEvent.setup()
+    const onReject = vi.fn()
+    render(<DemoForm onReject={onReject} rejectLabel="Decline" />)
+    await screen.findByRole('dialog')
+    const reject = screen.getByRole('button', { name: 'Decline' })
+    expect(reject.compareDocumentPosition(screen.getByRole('button', { name: 'Rename' })))
+      .toBe(Node.DOCUMENT_POSITION_FOLLOWING)
+    await user.click(reject)
+    expect(onReject).toHaveBeenCalled()
+  })
+
+  it('hideFooter suppresses the default footer', async () => {
+    render(<DemoForm hideFooter />)
+    await screen.findByRole('dialog')
+    expect(screen.queryByRole('button', { name: 'Rename' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Cancel' })).not.toBeInTheDocument()
+  })
+
+  it('bodyClassName merges onto the body container', async () => {
+    render(<DemoForm bodyClassName="pt-8" />)
+    await screen.findByRole('dialog')
+    const body = screen.getByLabelText('Name').closest('.px-6')
+    expect(body).toHaveClass('pt-8')
+  })
+
   it('open state has no axe violations', async () => {
     const { container } = render(<DemoForm />)
     await screen.findByRole('dialog')

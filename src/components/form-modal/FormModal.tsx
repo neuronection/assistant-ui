@@ -17,6 +17,7 @@ export interface FormModalProps {
   title: React.ReactNode
   description?: React.ReactNode
   icon?: LucideIcon
+  headerActions?: React.ReactNode
   children: React.ReactNode
   onSubmit?: () => void
   submitting?: boolean
@@ -26,7 +27,11 @@ export interface FormModalProps {
   closeLabel?: string
   size?: 'sm' | 'md' | 'lg' | 'xl'
   contentClassName?: string
+  bodyClassName?: string
   footer?: React.ReactNode
+  hideFooter?: boolean
+  onReject?: () => void
+  rejectLabel?: string
 }
 
 export function FormModal({
@@ -35,6 +40,7 @@ export function FormModal({
   title,
   description,
   icon: Icon,
+  headerActions,
   children,
   onSubmit,
   submitting = false,
@@ -44,7 +50,11 @@ export function FormModal({
   closeLabel = 'Close',
   size = 'md',
   contentClassName,
+  bodyClassName,
   footer,
+  hideFooter = false,
+  onReject,
+  rejectLabel = 'Reject',
 }: FormModalProps) {
   return (
     <Modal open={open} onOpenChange={onOpenChange}>
@@ -67,12 +77,26 @@ export function FormModal({
                 </span>
               ) : null}
               <ModalTitle>{title}</ModalTitle>
+              {headerActions ? (
+                <span className="ml-auto flex items-center gap-1.5">{headerActions}</span>
+              ) : null}
             </div>
             {description ? <ModalDescription>{description}</ModalDescription> : null}
           </ModalHeader>
-          <div className="px-6 pb-2">{children}</div>
-          {footer ?? (
+          <div className={cn('px-6 pb-2', bodyClassName)}>{children}</div>
+          {footer ?? (hideFooter ? null : (
             <ModalFooter>
+              {onReject ? (
+                <Button
+                  type="button"
+                  variant="destructive"
+                  onClick={onReject}
+                  disabled={submitting}
+                  className="sm:mr-auto"
+                >
+                  {rejectLabel}
+                </Button>
+              ) : null}
               <Button
                 type="button"
                 variant="outline"
@@ -87,7 +111,7 @@ export function FormModal({
                 </Button>
               ) : null}
             </ModalFooter>
-          )}
+          ))}
         </form>
       </ModalContent>
     </Modal>

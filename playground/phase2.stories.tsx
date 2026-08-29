@@ -5,6 +5,8 @@ import { RangeBar } from '../src/components/range-bar/RangeBar'
 import { ScaleSlider } from '../src/components/scale-slider/ScaleSlider'
 import { Table } from '../src/components/table/Table'
 import { DatePicker } from '../src/components/date-picker/DatePicker'
+import { CopyButton } from '../src/components/copy-button/CopyButton'
+import { Breadcrumbs } from '../src/components/breadcrumbs/Breadcrumbs'
 
 export const ChipEditing = () => {
   const [skills, setSkills] = useState<string[]>(['React', 'TypeScript'])
@@ -110,3 +112,23 @@ export const DatePickers = () => {
     </div>
   )
 }
+
+export const CopyButtons = () => (
+  <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+    <CopyButton value="copy-me" label="Copy value" />
+    <CopyButton value="2026-08-30" label="Copy date" size={16} />
+    <CopyButton value="" hideWhenEmpty={false} label="Copy empty" />
+  </div>
+)
+
+export const BreadcrumbNav = () => (
+  <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+    <Breadcrumbs homeHref="/" currentLabel="Dashboard" />
+    <Breadcrumbs
+      homeHref="/"
+      items={[{ label: 'Doctors', href: '/doctors' }, { label: 'Dr. Mara' }]}
+      currentLabel="Overview"
+    />
+    <Breadcrumbs items={[{ label: 'Settings' }]} />
+  </div>
+)
