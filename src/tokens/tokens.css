@@ -81,6 +81,15 @@
   }
 }
 
+@keyframes as-drawer-in {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
 .as-anim-fade {
   animation: as-fade-in 0.15s ease-out;
 }
@@ -91,4 +100,8 @@
 
 .as-anim-pop {
   animation: as-pop-in 0.12s ease-out;
+}
+
+.as-anim-drawer {
+  animation: as-drawer-in 0.2s ease-out;
 }
