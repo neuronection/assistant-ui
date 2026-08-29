@@ -55,6 +55,40 @@ library component reappears.
 Dependabot (npm ecosystem, weekly) picks up new releases; app CI validates
 the bump PR like any other.
 
+## 7. Agent skill (one-time per app)
+
+Create `.opencode/skills/<app-prefix>-assistant-ui/SKILL.md`
+(`sa-`/`ca-`/`ha-` prefix per family convention):
+
+```markdown
+---
+name: sa-assistant-ui
+description: Use when building UI in this app with @neuronection/assistant-ui — import patterns, CSS order, theming, the check-library-first rule, and how to test local library changes. Use BEFORE creating any new ui/ component or touching an existing one.
+---
+
+# Using assistant-ui in study-assistant
+
+- Import from `@neuronection/assistant-ui` (per-module entries: `/button`,
+  `/modal`, …). `cn()` is exported too.
+- CSS order in the entry: app CSS → `@neuronection/assistant-ui/styles.css`
+  → `./theme.css` (identity tokens — overrides only).
+- Styling hooks: `--as-*` tokens and `data-as-*` attributes — never internal
+  class names.
+- **Check-library-first:** before writing any new shared-looking UI
+  component, check the library's catalog (gallery / README). If it exists
+  there, import it — do not create a local copy. Local copies of library
+  components are deleted in the same commit they're replaced (drift audit
+  flags regressions weekly).
+- Labels: components take English-default props — pass translated strings
+  from i18next at call sites.
+- To test local library changes: in `../assistant-ui` run `pnpm watch` +
+  `node scripts/dev-link.mjs link <this-app-frontend>`; never commit linked
+  manifests (see library docs/local-development.md).
+```
+
+Adapt name/paths per app; commit it so every agent session in the app repo
+loads it.
+
 ## Verifying before you commit an adoption PR
 
 ```bash
