@@ -66,8 +66,43 @@ Without it Vite pre-bundles the linked package into `.vite/deps` and serves a
 ```bash
 pnpm build && pnpm pack
 # in the app, temporarily:
-npm i ../assistant-ui/neuronection-assistant-ui-<version>.tgz
+npm i ../assistant-ui/neuronection-assistant-ui-<ver>.tgz
 ```
 
 This verifies the `exports` map and `files` whitelist — the symlink path
 can't catch those mistakes.
+
+## Running an app's test suite against local changes
+
+**dev-link is for the dev server only.** Under pnpm, the `link:` override
+makes library internals (Radix, lucide) resolve their **own** copies of
+react/react-dom from the library's `node_modules` — app tests then crash
+with "invalid hook call / more than one copy of React". There is no clean
+app-side fix (aliases + `server.deps.inline` in the app's vitest config
+only paper over parts of it). Use the tarball flow instead:
+
+```bash
+node scripts/verify-in-app.mjs ../study-assistant/frontend
+```
+
+One command: `pnpm build` + `pnpm pack`, installs the tarball into the
+app, runs the app's test suite, then **restores the app manifest +
+lockfile** and reinstalls. `--test "<cmd>"` overrides the test command,
+`--keep` leaves the tarball installed for interactive use.
+
+Manual equivalent (know the gotchas):
+
+```bash
+pnpm build && pnpm pack
+# pnpm app (workspace root): pnpm --filter <pkg> remove @neuronection/assistant-ui
+#                            pnpm --filter <pkg> add file:/abs/path/to.tgz
+# npm app:                    npm i --no-save /abs/path/to.tgz
+```
+
+- **pnpm skips re-resolution when a `file:` spec hasn't changed** —
+  repacking the same version silently reuses the old tarball. Remove +
+  re-add (what the script does) or bump the version to iterate.
+- The tarball is *copied* into `node_modules` (no symlink), so there are
+  no dual-instance problems — but you must reinstall to see new changes.
+- Never commit a manifest pointing at a tarball; the script restores it
+  unless you pass `--keep`.

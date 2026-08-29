@@ -29,7 +29,8 @@ backups). In-repo docs: `docs/` is the source of truth for workflows.
 pnpm dev            # Ladle playground :61000
 pnpm watch          # watch build for live app testing (docs/local-development.md)
 pnpm verify         # the gate
-node scripts/dev-link.mjs link <app-dir>   # wire an app to this checkout
+node scripts/dev-link.mjs link <app-dir>   # wire an app to this checkout (dev server only)
+node scripts/verify-in-app.mjs <app-dir>   # run an app's test suite against a packed tarball
 ```
 
 ## Gotchas learned the hard way
