@@ -40,6 +40,7 @@ export interface ButtonProps
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   function Button(
+  /* */
     { className, variant, size, asChild = false, loading = false, disabled, children, ...props },
     ref,
   ) {
@@ -68,3 +69,4 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 )
 
 export { buttonVariants }
+

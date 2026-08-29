@@ -36,6 +36,17 @@ function detectManager(appDir) {
     existsSync(join(d, 'pnpm-workspace.yaml')) || existsSync(join(d, 'pnpm-lock.yaml')),
   )
   if (pnpmRoot) return { manager: 'pnpm', root: pnpmRoot }
+  const pkgFile = join(appDir, 'package.json')
+  if (existsSync(pkgFile)) {
+    try {
+      const pkg = JSON.parse(readFileSync(pkgFile, 'utf8'))
+      if (typeof pkg.packageManager === 'string' && pkg.packageManager.startsWith('pnpm@')) {
+        return { manager: 'pnpm', root: appDir }
+      }
+    } catch {
+      void 0
+    }
+  }
   const npmRoot = findUp(appDir, (d) => existsSync(join(d, 'package-lock.json')))
   if (npmRoot) return { manager: 'npm', root: npmRoot }
   return { manager: 'npm', root: appDir }

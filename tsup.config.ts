@@ -18,7 +18,7 @@ export default defineConfig({
     tooltip: 'src/components/tooltip/index.ts',
   },
   format: ['esm'],
-  dts: true,
+  dts: process.env.AS_UI_WATCH ? false : true,
   splitting: true,
   sourcemap: true,
   clean: false,

@@ -78,11 +78,10 @@
   "scripts": {
     "dev": "pnpm build:css && concurrently -k -n css,ladle \"pnpm:watch:css\" \"pnpm:playground\"",
     "watch": "pnpm build && concurrently -k -n ts,css \"pnpm:watch:ts\" \"pnpm:watch:css\"",
-    "watch:ts": "tsup --watch",
+    "watch:ts": "node scripts/watch-ts.mjs",
     "watch:css": "node scripts/watch-css.mjs",
     "playground": "ladle serve -p 61000",
     "playground:build": "ladle build",
-    "watch:css": "tailwindcss -i src/tokens/tokens.css -o dist/styles.css --watch",
     "build": "pnpm build:ts && pnpm build:css",
     "build:ts": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\" && tsup",
     "build:css": "tailwindcss -i src/tokens/tokens.css -o dist/styles.css --minify && node scripts/unwrap-layers.mjs",
