@@ -13,7 +13,8 @@
     "**/*.css"
   ],
   "files": [
-    "dist"
+    "dist",
+    "CHANGELOG.md"
   ],
   "types": "./dist/index.d.ts",
   "exports": {

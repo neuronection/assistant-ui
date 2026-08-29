@@ -65,11 +65,27 @@ without configuration. Do **not** add this package to your Tailwind
 
 ## Components
 
-Button, Badge, Card (+Header/Title/Description/Content/Footer), Modal
-(+Trigger/Header/Title/Description/Footer/Close), Popover, Tooltip +
-InfoTooltip, Input, Spinner, EmptyState, ConfirmationModal, Portal,
-ThemeScope, `cn()`. Full props in the
-[gallery](https://neuronection.github.io/assistant-ui/) (Ladle build).
+Every module has its own entry point (`import { Menu } from
+'@neuronection/assistant-ui/menu'`) and everything is re-exported from the
+package root. Authoritative props for your installed version: the `.d.ts`
+files in the package's `dist/`. Visual reference:
+[gallery](https://neuronection.github.io/assistant-ui/).
+
+| Module | Exports |
+|---|---|
+| `button` / `badge` / `card` | `Button`, `buttonVariants` · `Badge`, `badgeVariants` · `Card`, `CardHeader/Title/Description/Content/Footer` |
+| `modal` / `confirmation-modal` / `form-modal` | `Modal` + parts, `modalContentVariants` · `ConfirmationModal` · `FormModal` (form-in-modal shell) |
+| `popover` / `popover-button` | compound Radix `Popover` + parts · `PopoverButton` (self-contained trigger + panel, hover-open, lazy children, `closeSignal`) |
+| `menu` / `context-menu` | `Menu`, `MenuTrigger/Content/Item/Separator/Label`, `ActionMenu` (items-driven) · `ContextMenu` (coordinate-anchored, `{x, y, items, onClose}`) |
+| `combobox` | `Combobox`, `ComboboxMulti` — async mode (`onSearchChange` + `loading`), grouping, full keyboard nav |
+| `tooltip` | `Tooltip` + parts, `InfoTooltip` |
+| `wizard` | `Wizard` (steps config + `renderStep`, per-step validation gates, modal/drawer variants), `Stepper` (dots/labels) |
+| `input` / `search-input` / `expandable-search` | `Input` (label/hint/error wiring) · `SearchInput` · `ExpandableSearch` |
+| `check-indicator` / `selection-bar` / `view-toggle` | `CheckIndicator` (tri-state) · `SelectionBar` (bulk-select bar) · `ViewToggle` (grid/list) |
+| `error-banner` / `undo-notice` / `empty-state` / `spinner` | presentational feedback: alert banner with `action` slot · undo toast · `EmptyState` · `Spinner` |
+| `info-button` / `field-label` | `InfoButton` (info popover) · `FieldLabel` (label + info affordance) |
+| `marquee` | `useMarquee`, `MarqueeSurface`, `MarqueeBand` (rubber-band selection) |
+| `portal` / `theme-scope` / `tokens` | `Portal` · `ThemeScope` · token name lists + types |
 
 API rules: controlled-first, `className` merges (never replaces), `asChild`
 where it makes sense, refs forwarded everywhere, English label props with

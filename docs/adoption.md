@@ -113,40 +113,34 @@ Dependabot (npm ecosystem, weekly, allow-listed to
 bump PR like any other. See study's `.github/dependabot.yml` for the
 pattern.
 
-## 7. Agent skill (one-time per app)
+## 7. Agent skill + AGENTS.md (one-time per app)
 
-Create `.opencode/skills/<app-prefix>-assistant-ui/SKILL.md`
-(`sa-`/`ca-`/`ha-` prefix per family convention):
+Copy **study-assistant's**
+`.opencode/skills/sa-assistant-ui/SKILL.md` (the canonical, maintained
+version) to `.opencode/skills/<app-prefix>-assistant-ui/SKILL.md`
+(`sa-`/`ca-`/`ha-` prefix per family convention) and adapt repo paths.
+Commit it so every agent session in the app repo loads it.
 
-```markdown
----
-name: sa-assistant-ui
-description: Use when building UI in this app with @neuronection/assistant-ui — import patterns, CSS order, theming, the check-library-first rule, and how to test local library changes. Use BEFORE creating any new ui/ component or touching an existing one.
----
+The skill makes agents treat the package as **first-party**, and encodes:
 
-# Using assistant-ui in study-assistant
+- **Check-library-first** — no local copies of library components (the
+  drift audit enforces weekly); if the API doesn't fit, *change the
+  library*, never fork/wrap it.
+- **How to explore what's implemented** — module inventory + authoritative
+  API via the installed package's `dist/*.d.ts`, the gallery for visuals,
+  CHANGELOG on the library repo for what's new, `package.json` for the
+  installed version.
+- **Conventions** — per-module imports, `cn()`, ui/ re-export shims as the
+  import path + exit hatch, `--as-*`/`data-as-*` styling, label props +
+  i18n at call sites, app-coupled glue stays app-side.
+- **The contribution workflow** — two-app rule, library repo rules
+  (boundary, tokens, tests+axe, story, changeset), verification via
+  `scripts/verify-in-app.mjs`, release via changesets, never editing
+  `node_modules`.
 
-- Import from `@neuronection/assistant-ui` (per-module entries: `/button`,
-  `/modal`, …). `cn()` is exported too.
-- CSS order in the entry: app CSS → `@neuronection/assistant-ui/styles.css`
-  → `./theme.css` (identity tokens — overrides only).
-- Styling hooks: `--as-*` tokens and `data-as-*` attributes — never internal
-  class names.
-- **Check-library-first:** before writing any new shared-looking UI
-  component, check the library's catalog (gallery / README). If it exists
-  there, import it — do not create a local copy. Local copies of library
-  components are deleted in the same commit they're replaced (drift audit
-  flags regressions weekly).
-- Labels: components take English-default props — pass translated strings
-  from i18next at call sites.
-- To test local library changes: dev server — in `../assistant-ui` run
-  `pnpm watch` + `node scripts/dev-link.mjs link <this-app-frontend>`;
-  test suite — `node scripts/verify-in-app.mjs <this-app-frontend>`
-  (tarball flow; never commit linked manifests).
-```
-
-Adapt name/paths per app; commit it so every agent session in the app repo
-loads it.
+Also add a short "Shared UI library" section to the app's `AGENTS.md`
+pointing at the skill with the check-library-first rule — AGENTS.md loads
+in every session; skills load on trigger.
 
 ## Verifying before you commit an adoption PR
 
