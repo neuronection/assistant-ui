@@ -115,11 +115,11 @@ pattern.
 
 ## 7. Agent skill + AGENTS.md (one-time per app)
 
-Copy **study-assistant's**
-`.opencode/skills/sa-assistant-ui/SKILL.md` (the canonical, maintained
-version) to `.opencode/skills/<app-prefix>-assistant-ui/SKILL.md`
-(`sa-`/`ca-`/`ha-` prefix per family convention) and adapt repo paths.
-Commit it so every agent session in the app repo loads it.
+Create `.opencode/skills/<app-prefix>-assistant-ui/SKILL.md`
+(`sa-`/`ca-`/`ha-` prefix per family convention). **Skills are local-only
+— never committed** (family policy; the library repo's `.opencode` is
+gitignored too). Copy a sibling app's skill from its local checkout as the
+starting point and keep your own backups, like `dev/plans/`.
 
 The skill makes agents treat the package as **first-party**, and encodes:
 

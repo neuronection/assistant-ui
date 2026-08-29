@@ -6,5 +6,4 @@ dev/
 *.tsbuildinfo
 .ladle/cache/
 build/
-.opencode/*
-!.opencode/skills/
+.opencode
