@@ -10,3 +10,4 @@ export {
   modalContentVariants,
   type ModalContentProps,
 } from './Modal'
+export { PanelModal, type PanelModalProps } from './PanelModal'

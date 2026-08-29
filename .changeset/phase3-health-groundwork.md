@@ -8,4 +8,8 @@ Phase-3 groundwork for health-assistant adoption: `FormModal` gains
 fallback, copied state, `onCopied`/`onCopyError` callbacks — apps own
 toasts/i18n) and `Breadcrumbs` (router-free: `linkComponent` prop for SPA
 links); `themes/health.css` now matches health's real blue-600 accent with a
-`.dark` token block for its class-based dark mode.
+`.dark` token block for its class-based dark mode. New `PanelModal`:
+header (icon/title/actions/close) + scrollable body + sticky footer,
+full-screen on mobile — the shared shape both career and health used as
+their hand-rolled `Modal`. `DatePicker` gains `variant="unstyled"` for
+inline dense usage.

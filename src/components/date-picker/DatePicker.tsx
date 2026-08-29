@@ -47,6 +47,7 @@ export interface DatePickerProps {
   weekStartsOn?: 0 | 1
   disabled?: boolean
   required?: boolean
+  variant?: 'default' | 'unstyled'
   id?: string
   name?: string
   label?: string
@@ -75,6 +76,7 @@ export const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
       weekStartsOn = 1,
       disabled = false,
       required,
+      variant = 'default',
       id,
       name,
       label = 'Choose date',
@@ -236,18 +238,28 @@ export const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
                 type="button"
                 aria-label={label}
                 className={cn(
-                  'flex h-9 w-full items-center gap-2 rounded-[var(--as-radius)] border border-[var(--as-border)] bg-[var(--as-surface)] px-3 py-2 text-left text-sm text-[var(--as-fg)] transition-colors hover:border-[var(--as-fg)]/30 focus-visible:border-[var(--as-focus-ring)] focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[var(--as-focus-ring)] disabled:cursor-not-allowed disabled:opacity-50',
-                  allowClear && selectedDate && !disabled && 'pr-8',
+                  'disabled:cursor-not-allowed disabled:opacity-50',
+                  variant === 'default'
+                    ? 'flex h-9 w-full items-center gap-2 rounded-[var(--as-radius)] border border-[var(--as-border)] bg-[var(--as-surface)] px-3 py-2 text-left text-sm text-[var(--as-fg)] transition-colors hover:border-[var(--as-fg)]/30 focus-visible:border-[var(--as-focus-ring)] focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[var(--as-focus-ring)]'
+                    : 'flex items-center gap-1 text-left text-sm text-[var(--as-fg)] outline-none focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[var(--as-focus-ring)]',
+                  variant === 'default' &&
+                    allowClear &&
+                    selectedDate &&
+                    !disabled &&
+                    'pr-8',
                 )}
               >
-                <CalendarIcon
-                  className="size-4 shrink-0 text-[var(--as-muted-fg)]"
-                  aria-hidden
-                />
+                {variant === 'default' ? (
+                  <CalendarIcon
+                    className="size-4 shrink-0 text-[var(--as-muted-fg)]"
+                    aria-hidden
+                  />
+                ) : null}
                 <span
                   className={cn(
                     'flex-1 truncate text-left',
-                    !selectedDate && 'text-[var(--as-muted-fg)]',
+                    !selectedDate &&
+                      (variant === 'default' ? 'text-[var(--as-muted-fg)]' : 'opacity-70'),
                   )}
                 >
                   {selectedDate

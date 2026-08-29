@@ -94,6 +94,8 @@ export {
 } from './components/menu'
 export {
   Modal,
+  PanelModal,
+  type PanelModalProps,
   ModalClose,
   ModalContent,
   ModalDescription,

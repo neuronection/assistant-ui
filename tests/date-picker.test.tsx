@@ -144,3 +144,16 @@ describe('DatePicker', () => {
     expect(await axe(document.body)).toHaveNoViolations()
   })
 })
+
+describe('DatePicker (unstyled variant)', () => {
+  it('omits trigger chrome and keeps the value text', async () => {
+    const user = userEvent.setup()
+    render(<DatePickerDemo variant="unstyled" className="w-28 text-xs" />)
+    const trigger = screen.getByRole('button', { name: 'Choose date' })
+    expect(trigger).not.toHaveClass('border')
+    await user.click(trigger)
+    expect(await screen.findByRole('grid')).toBeInTheDocument()
+    await user.click(dayButton('2026-08-05')!)
+    expect(screen.getByRole('button', { name: 'Choose date' })).toHaveTextContent('05/08/2026')
+  })
+})

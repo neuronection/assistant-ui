@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { axe } from 'jest-axe'
@@ -12,6 +12,7 @@ import {
   ModalTitle,
   ModalTrigger,
 } from '../src/components/modal/Modal'
+import { PanelModal } from '../src/components/modal/PanelModal'
 import { Button } from '../src/components/button/Button'
 
 function DemoModal() {
@@ -72,5 +73,79 @@ describe('Modal', () => {
     await user.click(screen.getByRole('button', { name: 'Open' }))
     await screen.findByRole('dialog')
     expect(await axe(container)).toHaveNoViolations()
+  })
+})
+
+describe('PanelModal', () => {
+  it('renders title, body and footer with a close button', async () => {
+    render(
+      <PanelModal open onOpenChange={() => {}} title="Details" footer={<button>Save</button>}>
+        <p>Panel body</p>
+      </PanelModal>,
+    )
+    expect(await screen.findByRole('dialog')).toBeInTheDocument()
+    expect(screen.getByText('Details')).toBeInTheDocument()
+    expect(screen.getByText('Panel body')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Save' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Close' })).toBeInTheDocument()
+  })
+
+  it('hideHeader keeps a floating close button', async () => {
+    render(
+      <PanelModal open onOpenChange={() => {}} title="Hidden" hideHeader>
+        <p>Body</p>
+      </PanelModal>,
+    )
+    await screen.findByRole('dialog')
+    expect(screen.queryByText('Hidden')).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Close' })).toBeInTheDocument()
+  })
+
+  it('Escape closes via onOpenChange (keyboard)', async () => {
+    const user = userEvent.setup()
+    const onOpenChange = vi.fn()
+    render(
+      <PanelModal open onOpenChange={onOpenChange} title="Esc">
+        <button>Focusable</button>
+      </PanelModal>,
+    )
+    await screen.findByRole('dialog')
+    await user.keyboard('{Escape}')
+    expect(onOpenChange).toHaveBeenCalledWith(false)
+  })
+
+  it('headerActions render in the header', async () => {
+    render(
+      <PanelModal
+        open
+        onOpenChange={() => {}}
+        title="T"
+        headerActions={<button type="button">Act</button>}
+      >
+        <p>b</p>
+      </PanelModal>,
+    )
+    await screen.findByRole('dialog')
+    expect(screen.getByRole('button', { name: 'Act' })).toBeInTheDocument()
+  })
+
+  it('size applies the desktop max-width', async () => {
+    render(
+      <PanelModal open onOpenChange={() => {}} title="Wide" size="lg">
+        <p>b</p>
+      </PanelModal>,
+    )
+    await screen.findByRole('dialog')
+    expect(document.body.querySelector('[data-as="panel-modal"]')).toHaveClass('sm:max-w-4xl')
+  })
+
+  it('open state has no axe violations', async () => {
+    render(
+      <PanelModal open onOpenChange={() => {}} title="A11y" footer={<button>Ok</button>}>
+        <p>body</p>
+      </PanelModal>,
+    )
+    await screen.findByRole('dialog')
+    expect(await axe(document.body)).toHaveNoViolations()
   })
 })
