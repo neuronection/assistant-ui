@@ -1,5 +1,32 @@
 # @neuronection/assistant-ui
 
+## 0.5.0
+
+### Minor Changes
+
+- [`59c5f5a`](https://github.com/neuronection/assistant-ui/commit/59c5f5a545f230c88e11b056088bfbbf991dd5a8) Thanks [@constLiakos](https://github.com/constLiakos)! - Phase-4 assistant patterns: new `AiButton` (sparkles trigger + popover with
+  suggestion chips, typed prompt, loading/error state and an `onResponse` render
+  slot — the app owns the API call) and `AiActionsDropdown` (action list +
+  optional custom prompt, `onAction`/`onPrompt` callbacks). `AiBadge` folds into
+  the existing `Badge variant="ai"` instead of a new component; health's live
+  task-monitor AIBadge stays app-side (store-coupled, ADR-006).
+
+### Patch Changes
+
+- [`8df2f7a`](https://github.com/neuronection/assistant-ui/commit/8df2f7ad0baee8649e73318857a2c9d9baa6354c) Thanks [@constLiakos](https://github.com/constLiakos)! - `ChipList`/`ChipVariant`: add an `info` variant (accent tint) — health's
+  taxonomy chips use it.
+
+- [`2b3da08`](https://github.com/neuronection/assistant-ui/commit/2b3da0894dc56fa6814a083ba0700692a0b70cfb) Thanks [@constLiakos](https://github.com/constLiakos)! - `Table`'s `emptyText` is opt-in now: an empty table renders no filler row
+  unless `emptyText` is provided (health-assistant shows nothing for empty
+  tables; pass `emptyText` to keep the previous default-row behavior).
+
+- [`8cce666`](https://github.com/neuronection/assistant-ui/commit/8cce666585b7a7cb4553c1c34e359d9fdaaa3c82) Thanks [@constLiakos](https://github.com/constLiakos)! - Overlay stacking is token-driven: new `--as-z-modal` and `--as-z-popover`
+  (default 50, see `tokens.css`) replace the hardcoded `z-50` on modal,
+  popover, menu, combobox, tooltip and wizard surfaces. Apps with high-z chrome
+  (health's sidebar at z-950) raise them in `theme.css`. Also: for Tailwind 3
+  apps, import `styles.css` **before** the app's own CSS so app variant
+  utilities (`lg:relative` vs a library `.fixed`) win the cascade.
+
 ## 0.4.0
 
 ### Minor Changes
