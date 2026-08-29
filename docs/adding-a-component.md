@@ -1,0 +1,64 @@
+# Adding a component
+
+Checklist for landing a new component in the library.
+
+## Before you build
+
+- **Two-app rule**: is it needed by ≥2 family apps? If it exists in only one
+  app, it belongs on the "decide-and-record" list (see
+  `dev/plans/03-component-catalog.md` locally) until a second app needs it.
+- **Boundary (ADR-006)**: presentational + controlled only. No fetching, no
+  stores, no router, no i18n engine, no API keys. Data in, events out.
+- **React 18 + Tailwind 3/4 compatibility**: no React-19-only APIs (banned by
+  lint), no assumptions about the app's Tailwind.
+
+## Implementation rules
+
+1. `forwardRef` on every DOM-emitting component.
+2. `className` merges via `cn(internal, className)` — never replaces.
+3. `asChild` (Radix Slot) where composition matters.
+4. Controlled-first: `value` + `onValueChange`; `defaultValue` if cheap.
+5. Semantic `--as-*` tokens only — no raw colors in component code.
+6. `data-as="<component>"` attribute on the root element.
+7. Label/button strings via props with English defaults (apps translate at
+   call sites; all three apps use i18next).
+8. Icons via props (`icon?: LucideIcon`) with conservative defaults.
+
+## File layout
+
+```
+src/components/<name>/
+├── <Name>.tsx
+└── index.ts        (public re-exports)
+```
+
+Then wire it up:
+
+- `src/index.ts` — add exports
+- `package.json` `exports` + `tsup.config.ts` entry (per-module entry point)
+- `scripts/audit-usage.mjs` — add the names drift-audit should catch
+
+## Required companions (same PR)
+
+- **Tests** (`tests/<name>.test.tsx`): render + interaction + **keyboard-nav
+  assertions** + jest-axe. Keyboard tests are not deferred to later.
+- **Ladle story** (`playground/<name>.stories.tsx`): the gallery is the review
+  surface for design.
+- **Changeset** (`pnpm changeset`): minor for the new component.
+
+## Verify
+
+```bash
+pnpm verify          # lint + typecheck + test + build
+```
+
+Check the component in a real app via the [local dev loop](./local-development.md)
+before merging, especially if it replaces an existing app component
+(same-commit delete rule).
+
+## After a component replaces app-local copies
+
+When apps adopt it: the app PR **deletes the local copy and imports the
+library in the same commit**. No wrappers, no TODOs. The weekly drift-audit
+workflow in each app (snippet: `.github/drift-audit.snippet.yml`) catches
+regressions.

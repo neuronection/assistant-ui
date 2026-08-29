@@ -27,12 +27,14 @@ not a general-purpose design system.
 
 ## Workflow
 
-1. Branch, code, add/update stories and tests.
+1. Branch, code, add/update stories and tests
+   ([adding a component](./docs/adding-a-component.md)).
 2. `pnpm verify` (lint + typecheck + test + build).
 3. Add a changeset: `pnpm changeset` — patch / minor / major per
-   [04-versioning](./dev/plans) discipline.
-4. PR; CI must be green (incl. the React×Tailwind smoke matrix).
-5. Merging to `main` triggers the Changesets version PR; merging that
+   [publishing](./docs/publishing.md) discipline.
+4. Test in a real app via the [local dev loop](./docs/local-development.md).
+5. PR; CI must be green (incl. the React×Tailwind smoke matrix).
+6. Merging to `main` triggers the Changesets version PR; merging that
    publishes to npm with provenance. Nobody publishes from a laptop.
 
 ## App adoption rules (for the three apps)

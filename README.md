@@ -55,6 +55,13 @@ Tailwind is **not** required — but if your app uses Tailwind 3 or 4, both work
 without configuration. Do **not** add this package to your Tailwind
 `content`/`@source`.
 
+## Documentation
+
+- [Local development](./docs/local-development.md) — live-test library changes in the family apps without publishing
+- [Theming](./docs/theming.md) — tokens, app themes, styling hooks
+- [Publishing](./docs/publishing.md) — the Changesets release flow and CI setup
+- [Adding a component](./docs/adding-a-component.md) — rules, checklist, required companions
+
 ## Components
 
 Button, Badge, Card (+Header/Title/Description/Content/Footer), Modal
@@ -77,7 +84,8 @@ pnpm test --watch
 pnpm verify       # lint + typecheck + test + build
 ```
 
-Testing library changes inside a real app (no publishing needed):
+Testing library changes inside a real app (no publishing needed) — full
+guide in [docs/local-development.md](./docs/local-development.md):
 
 ```bash
 pnpm watch                                  # library: rebuild TS + CSS on change
