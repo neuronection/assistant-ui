@@ -2,7 +2,13 @@ import * as React from 'react'
 import { ChevronRight, X } from 'lucide-react'
 import { cn } from '../../lib/utils'
 
-export type ChipVariant = 'neutral' | 'primary' | 'success' | 'warning' | 'danger'
+export type ChipVariant =
+  | 'neutral'
+  | 'primary'
+  | 'info'
+  | 'success'
+  | 'warning'
+  | 'danger'
 
 export interface ChipListProps extends React.ComponentProps<'div'> {
   items: ReadonlyArray<string | null | undefined>
@@ -16,6 +22,7 @@ export interface ChipListProps extends React.ComponentProps<'div'> {
 
 const chipTints: Record<Exclude<ChipVariant, 'neutral'>, string> = {
   primary: 'bg-[color-mix(in_srgb,var(--as-primary)_12%,transparent)] text-[var(--as-primary)]',
+  info: 'bg-[color-mix(in_srgb,var(--as-primary)_12%,transparent)] text-[var(--as-primary)]',
   success:
     'bg-[color-mix(in_srgb,var(--as-success)_14%,transparent)] text-[var(--as-success)]',
   warning:
