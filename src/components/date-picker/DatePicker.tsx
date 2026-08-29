@@ -302,7 +302,7 @@ export const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
               target?.focus()
             }}
             className={cn(
-              'as-anim-pop z-50 w-[280px] rounded-[var(--as-radius-lg)] border border-[var(--as-border)] bg-[var(--as-surface-raised)] p-2 text-[var(--as-fg)] shadow-[var(--as-shadow-3)] outline-none',
+              'as-anim-pop z-[var(--as-z-popover)] w-[280px] rounded-[var(--as-radius-lg)] border border-[var(--as-border)] bg-[var(--as-surface-raised)] p-2 text-[var(--as-fg)] shadow-[var(--as-shadow-3)] outline-none',
               panelClassName,
             )}
           >

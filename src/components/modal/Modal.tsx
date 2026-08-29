@@ -36,13 +36,13 @@ export const ModalContent = React.forwardRef<
     <DialogPrimitive.Portal>
       <DialogPrimitive.Overlay
         data-as="modal-overlay"
-        className={cn('as-anim-fade fixed inset-0 z-50 bg-[var(--as-overlay)]')}
+        className={cn('as-anim-fade fixed inset-0 z-[var(--as-z-modal)] bg-[var(--as-overlay)]')}
       />
       <DialogPrimitive.Content
         ref={ref}
         data-as="modal"
         className={cn(
-          'as-anim-modal fixed left-1/2 top-1/2 z-50 flex max-h-[85vh] w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 flex-col overflow-y-auto rounded-[var(--as-radius-lg)] border border-[var(--as-border)] bg-[var(--as-surface-raised)] text-[var(--as-fg)] shadow-[var(--as-shadow-3)] focus:outline-none',
+          'as-anim-modal fixed left-1/2 top-1/2 z-[var(--as-z-modal)] flex max-h-[85vh] w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 flex-col overflow-y-auto rounded-[var(--as-radius-lg)] border border-[var(--as-border)] bg-[var(--as-surface-raised)] text-[var(--as-fg)] shadow-[var(--as-shadow-3)] focus:outline-none',
           modalContentVariants({ size }),
           className,
         )}

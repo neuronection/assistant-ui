@@ -37,6 +37,9 @@
     --as-focus-ring: var(--as-accent);
     --as-overlay: oklch(0 0 0 / 0.6);
 
+    --as-z-modal: 50;
+    --as-z-popover: 50;
+
     --as-radius-sm: calc(var(--as-radius) - 0.25rem);
     --as-radius: 0.625rem;
     --as-radius-lg: calc(var(--as-radius) + 0.25rem);

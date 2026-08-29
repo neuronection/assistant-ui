@@ -67,14 +67,14 @@ export const PanelModal = React.forwardRef<
       <DialogPrimitive.Portal>
         <DialogPrimitive.Overlay
           data-as="modal-overlay"
-          className="as-anim-fade fixed inset-0 z-50 bg-[var(--as-overlay)]"
+          className="as-anim-fade fixed inset-0 z-[var(--as-z-modal)] bg-[var(--as-overlay)]"
         />
         <DialogPrimitive.Content
           ref={ref}
           data-as="panel-modal"
           aria-describedby={undefined}
           className={cn(
-            'as-anim-pop fixed inset-0 z-50 flex flex-col overflow-y-auto bg-[var(--as-surface-raised)] text-[var(--as-fg)] shadow-[var(--as-shadow-3)] focus:outline-none',
+            'as-anim-pop fixed inset-0 z-[var(--as-z-modal)] flex flex-col overflow-y-auto bg-[var(--as-surface-raised)] text-[var(--as-fg)] shadow-[var(--as-shadow-3)] focus:outline-none',
             'sm:inset-auto sm:left-1/2 sm:top-1/2 sm:h-auto sm:max-h-[90vh] sm:w-auto sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-[var(--as-radius-lg)] sm:border sm:border-[var(--as-border)]',
             panelModalVariants({ size }),
             className,

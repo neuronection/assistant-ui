@@ -129,7 +129,7 @@ export function PopoverButton({
                 : undefined
             }
             className={cn(
-              'as-anim-pop z-50 w-80 rounded-[var(--as-radius-lg)] border border-[var(--as-border)] bg-[var(--as-surface-raised)] p-3 text-[var(--as-fg)] shadow-[var(--as-shadow-3)] outline-none',
+              'as-anim-pop z-[var(--as-z-popover)] w-80 rounded-[var(--as-radius-lg)] border border-[var(--as-border)] bg-[var(--as-surface-raised)] p-3 text-[var(--as-fg)] shadow-[var(--as-shadow-3)] outline-none',
               panelClassName,
             )}
           >

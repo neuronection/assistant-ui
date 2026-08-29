@@ -17,7 +17,7 @@ export const TooltipContent = React.forwardRef<
         data-as="tooltip"
         sideOffset={sideOffset}
         className={cn(
-          'as-anim-fade z-50 max-w-64 rounded-[var(--as-radius)] bg-[var(--as-fg)] px-3 py-1.5 text-xs font-medium text-[var(--as-surface)] shadow-[var(--as-shadow-2)] focus:outline-none',
+          'as-anim-fade z-[var(--as-z-popover)] max-w-64 rounded-[var(--as-radius)] bg-[var(--as-fg)] px-3 py-1.5 text-xs font-medium text-[var(--as-surface)] shadow-[var(--as-shadow-2)] focus:outline-none',
           className,
         )}
         {...props}

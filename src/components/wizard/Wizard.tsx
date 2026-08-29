@@ -184,7 +184,7 @@ export function Wizard({
       <DialogPrimitive.Portal>
         <DialogPrimitive.Overlay
           data-as="wizard-overlay"
-          className="as-anim-fade fixed inset-0 z-50 bg-[var(--as-overlay)]"
+          className="as-anim-fade fixed inset-0 z-[var(--as-z-modal)] bg-[var(--as-overlay)]"
         />
         <DialogPrimitive.Content
           data-as="wizard"
@@ -192,8 +192,8 @@ export function Wizard({
           className={cn(
             'flex flex-col overflow-hidden border border-[var(--as-border)] bg-[var(--as-surface-raised)] text-[var(--as-fg)] shadow-[var(--as-shadow-3)] focus:outline-none',
             variant === 'drawer'
-              ? 'as-anim-drawer fixed inset-y-0 right-0 z-50 h-full w-4/5 max-w-md border-l'
-              : 'as-anim-modal fixed left-1/2 top-1/2 z-50 max-h-[92vh] w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 rounded-[var(--as-radius-lg)]',
+              ? 'as-anim-drawer fixed inset-y-0 right-0 z-[var(--as-z-modal)] h-full w-4/5 max-w-md border-l'
+              : 'as-anim-modal fixed left-1/2 top-1/2 z-[var(--as-z-modal)] max-h-[92vh] w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 rounded-[var(--as-radius-lg)]',
             variant === 'modal' &&
               cn(
                 size === 'sm' && 'max-w-sm',

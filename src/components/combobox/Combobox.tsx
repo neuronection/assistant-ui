@@ -216,7 +216,7 @@ function ComboboxPanel(props: ComboboxPanelProps) {
         }
       }}
       className={cn(
-        'as-anim-pop z-50 w-[var(--radix-popover-trigger-width)] min-w-48 overflow-hidden rounded-[var(--as-radius-lg)] border border-[var(--as-border)] bg-[var(--as-surface-raised)] text-[var(--as-fg)] shadow-[var(--as-shadow-3)]',
+        'as-anim-pop z-[var(--as-z-popover)] w-[var(--radix-popover-trigger-width)] min-w-48 overflow-hidden rounded-[var(--as-radius-lg)] border border-[var(--as-border)] bg-[var(--as-surface-raised)] text-[var(--as-fg)] shadow-[var(--as-shadow-3)]',
         panelClassName,
       )}
       data-as="combobox-panel"

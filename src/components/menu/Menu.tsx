@@ -19,7 +19,7 @@ export const MenuContent = React.forwardRef<
         sideOffset={sideOffset}
         collisionPadding={8}
         className={cn(
-          'as-anim-pop z-50 min-w-40 overflow-hidden rounded-[var(--as-radius-lg)] border border-[var(--as-border)] bg-[var(--as-surface-raised)] p-1 text-[var(--as-fg)] shadow-[var(--as-shadow-3)]',
+          'as-anim-pop z-[var(--as-z-popover)] min-w-40 overflow-hidden rounded-[var(--as-radius-lg)] border border-[var(--as-border)] bg-[var(--as-surface-raised)] p-1 text-[var(--as-fg)] shadow-[var(--as-shadow-3)]',
           className,
         )}
         {...props}

@@ -32,6 +32,8 @@ export const semanticTokens = [
   '--as-ai-fg',
   '--as-focus-ring',
   '--as-overlay',
+  '--as-z-modal',
+  '--as-z-popover',
   '--as-radius-sm',
   '--as-radius',
   '--as-radius-lg',
