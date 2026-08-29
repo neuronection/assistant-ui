@@ -13,6 +13,12 @@ export {
 export { Portal, type PortalProps } from './components/portal'
 export { ThemeScope, type ThemeScopeProps } from './components/theme-scope'
 
+export {
+  AiActionsDropdown,
+  type AiAction,
+  type AiActionsDropdownProps,
+} from './components/ai-actions-dropdown'
+export { AiButton, type AiButtonProps } from './components/ai-button'
 export { Badge, badgeVariants, type BadgeProps } from './components/badge'
 export {
   Breadcrumbs,

@@ -23,6 +23,14 @@
       "import": "./dist/index.js"
     },
     "./styles.css": "./dist/styles.css",
+    "./ai-actions-dropdown": {
+      "types": "./dist/ai-actions-dropdown.d.ts",
+      "import": "./dist/ai-actions-dropdown.js"
+    },
+    "./ai-button": {
+      "types": "./dist/ai-button.d.ts",
+      "import": "./dist/ai-button.js"
+    },
     "./badge": {
       "types": "./dist/badge.d.ts",
       "import": "./dist/badge.js"

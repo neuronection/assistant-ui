@@ -4,6 +4,8 @@ export default defineConfig({
   entry: {
     index: 'src/index.ts',
     tokens: 'src/tokens/tokens.ts',
+    'ai-actions-dropdown': 'src/components/ai-actions-dropdown/index.ts',
+    'ai-button': 'src/components/ai-button/index.ts',
     badge: 'src/components/badge/index.ts',
     breadcrumbs: 'src/components/breadcrumbs/index.ts',
     button: 'src/components/button/index.ts',

@@ -2,6 +2,9 @@ import { readdir, readFile } from 'node:fs/promises'
 import { join, basename } from 'node:path'
 
 const LIBRARY_COMPONENTS = [
+  'AiActionsDropdown',
+  'AiBadge',
+  'AiButton',
   'Badge',
   'Breadcrumbs',
   'Button',

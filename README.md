@@ -89,6 +89,7 @@ files in the package's `dist/`. Visual reference:
 | `error-banner` / `undo-notice` / `empty-state` / `spinner` | presentational feedback: alert banner with `action` slot · undo toast · `EmptyState` · `Spinner` |
 | `info-button` / `field-label` | `InfoButton` (info popover) · `FieldLabel` (label + info affordance) |
 | `copy-button` / `breadcrumbs` | `CopyButton` (clipboard + copied state) · `Breadcrumbs` (SPA links via `linkComponent`) |
+| `ai-button` / `ai-actions-dropdown` | `AiButton` (suggestions + prompt + response slot) · `AiActionsDropdown` (action list + custom prompt) |
 | `marquee` | `useMarquee`, `MarqueeSurface`, `MarqueeBand` (rubber-band selection) |
 | `portal` / `theme-scope` / `tokens` | `Portal` · `ThemeScope` · token name lists + types |
 
