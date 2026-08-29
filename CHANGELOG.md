@@ -1,5 +1,21 @@
 # @neuronection/assistant-ui
 
+## 0.4.0
+
+### Minor Changes
+
+- [`5b2ff4c`](https://github.com/neuronection/assistant-ui/commit/5b2ff4cc6304c90fa8b15497fd554fd0a14ced21) Thanks [@constLiakos](https://github.com/constLiakos)! - Phase-3 groundwork for health-assistant adoption: `FormModal` gains
+  `headerActions`, `onReject`/`rejectLabel`, `hideFooter` and `bodyClassName`
+  (health's HITL flows need them); new `CopyButton` (clipboard with legacy
+  fallback, copied state, `onCopied`/`onCopyError` callbacks — apps own
+  toasts/i18n) and `Breadcrumbs` (router-free: `linkComponent` prop for SPA
+  links); `themes/health.css` now matches health's real blue-600 accent with a
+  `.dark` token block for its class-based dark mode. New `PanelModal`:
+  header (icon/title/actions/close) + scrollable body + sticky footer,
+  full-screen on mobile — the shared shape both career and health used as
+  their hand-rolled `Modal`. `DatePicker` gains `variant="unstyled"` for
+  inline dense usage.
+
 ## 0.3.0
 
 ### Minor Changes
