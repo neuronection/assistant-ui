@@ -77,11 +77,13 @@ pnpm test --watch
 pnpm verify       # lint + typecheck + test + build
 ```
 
-Testing library changes inside a real app (temporary, never commit):
+Testing library changes inside a real app (no publishing needed):
 
-```jsonc
-// app package.json pnpm.overrides
-{ "@neuronection/assistant-ui": "link:../assistant-ui/dist" }
+```bash
+pnpm watch                                  # library: rebuild TS + CSS on change
+node scripts/dev-link.mjs link <app-dir>    # wire app (pnpm override / npm file:)
+# ...run the app dev server; reload picks up library changes
+node scripts/dev-link.mjs unlink <app-dir>  # restore before committing in the app
 ```
 
 Releases happen via [Changesets](./CONTRIBUTING.md) — CI publishes, never a

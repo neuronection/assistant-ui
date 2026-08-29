@@ -1,9 +1,6 @@
-import { readFile, writeFile } from 'node:fs/promises'
 import postcss from 'postcss'
 
-const FILE = 'dist/styles.css'
-
-const unwrapper = {
+export const unwrapCss = {
   postcssPlugin: 'unwrap-layers',
   AtRule: {
     layer(atRule) {
@@ -16,12 +13,16 @@ const unwrapper = {
   },
 }
 
-const css = await readFile(FILE, 'utf8')
-const result = await postcss([unwrapper]).process(css, { from: FILE })
-await writeFile(FILE, result.css)
+const FILE = 'dist/styles.css'
 
-if (result.css.includes('@layer')) {
-  console.error('unwrap-layers: @layer rules remain in output')
-  process.exit(1)
+if (process.argv[1] && (process.argv[1].endsWith('unwrap-layers.mjs'))) {
+  const { readFile, writeFile } = await import('node:fs/promises')
+  const css = await readFile(FILE, 'utf8')
+  const result = await postcss([unwrapCss]).process(css, { from: FILE })
+  await writeFile(FILE, result.css)
+  if (result.css.includes('@layer')) {
+    console.error('unwrap-layers: @layer rules remain in output')
+    process.exit(1)
+  }
+  console.log(`unwrap-layers: wrote ${FILE} (${result.css.length} bytes, layers stripped)`)
 }
-console.log(`unwrap-layers: wrote ${FILE} (${result.css.length} bytes, layers stripped)`)
