@@ -6,4 +6,5 @@ dev/
 *.tsbuildinfo
 .ladle/cache/
 build/
-.opencode*.tgz
+.opencode/
+*.tgz
