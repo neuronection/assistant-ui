@@ -11,13 +11,19 @@ pnpm add @neuronection/assistant-ui   # or: npm i @neuronection/assistant-ui
 
 ## 2. Import CSS (order matters)
 
-In the app entry, after the app's own CSS:
-
 ```ts
-import "./index.css";                              // app CSS first
-import "@neuronection/assistant-ui/styles.css";    // tokens + components
+import "@neuronection/assistant-ui/styles.css";    // tokens + components FIRST
+import "./index.css";                              // app CSS second
 import "./theme.css";                              // identity overrides, LAST
 ```
+
+Library CSS goes **before** the app's own CSS. Both ship unlayered, so on a
+Tailwind 3 app the cascade is decided by order at equal specificity — if the
+app loads last, its variant utilities (e.g. `lg:relative` on a layout column)
+can beat the library's base utilities (`.fixed`), and vice versa. App-last
+keeps layout utilities app-owned; the library's own components are unaffected
+because app utilities with the same name define the same properties.
+(Tailwind 4 apps are layered, so order doesn't matter there.)
 
 Start `theme.css` from `themes/<app>.css` in the library repo. Do **not**
 add the package to the app's Tailwind `content`/`@source` — the CSS is
