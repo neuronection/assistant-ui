@@ -15,6 +15,10 @@ export interface AiButtonProps {
   loadingLabel?: string
   placeholder?: string
   disabled?: boolean
+  /** Controlled open state (defaults to internal). */
+  open?: boolean
+  defaultOpen?: boolean
+  onOpenChange?: (open: boolean) => void
   /** Show the label text next to the icon (default true; icon-only when false). */
   showLabel?: boolean
   /** Close the panel after a submit (form-fill flows; Q&A keeps it open). */
@@ -39,6 +43,9 @@ export const AiButton = React.forwardRef<HTMLButtonElement, AiButtonProps>(
       loadingLabel = 'Thinking…',
       placeholder,
       disabled = false,
+      open: openProp,
+      defaultOpen = false,
+      onOpenChange,
       showLabel = true,
       closeOnSubmit = false,
       side = 'bottom',
@@ -48,8 +55,15 @@ export const AiButton = React.forwardRef<HTMLButtonElement, AiButtonProps>(
     },
     ref,
   ) {
-    const [open, setOpen] = React.useState(false)
+    const [uncontrolledOpen, setUncontrolledOpen] = React.useState(defaultOpen)
+    const isControlled = openProp !== undefined
+    const open = isControlled ? openProp : uncontrolledOpen
     const [prompt, setPrompt] = React.useState('')
+
+    const setOpen = (next: boolean) => {
+      if (!isControlled) setUncontrolledOpen(next)
+      onOpenChange?.(next)
+    }
 
     const send = (value: string) => {
       const trimmed = value.trim()

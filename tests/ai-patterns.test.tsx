@@ -65,6 +65,27 @@ describe('AiButton', () => {
     expect(screen.getByRole('status')).toHaveTextContent('Thinking…')
   })
 
+  it('supports controlled open (close only on success)', async () => {
+    const user = userEvent.setup()
+    function Controlled() {
+      const [open, setOpen] = React.useState(false)
+      return (
+        <AiButton
+          open={open}
+          onOpenChange={setOpen}
+          onSubmit={() => setOpen(false)}
+          error={undefined}
+        />
+      )
+    }
+    render(<Controlled />)
+    await user.click(screen.getByRole('button', { name: 'Ask AI' }))
+    const panel = screen.getByRole('dialog')
+    expect(panel).toBeInTheDocument()
+    await user.type(screen.getByLabelText('Ask a question'), 'x{Enter}')
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+  })
+
   it('renders icon-only when showLabel is false', () => {
     render(<AiButton onSubmit={vi.fn()} showLabel={false} />)
     const trigger = screen.getByRole('button', { name: 'Ask AI' })
