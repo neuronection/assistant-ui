@@ -9,6 +9,7 @@ export interface ComboboxOption {
   label: string
   description?: string
   group?: string
+  badge?: string
   disabled?: boolean
 }
 
@@ -85,11 +86,18 @@ function ComboboxList({
         onMouseMove={() => onActiveIndexChange(index)}
         onClick={() => !option.disabled && onPick(option)}
       >
-        <span className="flex min-w-0 flex-col">
-          <span className="truncate">{option.label}</span>
-          {option.description ? (
-            <span className="truncate text-xs text-[var(--as-muted-fg)]">
-              {option.description}
+        <span className="flex min-w-0 flex-1 items-center gap-2 text-left">
+          <span className="flex min-w-0 flex-col">
+            <span className="truncate">{option.label}</span>
+            {option.description ? (
+              <span className="truncate text-xs text-[var(--as-muted-fg)]">
+                {option.description}
+              </span>
+            ) : null}
+          </span>
+          {option.badge ? (
+            <span className="shrink-0 rounded-full bg-[var(--as-secondary)] px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[var(--as-secondary-fg)]">
+              {option.badge}
             </span>
           ) : null}
         </span>

@@ -131,8 +131,19 @@ export {
   type ScaleSliderProps,
 } from './components/scale-slider'
 export { SearchInput, type SearchInputProps } from './components/search-input'
+export {
+  ModelPicker,
+  type ModelPickerModel,
+  type ModelPickerProps,
+  type ModelPickerProvider,
+} from './components/model-picker'
 export { SelectionBar, type SelectionBarProps } from './components/selection-bar'
 export { Spinner, type SpinnerProps } from './components/spinner'
+export {
+  TaskAssignmentPicker,
+  type TaskAssignmentPickerProps,
+  type TaskAssignmentTask,
+} from './components/task-assignment-picker'
 export { Table, type TableProps } from './components/table'
 export {
   Tooltip,

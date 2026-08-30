@@ -88,6 +88,7 @@ files in the package's `dist/`. Visual reference:
 | `check-indicator` / `selection-bar` / `view-toggle` | `CheckIndicator` (tri-state) · `SelectionBar` (bulk-select bar) · `ViewToggle` (grid/list) |
 | `error-banner` / `undo-notice` / `empty-state` / `spinner` | presentational feedback: alert banner with `action` slot · undo toast · `EmptyState` · `Spinner` |
 | `info-button` / `field-label` | `InfoButton` (info popover) · `FieldLabel` (label + info affordance) |
+| `model-picker` / `task-assignment-picker` | `ModelPicker` (grouped provider→model combobox, capability chips) · `TaskAssignmentPicker` (task → model mapping rows) |
 | `settings-shell` / `provider-form` / `connection-test-row` | `SettingsShell` (controlled two-pane nav) · `ProviderForm` (write-only key field) · `ConnectionTestRow` (idle/testing/ok/fail) |
 | `copy-button` / `breadcrumbs` | `CopyButton` (clipboard + copied state) · `Breadcrumbs` (SPA links via `linkComponent`) |
 | `ai-magic-fill` | `AiMagicFill` (describe-in-words → structured data prompt modal; app applies the data) |

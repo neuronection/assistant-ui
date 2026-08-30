@@ -41,6 +41,7 @@ const LIBRARY_COMPONENTS = [
   'ActionMenu',
   'Modal',
   'ModalContent',
+  'ModelPicker',
   'ModalHeader',
   'ModalTitle',
   'ModalDescription',

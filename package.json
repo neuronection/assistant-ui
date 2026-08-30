@@ -123,6 +123,14 @@
       "types": "./dist/modal.d.ts",
       "import": "./dist/modal.js"
     },
+    "./model-picker": {
+      "types": "./dist/model-picker.d.ts",
+      "import": "./dist/model-picker.js"
+    },
+    "./task-assignment-picker": {
+      "types": "./dist/task-assignment-picker.d.ts",
+      "import": "./dist/task-assignment-picker.js"
+    },
     "./popover": {
       "types": "./dist/popover.d.ts",
       "import": "./dist/popover.js"
