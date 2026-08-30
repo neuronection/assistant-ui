@@ -283,7 +283,7 @@ const TimeInput: React.FC<TimeInputProps> = ({
         onFocus()
         requestAnimationFrame(() => {
           const el = document.activeElement as HTMLInputElement | null
-          if (el) el.select()
+          if (el && typeof el.select === 'function') el.select()
         })
       }}
       onBlur={() => {
