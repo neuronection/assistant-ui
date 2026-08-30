@@ -1,5 +1,19 @@
 # @neuronection/assistant-ui
 
+## 0.6.0
+
+### Minor Changes
+
+- [`fc350c6`](https://github.com/neuronection/assistant-ui/commit/fc350c6a684eb85dd5ef18a73af5c0d1a368b315) Thanks [@constLiakos](https://github.com/constLiakos)! - New `AiMagicFill` (describe-in-words prompt modal over `FormModal`, with
+  busy/error states — the app applies the extracted data) and a `Textarea`
+  primitive with the same label/hint/error wiring as `Input`.
+
+- [`048e70a`](https://github.com/neuronection/assistant-ui/commit/048e70abfcaa349b8e61193ac85961ca834ca8b1) Thanks [@constLiakos](https://github.com/constLiakos)! - Phase-4 settings-trio blocks (part 1): `SettingsShell` (controlled two-pane
+  nav — router/store stay app-side), `ProviderForm` (name/base URL plus a
+  **write-only** masked API-key field; keyring stays app-side, ADR-006) and
+  `ConnectionTestRow` (idle/testing/ok/fail + latency presentation; the ping is
+  app-side). `Input`'s `label`/`hint` now accept ReactNode.
+
 ## 0.5.0
 
 ### Minor Changes
