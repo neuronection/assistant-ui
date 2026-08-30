@@ -1,5 +1,22 @@
 # @neuronection/assistant-ui
 
+## 0.8.0
+
+### Minor Changes
+
+- [`8f92588`](https://github.com/neuronection/assistant-ui/commit/8f92588f6b294c8661fd56d57991c394a1ac9dc1) Thanks [@constLiakos](https://github.com/constLiakos)! - New `TimePicker` (+ standalone `TimePickerContent`): clock-face time picker
+  with a 12h AM/PM UI over a 24-hour `HH:MM` value, editable HH:MM fields
+  (typing 13–23 or 0 normalizes the period), keyboard-navigable dial, and
+  default/unstyled trigger variants. New `TimeList`: chip-based editor for
+  `HH:MM` lists with per-chip pickers, remove-on-hover and a max cap.
+  Ported from health-assistant (i18n → label props, Radix popover, tokens).
+
+### Patch Changes
+
+- [`077def0`](https://github.com/neuronection/assistant-ui/commit/077def0835ab7d962b7dec04fd4e2cd26ff08bc3) Thanks [@constLiakos](https://github.com/constLiakos)! - `AiButton`: new `showLabel` (icon-only trigger), `closeOnSubmit`
+  (auto-close after submit) and controlled `open`/`onOpenChange` props
+  (close-on-success form-fill flows).
+
 ## 0.7.1
 
 ### Patch Changes
