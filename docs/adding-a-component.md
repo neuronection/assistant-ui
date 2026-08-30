@@ -23,6 +23,15 @@ Checklist for landing a new component in the library.
 7. Label/button strings via props with English defaults (apps translate at
    call sites; all three apps use i18next).
 8. Icons via props (`icon?: LucideIcon`) with conservative defaults.
+9. **No `-translate-x/y-*` utilities for overlay positioning.** On Tailwind 3
+   apps those class names also resolve through the app stylesheet
+   (transform-based) and double-apply with the library's translate-property
+   version — center with `inset-0` + `m-auto` instead (guarded by a CI test).
+10. **Overlay z-index goes through tokens** (`z-[var(--as-z-modal)]` /
+    `z-[var(--as-z-popover)]`) — never a literal, so apps can restack.
+11. App-glue files that shadow a library export name must import from
+    `'@neuronection/assistant-ui'` **directly** (not via the app barrel) or
+    the drift audit flags them.
 
 ## File layout
 

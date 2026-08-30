@@ -44,3 +44,11 @@ node scripts/verify-in-app.mjs <app-dir>   # run an app's test suite against a p
   `link:` overrides for pnpm apps.
 - tsup's own watch mode doesn't fire on this machine; `scripts/watch-ts.mjs`
   replaces it.
+- **TW3 apps double-apply translate utilities**: the library's TW4 CSS and an
+  app's TW3 CSS can emit the same `-translate-x/2` class with different
+  mechanics (translate property vs transform) — overlays ended up
+  off-screen once; never use translate utilities for positioning
+  (`inset-0` + `m-auto`; CI test guards it).
+- `pnpm build:ts` needs `NODE_OPTIONS=--max-old-space-size=8192` (already in
+  the `build` script) — the DTS worker OOMs at default heap with 40+ entry
+  points.

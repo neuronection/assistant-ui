@@ -18,22 +18,30 @@ library never hard-codes colors.
 ```
 
 - Components reference **semantic** tokens only (`bg-[var(--as-primary)]`).
-- A future dark theme re-maps raw→semantic under `prefers-color-scheme` /
-  `[data-as-theme="dark"]` — additive, no component rewrites.
+- **Dark mode is the same move**: remap the semantic tokens under a `.dark`
+  (or `[data-as-theme="dark"]`) selector in your `theme.css` — health-assistant
+  ships a class-based dark theme exactly this way, no component rewrites.
 
 Key semantic tokens: `--as-primary(-fg)`, `--as-secondary(-fg)`,
 `--as-surface(-raised)`, `--as-border`, `--as-fg`, `--as-muted(-fg)`,
 `--as-success/warning/danger(-fg)`, `--as-ai(-fg)`, `--as-focus-ring`,
-`--as-overlay`, `--as-radius(-sm/-lg)`, `--as-font-sans/mono`,
-`--as-shadow-1/2/3`.
+`--as-overlay`, `--as-z-modal` / `--as-z-popover` (overlay stacking — raise
+them in `theme.css` when your app chrome sits above the default 50),
+`--as-radius(-sm/-lg)`, `--as-font-sans/mono`, `--as-shadow-1/2/3`.
 
 ## App integration
 
 ```ts
-import "./index.css";                              // app's own CSS (any Tailwind)
-import "@neuronection/assistant-ui/styles.css";    // tokens + precompiled components
+import "@neuronection/assistant-ui/styles.css";    // tokens + precompiled components FIRST
+import "./index.css";                              // app's own CSS (any Tailwind) second
 import "./theme.css";                              // identity overrides — loaded LAST
 ```
+
+Library CSS goes **before** the app's own CSS: both bundles ship unlayered,
+so on Tailwind 3 apps the cascade is decided by order at equal specificity —
+app-last keeps layout utilities app-owned (e.g. an `lg:relative` column must
+beat the library's `.fixed`). Tailwind 4 apps are layered, so order doesn't
+matter there. Full reasoning in [adoption.md](./adoption.md).
 
 Minimal `theme.css` (`themes/` in this repo has per-app starting points):
 

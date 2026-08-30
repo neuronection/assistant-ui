@@ -100,6 +100,19 @@ popovers/menus will hit these differences:
   "new floating closes old floating" work through Radix layering instead
   of app-wide coordination.
 
+### Tailwind 3 cascade notes (learned the hard way)
+
+- **Never center library overlays with `-translate-x/y-1/2` utilities.** On
+  a TW3 app those class names may also resolve through the app's own
+  stylesheet (transform-based) *in addition to* the library's
+  translate-property version — the translation applies twice and the dialog
+  lands off-screen. The library centers with `inset-0` + auto margins;
+  keep it that way (a CI test guards it).
+- **Stacking is token-driven.** Library overlays use
+  `z-[var(--as-z-modal)]` / `z-[var(--as-z-popover)]` (default 50). If app
+  chrome sits higher (health's sidebar is z-950), raise the tokens in
+  `theme.css` instead of patching components.
+
 ## 5. Drift tripwire (one-time per app)
 
 Copy `.github/drift-audit.snippet.yml` from the library repo into the app's
