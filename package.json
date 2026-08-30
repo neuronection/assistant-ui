@@ -47,6 +47,10 @@
       "types": "./dist/card.d.ts",
       "import": "./dist/card.js"
     },
+    "./connection-test-row": {
+      "types": "./dist/connection-test-row.d.ts",
+      "import": "./dist/connection-test-row.js"
+    },
     "./check-indicator": {
       "types": "./dist/check-indicator.d.ts",
       "import": "./dist/check-indicator.js"
@@ -127,6 +131,10 @@
       "types": "./dist/popover-button.d.ts",
       "import": "./dist/popover-button.js"
     },
+    "./provider-form": {
+      "types": "./dist/provider-form.d.ts",
+      "import": "./dist/provider-form.js"
+    },
     "./portal": {
       "types": "./dist/portal.d.ts",
       "import": "./dist/portal.js"
@@ -158,6 +166,10 @@
     "./textarea": {
       "types": "./dist/textarea.d.ts",
       "import": "./dist/textarea.js"
+    },
+    "./settings-shell": {
+      "types": "./dist/settings-shell.d.ts",
+      "import": "./dist/settings-shell.js"
     },
     "./theme-scope": {
       "types": "./dist/theme-scope.d.ts",
@@ -191,7 +203,7 @@
     "watch:css": "node scripts/watch-css.mjs",
     "playground": "ladle serve -p 61000",
     "playground:build": "ladle build",
-    "build": "pnpm build:ts && pnpm build:css",
+    "build": "NODE_OPTIONS=--max-old-space-size=8192 pnpm build:ts && pnpm build:css",
     "build:ts": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\" && tsup",
     "build:css": "tailwindcss -i src/tokens/tokens.css -o dist/styles.css --minify && node scripts/unwrap-layers.mjs",
     "test": "vitest run",

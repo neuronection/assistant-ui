@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { Sparkles } from 'lucide-react'
 import { FormModal } from '../form-modal/FormModal'
-import { Textarea } from '../input/Textarea'
+import { Textarea } from '../textarea/Textarea'
 
 export interface AiMagicFillProps {
   open: boolean
@@ -69,7 +69,9 @@ export function AiMagicFill({
             id="ai-magic-fill-prompt"
             rows={5}
             value={prompt}
-            onChange={(event) => setPrompt(event.target.value)}
+            onChange={(event: React.ChangeEvent<HTMLTextAreaElement>) =>
+              setPrompt(event.target.value)
+            }
             placeholder={placeholder}
             className="resize-none leading-relaxed"
           />

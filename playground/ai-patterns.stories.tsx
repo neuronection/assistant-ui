@@ -6,7 +6,7 @@ import {
   type AiAction,
 } from '../src/components/ai-actions-dropdown/AiActionsDropdown'
 import { AiMagicFill } from '../src/components/ai-magic-fill/AiMagicFill'
-import { Textarea } from '../src/components/input/Textarea'
+import { Textarea } from '../src/components/textarea/Textarea'
 
 export const AiButtons = () => {
   const [answer, setAnswer] = useState('')

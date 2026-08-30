@@ -4,7 +4,7 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { axe } from 'jest-axe'
 import { Input } from '../src/components/input/Input'
-import { Textarea } from '../src/components/input/Textarea'
+import { Textarea } from '../src/components/textarea/Textarea'
 import { Spinner } from '../src/components/spinner/Spinner'
 
 describe('Input', () => {
