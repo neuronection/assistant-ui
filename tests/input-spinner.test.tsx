@@ -4,6 +4,7 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { axe } from 'jest-axe'
 import { Input } from '../src/components/input/Input'
+import { Textarea } from '../src/components/input/Textarea'
 import { Spinner } from '../src/components/spinner/Spinner'
 
 describe('Input', () => {
@@ -54,5 +55,31 @@ describe('React 18 API compliance', () => {
     const ref = React.createRef<HTMLInputElement>()
     render(<Input ref={ref} />)
     expect(ref.current).toBeInstanceOf(HTMLInputElement)
+  })
+})
+
+describe('Textarea', () => {
+  it('renders bare textarea when no label, hint or error is given', () => {
+    render(<Textarea placeholder="Notes" />)
+    const textarea = screen.getByPlaceholderText('Notes')
+    expect(textarea).toHaveAttribute('data-as', 'textarea')
+  })
+
+  it('associates label and error with the textarea', () => {
+    render(<Textarea label="Summary" error="Required" />)
+    expect(screen.getByLabelText('Summary')).toHaveAttribute('aria-invalid', 'true')
+    expect(screen.getByRole('alert')).toHaveTextContent('Required')
+  })
+
+  it('supports typing', async () => {
+    const user = userEvent.setup()
+    render(<Textarea label="Summary" />)
+    await user.type(screen.getByLabelText('Summary'), 'hello')
+    expect(screen.getByLabelText('Summary')).toHaveValue('hello')
+  })
+
+  it('has no axe violations', async () => {
+    const { container } = render(<Textarea label="Summary" hint="Markdown allowed" />)
+    expect(await axe(container)).toHaveNoViolations()
   })
 })

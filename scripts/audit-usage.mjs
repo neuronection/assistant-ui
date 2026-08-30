@@ -5,6 +5,7 @@ const LIBRARY_COMPONENTS = [
   'AiActionsDropdown',
   'AiBadge',
   'AiButton',
+  'AiMagicFill',
   'Badge',
   'Breadcrumbs',
   'Button',

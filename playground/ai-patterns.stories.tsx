@@ -5,6 +5,8 @@ import {
   AiActionsDropdown,
   type AiAction,
 } from '../src/components/ai-actions-dropdown/AiActionsDropdown'
+import { AiMagicFill } from '../src/components/ai-magic-fill/AiMagicFill'
+import { Textarea } from '../src/components/input/Textarea'
 
 export const AiButtons = () => {
   const [answer, setAnswer] = useState('')
@@ -53,3 +55,43 @@ export const AiActions = () => {
     </div>
   )
 }
+
+export const AiMagicFillStory = () => {
+  const [open, setOpen] = useState(false)
+  const [busy, setBusy] = useState(false)
+  return (
+    <>
+      <AiActionsDropdownStory onOpen={() => setOpen(true)} />
+      <AiMagicFill
+        open={open}
+        onOpenChange={setOpen}
+        busy={busy}
+        title="Magic Fill"
+        subtitle="AI-powered data extraction"
+        description="Describe the details in natural language — the AI extracts structured data and fills the form for you."
+        onSubmit={() => {
+          setBusy(true)
+          setTimeout(() => {
+            setBusy(false)
+            setOpen(false)
+          }, 500)
+        }}
+      />
+    </>
+  )
+}
+
+function AiActionsDropdownStory({ onOpen }: { onOpen: () => void }) {
+  return (
+    <button onClick={onOpen} style={{ cursor: 'pointer' }}>
+      Open Magic Fill
+    </button>
+  )
+}
+
+export const Textareas = () => (
+  <div style={{ display: 'grid', gap: 16, maxWidth: 420 }}>
+    <Textarea label="Summary" hint="Markdown allowed" rows={4} />
+    <Textarea label="Notes" error="This field is required." />
+  </div>
+)

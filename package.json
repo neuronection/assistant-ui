@@ -155,6 +155,10 @@
       "types": "./dist/table.d.ts",
       "import": "./dist/table.js"
     },
+    "./textarea": {
+      "types": "./dist/textarea.d.ts",
+      "import": "./dist/textarea.js"
+    },
     "./theme-scope": {
       "types": "./dist/theme-scope.d.ts",
       "import": "./dist/theme-scope.js"

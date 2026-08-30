@@ -19,6 +19,10 @@ export {
   type AiActionsDropdownProps,
 } from './components/ai-actions-dropdown'
 export { AiButton, type AiButtonProps } from './components/ai-button'
+export {
+  AiMagicFill,
+  type AiMagicFillProps,
+} from './components/ai-magic-fill'
 export { Badge, badgeVariants, type BadgeProps } from './components/badge'
 export {
   Breadcrumbs,
