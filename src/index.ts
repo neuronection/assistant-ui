@@ -27,6 +27,40 @@ export {
   type UploadDropzoneProps,
 } from './components/upload-dropzone'
 export { ThemeScope, type ThemeScopeProps } from './components/theme-scope'
+export {
+  CareerMark,
+  HealthMark,
+  NeuronectionMark,
+  NeuronectionWordmark,
+  StudyMark,
+  useLogoId,
+  type LogoProps,
+  type LogoTheme,
+  type NeuronectionWordmarkProps,
+} from './components/logo'
+export {
+  AboutCard,
+  AboutLinkList,
+  AboutNote,
+  AboutFooterLine,
+  AboutPanel,
+  FamilyBadge,
+  TechChips,
+  type AboutCardProps,
+  type AboutLinkItem,
+  type AboutLinkListProps,
+  type AboutNoteProps,
+  type AboutFooterLineProps,
+  type AboutPanelProps,
+  type AboutCreator,
+  type AboutLicense,
+  type AboutNoteContent,
+  type FamilyApp,
+  type FamilyMember,
+  type FamilyCreator,
+  type FamilyBadgeProps,
+  type TechChipsProps,
+} from './components/about'
 
 export {
   AiActionsDropdown,

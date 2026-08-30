@@ -2,6 +2,13 @@ import { readdir, readFile } from 'node:fs/promises'
 import { join, basename } from 'node:path'
 
 const LIBRARY_COMPONENTS = [
+  'AboutCard',
+  'AboutLinkList',
+  'AboutNote',
+  'AboutFooterLine',
+  'AboutPanel',
+  'FamilyBadge',
+  'TechChips',
   'AiActionsDropdown',
   'AiBadge',
   'AiButton',
@@ -34,6 +41,11 @@ const LIBRARY_COMPONENTS = [
   'FormModal',
   'InfoButton',
   'Input',
+  'CareerMark',
+  'HealthMark',
+  'NeuronectionMark',
+  'NeuronectionWordmark',
+  'StudyMark',
   'Marquee',
   'MarqueeBand',
   'MarqueeSurface',

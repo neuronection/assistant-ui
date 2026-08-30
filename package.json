@@ -23,6 +23,10 @@
       "import": "./dist/index.js"
     },
     "./styles.css": "./dist/styles.css",
+    "./about": {
+      "types": "./dist/about.d.ts",
+      "import": "./dist/about.js"
+    },
     "./ai-actions-dropdown": {
       "types": "./dist/ai-actions-dropdown.d.ts",
       "import": "./dist/ai-actions-dropdown.js"
@@ -118,6 +122,10 @@
     "./input": {
       "types": "./dist/input.d.ts",
       "import": "./dist/input.js"
+    },
+    "./logo": {
+      "types": "./dist/logo.d.ts",
+      "import": "./dist/logo.js"
     },
     "./marquee": {
       "types": "./dist/marquee.d.ts",
