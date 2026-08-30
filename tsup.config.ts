@@ -23,6 +23,8 @@ export default defineConfig({
     'empty-state': 'src/components/empty-state/index.ts',
     'error-banner': 'src/components/error-banner/index.ts',
     'expandable-search': 'src/components/expandable-search/index.ts',
+    'file-card': 'src/components/file-card/index.ts',
+    'file-queue': 'src/components/file-queue/index.ts',
     'field-label': 'src/components/field-label/index.ts',
     'form-modal': 'src/components/form-modal/index.ts',
     'info-button': 'src/components/info-button/index.ts',

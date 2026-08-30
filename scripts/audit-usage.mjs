@@ -27,6 +27,8 @@ const LIBRARY_COMPONENTS = [
   'DatePicker',
   'EmptyState',
   'ErrorBanner',
+  'FileCard',
+  'FileQueue',
   'ExpandableSearch',
   'FieldLabel',
   'FormModal',
@@ -64,6 +66,7 @@ const LIBRARY_COMPONENTS = [
   'TooltipContent',
   'InfoTooltip',
   'UndoNotice',
+  'UploadDropzone',
   'ViewToggle',
   'Wizard',
 ]

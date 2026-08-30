@@ -93,6 +93,7 @@ files in the package's `dist/`. Visual reference:
 | `copy-button` / `breadcrumbs` | `CopyButton` (clipboard + copied state) · `Breadcrumbs` (SPA links via `linkComponent`) |
 | `ai-magic-fill` | `AiMagicFill` (describe-in-words → structured data prompt modal; app applies the data) |
 | `ai-button` / `ai-actions-dropdown` | `AiButton` (suggestions + prompt + response slot) · `AiActionsDropdown` (action list + custom prompt) |
+| `upload-dropzone` / `file-card` / `file-queue` | file attachment surface: dropzone (block/row) · card (status, include toggle) · queue (summary + reorder) |
 | `marquee` | `useMarquee`, `MarqueeSurface`, `MarqueeBand` (rubber-band selection) |
 | `portal` / `theme-scope` / `tokens` | `Portal` · `ThemeScope` · token name lists + types |
 

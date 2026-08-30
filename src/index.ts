@@ -10,7 +10,22 @@ export {
   type ThemeTokens,
 } from './tokens/tokens'
 
+export {
+  FileCard,
+  formatBytes,
+  type FileCardProps,
+  type FileCardStatus,
+} from './components/file-card'
+export {
+  FileQueue,
+  type FileQueueItem,
+  type FileQueueProps,
+} from './components/file-queue'
 export { Portal, type PortalProps } from './components/portal'
+export {
+  UploadDropzone,
+  type UploadDropzoneProps,
+} from './components/upload-dropzone'
 export { ThemeScope, type ThemeScopeProps } from './components/theme-scope'
 
 export {

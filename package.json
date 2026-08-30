@@ -91,6 +91,14 @@
       "types": "./dist/error-banner.d.ts",
       "import": "./dist/error-banner.js"
     },
+    "./file-card": {
+      "types": "./dist/file-card.d.ts",
+      "import": "./dist/file-card.js"
+    },
+    "./file-queue": {
+      "types": "./dist/file-queue.d.ts",
+      "import": "./dist/file-queue.js"
+    },
     "./expandable-search": {
       "types": "./dist/expandable-search.d.ts",
       "import": "./dist/expandable-search.js"
@@ -194,6 +202,10 @@
     "./undo-notice": {
       "types": "./dist/undo-notice.d.ts",
       "import": "./dist/undo-notice.js"
+    },
+    "./upload-dropzone": {
+      "types": "./dist/upload-dropzone.d.ts",
+      "import": "./dist/upload-dropzone.js"
     },
     "./view-toggle": {
       "types": "./dist/view-toggle.d.ts",
