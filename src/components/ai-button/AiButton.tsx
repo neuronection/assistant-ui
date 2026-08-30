@@ -15,6 +15,10 @@ export interface AiButtonProps {
   loadingLabel?: string
   placeholder?: string
   disabled?: boolean
+  /** Show the label text next to the icon (default true; icon-only when false). */
+  showLabel?: boolean
+  /** Close the panel after a submit (form-fill flows; Q&A keeps it open). */
+  closeOnSubmit?: boolean
   side?: 'top' | 'bottom' | 'left' | 'right'
   align?: 'start' | 'center' | 'end'
   className?: string
@@ -35,6 +39,8 @@ export const AiButton = React.forwardRef<HTMLButtonElement, AiButtonProps>(
       loadingLabel = 'Thinking…',
       placeholder,
       disabled = false,
+      showLabel = true,
+      closeOnSubmit = false,
       side = 'bottom',
       align = 'end',
       className,
@@ -50,6 +56,7 @@ export const AiButton = React.forwardRef<HTMLButtonElement, AiButtonProps>(
       if (!trimmed || loading) return
       onSubmit(trimmed)
       setPrompt('')
+      if (closeOnSubmit) setOpen(false)
     }
 
     return (
@@ -67,7 +74,7 @@ export const AiButton = React.forwardRef<HTMLButtonElement, AiButtonProps>(
               )}
             >
               <Sparkles className="size-3.5" aria-hidden />
-              {label}
+              {showLabel ? label : null}
             </button>
           </PopoverTrigger>
           <PopoverContent

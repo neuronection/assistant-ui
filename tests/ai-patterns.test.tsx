@@ -65,6 +65,20 @@ describe('AiButton', () => {
     expect(screen.getByRole('status')).toHaveTextContent('Thinking…')
   })
 
+  it('renders icon-only when showLabel is false', () => {
+    render(<AiButton onSubmit={vi.fn()} showLabel={false} />)
+    const trigger = screen.getByRole('button', { name: 'Ask AI' })
+    expect(trigger.textContent).toBe('')
+  })
+
+  it('closes the panel after submit when closeOnSubmit is set', async () => {
+    const user = userEvent.setup()
+    render(<AiButtonDemo closeOnSubmit />)
+    await user.click(screen.getByRole('button', { name: 'Ask AI' }))
+    await user.type(screen.getByLabelText('Ask a question'), 'fill it{Enter}')
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+  })
+
   it('has no axe violations open', async () => {
     const user = userEvent.setup()
     render(<AiButtonDemo error="API offline" />)
