@@ -1,5 +1,13 @@
 # @neuronection/assistant-ui
 
+## 0.9.0
+
+### Minor Changes
+
+- [`71f029b`](https://github.com/neuronection/assistant-ui/commit/71f029b3193460db28293b811186a2f46516bf10) Thanks [@constLiakos](https://github.com/constLiakos)! - Add about module: a uniform family "about page" kit. `AboutPanel` composes hero (logo, name, tagline, version badge), creator/license/links cards, tech chips, a toned note (e.g. medical disclaimer), the `FamilyBadge` showcase and a version/copyright footer — all content via props so apps keep their i18n and data. `FamilyBadge` presents the Neuronection brand lockup (mark + wordmark), an open-source/self-hosted family blurb, a prominent hub CTA, and one tile per app (logo, name, tagline, links to its presentation page, GitHub and website where applicable) with the current app highlighted. Building blocks (`AboutCard`, `AboutLinkList`, `AboutNote`, `AboutFooterLine`, `FamilyBadge`, `TechChips`) are also exported individually.
+
+- [`71f029b`](https://github.com/neuronection/assistant-ui/commit/71f029b3193460db28293b811186a2f46516bf10) Thanks [@constLiakos](https://github.com/constLiakos)! - Add logo module with inline brand marks for the Assistant family: `NeuronectionMark`, `NeuronectionWordmark`, `CareerMark`, `StudyMark`, `HealthMark`. All are theme-aware (`theme="light" | "dark"`, mirroring the hub artwork pairs), decorative and non-focusable by default, labeled via an optional `title` prop, sized via `size`, and use per-instance gradient ids so several marks can share a page. The wordmark also accepts `mono` for a `currentColor` fill. Brand artwork keeps its fixed fills as a deliberate exception to the semantic-token rule.
+
 ## 0.8.1
 
 ### Patch Changes
