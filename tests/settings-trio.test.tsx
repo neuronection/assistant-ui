@@ -160,7 +160,9 @@ describe('ConnectionTestRow', () => {
     const user = userEvent.setup()
     const onTest = vi.fn()
     render(<ConnectionTestRow status="idle" onTest={onTest} />)
-    await user.click(screen.getByRole('button', { name: 'Test' }))
+    const button = screen.getByRole('button', { name: 'Test' })
+    button.focus()
+    await user.keyboard('{Enter}')
     expect(onTest).toHaveBeenCalled()
   })
 

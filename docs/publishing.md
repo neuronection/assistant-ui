@@ -27,8 +27,9 @@ CI runs lint/typecheck/test/build → changeset publish →
 
 - During `0.x`: breaking changes may land in a **minor** — read the
   changelog. Consumers are our own apps on Dependabot.
-- **1.0.0** is cut when study-assistant is fully migrated (API proven);
-  from then on the discipline above is enforced verbatim.
+- **1.0.0** is cut once Phase 5's H1 (a11y docs) and H2 (visual-regression
+  CI) have landed on top of three production apps; from then on the
+  discipline above is enforced verbatim — breaking means **major**.
 - Apps may lag at most one major behind.
 
 ## Infrastructure notes

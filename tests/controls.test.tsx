@@ -130,6 +130,16 @@ describe('UndoNotice', () => {
     expect(onUndo).toHaveBeenCalledOnce()
   })
 
+  it('fires onUndo via keyboard (Enter)', async () => {
+    const user = userEvent.setup()
+    const onUndo = vi.fn()
+    render(<UndoNotice onUndo={onUndo} onDismiss={() => {}} duration={0} />)
+    const button = screen.getByRole('button', { name: 'Undo' })
+    button.focus()
+    await user.keyboard('{Enter}')
+    expect(onUndo).toHaveBeenCalledOnce()
+  })
+
   it('auto-dismisses after the duration', async () => {
     vi.useFakeTimers()
     const onDismiss = vi.fn()

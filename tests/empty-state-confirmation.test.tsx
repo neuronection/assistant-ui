@@ -56,6 +56,27 @@ describe('ConfirmationModal', () => {
     expect(onConfirm).toHaveBeenCalledOnce()
   })
 
+  it('confirm and cancel are keyboard operable; Escape reports onOpenChange (keyboard)', async () => {
+    const user = userEvent.setup()
+    const onConfirm = vi.fn()
+    const onOpenChange = vi.fn()
+    render(
+      <ConfirmationModal
+        open
+        onOpenChange={onOpenChange}
+        onConfirm={onConfirm}
+        title="Delete entry"
+        confirmLabel="Delete"
+      />,
+    )
+    const confirm = await screen.findByRole('button', { name: 'Delete' })
+    confirm.focus()
+    await user.keyboard('{Enter}')
+    expect(onConfirm).toHaveBeenCalledOnce()
+    await user.keyboard('{Escape}')
+    expect(onOpenChange).toHaveBeenCalledWith(false)
+  })
+
   it('disables both actions while busy', async () => {
     render(
       <ConfirmationModal open busy onOpenChange={() => {}} onConfirm={() => {}} title="Working" />,

@@ -82,6 +82,16 @@ describe('CopyButton', () => {
     expect(onCopied).toHaveBeenCalled()
   })
 
+  it('copies from the keyboard (Enter)', async () => {
+    const user = userEvent.setup()
+    withClipboard(Promise.resolve())
+    render(<CopyButton value="abc" label="Copy code" />)
+    const button = screen.getByRole('button', { name: 'Copy code' })
+    button.focus()
+    await user.keyboard('{Enter}')
+    expect(navigator.clipboard.writeText).toHaveBeenCalledWith('abc')
+  })
+
   it('reports copy errors via callback', async () => {
     const user = userEvent.setup()
     Object.defineProperty(navigator, 'clipboard', {

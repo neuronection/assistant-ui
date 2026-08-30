@@ -70,6 +70,12 @@ describe('TimePicker', () => {
     await waitFor(() =>
       expect(screen.queryByRole('slider')).not.toBeInTheDocument(),
     )
+    await user.click(screen.getByRole('button', { name: 'Choose time' }))
+    await screen.findByRole('slider', { name: 'Hour' })
+    await user.keyboard('{Escape}')
+    await waitFor(() =>
+      expect(screen.queryByRole('slider')).not.toBeInTheDocument(),
+    )
   })
 
   it('typing 24h hours normalizes AM/PM (type 14 → 2 PM)', async () => {

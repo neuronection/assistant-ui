@@ -99,6 +99,7 @@ no router — data in, events out.
 
 - [Adopting in an app](./docs/adoption.md) — the install/switchover recipe each family app follows (incl. the TW3 cascade notes)
 - [Theming](./docs/theming.md) — tokens, app themes, dark mode, styling hooks
+- [Accessibility](./docs/accessibility.md) — the keyboard + ARIA contract per module (test-asserted)
 - [Adding a component](./docs/adding-a-component.md) — rules, checklist, required companions
 - [Local development](./docs/local-development.md) — live-test library changes in the family apps without publishing
 - [Publishing](./docs/publishing.md) — the Changesets release flow and CI setup

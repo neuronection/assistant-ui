@@ -21,6 +21,8 @@ library never hard-codes colors.
 - **Dark mode is the same move**: remap the semantic tokens under a `.dark`
   (or `[data-as-theme="dark"]`) selector in your `theme.css` — health-assistant
   ships a class-based dark theme exactly this way, no component rewrites.
+  `themes/dark-reference.css` is a copy-paste starting block, and the
+  gallery's "Dark tokens" story shows it applied live.
 
 Key semantic tokens: `--as-primary(-fg)`, `--as-secondary(-fg)`,
 `--as-surface(-raised)`, `--as-border`, `--as-fg`, `--as-muted(-fg)`,

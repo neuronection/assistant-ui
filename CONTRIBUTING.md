@@ -22,8 +22,13 @@ not a general-purpose design system.
   class names.
 - **Tests ship with the component:** render + interaction + keyboard-nav
   assertions + jest-axe, in the same PR. Keyboard tests are not deferred.
+  The documented contract lives in [docs/accessibility.md](./docs/accessibility.md).
 - **Every story needs a Ladle story** in `playground/` — the gallery is the
-  review surface for design changes.
+  review surface for design changes, and CI screenshots every story
+  (`pnpm test:visual`). Intentional pixel changes update the baselines in the
+  same reviewed PR: `pnpm exec playwright test --update-snapshots` and commit
+  `tests/visual/__screenshots__/`. The job also fails if the story count drops
+  below its floor, so a broken stories glob can't ship an empty gallery again.
 
 ## Workflow
 
