@@ -149,3 +149,30 @@ describe('PanelModal', () => {
     expect(await axe(document.body)).toHaveNoViolations()
   })
 })
+
+describe('overlay positioning (TW3 collision guard)', () => {
+  it('ModalContent centers via inset + auto margins, not translate utilities', async () => {
+    render(
+      <Modal open onOpenChange={() => {}}>
+        <ModalContent>
+          <ModalHeader>
+            <ModalTitle>T</ModalTitle>
+          </ModalHeader>
+        </ModalContent>
+      </Modal>,
+    )
+    await screen.findByRole('dialog')
+    const dialog = document.body.querySelector('[data-as="modal"]')!
+    expect(dialog).toHaveClass('inset-0')
+    expect(dialog).toHaveClass('m-auto')
+    expect(dialog.className).not.toMatch(/translate/)
+  })
+
+  it('PanelModal centers via inset + auto margins on desktop, not translate utilities', async () => {
+    render(<PanelModal open onOpenChange={() => {}} title="T"><p>b</p></PanelModal>)
+    await screen.findByRole('dialog')
+    const panel = document.body.querySelector('[data-as="panel-modal"]')!
+    expect(panel.className).not.toMatch(/translate/)
+    expect(panel.className).toMatch(/sm:m[xy]-auto/)
+  })
+})

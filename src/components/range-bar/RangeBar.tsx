@@ -67,7 +67,7 @@ export const RangeBar = React.forwardRef<HTMLDivElement, RangeBarProps>(
           />
           {valuePct !== null ? (
             <div
-              className="absolute top-1/2 size-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-[var(--as-surface-raised)] bg-[var(--as-primary)] shadow-[var(--as-shadow-1)]"
+              className="absolute top-1/2 size-2.5 [translate:-50%_-50%] rounded-full border-2 border-[var(--as-surface-raised)] bg-[var(--as-primary)] shadow-[var(--as-shadow-1)]"
               style={{ left: `${valuePct}%` }}
               title={`${valueLabel}: ${fmt(value as number)}${unit ? ` ${unit}` : ''}`}
             />

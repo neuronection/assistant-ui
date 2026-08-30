@@ -273,7 +273,7 @@ export const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
                 type="button"
                 aria-label={clearLabel}
                 onClick={handleClear}
-                className="absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer rounded-full p-0.5 text-[var(--as-muted-fg)] transition-colors hover:bg-[var(--as-muted)] hover:text-[var(--as-fg)] focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[var(--as-focus-ring)]"
+                className="absolute right-2 top-1/2 [translate:0_-50%] cursor-pointer rounded-full p-0.5 text-[var(--as-muted-fg)] transition-colors hover:bg-[var(--as-muted)] hover:text-[var(--as-fg)] focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[var(--as-focus-ring)]"
               >
                 <X className="size-3.5" aria-hidden />
               </button>

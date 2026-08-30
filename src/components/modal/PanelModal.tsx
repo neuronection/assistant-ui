@@ -75,7 +75,7 @@ export const PanelModal = React.forwardRef<
           aria-describedby={undefined}
           className={cn(
             'as-anim-pop fixed inset-0 z-[var(--as-z-modal)] flex flex-col overflow-y-auto bg-[var(--as-surface-raised)] text-[var(--as-fg)] shadow-[var(--as-shadow-3)] focus:outline-none',
-            'sm:inset-auto sm:left-1/2 sm:top-1/2 sm:h-auto sm:max-h-[90vh] sm:w-auto sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-[var(--as-radius-lg)] sm:border sm:border-[var(--as-border)]',
+            'sm:inset-0 sm:mx-auto sm:my-auto sm:h-fit sm:max-h-[90vh] sm:w-fit sm:rounded-[var(--as-radius-lg)] sm:border sm:border-[var(--as-border)]',
             panelModalVariants({ size }),
             className,
           )}

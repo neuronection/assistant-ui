@@ -42,7 +42,7 @@ export const ModalContent = React.forwardRef<
         ref={ref}
         data-as="modal"
         className={cn(
-          'as-anim-modal fixed left-1/2 top-1/2 z-[var(--as-z-modal)] flex max-h-[85vh] w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 flex-col overflow-y-auto rounded-[var(--as-radius-lg)] border border-[var(--as-border)] bg-[var(--as-surface-raised)] text-[var(--as-fg)] shadow-[var(--as-shadow-3)] focus:outline-none',
+          'as-anim-modal fixed inset-0 z-[var(--as-z-modal)] m-auto flex h-fit max-h-[85vh] w-[calc(100%-2rem)] flex-col overflow-y-auto rounded-[var(--as-radius-lg)] border border-[var(--as-border)] bg-[var(--as-surface-raised)] text-[var(--as-fg)] shadow-[var(--as-shadow-3)] focus:outline-none',
           modalContentVariants({ size }),
           className,
         )}

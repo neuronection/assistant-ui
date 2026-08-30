@@ -388,7 +388,7 @@ export const Combobox = React.forwardRef<HTMLButtonElement, ComboboxProps>(funct
             <button
               type="button"
               aria-label={clearLabel}
-              className="absolute right-7 top-1/2 -translate-y-1/2 cursor-pointer rounded-[var(--as-radius-sm)] p-0.5 text-[var(--as-muted-fg)] hover:text-[var(--as-fg)] focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[var(--as-focus-ring)]"
+              className="absolute right-7 top-1/2 [translate:0_-50%] cursor-pointer rounded-[var(--as-radius-sm)] p-0.5 text-[var(--as-muted-fg)] hover:text-[var(--as-fg)] focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[var(--as-focus-ring)]"
               onClick={(event) => {
                 event.stopPropagation()
                 onChange('')
