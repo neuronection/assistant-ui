@@ -1,5 +1,18 @@
 # @neuronection/assistant-ui
 
+## 0.7.1
+
+### Patch Changes
+
+- [`904aa08`](https://github.com/neuronection/assistant-ui/commit/904aa083306facd19cf45c03be39ec459400a474) Thanks [@constLiakos](https://github.com/constLiakos)! - Fix modals rendering off-center (bottom-left, outside the viewport) on
+  Tailwind 3 apps: overlay centering no longer uses `-translate-x/y-1/2`
+  utilities. On a TW3 app those class names also resolve through the app's own
+  stylesheet (transform-based), stacking a second translation on top of the
+  library's (translate-property) one. `ModalContent`, `PanelModal` and the
+  Wizard modal now center with `inset-0` + auto margins; small decorations use
+  arbitrary `translate:` properties; the `as-zoom-in` keyframe no longer
+  hardcodes a translate.
+
 ## 0.7.0
 
 ### Minor Changes
