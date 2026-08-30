@@ -1,5 +1,16 @@
 # @neuronection/assistant-ui
 
+## 0.8.1
+
+### Patch Changes
+
+- [`0421e0e`](https://github.com/neuronection/assistant-ui/commit/0421e0e02ed994182ac3d2e79c23f786aff87b36) Thanks [@constLiakos](https://github.com/constLiakos)! - README: family showcase — neuronection.com, the three Assistant apps
+  (career / study / health-assistant.io) front and center; complete component
+  index incl. PanelModal, Textarea and the dark-mode / z-token theming notes.
+  Docs: correct CSS import order in theming.md, TW3 translate-collision +
+  z-index notes in adoption.md, positioning/z-index/audit-import rules in
+  adding-a-component.md, AGENTS.md gotchas updated.
+
 ## 0.8.0
 
 ### Minor Changes
