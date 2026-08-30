@@ -1,5 +1,28 @@
 # @neuronection/assistant-ui
 
+## 0.7.0
+
+### Minor Changes
+
+- [`8022462`](https://github.com/neuronection/assistant-ui/commit/80224625682e6f59b1d40e2622f4935a50494063) Thanks [@constLiakos](https://github.com/constLiakos)! - Phase-4 file-attachment surface (presentational; upload controllers stay
+  app-side): `UploadDropzone` (block/row variants, drag events + file-picker
+  results out via `onFiles`, optional folder picker, uploading state),
+  `FileCard` (name/size/status/thumbnail, remove, include-in-processing
+  toggle) and `FileQueue` (aggregate summary, drag-to-reorder intent via
+  `onReorder(fromId, toId)`).
+
+- [`58445ab`](https://github.com/neuronection/assistant-ui/commit/58445ab109ec5c9dce8073b04b9f780f11d8ad50) Thanks [@constLiakos](https://github.com/constLiakos)! - Phase-4 settings-trio blocks (part 2): `ModelPicker` (grouped, searchable
+  provider → model combobox with capability chips) and
+  `TaskAssignmentPicker` (task → model mapping rows with inline pickers and
+  clear buttons). `ComboboxOption` gains an optional `badge` chip.
+
+### Patch Changes
+
+- [`6202ef0`](https://github.com/neuronection/assistant-ui/commit/6202ef0957e2edaaecdd9dce8aa8d25ca5d65344) Thanks [@constLiakos](https://github.com/constLiakos)! - Fix the package-root re-exports for `SettingsShell`, `ProviderForm` and
+  `ConnectionTestRow` (missing from `index.d.ts` in 0.6.0 — the per-module
+  entry points `/settings-shell`, `/provider-form`, `/connection-test-row`
+  were unaffected).
+
 ## 0.6.0
 
 ### Minor Changes
