@@ -51,14 +51,21 @@ Then wire it up:
 
 - **Tests** (`tests/<name>.test.tsx`): render + interaction + **keyboard-nav
   assertions** + jest-axe. Keyboard tests are not deferred to later.
-- **Ladle story** (`playground/<name>.stories.tsx`): the gallery is the review
-  surface for design.
+- **Matrix row** in [docs/accessibility.md](./accessibility.md): the
+  documented contract may not promise anything the tests don't assert —
+  write the test first, the doc row second.
+- **Ladle story** (`playground/<name>.stories.tsx`): the gallery is the
+  review surface for design — and CI screenshots it. New or intentionally
+  changed stories need refreshed baselines in the same PR:
+  `pnpm exec playwright test --update-snapshots`, commit
+  `tests/visual/__screenshots__/`.
 - **Changeset** (`pnpm changeset`): minor for the new component.
 
 ## Verify
 
 ```bash
 pnpm verify          # lint + typecheck + test + build
+pnpm test:visual     # pixel-diffs every story against committed baselines
 ```
 
 Check the component in a real app via the [local dev loop](./local-development.md)

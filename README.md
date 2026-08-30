@@ -111,6 +111,7 @@ pnpm install
 pnpm dev          # Ladle playground on :61000 (CSS watches alongside)
 pnpm test --watch
 pnpm verify       # lint + typecheck + test + build
+pnpm test:visual  # Playwright screenshots of every story vs committed baselines
 ```
 
 Releases happen via [Changesets](./CONTRIBUTING.md) — CI publishes, never a

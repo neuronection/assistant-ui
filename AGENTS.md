@@ -31,10 +31,13 @@ pnpm watch          # watch build for live app testing (docs/local-development.m
 pnpm verify         # the gate
 node scripts/dev-link.mjs link <app-dir>   # wire an app to this checkout (dev server only)
 node scripts/verify-in-app.mjs <app-dir>   # run an app's test suite against a packed tarball
+pnpm test:visual                          # Playwright screenshots of every Ladle story vs baselines
 ```
 
 ## Gotchas learned the hard way
 
+- `pnpm test:visual -- --update-snapshots` **doesn't work** — pnpm mangles
+  the flag; use `pnpm exec playwright test --update-snapshots`.
 - `dist/styles.css` must ship **without `@layer`s** (TW3 preflight is
   unlayered and would override library utilities) — never remove
   `scripts/unwrap-layers.mjs` from the CSS build.
