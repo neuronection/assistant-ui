@@ -82,6 +82,7 @@ files in the package's `dist/`. Visual reference:
 | `wizard` | `Wizard` (steps config + `renderStep`, per-step validation gates, modal/drawer variants), `Stepper` (dots/labels) |
 | `input` / `search-input` / `expandable-search` | `Input` (label/hint/error wiring) · `SearchInput` · `ExpandableSearch` |
 | `chip-input` / `chip-list` | `ChipInput` (Enter/comma commit, paste-splits, Backspace-removes) · `ChipList` (variant pills, clickable, removable) |
+| `time-picker` / `time-list` | `TimePicker` (clock face, 24h value, 12h UI) · `TimeList` (time chips) |
 | `date-picker` | `DatePicker` (popover calendar: days/months/years views, min/max, `allowClear`, arrow-key day grid) |
 | `range-bar` / `scale-slider` | `RangeBar` (low–high band + value dot) · `ScaleSlider` (+ `scaleColorForValue`) |
 | `table` | `Table` (headers/rows, built-in empty state) |

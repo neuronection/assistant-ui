@@ -195,6 +195,14 @@
       "types": "./dist/tokens.d.ts",
       "import": "./dist/tokens.js"
     },
+    "./time-picker": {
+      "types": "./dist/time-picker.d.ts",
+      "import": "./dist/time-picker.js"
+    },
+    "./time-list": {
+      "types": "./dist/time-list.d.ts",
+      "import": "./dist/time-list.js"
+    },
     "./tooltip": {
       "types": "./dist/tooltip.d.ts",
       "import": "./dist/tooltip.js"

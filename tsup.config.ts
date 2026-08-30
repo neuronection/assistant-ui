@@ -47,6 +47,8 @@ export default defineConfig({
     'task-assignment-picker': 'src/components/task-assignment-picker/index.ts',
     'settings-shell': 'src/components/settings-shell/index.ts',
     'theme-scope': 'src/components/theme-scope/index.ts',
+    'time-picker': 'src/components/time-picker/index.ts',
+    'time-list': 'src/components/time-list/index.ts',
     tooltip: 'src/components/tooltip/index.ts',
     'undo-notice': 'src/components/undo-notice/index.ts',
     'view-toggle': 'src/components/view-toggle/index.ts',

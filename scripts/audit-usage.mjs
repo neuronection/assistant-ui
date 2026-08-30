@@ -62,6 +62,8 @@ const LIBRARY_COMPONENTS = [
   'Stepper',
   'Table',
   'ThemeScope',
+  'TimePicker',
+  'TimeList',
   'Tooltip',
   'TooltipContent',
   'InfoTooltip',
