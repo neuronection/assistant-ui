@@ -47,6 +47,17 @@ export {
 } from './components/breadcrumbs'
 export { Button, buttonVariants, type ButtonProps } from './components/button'
 export {
+  ConnectionTestRow,
+  type ConnectionTestStatus,
+  type ConnectionTestRowProps,
+} from './components/connection-test-row'
+export { ProviderForm, type ProviderFormProps } from './components/provider-form'
+export {
+  SettingsShell,
+  type SettingsNavItem,
+  type SettingsShellProps,
+} from './components/settings-shell'
+export {
   Card,
   CardContent,
   CardDescription,
