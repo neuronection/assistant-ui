@@ -10,6 +10,10 @@ import { AboutFooterLine } from './AboutFooterLine'
 import { AboutLinkList, type AboutLinkItem } from './AboutLinkList'
 import { AboutNote } from './AboutNote'
 import { FamilyBadge, type FamilyApp, type FamilyMember } from './FamilyBadge'
+import {
+  SponsorCard,
+  type SponsorChannel,
+} from './SponsorCard'
 import { TechChips } from './TechChips'
 
 export interface AboutCreator {
@@ -30,6 +34,14 @@ export interface AboutNoteContent {
   children: React.ReactNode
 }
 
+export interface AboutSponsorContent {
+  channels: ReadonlyArray<SponsorChannel>
+  title?: React.ReactNode
+  description?: React.ReactNode
+  footnote?: React.ReactNode
+  channelsLabel?: string
+}
+
 export interface AboutPanelProps extends React.ComponentProps<'div'> {
   appName: string
   familyCurrent?: FamilyApp
@@ -47,6 +59,7 @@ export interface AboutPanelProps extends React.ComponentProps<'div'> {
   tech?: ReadonlyArray<string>
   techTitle?: string
   note?: AboutNoteContent
+  sponsor?: AboutSponsorContent
   familyMembers?: ReadonlyArray<FamilyMember>
   hubUrl?: string
   familyLabel?: string
@@ -82,6 +95,7 @@ export const AboutPanel = React.forwardRef<HTMLDivElement, AboutPanelProps>(
       tech,
       techTitle = 'Built with',
       note,
+      sponsor,
       familyMembers,
       hubUrl,
       familyLabel,
@@ -162,6 +176,16 @@ export const AboutPanel = React.forwardRef<HTMLDivElement, AboutPanelProps>(
               </AboutCard>
             ) : null}
           </section>
+        ) : null}
+
+        {sponsor ? (
+          <SponsorCard
+            channels={sponsor.channels}
+            title={sponsor.title}
+            description={sponsor.description}
+            footnote={sponsor.footnote}
+            channelsLabel={sponsor.channelsLabel}
+          />
         ) : null}
 
         {tech?.length ? (

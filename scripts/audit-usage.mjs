@@ -9,6 +9,7 @@ const LIBRARY_COMPONENTS = [
   'AboutPanel',
   'FamilyBadge',
   'TechChips',
+  'SponsorCard',
   'AiActionsDropdown',
   'AiBadge',
   'AiButton',

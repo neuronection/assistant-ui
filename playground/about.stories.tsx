@@ -4,6 +4,7 @@ import { AboutCard } from '../src/components/about/AboutCard'
 import { AboutLinkList } from '../src/components/about/AboutLinkList'
 import { AboutNote } from '../src/components/about/AboutNote'
 import { FamilyBadge } from '../src/components/about/FamilyBadge'
+import { SponsorCard } from '../src/components/about/SponsorCard'
 import { TechChips } from '../src/components/about/TechChips'
 
 export const HealthAboutPage = () => (
@@ -38,7 +39,55 @@ export const HealthAboutPage = () => (
         children:
           'This software is for informational and wellness purposes only. It does not provide medical diagnosis or substitute professional medical care.',
       }}
+      sponsor={{
+        title: 'Keep Health Assistant alive',
+        description:
+          'Health Assistant is free and open source. Your support funds servers, maintenance and the future of the whole Neuronection family.',
+        footnote: 'Every contribution goes directly into hosting and development.',
+        channels: [
+          {
+            id: 'buymeacoffee',
+            name: 'Buy Me a Coffee',
+            href: 'https://buymeacoffee.com/neuronection',
+            description: 'One-time support — every coffee counts',
+            highlight: true,
+          },
+          {
+            id: 'github',
+            name: 'GitHub Sponsors',
+            href: 'https://github.com/neuronection',
+            description: 'Recurring support for the organisation',
+            icon: Globe,
+          },
+        ],
+      }}
       copyright="© 2026 Neuronection"
+    />
+  </div>
+)
+
+export const SponsorWays = () => (
+  <div style={{ maxWidth: 420, margin: '0 auto' }}>
+    <SponsorCard
+      title="Sponsor the Neuronection family"
+      description="Open source that respects your data needs fuel. Fund the servers, the maintenance and what gets built next."
+      footnote="neuronection.com · hosted and maintained by the community, for the community."
+      channels={[
+        {
+          id: 'buymeacoffee',
+          name: 'Buy Me a Coffee',
+          href: 'https://buymeacoffee.com/neuronection',
+          description: 'One-time support — every coffee counts',
+          highlight: true,
+        },
+        {
+          id: 'github',
+          name: 'GitHub Sponsors',
+          href: 'https://github.com/neuronection',
+          description: 'Recurring support for the organisation',
+          icon: Globe,
+        },
+      ]}
     />
   </div>
 )

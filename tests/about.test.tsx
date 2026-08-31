@@ -8,6 +8,7 @@ import { AboutNote } from '../src/components/about/AboutNote'
 import { AboutFooterLine } from '../src/components/about/AboutFooterLine'
 import { FamilyBadge } from '../src/components/about/FamilyBadge'
 import { TechChips } from '../src/components/about/TechChips'
+import { SponsorCard } from '../src/components/about/SponsorCard'
 import { AboutPanel } from '../src/components/about/AboutPanel'
 
 describe('AboutCard', () => {
@@ -204,6 +205,76 @@ describe('FamilyBadge', () => {
   })
 })
 
+describe('SponsorCard', () => {
+  const Globe = ({ className }: { className?: string }) => (
+    <svg className={className} aria-hidden />
+  )
+  const channels = [
+    {
+      id: 'buymeacoffee',
+      name: 'Buy Me a Coffee',
+      href: 'https://buymeacoffee.com/neuronection',
+      description: 'One-time support',
+      highlight: true,
+    },
+    {
+      id: 'github',
+      name: 'GitHub Sponsors',
+      href: 'https://github.com/neuronection',
+      icon: Globe,
+    },
+  ]
+
+  it('renders channels with external attributes and data hooks', () => {
+    const { container } = render(
+      <SponsorCard
+        title="Support the family"
+        description="Funding keeps the servers running."
+        channels={channels}
+      />,
+    )
+    expect(container.querySelector('[data-as="sponsor-card"]')).toBeTruthy()
+    const bmc = screen.getByRole('link', { name: /Buy Me a Coffee/ })
+    expect(bmc).toHaveAttribute('href', 'https://buymeacoffee.com/neuronection')
+    expect(bmc).toHaveAttribute('target', '_blank')
+    expect(bmc).toHaveAttribute('rel', 'noreferrer')
+    expect(bmc).toHaveAttribute('data-as-channel', 'buymeacoffee')
+    expect(bmc).toHaveAttribute('data-as-highlight', 'true')
+    const github = screen.getByRole('link', { name: /GitHub Sponsors/ })
+    expect(github).toHaveAttribute('data-as-channel', 'github')
+    expect(github).not.toHaveAttribute('data-as-highlight')
+    expect(screen.getByText('Support the family')).toBeInTheDocument()
+    expect(screen.getByText('Funding keeps the servers running.')).toBeInTheDocument()
+    expect(screen.getByText('One-time support')).toBeInTheDocument()
+  })
+
+  it('renders default title, description and footnote', () => {
+    render(<SponsorCard channels={[{ id: 'x', name: 'X', href: 'https://x.dev' }]} />)
+    expect(screen.getByText('Support this project')).toBeInTheDocument()
+    expect(screen.getByText(/free and open source/)).toBeInTheDocument()
+    expect(screen.getByText(/independent and free/)).toBeInTheDocument()
+  })
+
+  it('supports keyboard navigation across channels', async () => {
+    const user = userEvent.setup()
+    render(<SponsorCard channels={channels} />)
+    await user.tab()
+    expect(document.activeElement).toHaveAccessibleName(/Buy Me a Coffee/)
+    await user.tab()
+    expect(document.activeElement).toHaveAccessibleName(/GitHub Sponsors/)
+  })
+
+  it('renders nothing without channels', () => {
+    const { container } = render(<SponsorCard channels={[]} />)
+    expect(container.querySelector('[data-as="sponsor-card"]')).toBeNull()
+  })
+
+  it('has no axe violations', async () => {
+    const { container } = render(<SponsorCard channels={channels} />)
+    expect(await axe(container)).toHaveNoViolations()
+  })
+})
+
 describe('TechChips', () => {
   it('renders chips and skips empty entries', () => {
     const { container } = render(
@@ -270,6 +341,34 @@ describe('AboutPanel', () => {
     link.addEventListener('click', onClick as never)
     await user.click(link)
     expect(onClick).toHaveBeenCalled()
+  })
+
+  it('renders the sponsor section when provided', () => {
+    const { container } = render(
+      <AboutPanel
+        appName="Health Assistant"
+        sponsor={{
+          channels: [
+            {
+              id: 'buymeacoffee',
+              name: 'Buy Me a Coffee',
+              href: 'https://buymeacoffee.com/neuronection',
+              highlight: true,
+            },
+          ],
+        }}
+      />,
+    )
+    const card = container.querySelector('[data-as="sponsor-card"]')
+    expect(card).toBeTruthy()
+    expect(
+      within(card as HTMLElement).getByRole('link', { name: /Buy Me a Coffee/ }),
+    ).toHaveAttribute('href', 'https://buymeacoffee.com/neuronection')
+  })
+
+  it('renders no sponsor section without the prop', () => {
+    const { container } = render(<AboutPanel appName="Health Assistant" />)
+    expect(container.querySelector('[data-as="sponsor-card"]')).toBeNull()
   })
 
   it('has no axe violations', async () => {

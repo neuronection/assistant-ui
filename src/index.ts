@@ -46,6 +46,7 @@ export {
   AboutPanel,
   FamilyBadge,
   TechChips,
+  SponsorCard,
   type AboutCardProps,
   type AboutLinkItem,
   type AboutLinkListProps,
@@ -55,11 +56,14 @@ export {
   type AboutCreator,
   type AboutLicense,
   type AboutNoteContent,
+  type AboutSponsorContent,
   type FamilyApp,
   type FamilyMember,
   type FamilyCreator,
   type FamilyBadgeProps,
   type TechChipsProps,
+  type SponsorCardProps,
+  type SponsorChannel,
 } from './components/about'
 
 export {

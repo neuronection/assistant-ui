@@ -18,9 +18,15 @@ export {
 } from './FamilyBadge'
 export { TechChips, type TechChipsProps } from './TechChips'
 export {
+  SponsorCard,
+  type SponsorChannel,
+  type SponsorCardProps,
+} from './SponsorCard'
+export {
   AboutPanel,
   type AboutPanelProps,
   type AboutCreator,
   type AboutLicense,
   type AboutNoteContent,
+  type AboutSponsorContent,
 } from './AboutPanel'
