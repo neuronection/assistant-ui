@@ -77,6 +77,8 @@ export interface ModelRegistryProps {
   removeLabel?: string
   missingLabel?: string
   capsLabel?: string
+  /** Muted explainer under the capability chips (what they gate). */
+  capsHint?: string
   searchPlaceholder?: string
   searchLabel?: string
   emptyProviderLabel?: string
@@ -213,6 +215,7 @@ export const ModelRegistry = React.forwardRef<HTMLDivElement, ModelRegistryProps
       removeLabel = 'Remove',
       missingLabel = 'Missing',
       capsLabel = 'Capabilities',
+      capsHint,
       searchPlaceholder = 'Search models…',
       searchLabel = 'Search models',
       emptyProviderLabel = 'No models yet — use Add model to pick from the live catalog.',
@@ -484,6 +487,9 @@ export const ModelRegistry = React.forwardRef<HTMLDivElement, ModelRegistryProps
                   onToggle={toggleDraftCap}
                   ariaLabel={capsLabel}
                 />
+                {capsHint ? (
+                  <p className="text-xs text-[var(--as-muted-fg)]">{capsHint}</p>
+                ) : null}
               </div>
               {reasoningEffortOptions ? (
                 <label className="block space-y-1 text-sm">

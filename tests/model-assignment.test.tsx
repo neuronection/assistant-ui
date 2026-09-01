@@ -184,6 +184,35 @@ describe('TaskAssignmentPicker v2', () => {
     expect(screen.getAllByRole('combobox')).toHaveLength(4)
   })
 
+  it('renders primary/fallback badges with info popups', async () => {
+    const user = userEvent.setup()
+    render(
+      <TaskAssignmentPicker
+        tasks={[]}
+        sections={[
+          {
+            id: 'defaults',
+            label: 'Default models',
+            secondary: true,
+            tasks: [{ id: 'text', label: 'Default text model', requires: 'text' }],
+          },
+        ]}
+        providers={capProviders}
+        value={{ text: 'llama' }}
+        secondaryValue={{}}
+        onAssign={vi.fn()}
+        onAssignSecondary={vi.fn()}
+        primaryLabel="Primary"
+        primaryInfo="Serves every run of this task."
+        fallbackInfo="Used when the primary fails."
+      />,
+    )
+    expect(screen.getAllByText('Primary').length).toBeGreaterThan(0)
+    expect(screen.getByText('Fallback')).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Primary — Default text model' }))
+    expect(await screen.findByText('Serves every run of this task.')).toBeInTheDocument()
+  })
+
   it('renders the renderMeta slot per row', () => {
     render(
       <TaskAssignmentPicker

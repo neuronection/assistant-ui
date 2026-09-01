@@ -1,5 +1,6 @@
 import * as React from 'react'
-import { Cpu, X } from 'lucide-react'
+import { Cpu, Star, X } from 'lucide-react'
+import { InfoButton } from '../info-button/InfoButton'
 import type { LucideIcon } from 'lucide-react'
 import { cn } from '../../lib/utils'
 import {
@@ -43,6 +44,12 @@ export interface TaskAssignmentPickerProps {
   secondaryValue?: Record<string, string | null>
   onAssignSecondary?: (taskId: string, modelId: string | null) => void
   secondaryLabel?: string
+  /** Compact badge text for the primary picker (default "Primary"). */
+  primaryLabel?: string
+  /** Info-popup content for the primary picker (rendered when set). */
+  primaryInfo?: React.ReactNode
+  /** Info-popup content for the fallback picker (rendered when set). */
+  fallbackInfo?: React.ReactNode
   /** App-rendered per-row context (inherit notes, spend, badges). */
   renderMeta?: (task: TaskAssignmentTask) => React.ReactNode
   clearLabel?: string
@@ -77,7 +84,10 @@ export const TaskAssignmentPicker = React.forwardRef<
     onAssign,
     secondaryValue,
     onAssignSecondary,
-    secondaryLabel = 'Fallback model',
+    secondaryLabel = 'Fallback',
+    primaryLabel = 'Primary',
+    primaryInfo,
+    fallbackInfo,
     renderMeta,
     clearLabel = 'Clear assignment',
     disabled = false,
@@ -113,29 +123,50 @@ export const TaskAssignmentPicker = React.forwardRef<
         </div>
         <div className="flex shrink-0 items-center gap-1.5 self-center">
           {showSecondary && onAssignSecondary ? (
+            <span className="flex items-center gap-1.5 self-center">
+              <span className="inline-flex items-center gap-1 rounded-full bg-[var(--as-muted)] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-[var(--as-muted-fg)]">
+                {secondaryLabel}
+              </span>
+              <ModelPicker
+                providers={catalog}
+                value={secondaryValue?.[task.id] ?? ''}
+                onChange={(modelId) => onAssignSecondary(task.id, modelId)}
+                disabled={disabled}
+                clearable={false}
+                clearLabel={clearLabel}
+                label={`${secondaryLabel} — ${task.label}`}
+                hideLabel
+                className="w-48"
+              />
+              {fallbackInfo ? (
+                <InfoButton label={`${secondaryLabel} — ${task.label}`}>{fallbackInfo}</InfoButton>
+              ) : null}
+            </span>
+          ) : null}
+          <span className="flex items-center gap-1.5 self-center">
+            <span
+              className={cn(
+                'inline-flex items-center gap-1 rounded-full bg-[var(--as-muted)] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-[var(--as-muted-fg)]',
+              )}
+            >
+              <Star className="size-2.5" aria-hidden />
+              {primaryLabel}
+            </span>
             <ModelPicker
               providers={catalog}
-              value={secondaryValue?.[task.id] ?? ''}
-              onChange={(modelId) => onAssignSecondary(task.id, modelId)}
+              value={value[task.id] ?? ''}
+              onChange={(modelId) => onAssign(task.id, modelId)}
               disabled={disabled}
               clearable={false}
               clearLabel={clearLabel}
-              label={`${secondaryLabel} — ${task.label}`}
+              label={task.label}
               hideLabel
-              className="w-48 self-center"
+              className="w-56"
             />
-          ) : null}
-          <ModelPicker
-            providers={catalog}
-            value={value[task.id] ?? ''}
-            onChange={(modelId) => onAssign(task.id, modelId)}
-            disabled={disabled}
-            clearable={false}
-            clearLabel={clearLabel}
-            label={task.label}
-            hideLabel
-            className="w-56 self-center"
-          />
+            {primaryInfo ? (
+              <InfoButton label={`${primaryLabel} — ${task.label}`}>{primaryInfo}</InfoButton>
+            ) : null}
+          </span>
           {value[task.id] ? (
             <button
               type="button"
