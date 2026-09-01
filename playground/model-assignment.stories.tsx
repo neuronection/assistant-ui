@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Bot, Search } from 'lucide-react'
 import {
   ModelPicker,
   type ModelPickerProvider,
@@ -97,13 +98,15 @@ export const TaskAssignmentV2Story = () => {
           id: 'defaults',
           label: 'Default models',
           secondary: true,
-          tasks: [{ id: 'text', label: 'Default text model', requires: 'text' }],
+          tasks: [
+            { id: 'text', label: 'Default text model', requires: 'text', icon: Bot },
+          ],
         },
         {
           id: 'tasks',
           label: 'Tasks',
           tasks: [
-            { id: 'ocr', label: 'Page OCR', requires: 'vision' },
+            { id: 'ocr', label: 'Page OCR', requires: 'vision', icon: Search },
             { id: 'embed', label: 'Embeddings', requires: 'embeddings' },
           ],
         },

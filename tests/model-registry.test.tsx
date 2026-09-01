@@ -133,6 +133,10 @@ function RegistryDemo(props: Partial<React.ComponentProps<typeof ModelRegistry>>
 }
 
 describe('ModelRegistry', () => {
+
+  async function openCatalog(user: ReturnType<typeof userEvent.setup>) {
+    await user.click(screen.getByRole('button', { name: /Browse catalog/ }))
+  }
   it('expands and collapses a provider via its header', async () => {
     const user = userEvent.setup()
     render(<RegistryDemo />)
@@ -146,6 +150,7 @@ describe('ModelRegistry', () => {
     const user = userEvent.setup()
     const onAddModel = vi.fn()
     render(<RegistryDemo onAddModel={onAddModel} />)
+    await openCatalog(user)
     await user.click(screen.getByRole('button', { name: 'Add llava' }))
     expect(onAddModel).toHaveBeenCalledWith('p1', {
       externalId: 'llava',
@@ -157,6 +162,7 @@ describe('ModelRegistry', () => {
     const user = userEvent.setup()
     const onAddModel = vi.fn()
     render(<RegistryDemo onAddModel={onAddModel} />)
+    await openCatalog(user)
     await user.click(screen.getByRole('button', { name: 'Configure llava' }))
     const panel = screen
       .getByText('Display label')
@@ -180,6 +186,7 @@ describe('ModelRegistry', () => {
     const user = userEvent.setup()
     const onAddModel = vi.fn()
     render(<RegistryDemo onAddModel={onAddModel} />)
+    await openCatalog(user)
     await user.click(screen.getByRole('button', { name: /Add manually/ }))
     const confirm = screen.getByRole('button', { name: /Add model/ })
     expect(confirm).toBeDisabled()
@@ -212,14 +219,6 @@ describe('ModelRegistry', () => {
     )
   })
 
-  it('toggles a model off via the enable checkbox', async () => {
-    const user = userEvent.setup()
-    const onUpdateModel = vi.fn()
-    render(<RegistryDemo onUpdateModel={onUpdateModel} />)
-    await user.click(screen.getByRole('checkbox', { name: /Enabled — qwen2\.5-vl/ }))
-    expect(onUpdateModel).toHaveBeenCalledWith(models[0], { enabled: false })
-  })
-
   it('emits onDeleteModel from the remove button', async () => {
     const user = userEvent.setup()
     const onDeleteModel = vi.fn()
@@ -231,6 +230,7 @@ describe('ModelRegistry', () => {
   it('filters the remote catalog by capability and the unclassified pseudo-cap', async () => {
     const user = userEvent.setup()
     const { container } = render(<RegistryDemo />)
+    await openCatalog(user)
     const catalog = within(
       container.querySelector('[data-as="model-registry-catalog"]') as HTMLElement,
     )
@@ -246,6 +246,7 @@ describe('ModelRegistry', () => {
   it('searches the remote catalog with substring matching', async () => {
     const user = userEvent.setup()
     const { container } = render(<RegistryDemo />)
+    await openCatalog(user)
     const catalog = within(
       container.querySelector('[data-as="model-registry-catalog"]') as HTMLElement,
     )
@@ -254,8 +255,10 @@ describe('ModelRegistry', () => {
     expect(catalog.queryByText('nomic-embed-text')).not.toBeInTheDocument()
   })
 
-  it('marks already-registered remote models as added and offers edit instead', () => {
+  it('marks already-registered remote models as added and offers edit instead', async () => {
+    const user = userEvent.setup()
     render(<RegistryDemo />)
+    await openCatalog(user)
     expect(screen.getByText('Added')).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Add nomic-embed-text' })).not.toBeInTheDocument()
     expect(screen.getAllByRole('button', { name: 'Edit nomic-embed-text' })).toHaveLength(2)
@@ -265,6 +268,7 @@ describe('ModelRegistry', () => {
     const user = userEvent.setup()
     const onAddAll = vi.fn()
     render(<RegistryDemo onAddAll={onAddAll} />)
+    await openCatalog(user)
     await user.click(screen.getByRole('button', { name: /Add all \(2\)/ }))
     expect(onAddAll).toHaveBeenCalledWith(
       'p1',
@@ -286,13 +290,16 @@ describe('ModelRegistry', () => {
         onRetryRemote={onRetryRemote}
       />,
     )
+    await openCatalog(user)
     expect(screen.getByText('connection refused')).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: 'Retry' }))
     expect(onRetryRemote).toHaveBeenCalled()
   })
 
-  it('shows the remote loading state', () => {
+  it('shows the remote loading state', async () => {
+    const user = userEvent.setup()
     render(<RegistryDemo remoteModels={undefined} remoteState="loading" />)
+    await openCatalog(user)
     expect(screen.getByText('Loading models…')).toBeInTheDocument()
   })
 
@@ -308,9 +315,20 @@ describe('ModelRegistry', () => {
     expect(screen.getByTestId('empty-action')).toBeInTheDocument()
   })
 
+  it('hides the catalog zone until the browse trigger opens it', () => {
+    render(<RegistryDemo />)
+    expect(screen.queryByRole('button', { name: 'Add llava' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('textbox', { name: 'Search models' })).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Browse catalog/ })).toHaveAttribute(
+      'aria-expanded',
+      'false',
+    )
+  })
+
   it('is keyboard operable through the row configure button', async () => {
     const user = userEvent.setup()
     render(<RegistryDemo />)
+    await openCatalog(user)
     const configure = screen.getByRole('button', { name: 'Configure llava' })
     configure.focus()
     await user.keyboard('{Enter}')
@@ -318,9 +336,12 @@ describe('ModelRegistry', () => {
   })
 
   it('has no axe violations', async () => {
+    const user = userEvent.setup()
     const { container } = render(
       <RegistryDemo emptyAction={<button type="button" data-testid="empty-action">Wizard</button>} />,
     )
+    expect(await axe(container)).toHaveNoViolations()
+    await openCatalog(user)
     expect(await axe(container)).toHaveNoViolations()
   })
 })

@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { X } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 import { cn } from '../../lib/utils'
 import {
   ModelPicker,
@@ -11,6 +12,8 @@ export interface TaskAssignmentTask {
   id: string
   label: string
   description?: string
+  /** Rendered in an icon tile at the row's leading edge. */
+  icon?: LucideIcon
   /** When set, the row's picker offers only models matching this capability. */
   requires?: string
   /** Render the fallback-model picker for this row (needs `onAssignSecondary`). */
@@ -104,7 +107,13 @@ export const TaskAssignmentPicker = React.forwardRef<
         key={task.id}
         className="flex flex-col gap-2 rounded-[var(--as-radius-lg)] border border-[var(--as-border)] bg-[var(--as-surface-raised)] p-3 sm:flex-row sm:items-center sm:justify-between"
       >
-        <div className="min-w-0">
+        <div className="flex min-w-0 items-center gap-3">
+          {task.icon ? (
+            <span className="flex size-9 shrink-0 items-center justify-center rounded-[var(--as-radius)] bg-[var(--as-muted)] text-[var(--as-muted-fg)]">
+              <task.icon className="size-4" aria-hidden />
+            </span>
+          ) : null}
+          <div className="min-w-0">
           <p className="truncate text-sm font-semibold text-[var(--as-fg)]">
             {task.label}
           </p>
@@ -126,6 +135,7 @@ export const TaskAssignmentPicker = React.forwardRef<
               unassignedLabel
             )}
           </p>
+          </div>
         </div>
         <div className="flex shrink-0 items-center gap-1.5">
           {showSecondary && onAssignSecondary ? (

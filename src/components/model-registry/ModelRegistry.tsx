@@ -67,7 +67,6 @@ export interface ModelRegistryProps {
   configureLabel?: string
   editLabel?: string
   removeLabel?: string
-  enabledLabel?: string
   missingLabel?: string
   capsLabel?: string
   searchPlaceholder?: string
@@ -78,6 +77,8 @@ export interface ModelRegistryProps {
   remoteEmptyLabel?: string
   remoteLoadingLabel?: string
   retryLabel?: string
+  /** Catalog disclosure trigger; the search/filter zone renders only when opened. */
+  browseLabel?: string
   manualAddLabel?: string
   externalIdLabel?: string
   labelLabel?: string
@@ -128,7 +129,6 @@ export const ModelRegistry = React.forwardRef<HTMLDivElement, ModelRegistryProps
       configureLabel = 'Configure',
       editLabel = 'Edit',
       removeLabel = 'Remove',
-      enabledLabel = 'Enabled',
       missingLabel = 'Missing',
       capsLabel = 'Capabilities',
       searchPlaceholder = 'Search models…',
@@ -139,6 +139,7 @@ export const ModelRegistry = React.forwardRef<HTMLDivElement, ModelRegistryProps
       remoteEmptyLabel = 'No models match.',
       remoteLoadingLabel = 'Loading models…',
       retryLabel = 'Retry',
+      browseLabel = 'Browse catalog',
       manualAddLabel = 'Add manually',
       externalIdLabel = 'Model ID',
       labelLabel = 'Display label',
@@ -157,6 +158,7 @@ export const ModelRegistry = React.forwardRef<HTMLDivElement, ModelRegistryProps
     const [capFilter, setCapFilter] = React.useState<string | null>(null)
     const [draft, setDraft] = React.useState<DraftState | null>(null)
     const [draftError, setDraftError] = React.useState<string | null>(null)
+    const [catalogOpen, setCatalogOpen] = React.useState(false)
 
     const descriptorFor = React.useCallback(
       (value: string): CapabilityDescriptor =>
@@ -204,6 +206,7 @@ export const ModelRegistry = React.forwardRef<HTMLDivElement, ModelRegistryProps
       onExpandedProviderChange(next)
       setQuery('')
       setCapFilter(null)
+      setCatalogOpen(false)
       resetDraft()
     }
 
@@ -485,16 +488,6 @@ export const ModelRegistry = React.forwardRef<HTMLDivElement, ModelRegistryProps
               caps={model.caps.map(descriptorFor)}
               selected={model.caps}
             />
-            <label className="flex shrink-0 cursor-pointer items-center gap-1.5 text-xs text-[var(--as-muted-fg)]">
-              <input
-                type="checkbox"
-                checked={model.enabled}
-                onChange={(event) =>
-                  onUpdateModel(model, { enabled: event.target.checked })
-                }
-                aria-label={`${enabledLabel} — ${model.externalId}`}
-              />
-            </label>
             <button
               type="button"
               aria-expanded={expandedRow}
@@ -535,33 +528,46 @@ export const ModelRegistry = React.forwardRef<HTMLDivElement, ModelRegistryProps
               key={provider.id}
               data-as="model-registry-provider"
               className={cn(
-                'rounded-[var(--as-radius-lg)] border bg-[var(--as-surface)] transition-colors',
-                expanded ? 'border-[var(--as-primary)]' : 'border-[var(--as-border)]',
+                'rounded-[var(--as-radius-lg)] border bg-[var(--as-surface)] transition-all',
+                expanded
+                  ? 'border-[var(--as-primary)] shadow-[var(--as-shadow-1)]'
+                  : 'border-[var(--as-border)]',
               )}
             >
               <button
                 type="button"
                 aria-expanded={expanded}
                 onClick={() => toggleProvider(provider.id)}
-                className="flex w-full cursor-pointer items-center gap-3 p-4 text-left focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[var(--as-focus-ring)]"
+                className="group flex w-full cursor-pointer items-center gap-4 p-4 text-left focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[var(--as-focus-ring)]"
               >
-                {expanded ? (
-                  <ChevronDown className="size-5 shrink-0 text-[var(--as-muted-fg)]" aria-hidden />
-                ) : (
-                  <ChevronRight className="size-5 shrink-0 text-[var(--as-muted-fg)]" aria-hidden />
-                )}
+                <span
+                  className={cn(
+                    'flex size-9 shrink-0 items-center justify-center rounded-[var(--as-radius)] transition-colors',
+                    expanded
+                      ? 'bg-[var(--as-primary)] text-[var(--as-primary-fg)]'
+                      : 'bg-[var(--as-muted)] text-[var(--as-muted-fg)] group-hover:bg-[var(--as-primary)]/10 group-hover:text-[var(--as-primary)]',
+                  )}
+                >
+                  {expanded ? (
+                    <ChevronDown className="size-5" aria-hidden />
+                  ) : (
+                    <ChevronRight className="size-5" aria-hidden />
+                  )}
+                </span>
                 <span className="min-w-0 flex-1">
-                  <span className="flex items-center gap-2 text-sm font-semibold text-[var(--as-fg)]">
+                  <span className="flex flex-wrap items-center gap-2 text-sm font-semibold text-[var(--as-fg)]">
                     {provider.name}
                     {provider.type ? (
-                      <span className="rounded-full border border-[var(--as-border)] px-2 py-0.5 text-[11px] font-normal text-[var(--as-muted-fg)]">
+                      <span className="rounded-full border border-[var(--as-border)] px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-[var(--as-muted-fg)]">
                         {provider.type}
                       </span>
                     ) : null}
-                    <span className="text-xs font-normal text-[var(--as-muted-fg)]">
-                      {providerModels.filter((model) => model.enabled).length}/
-                      {providerModels.length}
-                    </span>
+                    {providerModels.length ? (
+                      <span className="rounded-full bg-[var(--as-muted)] px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-widest text-[var(--as-muted-fg)]">
+                        {providerModels.filter((model) => model.enabled).length}/
+                        {providerModels.length}
+                      </span>
+                    ) : null}
                   </span>
                   {provider.baseUrl ? (
                     <span className="block truncate font-mono text-xs text-[var(--as-muted-fg)]">
@@ -571,7 +577,7 @@ export const ModelRegistry = React.forwardRef<HTMLDivElement, ModelRegistryProps
                 </span>
               </button>
               {expanded ? (
-                <div className="flex flex-col gap-3 border-t border-[var(--as-border)] p-4">
+                <div className="as-anim-fade flex flex-col gap-3 border-t border-[var(--as-border)] p-4">
                   {providerModels.length === 0 ? (
                     <p className="text-xs text-[var(--as-muted-fg)]">{emptyProviderLabel}</p>
                   ) : (
@@ -580,51 +586,66 @@ export const ModelRegistry = React.forwardRef<HTMLDivElement, ModelRegistryProps
                     </div>
                   )}
                   <div className="flex flex-col gap-2 border-t border-[var(--as-border)] pt-3">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <SearchInput
-                        value={query}
-                        onChange={(next) => {
-                          setQuery(next)
-                          resetDraft()
-                        }}
-                        placeholder={searchPlaceholder}
-                        ariaLabel={searchLabel}
-                        className="max-w-xs flex-1"
-                      />
-                      <CapabilityChips
-                        caps={filterDescriptors}
-                        selected={capFilter ? [capFilter] : []}
-                        onToggle={(value) =>
-                          setCapFilter((current) => (current === value ? null : value))
-                        }
-                        ariaLabel={capFilterLabel}
-                      />
-                      <Button variant="ghost" size="sm" onClick={() => openManualDraft(provider.id)}>
+                    <div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        aria-expanded={catalogOpen}
+                        onClick={() => setCatalogOpen((open) => !open)}
+                      >
                         <Plus aria-hidden />
-                        {manualAddLabel}
+                        {browseLabel}
                       </Button>
-                      {onAddAll ? (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          disabled={remoteState !== 'ready' || pendingRemote.length === 0}
-                          onClick={() =>
-                            onAddAll(
-                              provider.id,
-                              pendingRemote.map((remote) => ({
-                                externalId: remote.id,
-                                caps: remote.caps,
-                              })),
-                            )
-                          }
-                        >
-                          <Plus aria-hidden />
-                          {addAllLabel} ({pendingRemote.length})
-                        </Button>
-                      ) : null}
                     </div>
-                    {draft?.key.startsWith('manual:') ? renderDraftPanel() : null}
-                    {renderRemoteRows(provider.id)}
+                    {catalogOpen ? (
+                      <>
+                        <div className="flex flex-wrap items-center gap-2">
+                          <SearchInput
+                            value={query}
+                            onChange={(next) => {
+                              setQuery(next)
+                              resetDraft()
+                            }}
+                            placeholder={searchPlaceholder}
+                            ariaLabel={searchLabel}
+                            className="max-w-xs flex-1"
+                          />
+                          <CapabilityChips
+                            caps={filterDescriptors}
+                            selected={capFilter ? [capFilter] : []}
+                            onToggle={(value) =>
+                              setCapFilter((current) => (current === value ? null : value))
+                            }
+                            ariaLabel={capFilterLabel}
+                          />
+                          <Button variant="ghost" size="sm" onClick={() => openManualDraft(provider.id)}>
+                            <Plus aria-hidden />
+                            {manualAddLabel}
+                          </Button>
+                          {onAddAll ? (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              disabled={remoteState !== 'ready' || pendingRemote.length === 0}
+                              onClick={() =>
+                                onAddAll(
+                                  provider.id,
+                                  pendingRemote.map((remote) => ({
+                                    externalId: remote.id,
+                                    caps: remote.caps,
+                                  })),
+                                )
+                              }
+                            >
+                              <Plus aria-hidden />
+                              {addAllLabel} ({pendingRemote.length})
+                            </Button>
+                          ) : null}
+                        </div>
+                        {draft?.key.startsWith('manual:') ? renderDraftPanel() : null}
+                        {renderRemoteRows(provider.id)}
+                      </>
+                    ) : null}
                   </div>
                 </div>
               ) : null}

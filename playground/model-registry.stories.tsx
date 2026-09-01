@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Sparkles } from 'lucide-react'
+import { AudioLines, Database, Eye, FileText, Sparkles, Wrench } from 'lucide-react'
 import {
   CapabilityChips,
   type CapabilityDescriptor,
@@ -12,11 +12,11 @@ import {
 import type { ModelRegistryProvider } from '../src/components/model-registry/ModelRegistry'
 
 const caps: CapabilityDescriptor[] = [
-  { value: 'text', label: 'Text' },
-  { value: 'vision', label: 'Vision' },
-  { value: 'tools', label: 'Tools' },
-  { value: 'embeddings', label: 'Embeddings' },
-  { value: 'audio', label: 'Audio' },
+  { value: 'text', label: 'Text', icon: FileText },
+  { value: 'vision', label: 'Vision', icon: Eye },
+  { value: 'tools', label: 'Tools', icon: Wrench },
+  { value: 'embeddings', label: 'Embeddings', icon: Database },
+  { value: 'audio', label: 'Audio', icon: AudioLines },
 ]
 
 const remote: ModelRegistryRemoteModel[] = [

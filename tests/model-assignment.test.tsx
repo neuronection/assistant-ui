@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { describe, expect, it, vi } from 'vitest'
-import { render, screen, within } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { axe } from 'jest-axe'
 import {
@@ -98,14 +98,12 @@ describe('TaskAssignmentPicker', () => {
   it('clears an assignment with the X button', async () => {
     const user = userEvent.setup()
     render(<AssignmentDemo />)
-    const label = screen.getByText('Summarize documents')
-    const card = label.closest('div')!.parentElement as HTMLElement
     await user.click(
-      within(card).getByRole('button', {
-        name: /Clear assignment — Summarize documents/,
+      screen.getByRole('button', {
+        name: 'Clear assignment — Summarize documents',
       }),
     )
-    expect(within(card).getByText('Not assigned')).toBeInTheDocument()
+    expect(await screen.findAllByText('Not assigned')).toHaveLength(2)
   })
 
   it('has no axe violations', async () => {

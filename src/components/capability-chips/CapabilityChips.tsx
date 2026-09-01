@@ -1,9 +1,12 @@
 import * as React from 'react'
+import { Check } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 import { cn } from '../../lib/utils'
 
 export interface CapabilityDescriptor {
   value: string
   label: string
+  icon?: LucideIcon
 }
 
 export interface CapabilityChipsProps {
@@ -46,18 +49,22 @@ export const CapabilityChips = React.forwardRef<HTMLDivElement, CapabilityChipsP
       >
         {caps.map((cap) => {
           const on = selected.includes(cap.value)
+          const Icon = cap.icon
           if (!interactive) {
             return (
               <span
                 key={cap.value}
+                data-as-cap={cap.value}
                 data-active={on || undefined}
+                title={`${cap.label} capability`}
                 className={cn(
-                  'inline-flex items-center rounded-full border px-2.5 py-0.5 text-[11px]',
+                  'inline-flex items-center gap-1 rounded-[var(--as-radius-sm)] px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide',
                   on
-                    ? 'border-[var(--as-primary)] bg-[var(--as-primary)]/10 text-[var(--as-primary)]'
-                    : 'border-[var(--as-border)] text-[var(--as-muted-fg)]',
+                    ? 'bg-[var(--as-primary)]/10 text-[var(--as-primary)]'
+                    : 'bg-[var(--as-muted)] text-[var(--as-muted-fg)]',
                 )}
               >
+                {Icon ? <Icon className="size-2.5" aria-hidden /> : null}
                 {cap.label}
               </span>
             )
@@ -66,19 +73,22 @@ export const CapabilityChips = React.forwardRef<HTMLDivElement, CapabilityChipsP
             <button
               key={cap.value}
               type="button"
+              data-as-cap={cap.value}
               aria-pressed={on}
               disabled={disabled || locked(cap.value)}
               onClick={() => onToggle?.(cap.value)}
               className={cn(
-                'cursor-pointer rounded-full border px-2.5 py-0.5 text-[11px] transition-colors',
+                'flex cursor-pointer items-center gap-1.5 rounded-[var(--as-radius)] border px-3 py-2 text-xs font-semibold uppercase tracking-wider transition-all',
                 'focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[var(--as-focus-ring)]',
-                'disabled:pointer-events-none disabled:opacity-50',
+                'disabled:pointer-events-none disabled:opacity-60',
                 on
-                  ? 'border-[var(--as-primary)] bg-[var(--as-primary)]/10 text-[var(--as-primary)]'
-                  : 'border-[var(--as-border)] text-[var(--as-muted-fg)] hover:bg-[var(--as-secondary)]',
+                  ? 'border-[var(--as-primary)]/30 bg-[var(--as-primary)]/10 text-[var(--as-primary)] shadow-[var(--as-shadow-1)]'
+                  : 'border-[var(--as-border)] bg-[var(--as-surface)] text-[var(--as-muted-fg)] hover:border-[var(--as-muted-fg)]/40',
               )}
             >
+              {Icon ? <Icon className="size-3.5" aria-hidden /> : null}
               {cap.label}
+              {on ? <Check className="size-3" aria-hidden /> : null}
             </button>
           )
         })}
