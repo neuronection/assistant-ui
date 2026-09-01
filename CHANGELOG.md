@@ -1,5 +1,21 @@
 # @neuronection/assistant-ui
 
+## 0.13.1
+
+### Patch Changes
+
+- [`aff5f8d`](https://github.com/neuronection/assistant-ui/commit/aff5f8df4834e704a0d329ed621a3fcac6df96ad) Thanks [@constLiakos](https://github.com/constLiakos)! - UX clarity from live testing: `ModelRegistry` gains `capsHint` (muted explainer under the capability chips in the catalog modal), and `TaskAssignmentPicker` renders a visible uppercase fallback marker before the secondary picker so the primary/fallback pair is self-explanatory.
+
+- [`aff5f8d`](https://github.com/neuronection/assistant-ui/commit/aff5f8df4834e704a0d329ed621a3fcac6df96ad) Thanks [@constLiakos](https://github.com/constLiakos)! - `TaskAssignmentPicker` marks the primary/fallback pickers with compact badges (`primaryLabel`, default "Primary"; the fallback uses `secondaryLabel`) and optional `primaryInfo`/`fallbackInfo` popups (via the library InfoButton) explaining when each is used.
+
+- [`ab46892`](https://github.com/neuronection/assistant-ui/commit/ab468925f37d6bc4a56c91cff4541fab8f8ace22) Thanks [@constLiakos](https://github.com/constLiakos)! - `TaskAssignmentPicker` defaults rows use a column layout: the Primary and Fallback badges act as column headers with their pickers aligned beneath (fixed widths keep the columns stuck across rows); override rows render a single unbadged picker; the task title block can no longer be squeezed out by the action columns.
+
+- [`67fed2e`](https://github.com/neuronection/assistant-ui/commit/67fed2ea4a85b96c46cbdf524fcc7590ad7675f8) Thanks [@constLiakos](https://github.com/constLiakos)! - `TaskAssignmentPicker` fallback rows get their own clear button (visible when a fallback is assigned) alongside the primary one — each row's X clears exactly its own assignment.
+
+- [`77913e3`](https://github.com/neuronection/assistant-ui/commit/77913e369c260bad9370a1a93376d45efebb3305) Thanks [@constLiakos](https://github.com/constLiakos)! - `TaskAssignmentPicker` info buttons are always visible and their popups open on click only — no hover-triggered description popups while moving across the rows.
+
+- [`783ae31`](https://github.com/neuronection/assistant-ui/commit/783ae317463213a084ab95f8d558bf18d5d1af7f) Thanks [@constLiakos](https://github.com/constLiakos)! - `TaskAssignmentPicker` defaults cards stack the pickers in rows instead of columns — the fallback picker sits on the first row, the primary picker (with the assignment clear button) on the second; override rows keep a single unbadged picker row.
+
 ## 0.13.0
 
 ### Minor Changes
