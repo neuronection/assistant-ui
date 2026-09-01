@@ -1,5 +1,0 @@
----
-'@neuronection/assistant-ui': minor
----
-
-Add the `model-registry` module and the AI-settings patterns it composes. `ModelRegistry` renders provider cards with registered model rows and the remote model catalog behind a two-stage add: quick-add with the app-provided cap guess, or an expandable draft panel where label, capabilities, and reasoning effort are editable before confirming — the same panel doubles as the inline editor, so apps can retire their separate edit dialogs. Adds `CapabilityChips` (controlled cap toggle group / badge display with `minSelected`), a `variant="inline"` + `meta` option on `ConnectionTestRow` for embedding in app provider cards, and v2 additions to `TaskAssignmentPicker`: `requires`-based capability filtering of the row catalog, `sections` grouping, per-task fallback (secondary) model assignment, and a `renderMeta` slot. `ModelPickerModel` gains an optional `capabilities: string[]`. All additions are backward compatible; flat `TaskAssignmentPicker` usage is unchanged.

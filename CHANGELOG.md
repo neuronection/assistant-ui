@@ -1,5 +1,13 @@
 # @neuronection/assistant-ui
 
+## 0.10.0
+
+### Minor Changes
+
+- [`e6a78cf`](https://github.com/neuronection/assistant-ui/commit/e6a78cfda0ccd3f8b4014e8d40f726803ae3c0e2) Thanks [@constLiakos](https://github.com/constLiakos)! - Add the `model-registry` module and the AI-settings patterns it composes. `ModelRegistry` renders provider cards with registered model rows and the remote model catalog behind a two-stage add: quick-add with the app-provided cap guess, or an expandable draft panel where label, capabilities, and reasoning effort are editable before confirming — the same panel doubles as the inline editor, so apps can retire their separate edit dialogs. Adds `CapabilityChips` (controlled cap toggle group / badge display with `minSelected`), a `variant="inline"` + `meta` option on `ConnectionTestRow` for embedding in app provider cards, and v2 additions to `TaskAssignmentPicker`: `requires`-based capability filtering of the row catalog, `sections` grouping, per-task fallback (secondary) model assignment, and a `renderMeta` slot. `ModelPickerModel` gains an optional `capabilities: string[]`. All additions are backward compatible; flat `TaskAssignmentPicker` usage is unchanged.
+
+- [`44d22a7`](https://github.com/neuronection/assistant-ui/commit/44d22a7d3c346d56e4a9c75ffb96c33f0d8ecc20) Thanks [@constLiakos](https://github.com/constLiakos)! - Add `SponsorCard` to the about module and a `sponsor` prop on `AboutPanel`. Channels are data-driven (`SponsorChannel[]`), so apps can start with Buy Me a Coffee (`https://buymeacoffee.com/neuronection`) and add future funding methods without API changes. Highlighted channels render as primary CTAs; per-channel `data-as-channel="<id>"` hooks allow app-side brand theming.
+
 ## 0.9.0
 
 ### Minor Changes
