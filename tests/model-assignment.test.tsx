@@ -177,7 +177,9 @@ describe('TaskAssignmentPicker v2', () => {
     )
     expect(screen.getByText('Default models')).toBeInTheDocument()
     expect(screen.getByText('Per-task overrides')).toBeInTheDocument()
-    const fallback = screen.getAllByRole('combobox')[0] as HTMLElement
+    const fallback = screen.getByRole('combobox', {
+      name: 'Fallback model — Default text model',
+    })
     await user.click(fallback)
     await user.click(screen.getByRole('option', { name: /Qwen VL/ }))
     expect(onAssignSecondary).toHaveBeenCalledWith('text', 'qwen-vl')
