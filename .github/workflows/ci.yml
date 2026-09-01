@@ -4,6 +4,7 @@ on:
   pull_request:
   push:
     branches: [main]
+  workflow_dispatch:
 
 concurrency:
   group: ci-${{ github.ref }}
@@ -164,3 +165,30 @@ jobs:
             playwright-report/
           retention-days: 7
           if-no-files-found: ignore
+
+  visual-rebaseline:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm exec playwright test --update-snapshots
+      - name: Commit regenerated baselines
+        run: |
+          if [[ -n "$(git status --porcelain tests/visual/__screenshots__)" ]]; then
+            git config user.name "neuronection-bot"
+            git config user.email "bot@neuronection.com"
+            git add tests/visual/__screenshots__
+            git commit -m "chore(visual): rebaseline gallery from the CI runner"
+            git push
+          else
+            echo "Baselines already canonical"
+          fi
