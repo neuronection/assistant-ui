@@ -1,5 +1,35 @@
 # @neuronection/assistant-ui
 
+## 0.14.0
+
+### Minor Changes
+
+- [`d94e5a8`](https://github.com/neuronection/assistant-ui/commit/d94e5a82e3ddaa67e7157a8775b42347b2a6ecdb) Thanks [@constLiakos](https://github.com/constLiakos)! - `ModelRegistry` gains an app-supplied extra-field slot and a per-row enable
+  toggle. `extraFields` (`{ key, label, placeholder?, multiline? }[]`) renders
+  app-declared fields inside the add/edit modal — e.g. health-assistant's model
+  description — with the string values carried verbatim on
+  `Model.extra`/`Draft.extra`/`Patch.extra` (included in a patch only when the
+  user touched a field or the model already carried non-empty values).
+  `onToggleEnabled(model, enabled)` renders a native per-row checkbox
+  (`Enabled — <id>` accessible name, hidden for read-only providers) so apps can
+  persist the model's enabled flag from the row itself. Note: the visual
+  baseline for `model-registry--model-registry-story` needs a CI rebaseline.
+
+- [`4401664`](https://github.com/neuronection/assistant-ui/commit/4401664b46b0a76a70fbca4711c31f5277913982) Thanks [@constLiakos](https://github.com/constLiakos)! - `TaskAssignmentTask` gains `secondaryOnly` — renders ONLY the fallback picker
+  line for that row (Fallback badge + picker + info + clear, no primary line)
+  for tasks whose assignment itself is a fallback, e.g. an app's single global
+  default model; the value round-trips via `secondaryValue`/`onAssignSecondary`.
+  It implies `secondary`, so it works flat or inside a section without the
+  section-level flag.
+
+### Patch Changes
+
+- [`2e1fe5a`](https://github.com/neuronection/assistant-ui/commit/2e1fe5a0383d810cb01ed1d40c13dea30a7b9292) Thanks [@constLiakos](https://github.com/constLiakos)! - `ConnectionTestRow` wraps long error messages (`whitespace-pre-wrap` +
+  `break-words` instead of a single clipped line) so full provider API errors —
+  e.g. OpenAI's multi-line 400 payloads — stay readable in app cards.
+
+- [`6d6d6b4`](https://github.com/neuronection/assistant-ui/commit/6d6d6b4c4b8ea8fc73cfd1ff37956bbbe73e5aa2) Thanks [@constLiakos](https://github.com/constLiakos)! - `ModelRegistry` providers accept a `readOnly` flag: read-only providers render their model rows without the Edit/Remove controls and without the Add-model button — for org-managed providers the current user may not modify.
+
 ## 0.13.1
 
 ### Patch Changes
