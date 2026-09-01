@@ -172,7 +172,7 @@ describe('ModelRegistry', () => {
       externalId: 'llava',
       label: undefined,
       caps: ['text', 'tools'],
-      reasoningEffort: undefined,
+      reasoningEffort: '',
     })
   })
 

@@ -271,7 +271,7 @@ export const ModelRegistry = React.forwardRef<HTMLDivElement, ModelRegistryProps
         externalId,
         label: draft.label.trim() || undefined,
         caps: draft.caps,
-        reasoningEffort: draft.reasoningEffort.trim() || undefined,
+        reasoningEffort: draft.reasoningEffort.trim(),
       }
       if (draft.mode === 'add') {
         onAddModel(draft.providerId, payload)
