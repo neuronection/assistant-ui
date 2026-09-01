@@ -1,5 +1,19 @@
 # @neuronection/assistant-ui
 
+## 0.11.0
+
+### Minor Changes
+
+- [`b69b713`](https://github.com/neuronection/assistant-ui/commit/b69b713f4a61887bf1ae1aee3c65f150f6e459e9) Thanks [@constLiakos](https://github.com/constLiakos)! - Model-registry family adopts the health-assistant settings design language, all on tokens: provider cards gain the chevron icon tile (primary-filled when expanded), tinted border + shadow on the open card, an entry fade, and an enabled/total count pill; `CapabilityDescriptor` gains `icon` and every chip/badge carries `data-as-cap` so apps can re-tint per capability; `TaskAssignmentTask` gains `icon` (leading tile). Behavior changes: the remote-catalog zone (search, capability filters, manual add, add-all, catalog rows) is collapsed behind a `browseLabel` trigger button (`aria-expanded`) instead of always visible, and the per-row enable checkbox is removed — apps filter the `models` prop themselves (disabled models re-enter via the catalog's normal add path). `enabledLabel` is gone; `tasks` is optional on `TaskAssignmentPicker`.
+
+### Patch Changes
+
+- [`4f9e9bb`](https://github.com/neuronection/assistant-ui/commit/4f9e9bb923ea09fb5f186312627b124779a0035f) Thanks [@constLiakos](https://github.com/constLiakos)! - `ModelRegistry` draft payloads always carry `reasoningEffort` (empty string when cleared) so apps can distinguish "unset" from "cleared" — previously clearing the field sent `undefined` and the stored value could never be removed.
+
+- [`a93f657`](https://github.com/neuronection/assistant-ui/commit/a93f657ed7577bb347909e211c62a40a36fda87a) Thanks [@constLiakos](https://github.com/constLiakos)! - `ProviderForm` gains `hideBaseUrl` for provider types with a fixed endpoint (Google, Anthropic) — the base URL field is omitted instead of rendering an inert input.
+
+- [`6d8c694`](https://github.com/neuronection/assistant-ui/commit/6d8c694ffdc5b1358d49cc2e596639fbab3818a2) Thanks [@constLiakos](https://github.com/constLiakos)! - `TaskAssignmentPicker` makes `tasks` optional — sections-only usage no longer needs an empty `tasks` array.
+
 ## 0.10.0
 
 ### Minor Changes
