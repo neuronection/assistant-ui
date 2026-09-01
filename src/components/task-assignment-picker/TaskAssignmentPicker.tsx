@@ -26,7 +26,8 @@ export interface TaskAssignmentSection {
 }
 
 export interface TaskAssignmentPickerProps {
-  tasks: TaskAssignmentTask[]
+  /** Flat rendering; ignored when `sections` is set. */
+  tasks?: TaskAssignmentTask[]
   /** Grouped rendering; when set, `tasks` is ignored. */
   sections?: TaskAssignmentSection[]
   providers: ModelPickerProvider[]
@@ -66,7 +67,7 @@ export const TaskAssignmentPicker = React.forwardRef<
   TaskAssignmentPickerProps
 >(function TaskAssignmentPicker(
   {
-    tasks,
+    tasks = [],
     sections,
     providers,
     value,
