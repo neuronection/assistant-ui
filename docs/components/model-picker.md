@@ -31,6 +31,7 @@ import {
 | `clearable` | `boolean` | `false` | × clear button when a value is set |
 | `clearLabel` | `string` | — | |
 | `label` | `string` | — | field label |
+| `hideLabel` | `boolean` | `false` | keep `label` as the accessible name but don't render it visibly |
 | `error` | `string` | — | `role="alert"` line |
 | `id` | `string` | auto | |
 | `className` / `panelClassName` | `string` | — | wrapper / popover panel |
@@ -59,16 +60,16 @@ minimal:
 ```
 
 realistic (per-task picker inside an assignment row, from study
-`TasksTab`):
+`TasksTab` — hidden label, the row X is the remove affordance):
 
 ```tsx
 <ModelPicker
   providers={catalog}
   value={value[task.id] ?? ''}
   onChange={(modelId) => onAssign(task.id, modelId)}
-  clearable={Boolean(value[task.id])}
-  clearLabel={clearLabel}
-  label={`${modelLabel} — ${task.label}`}
+  clearable={false}
+  label={task.label}
+  hideLabel
 />
 ```
 

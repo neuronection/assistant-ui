@@ -338,9 +338,7 @@ const sections: TaskAssignmentSection[] = [
   onAssign={handleAssign}
   onAssignSecondary={handleAssignSecondary}
   secondaryLabel={t('settings.defaultFallbackLabel')}
-  unassignedLabel={t('settings.unassigned')}
   clearLabel={t('settings.unassigned')}
-  modelLabel={t('settings.model')}
   disabled={assign.isPending || assignDefault.isPending}
 />
 ```

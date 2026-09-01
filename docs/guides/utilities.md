@@ -5,14 +5,14 @@ All are re-exported from the root barrel; `fuzzy` has no dedicated subpath.
 
 ## fuzzy search (`searchScore`, `fuzzyScore`)
 
-Source: `src/lib/fuzzy.ts`. `Combobox`'s default filter runs
-`searchScore` against each option's `label`, `value` and `description`, so the
-behavior below is what users get in every combobox-driven picker
-(`ModelPicker`, `ModelRegistry`'s add-model modal, apps' own `Combobox`
-usage).
+Source: `src/lib/fuzzy.ts`, shipped as the `@neuronection/assistant-ui/fuzzy`
+subpath. `Combobox`'s default filter runs `searchScore` against each option's
+`label`, `value` and `description`, so the behavior below is what users get
+in every combobox-driven picker (`ModelPicker`, `ModelRegistry`'s add-model
+modal, apps' own `Combobox` usage).
 
 ```ts
-import { fuzzyScore, searchScore, typoDistance } from '@neuronection/assistant-ui'
+import { fuzzyScore, searchScore, typoDistance, beautifyId } from '@neuronection/assistant-ui/fuzzy'
 ```
 
 - `searchScore(query, target)` → `number | null`. The full pipeline:
@@ -22,6 +22,10 @@ import { fuzzyScore, searchScore, typoDistance } from '@neuronection/assistant-u
 - `typoDistance(a, b, max)` → bounded Damerau-Levenshtein distance
   (substitutions, insertions, deletions, transpositions) or `null` when the
   distance exceeds `max` (early exit). Exported for app-side reuse.
+- `beautifyId(externalId)` → display name: splits on separators, title-cases
+  words and upper-cases known acronyms (`gpt`, `vl`, `ocr`, `llm`, …) —
+  `'gpt-4o-mini'` → `'GPT 4o Mini'`, `'qwen2.5-vl:7b'` → `'Qwen2.5 VL 7b'`.
+  `ModelRegistry` uses it to seed a model's display label from its id.
 
 ### ranking model
 

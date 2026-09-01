@@ -28,28 +28,30 @@ import {
 | `onAssignSecondary` | `(taskId: string, modelId: string \| null) => void` | — | enables fallback pickers for flagged tasks |
 | `secondaryLabel` | `string` | `'Fallback model'` | picker label prefix |
 | `renderMeta` | `(task: TaskAssignmentTask) => ReactNode` | — | app-rendered per-row context |
-| `unassignedLabel` | `string` | `'Not assigned'` | row summary when empty |
-| `clearLabel` | `string` | `'Clear assignment'` | × button + picker clear |
-| `modelLabel` | `string` | `'Model'` | picker label prefix (`Model — <task>`) |
+| `clearLabel` | `string` | `'Clear assignment'` | row-level × accessible name (`Clear assignment — <task>`) |
 | `disabled` | `boolean` | `false` | disables all pickers + clear buttons |
 | `className` | `string` | — | merges onto the root |
 
 `TaskAssignmentTask`: `{ id, label, description?, icon?, requires?,
 secondary? }` — `requires` filters the row's catalog to matching models,
-`secondary` forces the fallback picker for that row.
+`secondary` forces the fallback picker for that row. Rows without an `icon`
+fall back to a default `Cpu` glyph.
 
 ## controlled contract
 
 - Assignment state lives in `value`/`secondaryValue`; the component never
-  mutates it. Clearing reports `onAssign(taskId, null)`.
+  mutates it. Clearing reports `onAssign(taskId, null)` via the row-level ×
+  button — the single remove affordance (row pickers render without their
+  internal clear button).
+- The picker triggers show the selection themselves; there is no separate
+  per-row status line. Primary picker's accessible name is the task label;
+  the fallback picker's is `Fallback model — <task>`.
 - Catalogs are filtered per row by `requires` (matches `model.capabilities`
   or the legacy single `capability`); providers left with zero models drop
   out of that row's picker.
 - Fallback pickers render when the task (directly or via its section) is
   `secondary` **and** `onAssignSecondary` is set. Round-trip both ids in
   your handler (see the [ai-settings guide](../guides/ai-settings.md#3-tasks-taskassignmentpicker)).
-- Row summary text (`Model: <provider> / <model>`) is derived from
-  `providers` — unknown ids render as unassigned.
 
 ## labels & i18n
 
@@ -75,8 +77,9 @@ the [ai-settings guide](../guides/ai-settings.md#3-tasks-taskassignmentpicker).
 ## accessibility
 
 See [accessibility.md](../accessibility.md#settings-blocks): task rows with
-per-row `ModelPicker`s labelled `<role> — <task>`, clear button empties the
-assignment, optional fallback picker.
+per-row `ModelPicker`s (accessible name = the task label), clear button
+empties the assignment (`Clear assignment — <task>`), optional fallback
+picker named `Fallback model — <task>`.
 
 ## related
 

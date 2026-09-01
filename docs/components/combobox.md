@@ -31,6 +31,7 @@ import { Combobox, ComboboxMulti, type ComboboxOption } from '@neuronection/assi
 | `onSearchChange` | `(term: string) => void` | — | **async mode**: disables internal filtering, you filter `options` |
 | `onOpenChange` | `(open: boolean) => void` | — | panel open state reports |
 | `label` | `string` | — | visible field label wired to the trigger |
+| `hideLabel` | `boolean` | `false` | keep `label` as the accessible name but don't render it visibly (the surrounding component titles the row) |
 | `error` | `string` | — | `role="alert"` line + `aria-invalid` |
 | `id` | `string` | auto | on the trigger button |
 | `className` / `panelClassName` | `string` | — | wrapper / popover panel |
