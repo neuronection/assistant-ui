@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { describe, expect, it, vi } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { cleanup, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { axe } from 'jest-axe'
 import { KeyRound } from 'lucide-react'
@@ -99,6 +99,52 @@ describe('ProviderForm', () => {
       />,
     )
     expect(document.body.textContent).not.toContain('sk-live-999')
+  })
+
+  it('optional metadata fields render only behind their flags', async () => {
+    const user = userEvent.setup()
+    const onLocationKindChange = vi.fn()
+    const onCountryChange = vi.fn()
+    const { container } = render(
+      <ProviderForm
+        name="x"
+        onNameChange={vi.fn()}
+        baseUrl=""
+        onBaseUrlChange={vi.fn()}
+        apiKey=""
+        onApiKeyChange={vi.fn()}
+        showLocationKind
+        locationKind="local"
+        onLocationKindChange={onLocationKindChange}
+        showCountry
+        country="AT"
+        onCountryChange={onCountryChange}
+        countryOptions={[
+          { value: 'AT', label: 'Austria' },
+          { value: 'DE', label: 'Germany' },
+        ]}
+      />,
+    )
+    expect(screen.getByText('Hosting')).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: /Cloud/ }))
+    expect(onLocationKindChange).toHaveBeenCalledWith('cloud')
+    await user.selectOptions(screen.getByLabelText('Country'), 'DE')
+    expect(onCountryChange).toHaveBeenCalledWith('DE')
+    expect(await axe(container)).toHaveNoViolations()
+
+    cleanup()
+    render(
+      <ProviderForm
+        name="x"
+        onNameChange={vi.fn()}
+        baseUrl=""
+        onBaseUrlChange={vi.fn()}
+        apiKey=""
+        onApiKeyChange={vi.fn()}
+      />,
+    )
+    expect(screen.queryByText('Hosting')).not.toBeInTheDocument()
+    expect(screen.queryByText('Country')).not.toBeInTheDocument()
   })
 
   it('hideBaseUrl omits the base URL field', () => {

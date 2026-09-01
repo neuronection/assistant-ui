@@ -69,8 +69,12 @@ describe('CapabilityChips', () => {
 })
 
 const providers: ModelRegistryProvider[] = [
-  { id: 'p1', name: 'Ollama (local)', type: 'openai_compatible', baseUrl: 'http://localhost:11434/v1' },
-  { id: 'p2', name: 'Cloud', type: 'google' },
+  {
+    id: 'p1',
+    name: 'Ollama (local)',
+    type: 'openai_compatible',
+    baseUrl: 'http://localhost:11434/v1',
+  },
 ]
 
 const models: ModelRegistryModel[] = [
@@ -82,8 +86,8 @@ const models: ModelRegistryModel[] = [
     caps: ['text', 'vision'],
     enabled: true,
     reasoningEffort: 'medium',
+    temperature: 0.4,
   },
-  { id: 'm2', providerId: 'p1', externalId: 'nomic-embed-text', caps: ['embeddings'], enabled: true },
 ]
 
 const remote: ModelRegistryRemoteModel[] = [
@@ -115,6 +119,8 @@ function RegistryDemo(props: Partial<React.ComponentProps<typeof ModelRegistry>>
             caps: draft.caps,
             enabled: true,
             reasoningEffort: draft.reasoningEffort,
+            temperature: draft.temperature,
+            maxTokens: draft.maxTokens,
           },
         ])
       }
@@ -132,11 +138,12 @@ function RegistryDemo(props: Partial<React.ComponentProps<typeof ModelRegistry>>
   )
 }
 
-describe('ModelRegistry', () => {
+async function openAddModal(user: ReturnType<typeof userEvent.setup>) {
+  await user.click(await screen.findByRole('button', { name: 'Add model' }))
+  return await screen.findByRole('dialog')
+}
 
-  async function openCatalog(user: ReturnType<typeof userEvent.setup>) {
-    await user.click(screen.getByRole('button', { name: /Browse catalog/ }))
-  }
+describe('ModelRegistry', () => {
   it('expands and collapses a provider via its header', async () => {
     const user = userEvent.setup()
     render(<RegistryDemo />)
@@ -146,75 +153,154 @@ describe('ModelRegistry', () => {
     expect(header).toHaveAttribute('aria-expanded', 'false')
   })
 
-  it('quick-adds a remote model with the guessed caps', async () => {
+  it('adds a model through the catalog modal (picker + cap correction)', async () => {
     const user = userEvent.setup()
     const onAddModel = vi.fn()
     render(<RegistryDemo onAddModel={onAddModel} />)
-    await openCatalog(user)
-    await user.click(screen.getByRole('button', { name: 'Add llava' }))
-    expect(onAddModel).toHaveBeenCalledWith('p1', {
-      externalId: 'llava',
-      caps: ['text', 'vision'],
-    })
-  })
-
-  it('configures a remote model before adding (cap correction)', async () => {
-    const user = userEvent.setup()
-    const onAddModel = vi.fn()
-    render(<RegistryDemo onAddModel={onAddModel} />)
-    await openCatalog(user)
-    await user.click(screen.getByRole('button', { name: 'Configure llava' }))
-    const panel = screen
-      .getByText('Display label')
-      .closest('[data-as="model-registry-draft"]') as HTMLElement
-    expect(within(panel).getByRole('button', { name: 'Vision' })).toHaveAttribute(
+    const dialog = await openAddModal(user)
+    const picker = within(dialog).getByRole('combobox', { name: 'Model' })
+    await user.click(picker)
+    await user.click(screen.getByRole('option', { name: 'llava' }))
+    expect(within(dialog).getByRole('button', { name: 'Vision' })).toHaveAttribute(
       'aria-pressed',
       'true',
     )
-    await user.click(within(panel).getByRole('button', { name: 'Vision' }))
-    await user.click(within(panel).getByRole('button', { name: 'Tools' }))
-    await user.click(within(panel).getByRole('button', { name: /Add model/ }))
+    await user.click(within(dialog).getByRole('button', { name: 'Vision' }))
+    await user.click(within(dialog).getByRole('button', { name: 'Tools' }))
+    await user.click(within(dialog).getByRole('button', { name: 'Add model' }))
     expect(onAddModel).toHaveBeenCalledWith('p1', {
       externalId: 'llava',
-      label: undefined,
+      label: 'Llava',
       caps: ['text', 'tools'],
       reasoningEffort: '',
+      temperature: null,
+      maxTokens: null,
     })
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
   })
 
-  it('manual add requires an external id', async () => {
+  it('auto-fills an editable display name from the id (health-style beautifier)', async () => {
+    const user = userEvent.setup()
+    const onAddModel = vi.fn()
+    render(
+      <RegistryDemo
+        onAddModel={onAddModel}
+        remoteModels={[
+          { id: 'gpt-4o-mini', caps: ['text'] },
+          { id: 'llama-3.1-8b', caps: ['text'] },
+        ]}
+      />,
+    )
+    const dialog = await openAddModal(user)
+    await user.click(within(dialog).getByRole('combobox', { name: 'Model' }))
+    await user.click(screen.getByRole('option', { name: 'gpt-4o-mini' }))
+    expect(within(dialog).getByLabelText('Display label')).toHaveValue('GPT 4o Mini')
+    await user.type(within(dialog).getByLabelText('Display label'), '!')
+    await user.click(within(dialog).getByRole('button', { name: 'Add model' }))
+    expect(onAddModel).toHaveBeenCalledWith(
+      'p1',
+      expect.objectContaining({ externalId: 'gpt-4o-mini', label: 'GPT 4o Mini!' }),
+    )
+  })
+
+  it('supports manual ids in the modal', async () => {
     const user = userEvent.setup()
     const onAddModel = vi.fn()
     render(<RegistryDemo onAddModel={onAddModel} />)
-    await openCatalog(user)
-    await user.click(screen.getByRole('button', { name: /Add manually/ }))
-    const confirm = screen.getByRole('button', { name: /Add model/ })
-    expect(confirm).toBeDisabled()
-    await user.type(screen.getByLabelText('Model ID'), 'custom-model')
-    await user.click(confirm)
-    expect(onAddModel).toHaveBeenCalledWith('p1', expect.objectContaining({ externalId: 'custom-model' }))
+    const dialog = await openAddModal(user)
+    await user.click(within(dialog).getByRole('button', { name: /manual/i }))
+    await user.type(within(dialog).getByLabelText('Model'), 'custom-model')
+    await user.click(within(dialog).getByRole('button', { name: 'Add model' }))
+    expect(onAddModel).toHaveBeenCalledWith(
+      'p1',
+      expect.objectContaining({ externalId: 'custom-model', caps: ['text'] }),
+    )
   })
 
-  it('edits an existing model inline (label, caps, reasoning effort)', async () => {
+  it('selects reasoning effort from the dropdown with a custom option', async () => {
+    const user = userEvent.setup()
+    const onAddModel = vi.fn()
+    render(<RegistryDemo onAddModel={onAddModel} />)
+    const dialog = await openAddModal(user)
+    await user.click(within(dialog).getByRole('combobox', { name: 'Model' }))
+    await user.click(screen.getByRole('option', { name: 'llava' }))
+    await user.selectOptions(within(dialog).getByLabelText('Reasoning effort'), 'high')
+    await user.click(within(dialog).getByRole('button', { name: 'Add model' }))
+    expect(onAddModel).toHaveBeenCalledWith(
+      'p1',
+      expect.objectContaining({ reasoningEffort: 'high' }),
+    )
+
+  })
+
+  it('reasoning effort supports a custom value', async () => {
+    const user = userEvent.setup()
+    const onAddModel = vi.fn()
+    render(<RegistryDemo onAddModel={onAddModel} />)
+    const dialog = await openAddModal(user)
+    await user.click(within(dialog).getByRole('combobox', { name: 'Model' }))
+    await user.click(screen.getByRole('option', { name: 'llava' }))
+    await user.selectOptions(within(dialog).getByLabelText('Reasoning effort'), '__custom__')
+    await user.type(within(dialog).getByLabelText('Reasoning effort'), 'wizard')
+    await user.click(within(dialog).getByRole('button', { name: 'Add model' }))
+    expect(onAddModel).toHaveBeenCalledWith(
+      'p1',
+      expect.objectContaining({ reasoningEffort: 'wizard' }),
+    )
+  })
+
+  it('sets and clears temperature and max tokens', async () => {
+    const user = userEvent.setup()
+    const onAddModel = vi.fn()
+    render(<RegistryDemo onAddModel={onAddModel} />)
+    const dialog = await openAddModal(user)
+    await user.click(within(dialog).getByRole('combobox', { name: 'Model' }))
+    await user.click(screen.getByRole('option', { name: 'llava' }))
+    await user.type(within(dialog).getByLabelText('Temperature'), '0.7')
+    await user.type(within(dialog).getByLabelText('Max tokens'), '4096')
+    await user.click(within(dialog).getByRole('button', { name: 'Add model' }))
+    expect(onAddModel).toHaveBeenCalledWith(
+      'p1',
+      expect.objectContaining({ temperature: 0.7, maxTokens: 4096 }),
+    )
+
+  })
+
+  it('clears temperature back to unset', async () => {
+    const user = userEvent.setup()
+    const onAddModel = vi.fn()
+    render(<RegistryDemo onAddModel={onAddModel} />)
+    const dialog = await openAddModal(user)
+    await user.click(within(dialog).getByRole('combobox', { name: 'Model' }))
+    await user.click(screen.getByRole('option', { name: 'llava' }))
+    await user.type(within(dialog).getByLabelText('Temperature'), '0.9')
+    await user.click(within(dialog).getByRole('button', { name: 'Temperature clear' }))
+    await user.click(within(dialog).getByRole('button', { name: 'Add model' }))
+    expect(onAddModel).toHaveBeenCalledWith(
+      'p1',
+      expect.objectContaining({ temperature: null }),
+    )
+  })
+
+  it('edits an existing model through the same modal', async () => {
     const user = userEvent.setup()
     const onUpdateModel = vi.fn()
     render(<RegistryDemo onUpdateModel={onUpdateModel} />)
-    await user.click(screen.getByRole('button', { name: 'Edit qwen2.5-vl' }))
-    const panel = screen
-      .getByText('Display label')
-      .closest('[data-as="model-registry-draft"]') as HTMLElement
-    expect(screen.getByLabelText('Model ID')).toBeDisabled()
-    await user.type(within(panel).getByLabelText('Display label'), '2')
-    await user.clear(within(panel).getByLabelText('Reasoning effort'))
-    await user.type(within(panel).getByLabelText('Reasoning effort'), 'high')
-    await user.click(within(panel).getByRole('button', { name: 'Tools' }))
-    await user.click(within(panel).getByRole('button', { name: /Save/ }))
+    await user.click(await screen.findByRole('button', { name: 'Edit qwen2.5-vl' }))
+    const dialog = await screen.findByRole('dialog')
+    expect(within(dialog).getByText('qwen2.5-vl')).toBeInTheDocument()
+    await user.type(within(dialog).getByLabelText('Display label'), '2')
+    await user.clear(within(dialog).getByLabelText('Temperature'))
+    await user.type(within(dialog).getByLabelText('Temperature'), '0.9')
+    await user.click(within(dialog).getByRole('button', { name: 'Tools' }))
+    await user.click(within(dialog).getByRole('button', { name: 'Save' }))
     expect(onUpdateModel).toHaveBeenCalledWith(
       models[0],
       expect.objectContaining({
         label: 'Qwen VL2',
         caps: ['text', 'vision', 'tools'],
-        reasoningEffort: 'high',
+        reasoningEffort: 'medium',
+        temperature: 0.9,
       }),
     )
   })
@@ -223,53 +309,16 @@ describe('ModelRegistry', () => {
     const user = userEvent.setup()
     const onDeleteModel = vi.fn()
     render(<RegistryDemo onDeleteModel={onDeleteModel} />)
-    await user.click(screen.getByRole('button', { name: /Remove qwen2\.5-vl/ }))
+    await user.click(await screen.findByRole('button', { name: 'Remove qwen2.5-vl' }))
     expect(onDeleteModel).toHaveBeenCalledWith(models[0])
   })
 
-  it('filters the remote catalog by capability and the unclassified pseudo-cap', async () => {
-    const user = userEvent.setup()
-    const { container } = render(<RegistryDemo />)
-    await openCatalog(user)
-    const catalog = within(
-      container.querySelector('[data-as="model-registry-catalog"]') as HTMLElement,
-    )
-    await user.click(screen.getByRole('button', { name: 'Embeddings' }))
-    expect(catalog.getByText('nomic-embed-text')).toBeInTheDocument()
-    expect(catalog.queryByText('llava')).not.toBeInTheDocument()
-    await user.click(screen.getByRole('button', { name: 'Embeddings' }))
-    await user.click(screen.getByRole('button', { name: 'Unclassified' }))
-    expect(catalog.getByText('tiny-random')).toBeInTheDocument()
-    expect(catalog.queryByText('llava')).not.toBeInTheDocument()
-  })
-
-  it('searches the remote catalog with substring matching', async () => {
-    const user = userEvent.setup()
-    const { container } = render(<RegistryDemo />)
-    await openCatalog(user)
-    const catalog = within(
-      container.querySelector('[data-as="model-registry-catalog"]') as HTMLElement,
-    )
-    await user.type(screen.getByRole('textbox', { name: 'Search models' }), 'llav')
-    expect(catalog.getByText('llava')).toBeInTheDocument()
-    expect(catalog.queryByText('nomic-embed-text')).not.toBeInTheDocument()
-  })
-
-  it('marks already-registered remote models as added and offers edit instead', async () => {
-    const user = userEvent.setup()
-    render(<RegistryDemo />)
-    await openCatalog(user)
-    expect(screen.getByText('Added')).toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: 'Add nomic-embed-text' })).not.toBeInTheDocument()
-    expect(screen.getAllByRole('button', { name: 'Edit nomic-embed-text' })).toHaveLength(2)
-  })
-
-  it('add-all fires with the filtered pending drafts (existing excluded)', async () => {
+  it('add-all fires with the pending drafts from the modal footer', async () => {
     const user = userEvent.setup()
     const onAddAll = vi.fn()
     render(<RegistryDemo onAddAll={onAddAll} />)
-    await openCatalog(user)
-    await user.click(screen.getByRole('button', { name: /Add all \(2\)/ }))
+    const dialog = await openAddModal(user)
+    await user.click(within(dialog).getByRole('button', { name: /Add all \(3\)/ }))
     expect(onAddAll).toHaveBeenCalledWith(
       'p1',
       expect.arrayContaining([
@@ -279,7 +328,7 @@ describe('ModelRegistry', () => {
     )
   })
 
-  it('shows the remote error state with retry', async () => {
+  it('shows the remote error state with retry inside the modal', async () => {
     const user = userEvent.setup()
     const onRetryRemote = vi.fn()
     render(
@@ -290,17 +339,17 @@ describe('ModelRegistry', () => {
         onRetryRemote={onRetryRemote}
       />,
     )
-    await openCatalog(user)
-    expect(screen.getByText('connection refused')).toBeInTheDocument()
-    await user.click(screen.getByRole('button', { name: 'Retry' }))
+    const dialog = await openAddModal(user)
+    expect(within(dialog).getByText('connection refused')).toBeInTheDocument()
+    await user.click(within(dialog).getByRole('button', { name: 'Retry' }))
     expect(onRetryRemote).toHaveBeenCalled()
   })
 
-  it('shows the remote loading state', async () => {
+  it('shows the remote loading state inside the modal', async () => {
     const user = userEvent.setup()
     render(<RegistryDemo remoteModels={undefined} remoteState="loading" />)
-    await openCatalog(user)
-    expect(screen.getByText('Loading models…')).toBeInTheDocument()
+    const dialog = await openAddModal(user)
+    expect(within(dialog).getByText('Loading models…')).toBeInTheDocument()
   })
 
   it('renders the providers empty state with the action slot', () => {
@@ -315,33 +364,24 @@ describe('ModelRegistry', () => {
     expect(screen.getByTestId('empty-action')).toBeInTheDocument()
   })
 
-  it('hides the catalog zone until the browse trigger opens it', () => {
-    render(<RegistryDemo />)
-    expect(screen.queryByRole('button', { name: 'Add llava' })).not.toBeInTheDocument()
-    expect(screen.queryByRole('textbox', { name: 'Search models' })).not.toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /Browse catalog/ })).toHaveAttribute(
-      'aria-expanded',
-      'false',
-    )
-  })
-
-  it('is keyboard operable through the row configure button', async () => {
+  it('is keyboard operable through the picker inside the modal', async () => {
     const user = userEvent.setup()
     render(<RegistryDemo />)
-    await openCatalog(user)
-    const configure = screen.getByRole('button', { name: 'Configure llava' })
-    configure.focus()
+    const dialog = await openAddModal(user)
+    const picker = within(dialog).getByRole('combobox', { name: 'Model' })
+    picker.focus()
     await user.keyboard('{Enter}')
-    expect(screen.getByLabelText('Display label')).toBeInTheDocument()
+    expect(await screen.findByRole('option', { name: 'llava' })).toBeInTheDocument()
+    await user.keyboard('{Escape}')
   })
 
-  it('has no axe violations', async () => {
+  it('has no axe violations closed and with the modal open', async () => {
     const user = userEvent.setup()
     const { container } = render(
-      <RegistryDemo emptyAction={<button type="button" data-testid="empty-action">Wizard</button>} />,
+      <RegistryDemo emptyAction={<button type="button">Wizard</button>} />,
     )
     expect(await axe(container)).toHaveNoViolations()
-    await openCatalog(user)
-    expect(await axe(container)).toHaveNoViolations()
+    await openAddModal(user)
+    expect(await axe(document.body)).toHaveNoViolations()
   })
 })

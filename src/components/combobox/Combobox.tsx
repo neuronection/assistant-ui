@@ -2,6 +2,7 @@ import * as React from 'react'
 import * as PopoverPrimitive from '@radix-ui/react-popover'
 import { Check, ChevronDown, Search, X } from 'lucide-react'
 import { cn } from '../../lib/utils'
+import { searchScore } from '../../lib/fuzzy'
 import { Spinner } from '../spinner/Spinner'
 
 export interface ComboboxOption {
@@ -14,16 +15,24 @@ export interface ComboboxOption {
 }
 
 function defaultFilter(options: ComboboxOption[], term: string): ComboboxOption[] {
-  if (!term.trim()) {
+  const needle = term.trim()
+  if (!needle) {
     return options
   }
-  const needle = term.toLowerCase()
-  return options.filter(
-    (option) =>
-      option.label.toLowerCase().includes(needle) ||
-      option.value.toLowerCase().includes(needle) ||
-      option.description?.toLowerCase().includes(needle),
+  const scored = options.flatMap((option) => {
+    let best: number | null = null
+    for (const target of [option.label, option.value, option.description ?? '']) {
+      const score = searchScore(needle, target)
+      if (score !== null && (best === null || score > best)) {
+        best = score
+      }
+    }
+    return best === null ? [] : [{ option, score: best as number }]
+  })
+  scored.sort(
+    (a, b) => b.score - a.score || a.option.label.localeCompare(b.option.label),
   )
+  return scored.map((entry) => entry.option)
 }
 
 interface ComboboxListProps {
@@ -224,7 +233,7 @@ function ComboboxPanel(props: ComboboxPanelProps) {
         }
       }}
       className={cn(
-        'as-anim-pop z-[var(--as-z-popover)] w-[var(--radix-popover-trigger-width)] min-w-48 overflow-hidden rounded-[var(--as-radius-lg)] border border-[var(--as-border)] bg-[var(--as-surface-raised)] text-[var(--as-fg)] shadow-[var(--as-shadow-3)]',
+        'as-anim-pop pointer-events-auto z-[var(--as-z-popover)] w-[var(--radix-popover-trigger-width)] min-w-48 overflow-hidden rounded-[var(--as-radius-lg)] border border-[var(--as-border)] bg-[var(--as-surface-raised)] text-[var(--as-fg)] shadow-[var(--as-shadow-3)]',
         panelClassName,
       )}
       data-as="combobox-panel"
@@ -342,7 +351,7 @@ export const Combobox = React.forwardRef<HTMLButtonElement, ComboboxProps>(funct
           {label}
         </label>
       ) : null}
-      <PopoverPrimitive.Root open={open} onOpenChange={handleOpenChange}>
+      <PopoverPrimitive.Root modal open={open} onOpenChange={handleOpenChange}>
         <span className="relative inline-flex w-full">
           <PopoverPrimitive.Trigger asChild>
             <button
