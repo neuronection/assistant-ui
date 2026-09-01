@@ -232,6 +232,17 @@ describe('ConnectionTestRow', () => {
     expect(screen.getByText('401 unauthorized')).toBeInTheDocument()
   })
 
+  it('wraps long error messages instead of clipping them', () => {
+    const longError =
+      'Error code: 400 - {"error": {"message": "Unsupported parameter: max_tokens is not supported with this model. Use max_completion_tokens instead.", "type": "invalid_request_error"}}'
+    render(<ConnectionTestRow status="fail" errorMessage={longError} />)
+    const message = screen.getByText(/Unsupported parameter/)
+    expect(message).toBeInTheDocument()
+    expect(message.className).not.toContain('truncate')
+    expect(message.className).toContain('whitespace-pre-wrap')
+    expect(message.className).toContain('break-words')
+  })
+
   it('inline variant drops the card chrome', () => {
     const { container } = render(<ConnectionTestRow status="idle" variant="inline" />)
     const root = container.firstElementChild as HTMLElement

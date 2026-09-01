@@ -92,7 +92,7 @@ export const ConnectionTestRow = React.forwardRef<
           </span>
         ) : null}
         {status === 'fail' && errorMessage ? (
-          <span className="truncate text-xs text-[var(--as-danger)]">
+          <span className="min-w-0 whitespace-pre-wrap break-words text-xs text-[var(--as-danger)]">
             {errorMessage}
           </span>
         ) : null}
