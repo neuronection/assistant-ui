@@ -293,6 +293,8 @@ export interface ComboboxProps {
   onSearchChange?: (term: string) => void
   onOpenChange?: (open: boolean) => void
   label?: string
+  /** Keep the accessible name from `label` but do not render it visibly. */
+  hideLabel?: boolean
   error?: string
   id?: string
   className?: string
@@ -316,6 +318,7 @@ export const Combobox = React.forwardRef<HTMLButtonElement, ComboboxProps>(funct
     onSearchChange,
     onOpenChange,
     label,
+    hideLabel = false,
     error,
     id: idProp,
     className,
@@ -346,7 +349,7 @@ export const Combobox = React.forwardRef<HTMLButtonElement, ComboboxProps>(funct
 
   return (
     <div className={cn('flex w-full flex-col gap-1.5', className)}>
-      {label ? (
+      {label && !hideLabel ? (
         <label htmlFor={id} className="text-sm font-medium leading-none text-[var(--as-fg)]">
           {label}
         </label>

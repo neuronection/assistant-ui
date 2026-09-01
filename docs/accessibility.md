@@ -42,6 +42,7 @@ behavior and focus restoration are listed **only where asserted**.
 | `Popover` | Radix popover | Escape closes and restores focus to the trigger | clean (open) |
 | `PopoverButton` | Radix popover behind a button | Escape closes the panel | clean (open) |
 | `InfoButton` | popover button, default name "Information" | opens on click, content exposed | clean |
+| `FieldLabel` | wrapper around `InfoButton` (popover button; default name "Information") | opens via the inner `InfoButton`; content exposed | clean |
 | `Tooltip` | Radix tooltip (`role="tooltip"`) | **focus** (Tab) shows the tooltip — not hover-only | clean |
 | `InfoTooltip` | trigger with default accessible label; `mode="click"` becomes a popover | focus/click per mode | clean |
 | `Menu` / `ActionMenu` | `role="menu"` / `menuitem` | ArrowDown moves focus between items; Enter selects; Escape closes; `disabled` items carry `data-disabled` and are not selectable | clean (open) |
@@ -57,6 +58,7 @@ behavior and focus restoration are listed **only where asserted**.
 | `SearchInput` | `role="search"` wrapper + textbox + clear button | Enter submits (`onSubmit`); clear button empties | clean |
 | `ExpandableSearch` | trigger reveals a `role="search"` input | first Escape clears the value, second Escape collapses (collapsed trigger `aria-hidden`) | clean |
 | `ChipInput` | labelled input + chip remove buttons | Enter commits a chip; separator keys (`,`) commit; Backspace on empty input removes the last chip; paste splits into chips; blur commits the draft; Tab reaches remove buttons and the input | clean |
+| `ChipList` | presentational pills; remove buttons named `<removeLabel> — <item>`; clickable chips are real buttons | remove/click via native button semantics (asserted: accessible names, Enter activation) | clean |
 | `ScaleSlider` | `role="slider"` (native range) paired with a number input | slider `change` emits numeric values; typed input syncs; blur clamps to `min`/`max`; clearing emits `''` | clean |
 | `ProviderForm` | labelled fields; write-only API-key input (never renders a stored value); error `role="alert"` | typing reports `onApiKeyChange` | clean |
 
@@ -120,6 +122,13 @@ behavior and focus restoration are listed **only where asserted**.
 
 - `Portal`, `ThemeScope`, `cn` — rendering/theming primitives (`ThemeScope`
   is axe-checked).
+- `Logo` (`NeuronectionMark`, `NeuronectionWordmark`, app marks) — inline
+  SVGs; `aria-hidden` by default, `title` exposes an accessible name
+  (asserted).
+- `About*` (`AboutPanel`, `AboutCard`, `AboutLinkList`, `AboutNote`,
+  `AboutFooterLine`, `FamilyBadge`, `TechChips`, `SponsorCard`) —
+  presentational composition; link rows are real `<a>`s and copy rows are
+  real buttons (`"<label> — Copy to clipboard"`), axe-checked.
 - `Marquee` — **pointer-only** drag-selection hook. It intentionally has no
   keyboard mode; apps using it must keep a keyboard-reachable selection
   alternative (e.g. the checkboxes from `CheckIndicator` on the same items).

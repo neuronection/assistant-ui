@@ -238,6 +238,10 @@
     "./wizard": {
       "types": "./dist/wizard.d.ts",
       "import": "./dist/wizard.js"
+    },
+    "./fuzzy": {
+      "types": "./dist/fuzzy.d.ts",
+      "import": "./dist/fuzzy.js"
     }
   },
   "scripts": {
@@ -255,7 +259,7 @@
     "test:visual": "playwright test",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "verify": "pnpm lint && pnpm typecheck && pnpm test && pnpm build",
+    "verify": "pnpm lint && node scripts/check-docs.mjs && pnpm typecheck && pnpm test && pnpm build",
     "audit": "node scripts/audit-usage.mjs",
     "changeset": "changeset",
     "ci:publish": "changeset publish"

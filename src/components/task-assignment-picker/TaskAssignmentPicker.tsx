@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { X } from 'lucide-react'
+import { Cpu, X } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { cn } from '../../lib/utils'
 import {
@@ -45,9 +45,7 @@ export interface TaskAssignmentPickerProps {
   secondaryLabel?: string
   /** App-rendered per-row context (inherit notes, spend, badges). */
   renderMeta?: (task: TaskAssignmentTask) => React.ReactNode
-  unassignedLabel?: string
   clearLabel?: string
-  modelLabel?: string
   disabled?: boolean
   className?: string
 }
@@ -81,28 +79,13 @@ export const TaskAssignmentPicker = React.forwardRef<
     onAssignSecondary,
     secondaryLabel = 'Fallback model',
     renderMeta,
-    unassignedLabel = 'Not assigned',
     clearLabel = 'Clear assignment',
-    modelLabel = 'Model',
     disabled = false,
     className,
   },
   ref,
 ) {
-  const modelName = React.useCallback(
-    (modelId: string | null | undefined) => {
-      if (!modelId) return null
-      for (const provider of providers) {
-        const model = provider.models.find((m) => m.id === modelId)
-        if (model) return { name: model.name, provider: provider.name }
-      }
-      return null
-    },
-    [providers],
-  )
-
   const renderRow = (task: TaskAssignmentTask, showSecondary: boolean) => {
-    const assigned = modelName(value[task.id])
     const catalog = filterProviders(providers, task.requires)
     return (
       <div
@@ -110,11 +93,12 @@ export const TaskAssignmentPicker = React.forwardRef<
         className="flex flex-col gap-2 rounded-[var(--as-radius-lg)] border border-[var(--as-border)] bg-[var(--as-surface-raised)] p-3 sm:flex-row sm:items-center sm:justify-between"
       >
         <div className="flex min-w-0 items-center gap-3">
-          {task.icon ? (
-            <span className="flex size-9 shrink-0 items-center justify-center rounded-[var(--as-radius)] bg-[var(--as-muted)] text-[var(--as-muted-fg)]">
-              <task.icon className="size-4" aria-hidden />
-            </span>
-          ) : null}
+          <span className="flex size-9 shrink-0 items-center justify-center rounded-[var(--as-radius)] bg-[var(--as-muted)] text-[var(--as-muted-fg)]">
+            {(() => {
+              const Icon = task.icon ?? Cpu
+              return <Icon className="size-4" aria-hidden />
+            })()}
+          </span>
           <div className="min-w-0">
           <p className="truncate text-sm font-semibold text-[var(--as-fg)]">
             {task.label}
@@ -125,31 +109,20 @@ export const TaskAssignmentPicker = React.forwardRef<
             </p>
           ) : null}
           {renderMeta ? renderMeta(task) : null}
-          <p className="mt-0.5 text-xs text-[var(--as-muted-fg)]">
-            {assigned ? (
-              <>
-                {modelLabel}:{' '}
-                <span className="font-medium text-[var(--as-fg)]">
-                  {assigned.provider} / {assigned.name}
-                </span>
-              </>
-            ) : (
-              unassignedLabel
-            )}
-          </p>
           </div>
         </div>
-        <div className="flex shrink-0 items-center gap-1.5">
+        <div className="flex shrink-0 items-center gap-1.5 self-center">
           {showSecondary && onAssignSecondary ? (
             <ModelPicker
               providers={catalog}
               value={secondaryValue?.[task.id] ?? ''}
               onChange={(modelId) => onAssignSecondary(task.id, modelId)}
               disabled={disabled}
-              clearable={Boolean(secondaryValue?.[task.id])}
+              clearable={false}
               clearLabel={clearLabel}
               label={`${secondaryLabel} — ${task.label}`}
-              className="w-48"
+              hideLabel
+              className="w-48 self-center"
             />
           ) : null}
           <ModelPicker
@@ -157,10 +130,11 @@ export const TaskAssignmentPicker = React.forwardRef<
             value={value[task.id] ?? ''}
             onChange={(modelId) => onAssign(task.id, modelId)}
             disabled={disabled}
-            clearable={Boolean(value[task.id])}
+            clearable={false}
             clearLabel={clearLabel}
-            label={`${modelLabel} — ${task.label}`}
-            className="w-56"
+            label={task.label}
+            hideLabel
+            className="w-56 self-center"
           />
           {value[task.id] ? (
             <button

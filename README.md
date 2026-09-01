@@ -60,36 +60,38 @@ dialogs clear your app chrome. Full guide: [docs/theming.md](./docs/theming.md).
 
 Every module has its own entry point (`import { Menu } from
 '@neuronection/assistant-ui/menu'`) and everything is re-exported from the
-package root. Authoritative props for your installed version: the `.d.ts`
-files in the package's `dist/`. Visual reference:
-[gallery](https://neuronection.github.io/assistant-ui/).
+package root. Each module links a reference page under
+[docs/components/](./docs/components/) below; the `.d.ts` files in the
+package's `dist/` stay the authoritative API for your installed version.
+Visual reference: [gallery](https://neuronection.github.io/assistant-ui/).
 
-| Module | Exports |
-|---|---|
-| `button` / `badge` / `card` | `Button`, `buttonVariants` · `Badge`, `badgeVariants` · `Card`, `CardHeader/Title/Description/Content/Footer` |
-| `modal` / `panel-modal` | `Modal` + parts (compound Radix dialog) · `PanelModal` (header/body/footer shell, full-screen on mobile) |
-| `confirmation-modal` / `form-modal` | `ConfirmationModal` · `FormModal` (form-in-modal shell: `headerActions`, reject button, busy states) |
-| `popover` / `popover-button` | compound Radix `Popover` + parts · `PopoverButton` (self-contained trigger + panel, hover-open, lazy children, `closeSignal`) |
-| `menu` / `context-menu` | `Menu`, `MenuTrigger/Content/Item/Separator/Label`, `ActionMenu` (items-driven) · `ContextMenu` (coordinate-anchored, `{x, y, items, onClose}`) |
-| `combobox` | `Combobox`, `ComboboxMulti` — async mode (`onSearchChange` + `loading`), grouping, capability badges, full keyboard nav |
-| `tooltip` | `Tooltip` + parts, `InfoTooltip` |
-| `wizard` | `Wizard` (steps config + `renderStep`, per-step validation gates, modal/drawer variants), `Stepper` (dots/labels) |
-| `input` / `textarea` / `search-input` / `expandable-search` | `Input` (label/hint/error wiring) · `Textarea` · `SearchInput` · `ExpandableSearch` |
-| `chip-input` / `chip-list` | `ChipInput` (Enter/comma commit, paste-splits, Backspace-removes) · `ChipList` (variant pills, clickable, removable) |
-| `time-picker` / `time-list` | `TimePicker` (clock face, 24h value, 12h UI, editable fields) · `TimeList` (time chips with per-chip pickers) |
-| `date-picker` | `DatePicker` (popover calendar: days/months/years views, min/max, `allowClear`, arrow-key day grid, `unstyled` variant) |
-| `range-bar` / `scale-slider` | `RangeBar` (low–high band + value dot) · `ScaleSlider` (+ `scaleColorForValue`) |
-| `table` | `Table` (headers/rows, opt-in empty state) |
-| `check-indicator` / `selection-bar` / `view-toggle` | `CheckIndicator` (tri-state) · `SelectionBar` (bulk-select bar) · `ViewToggle` (grid/list) |
-| `error-banner` / `undo-notice` / `empty-state` / `spinner` | presentational feedback: alert banner with `action` slot · undo toast · `EmptyState` · `Spinner` |
-| `info-button` / `field-label` / `copy-button` / `breadcrumbs` | `InfoButton` · `FieldLabel` · `CopyButton` (clipboard + copied state) · `Breadcrumbs` (SPA links via `linkComponent`) |
-| `ai-button` / `ai-actions-dropdown` / `ai-magic-fill` | AI affordances: ask-with-suggestions (controlled open, icon-only mode) · action menu + custom prompt · describe-in-words fill modal — API calls stay app-side |
-| `settings-shell` / `provider-form` / `connection-test-row` | `SettingsShell` (controlled two-pane nav) · `ProviderForm` (write-only API-key field) · `ConnectionTestRow` (idle/testing/ok/fail + latency, `inline` variant + meta slot) |
-| `model-picker` / `task-assignment-picker` / `capability-chips` | `ModelPicker` (grouped provider→model combobox, capability chips) · `TaskAssignmentPicker` (task → model mapping rows, capability-filtered, sections + fallback assignment, meta slot) · `CapabilityChips` (cap toggle group / badges, min-selected) |
-| `model-registry` | `ModelRegistry` (provider cards → registered model rows + remote catalog with two-stage add: quick-add or expandable draft panel with editable label/caps/reasoning-effort; cap filter + search + add-all; add/edit are one panel) |
-| `upload-dropzone` / `file-card` / `file-queue` | file attachment surface: dropzone (block/row) · card (status, include toggle) · queue (summary + reorder) |
-| `marquee` | `useMarquee`, `MarqueeSurface`, `MarqueeBand` (rubber-band selection) |
-| `portal` / `theme-scope` / `tokens` | `Portal` · `ThemeScope` · token name lists + types |
+| Module | Exports | Gallery |
+|---|---|---|
+| [`button`](./docs/components/button.md) / [`badge`](./docs/components/badge.md) / [`card`](./docs/components/card.md) | `Button`, `buttonVariants` · `Badge`, `badgeVariants` · `Card`, `CardHeader/Title/Description/Content/Footer` | [stories](https://neuronection.github.io/assistant-ui/?story=button--variants) |
+| [`modal`](./docs/components/modal.md) (`Modal` + parts, `PanelModal`) | `Modal` + parts (compound Radix dialog) · `PanelModal` (header/body/footer shell, full-screen on mobile) | [stories](https://neuronection.github.io/assistant-ui/?story=modal--sizes) |
+| [`confirmation-modal`](./docs/components/confirmation-modal.md) / [`form-modal`](./docs/components/form-modal.md) | `ConfirmationModal` · `FormModal` (form-in-modal shell: `headerActions`, reject button, busy states) | [stories](https://neuronection.github.io/assistant-ui/?story=modal--confirmation) |
+| [`popover`](./docs/components/popover.md) / [`popover-button`](./docs/components/popover-button.md) | compound Radix `Popover` + parts · `PopoverButton` (self-contained trigger + panel, hover-open, lazy children, `closeSignal`) | [stories](https://neuronection.github.io/assistant-ui/?story=popover-button--default) |
+| [`menu`](./docs/components/menu.md) / [`context-menu`](./docs/components/context-menu.md) | `Menu`, `MenuTrigger/Content/Item/Separator/Label`, `ActionMenu` (items-driven) · `ContextMenu` (coordinate-anchored, `{x, y, items, onClose}`) | [stories](https://neuronection.github.io/assistant-ui/?story=menu--compound-menu) |
+| [`combobox`](./docs/components/combobox.md) | `Combobox`, `ComboboxMulti` — async mode (`onSearchChange` + `loading`), grouping, capability badges, full keyboard nav | [stories](https://neuronection.github.io/assistant-ui/?story=combobox--single-select) |
+| [`tooltip`](./docs/components/tooltip.md) | `Tooltip` + parts, `InfoTooltip` | [stories](https://neuronection.github.io/assistant-ui/?story=overlay--tooltips) |
+| [`wizard`](./docs/components/wizard.md) | `Wizard` (steps config + `renderStep`, per-step validation gates, modal/drawer variants), `Stepper` (dots/labels) | [stories](https://neuronection.github.io/assistant-ui/?story=wizard--modal-wizard) |
+| [`input`](./docs/components/input.md) / [`textarea`](./docs/components/textarea.md) / [`search-input`](./docs/components/search-input.md) / [`expandable-search`](./docs/components/expandable-search.md) | `Input` (label/hint/error wiring) · `Textarea` · `SearchInput` · `ExpandableSearch` | [stories](https://neuronection.github.io/assistant-ui/?story=misc--inputs) |
+| [`chip-input`](./docs/components/chip-input.md) / [`chip-list`](./docs/components/chip-list.md) | `ChipInput` (Enter/comma commit, paste-splits, Backspace-removes) · `ChipList` (variant pills, clickable, removable) | [stories](https://neuronection.github.io/assistant-ui/?story=phase2--chip-editing) |
+| [`time-picker`](./docs/components/time-picker.md) / [`time-list`](./docs/components/time-list.md) | `TimePicker` (clock face, 24h value, 12h UI, editable fields) · `TimeList` (time chips with per-chip pickers) | [stories](https://neuronection.github.io/assistant-ui/?story=time-pickers--time-picker-story) |
+| [`date-picker`](./docs/components/date-picker.md) | `DatePicker` (popover calendar: days/months/years views, min/max, `allowClear`, arrow-key day grid, `unstyled` variant) | [stories](https://neuronection.github.io/assistant-ui/?story=phase2--date-pickers) |
+| [`range-bar`](./docs/components/range-bar.md) / [`scale-slider`](./docs/components/scale-slider.md) | `RangeBar` (low–high band + value dot) · `ScaleSlider` (+ `scaleColorForValue`) | [stories](https://neuronection.github.io/assistant-ui/?story=phase2--range-bars) |
+| [`table`](./docs/components/table.md) | `Table` (headers/rows, opt-in empty state) | [stories](https://neuronection.github.io/assistant-ui/?story=phase2--data-table) |
+| [`check-indicator`](./docs/components/check-indicator.md) / [`selection-bar`](./docs/components/selection-bar.md) / [`view-toggle`](./docs/components/view-toggle.md) | `CheckIndicator` (tri-state) · `SelectionBar` (bulk-select bar) · `ViewToggle` (grid/list) | [stories](https://neuronection.github.io/assistant-ui/?story=controls--selection) |
+| [`error-banner`](./docs/components/error-banner.md) / [`undo-notice`](./docs/components/undo-notice.md) / [`empty-state`](./docs/components/empty-state.md) / [`spinner`](./docs/components/spinner.md) | presentational feedback: alert banner with `action` slot · undo toast · `EmptyState` · `Spinner` | [stories](https://neuronection.github.io/assistant-ui/?story=feedback--errors) |
+| [`info-button`](./docs/components/info-button.md) / [`field-label`](./docs/components/field-label.md) / [`copy-button`](./docs/components/copy-button.md) / [`breadcrumbs`](./docs/components/breadcrumbs.md) | `InfoButton` · `FieldLabel` · `CopyButton` (clipboard + copied state) · `Breadcrumbs` (SPA links via `linkComponent`) | [stories](https://neuronection.github.io/assistant-ui/?story=phase2--copy-buttons) |
+| [`ai-button`](./docs/components/ai-button.md) / [`ai-actions-dropdown`](./docs/components/ai-actions-dropdown.md) / [`ai-magic-fill`](./docs/components/ai-magic-fill.md) | AI affordances: ask-with-suggestions (controlled open, icon-only mode) · action menu + custom prompt · describe-in-words fill modal — API calls stay app-side | [stories](https://neuronection.github.io/assistant-ui/?story=ai-patterns--ai-buttons) |
+| [`settings-shell`](./docs/components/settings-shell.md) / [`provider-form`](./docs/components/provider-form.md) / [`connection-test-row`](./docs/components/connection-test-row.md) | `SettingsShell` (controlled two-pane nav) · `ProviderForm` (write-only API-key field) · `ConnectionTestRow` (idle/testing/ok/fail + latency, `inline` variant + meta slot) | [stories](https://neuronection.github.io/assistant-ui/?story=settings-trio--provider-form-story) |
+| [`model-picker`](./docs/components/model-picker.md) / [`task-assignment-picker`](./docs/components/task-assignment-picker.md) / [`capability-chips`](./docs/components/capability-chips.md) | `ModelPicker` (grouped provider→model combobox, capability chips) · `TaskAssignmentPicker` (task → model mapping rows, capability-filtered, sections + fallback assignment, meta slot) · `CapabilityChips` (cap toggle group / badges, min-selected) | [stories](https://neuronection.github.io/assistant-ui/?story=model-assignment--task-assignment-v2-story) |
+| [`model-registry`](./docs/components/model-registry.md) | `ModelRegistry` (provider cards → registered model rows; add/edit in one catalog modal fed by app-fetched remote models; manual id entry; add-all of pending ids) | [stories](https://neuronection.github.io/assistant-ui/?story=model-registry--model-registry-story) |
+| [`upload-dropzone`](./docs/components/upload-dropzone.md) / [`file-card`](./docs/components/file-card.md) / [`file-queue`](./docs/components/file-queue.md) | file attachment surface: dropzone (block/row) · card (status, include toggle) · queue (summary + reorder) | [stories](https://neuronection.github.io/assistant-ui/?story=file-surface--dropzones) |
+| [`marquee`](./docs/components/marquee.md) | `useMarquee`, `MarqueeSurface`, `MarqueeBand` (rubber-band selection) | [stories](https://neuronection.github.io/assistant-ui/?story=marquee--default) |
+| [`portal`](./docs/components/portal.md) / [`theme-scope`](./docs/components/theme-scope.md) / tokens | `Portal` · `ThemeScope` · [token name lists + types](./docs/guides/utilities.md#tokens-entry-point) | [stories](https://neuronection.github.io/assistant-ui/?story=tokens--semantic-tokens) |
+| [`logo`](./docs/components/logo.md) / [`about`](./docs/components/about.md) | `NeuronectionMark`, `NeuronectionWordmark`, `Career/Study/HealthMark` · `AboutPanel` + about-page building blocks (`AboutCard`, `AboutLinkList`, `FamilyBadge`, `SponsorCard`, …) | [stories](https://neuronection.github.io/assistant-ui/?story=about--health-about-page) |
 
 API rules: controlled-first, `className` merges (never replaces), `asChild`
 where it makes sense, refs forwarded everywhere, English label props with
@@ -97,6 +99,21 @@ defaults (translate at call sites), icons as props. No fetching, no stores,
 no router — data in, events out.
 
 ## Documentation
+
+Guides (`docs/guides/`):
+
+- [Import & theming](./docs/guides/import-and-theming.md) — import paths
+  (subpath vs barrel vs app shims), CSS load order, `--as-*` tokens,
+  `data-as-*` styling hooks, Vite setup checklist
+- [Utilities](./docs/guides/utilities.md) — `searchScore`/`fuzzyScore`
+  ranking model, `cn`, the tokens entry point
+- [AI settings surfaces](./docs/guides/ai-settings.md) — the providers →
+  models → tasks recipe (`ProviderForm`, `ConnectionTestRow`,
+  `ModelRegistry`, `TaskAssignmentPicker`) with real app call-sites
+
+Per-component reference (`docs/components/<module>.md`): purpose, import
+line, props table, controlled contract, i18n contract, snippets,
+accessibility notes — every module in the table above links its page.
 
 - [Adopting in an app](./docs/adoption.md) — the install/switchover recipe each family app follows (incl. the TW3 cascade notes)
 - [Theming](./docs/theming.md) — tokens, app themes, dark mode, styling hooks

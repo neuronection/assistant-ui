@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { UploadDropzone } from '../src/components/upload-dropzone/UploadDropzone'
+import { FileCard } from '../src/components/file-card/FileCard'
 import { FileQueue, type FileQueueItem } from '../src/components/file-queue/FileQueue'
 
 export const Dropzones = () => {
@@ -51,3 +52,25 @@ export const FileQueueStory = () => {
     />
   )
 }
+
+export const FileCardStory = () => (
+  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12 }}>
+    <FileCard name="bloodwork.pdf" sizeBytes={244000} status="done" onRemove={() => {}} />
+    <FileCard
+      name="scan.png"
+      sizeBytes={1280000}
+      status="processing"
+      included
+      onToggleInclude={() => {}}
+      onRemove={() => {}}
+    />
+    <FileCard
+      name="notes.txt"
+      sizeBytes={900}
+      status="failed"
+      error="Unsupported format"
+      included={false}
+      onToggleInclude={() => {}}
+    />
+  </div>
+)

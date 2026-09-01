@@ -59,6 +59,14 @@ Then wire it up:
   changed stories need refreshed baselines in the same PR:
   `pnpm exec playwright test --update-snapshots`, commit
   `tests/visual/__screenshots__/`.
+- **Docs page** (`docs/components/<name>.md`): purpose, import line, props
+  table (derive it from the component's Props interface — never invent),
+  controlled contract, label/i18n contract, minimal + realistic snippets,
+  accessibility link, related modules. See an existing page (e.g.
+  [`docs/components/button.md`](./components/button.md)) as the template.
+  The docs coverage check (`scripts/check-docs.mjs`, part of `pnpm verify`)
+  fails when the page, the README row, the story or the accessibility row
+  is missing.
 - **Changeset** (`pnpm changeset`): minor for the new component.
 
 ## Verify

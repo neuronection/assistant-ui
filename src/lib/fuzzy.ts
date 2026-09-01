@@ -113,6 +113,21 @@ export function typoDistance(a: string, b: string, max = 2): number | null {
   return previous[b.length] ?? null
 }
 
+export function beautifyId(externalId: string): string {
+  const acronyms = ['gpt', 'nlp', 'ocr', 'llm', 'stt', 'tts', 'vl', 'ai']
+  return externalId
+    .replace(/[-:]/g, ' ')
+    .replace(/(?<!\d)\.|\.(?!\d)/g, ' ')
+    .split(' ')
+    .filter(Boolean)
+    .map((word) =>
+      acronyms.includes(word.toLowerCase())
+        ? word.toUpperCase()
+        : word.charAt(0).toUpperCase() + word.slice(1),
+    )
+    .join(' ')
+}
+
 export function searchScore(query: string, target: string): number | null {
   const direct = fuzzyScore(query, target)
   if (direct !== null) {

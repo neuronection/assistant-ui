@@ -33,6 +33,8 @@ export interface ModelPickerProps {
   clearable?: boolean
   clearLabel?: string
   label?: string
+  /** Keep the accessible name from `label` but do not render it visibly. */
+  hideLabel?: boolean
   error?: string
   id?: string
   className?: string
@@ -58,6 +60,7 @@ export const ModelPicker = React.forwardRef<HTMLButtonElement, ModelPickerProps>
       clearable = false,
       clearLabel,
       label,
+      hideLabel = false,
       error,
       id,
       className,
@@ -93,6 +96,7 @@ export const ModelPicker = React.forwardRef<HTMLButtonElement, ModelPickerProps>
         clearable={clearable}
         clearLabel={clearLabel}
         label={label}
+        hideLabel={hideLabel}
         error={error}
         id={id}
         className={cn('w-full', className)}

@@ -4,6 +4,7 @@ import { EmptyState } from '../src/components/empty-state/EmptyState'
 import { Input } from '../src/components/input/Input'
 import { Spinner } from '../src/components/spinner/Spinner'
 import { PanelModal } from '../src/components/modal/PanelModal'
+import { Portal } from '../src/components/portal/Portal'
 import { useState } from 'react'
 
 function PanelModalDemo() {
@@ -57,5 +58,28 @@ export const Spinners = () => (
     <Spinner />
     <Spinner size="lg" />
     <Button loading>Saving</Button>
+  </div>
+)
+
+export const PortalSurface = () => (
+  <div
+    style={{
+      display: 'grid',
+      gap: 12,
+      maxWidth: 480,
+      border: '1px dashed var(--as-border)',
+      padding: 16,
+    }}
+  >
+    <span style={{ fontSize: 13, color: 'var(--as-muted-fg)' }}>
+      The badge below renders through Portal (document.body).
+    </span>
+    <Portal>
+      <div style={{ position: 'fixed', right: 16, bottom: 16 }}>
+        <Button variant="outline" size="sm">
+          Portaled to body
+        </Button>
+      </div>
+    </Portal>
   </div>
 )

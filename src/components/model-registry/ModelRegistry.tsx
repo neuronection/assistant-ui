@@ -6,6 +6,7 @@ import { CapabilityChips, type CapabilityDescriptor } from '../capability-chips'
 import { Modal, ModalContent, ModalHeader, ModalTitle, ModalFooter } from '../modal/Modal'
 import { ModelPicker, type ModelPickerProvider } from '../model-picker/ModelPicker'
 import { Spinner } from '../spinner'
+import { beautifyId } from '../../lib/fuzzy'
 
 export interface ModelRegistryProvider {
   id: string
@@ -97,21 +98,6 @@ export interface ModelRegistryProps {
 }
 
 const CUSTOM = '__custom__'
-const ACRONYMS = ['gpt', 'nlp', 'ocr', 'llm', 'stt', 'tts', 'vl', 'ai']
-
-function beautifyModelId(externalId: string): string {
-  return externalId
-    .replace(/[-:]/g, ' ')
-    .replace(/(?<!\d)\.|\.(?!\d)/g, ' ')
-    .split(' ')
-    .filter(Boolean)
-    .map((word) => {
-      if (ACRONYMS.includes(word.toLowerCase())) return word.toUpperCase()
-      return word.charAt(0).toUpperCase() + word.slice(1)
-    })
-    .join(' ')
-}
-
 interface NumberFieldProps {
   label: string
   value: string
@@ -312,7 +298,7 @@ export const ModelRegistry = React.forwardRef<HTMLDivElement, ModelRegistryProps
               ...current,
               externalId: remoteId,
               caps: remote ? [...remote.caps] : current.caps,
-              label: current.labelTouched ? current.label : beautifyModelId(remoteId),
+              label: current.labelTouched ? current.label : beautifyId(remoteId),
             }
           : current,
       )

@@ -77,12 +77,16 @@ function AssignmentDemo(props: Partial<React.ComponentProps<typeof TaskAssignmen
 }
 
 describe('TaskAssignmentPicker', () => {
-  it('renders tasks with the assigned provider/model', () => {
+  it('renders tasks with icon tiles and the selection in the trigger', () => {
     render(<AssignmentDemo />)
-    expect(screen.getByText('Summarize documents')).toBeInTheDocument()
+    expect(screen.getAllByText('Summarize documents').length).toBeGreaterThan(0)
     expect(screen.getByText('Daily digests')).toBeInTheDocument()
-    expect(screen.getByText(/OpenAI \/ GPT-5/)).toBeInTheDocument()
-    expect(screen.getByText('Not assigned')).toBeInTheDocument()
+    expect(screen.getByRole('combobox', { name: 'Summarize documents' })).toHaveTextContent(
+      'GPT-5',
+    )
+    expect(screen.getByRole('combobox', { name: 'Chat' })).toHaveTextContent(
+      /select a model/i,
+    )
   })
 
   it('assigns a model to a task via the row picker', async () => {
@@ -91,8 +95,7 @@ describe('TaskAssignmentPicker', () => {
     const rows = screen.getAllByRole('combobox')
     await user.click(rows[1]!)
     await user.click(screen.getByRole('option', { name: /Claude/ }))
-    expect(screen.getByText(/Anthropic \/ Claude/)).toBeInTheDocument()
-    expect(screen.queryByText('Not assigned')).not.toBeInTheDocument()
+    expect(screen.getByRole('combobox', { name: 'Chat' })).toHaveTextContent('Claude')
   })
 
   it('clears an assignment with the X button', async () => {
@@ -103,7 +106,9 @@ describe('TaskAssignmentPicker', () => {
         name: 'Clear assignment — Summarize documents',
       }),
     )
-    expect(await screen.findAllByText('Not assigned')).toHaveLength(2)
+    expect(screen.getByRole('combobox', { name: 'Summarize documents' })).toHaveTextContent(
+      /select a model/i,
+    )
   })
 
   it('has no axe violations', async () => {
