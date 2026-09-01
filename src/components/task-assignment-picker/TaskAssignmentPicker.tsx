@@ -23,6 +23,8 @@ export interface TaskAssignmentTask {
 export interface TaskAssignmentSection {
   id: string
   label: string
+  /** Muted context line under the section label (e.g. what the rows mean). */
+  description?: string
   /** Show the fallback picker on every task in the section (task-level wins). */
   secondary?: boolean
   tasks: TaskAssignmentTask[]
@@ -185,9 +187,16 @@ export const TaskAssignmentPicker = React.forwardRef<
       {sections
         ? sections.map((section) => (
             <div key={section.id} className="flex flex-col gap-2">
-              <p className="text-xs font-semibold uppercase tracking-wide text-[var(--as-muted-fg)]">
-                {section.label}
-              </p>
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wide text-[var(--as-muted-fg)]">
+                  {section.label}
+                </p>
+                {section.description ? (
+                  <p className="mt-0.5 text-xs text-[var(--as-muted-fg)]">
+                    {section.description}
+                  </p>
+                ) : null}
+              </div>
               {section.tasks.map((task) =>
                 renderRow(task, section.secondary || Boolean(task.secondary)),
               )}
