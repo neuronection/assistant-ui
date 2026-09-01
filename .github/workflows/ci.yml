@@ -171,6 +171,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      actions: write
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -189,6 +190,11 @@ jobs:
             git add tests/visual/__screenshots__
             git commit -m "chore(visual): rebaseline gallery from the CI runner"
             git push
+            curl -sf -X POST \
+              -H "Authorization: Bearer ${{ github.token }}" \
+              -H "Accept: application/vnd.github+json" \
+              "https://api.github.com/repos/${{ github.repository }}/actions/workflows/ci.yml/dispatches" \
+              -d '{"ref":"main"}'
           else
             echo "Baselines already canonical"
           fi
