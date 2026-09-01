@@ -13,6 +13,8 @@ export interface ModelRegistryProvider {
   name: string
   type?: string
   baseUrl?: string
+  /** Read-only provider: hides Add/Edit/Remove (e.g. org-managed providers). */
+  readOnly?: boolean
 }
 
 export interface ModelRegistryModel {
@@ -671,7 +673,7 @@ export const ModelRegistry = React.forwardRef<HTMLDivElement, ModelRegistryProps
               </button>
               {expanded ? (
                 <div className="as-anim-fade flex flex-col gap-2 border-t border-[var(--as-border)] p-4">
-                  {providerModels.length === 0 ? (
+                  {!provider.readOnly && providerModels.length === 0 ? (
                     <p className="text-xs text-[var(--as-muted-fg)]">
                       {emptyProviderLabel}
                     </p>
@@ -698,37 +700,43 @@ export const ModelRegistry = React.forwardRef<HTMLDivElement, ModelRegistryProps
                           caps={model.caps.map(descriptorFor)}
                           selected={model.caps}
                         />
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          aria-label={`${editLabel} ${model.externalId}`}
-                          onClick={() => openEditModal(model)}
-                        >
-                          <Pencil aria-hidden />
-                          {editLabel}
-                        </Button>
-                        <button
-                          type="button"
-                          aria-label={`${removeLabel} ${model.externalId}`}
-                          onClick={() => onDeleteModel(model)}
-                          className="cursor-pointer rounded-[var(--as-radius-sm)] p-1.5 text-[var(--as-muted-fg)] transition-colors hover:bg-[var(--as-muted)] hover:text-[var(--as-fg)] focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[var(--as-focus-ring)]"
-                        >
-                          <X className="size-4" aria-hidden />
-                        </button>
+                        {!provider.readOnly ? (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            aria-label={`${editLabel} ${model.externalId}`}
+                            onClick={() => openEditModal(model)}
+                          >
+                            <Pencil aria-hidden />
+                            {editLabel}
+                          </Button>
+                        ) : null}
+                        {!provider.readOnly ? (
+                          <button
+                            type="button"
+                            aria-label={`${removeLabel} ${model.externalId}`}
+                            onClick={() => onDeleteModel(model)}
+                            className="cursor-pointer rounded-[var(--as-radius-sm)] p-1.5 text-[var(--as-muted-fg)] transition-colors hover:bg-[var(--as-muted)] hover:text-[var(--as-fg)] focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[var(--as-focus-ring)]"
+                          >
+                            <X className="size-4" aria-hidden />
+                          </button>
+                        ) : null}
                       </div>
                     )
                   })}
-                  <div className="pt-1">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      aria-expanded={modal?.mode === 'add' && modal.providerId === provider.id}
-                      onClick={() => openAddModal(provider.id)}
-                    >
-                      <Plus aria-hidden />
-                      {addLabel}
-                    </Button>
-                  </div>
+                  {!provider.readOnly ? (
+                    <div className="pt-1">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        aria-expanded={modal?.mode === 'add' && modal.providerId === provider.id}
+                        onClick={() => openAddModal(provider.id)}
+                      >
+                        <Plus aria-hidden />
+                        {addLabel}
+                      </Button>
+                    </div>
+                  ) : null}
                 </div>
               ) : null}
             </div>

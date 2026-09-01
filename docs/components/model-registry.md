@@ -15,7 +15,7 @@ import { ModelRegistry } from '@neuronection/assistant-ui/model-registry'
 
 | prop | type | default | notes |
 |---|---|---|---|
-| `providers` | `ModelRegistryProvider[]` | — | `{ id, name, type?, baseUrl? }` |
+| `providers` | `ModelRegistryProvider[]` | — | `{ id, name, type?, baseUrl?, readOnly? }` — `readOnly` hides Add/Edit/Remove for that provider |
 | `models` | `ModelRegistryModel[]` | — | `{ id, providerId, externalId, label?, caps, enabled, reasoningEffort?, temperature?, maxTokens?, missing? }` |
 | `caps` | `CapabilityDescriptor[]` | — | `{ value, label, icon? }` — labels/icons come from the app |
 | `expandedProviderId` | `string \| null` | — | which provider card is open |
@@ -37,6 +37,10 @@ import { ModelRegistry } from '@neuronection/assistant-ui/model-registry'
 
 - Disclosure is controlled: you own `expandedProviderId`; the library toggles
   via `onExpandedProviderChange` (clicking the open provider reports `null`).
+- A provider flagged `readOnly` renders its rows without the Edit/Remove
+  controls and without the Add-model button — use it for org-managed /
+  shared providers the current user may not modify (permission is the
+  app's decision; the flag is presentational only).
 - Remote catalog data is a prop: fetch for the expanded provider only, map
   `remoteState`/`remoteError` from your query, refetch via `onRetryRemote`.
 - Add/edit/delete/add-all are events out; the app persists and refreshes

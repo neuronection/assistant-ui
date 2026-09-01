@@ -142,6 +142,31 @@ export const ModelRegistryStory = () => {
   )
 }
 
+export const ModelRegistryReadOnlyStory = () => {
+  const [expanded, setExpanded] = useState<string | null>('org')
+  return (
+    <div style={{ maxWidth: 720 }}>
+      <ModelRegistry
+        providers={[
+          { id: 'mine', name: 'My Ollama', type: 'openai_compatible', baseUrl: 'http://localhost:11434/v1' },
+          { id: 'org', name: 'Org OpenRouter', type: 'openai_compatible', readOnly: true },
+        ]}
+        models={[
+          { id: 'm1', providerId: 'mine', externalId: 'qwen2.5-vl:7b', label: 'Qwen VL', caps: ['text', 'vision'], enabled: true, reasoningEffort: 'medium' },
+          { id: 'm2', providerId: 'org', externalId: 'nomic-embed-text', caps: ['embeddings'], enabled: true },
+        ]}
+        caps={caps}
+        expandedProviderId={expanded}
+        onExpandedProviderChange={setExpanded}
+        onAddModel={() => {}}
+        onUpdateModel={() => {}}
+        onDeleteModel={() => {}}
+        reasoningEffortOptions={['none', 'low', 'medium', 'high']}
+      />
+    </div>
+  )
+}
+
 export const ModelRegistryEmptyStory = () => {
   return (
     <div style={{ maxWidth: 720 }}>

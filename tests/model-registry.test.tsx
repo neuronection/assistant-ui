@@ -364,6 +364,25 @@ describe('ModelRegistry', () => {
     expect(screen.getByTestId('empty-action')).toBeInTheDocument()
   })
 
+  it('hides add/edit/remove for a readOnly provider but keeps its rows', async () => {
+    const readOnlyProviders: ModelRegistryProvider[] = [
+      { id: 'p1', name: 'Ollama (local)', type: 'openai_compatible', readOnly: true },
+    ]
+    render(<RegistryDemo providers={readOnlyProviders} />)
+    expect(await screen.findByText('qwen2.5-vl')).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Add model' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Edit qwen2.5-vl' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Remove qwen2.5-vl' })).not.toBeInTheDocument()
+  })
+
+  it('has no axe violations with a readOnly provider', async () => {
+    const readOnlyProviders: ModelRegistryProvider[] = [
+      { id: 'p1', name: 'Ollama (local)', type: 'openai_compatible', readOnly: true },
+    ]
+    const { container } = render(<RegistryDemo providers={readOnlyProviders} />)
+    expect(await axe(container)).toHaveNoViolations()
+  })
+
   it('is keyboard operable through the picker inside the modal', async () => {
     const user = userEvent.setup()
     render(<RegistryDemo />)
