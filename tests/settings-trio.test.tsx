@@ -101,6 +101,21 @@ describe('ProviderForm', () => {
     expect(document.body.textContent).not.toContain('sk-live-999')
   })
 
+  it('hideBaseUrl omits the base URL field', () => {
+    render(
+      <ProviderForm
+        name="x"
+        onNameChange={vi.fn()}
+        baseUrl=""
+        onBaseUrlChange={vi.fn()}
+        apiKey=""
+        onApiKeyChange={vi.fn()}
+        hideBaseUrl
+      />,
+    )
+    expect(screen.queryByText('API base URL')).not.toBeInTheDocument()
+  })
+
   it('renders app-provided extra fields and the error', () => {
     render(
       <ProviderForm

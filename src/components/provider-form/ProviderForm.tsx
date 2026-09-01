@@ -14,6 +14,8 @@ export interface ProviderFormProps extends React.ComponentProps<'div'> {
   baseUrlPlaceholder?: string
   nameLabel?: string
   baseUrlLabel?: string
+  /** Hide the base URL field for provider types that have a fixed endpoint. */
+  hideBaseUrl?: boolean
   apiKeyLabel?: string
   /** Hint under the key field; apps mention keyring storage here. */
   apiKeyHelp?: string
@@ -43,6 +45,7 @@ export const ProviderForm = React.forwardRef<HTMLDivElement, ProviderFormProps>(
       baseUrlPlaceholder = 'https://api.example.com/v1',
       nameLabel = 'Name',
       baseUrlLabel = 'API base URL',
+      hideBaseUrl = false,
       apiKeyLabel = 'API key',
       apiKeyHelp,
       hasStoredKey = false,
@@ -68,13 +71,15 @@ export const ProviderForm = React.forwardRef<HTMLDivElement, ProviderFormProps>(
           onChange={(event) => onNameChange(event.target.value)}
           placeholder={namePlaceholder}
         />
-        <Input
-          label={baseUrlLabel}
-          value={baseUrl}
-          onChange={(event) => onBaseUrlChange(event.target.value)}
-          placeholder={baseUrlPlaceholder}
-          className="font-mono"
-        />
+        {hideBaseUrl ? null : (
+          <Input
+            label={baseUrlLabel}
+            value={baseUrl}
+            onChange={(event) => onBaseUrlChange(event.target.value)}
+            placeholder={baseUrlPlaceholder}
+            className="font-mono"
+          />
+        )}
         <Input
           label={
             hasStoredKey ? (
