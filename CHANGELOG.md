@@ -1,5 +1,21 @@
 # @neuronection/assistant-ui
 
+## 0.12.0
+
+### Minor Changes
+
+- [`7f69a7d`](https://github.com/neuronection/assistant-ui/commit/7f69a7d8f373e3bf66293d5eb423a2ad7b8115b6) Thanks [@constLiakos](https://github.com/constLiakos)! - `ModelRegistry` moves model add/edit into a **catalog modal** (replacing the inline draft panel and always-visible catalog zone): the picker is a searchable, scrollable `ModelPicker` over the provider's live catalog with a manual-id escape hatch; the draft form gains a **reasoning-effort dropdown with a Custom… option** (free-text), plus **clearable temperature and max-tokens fields** (empty = unset, `null` in drafts/patches — apps persist them per model). Registered rows keep edit/delete; Add-all moves to the modal footer. New labels: `addTitle`, `editTitle`, `selectModelLabel`, `manualIdToggleLabel`, `customOptionLabel`, `temperatureLabel`, `maxTokensLabel`, `emptyProviderLabel`, `externalIdRequiredLabel`; removed: `browseLabel`, `configureLabel`, `addedLabel`, `capFilterLabel`, `unclassifiedLabel`, `manualAddLabel`, `externalIdLabel`, `reasoningEffortPlaceholder`.
+
+- [`7f69a7d`](https://github.com/neuronection/assistant-ui/commit/7f69a7d8f373e3bf66293d5eb423a2ad7b8115b6) Thanks [@constLiakos](https://github.com/constLiakos)! - `ProviderForm` gains optional, flag-gated metadata fields — `showLocationKind` renders a Local/Cloud toggle (`locationKind`/`onLocationKindChange`, icon tile chips) and `showCountry` renders a country select (`country`/`onCountryChange`, app-supplied `countryOptions`). Both default off; apps adopt only what they model.
+
+### Patch Changes
+
+- [`7f69a7d`](https://github.com/neuronection/assistant-ui/commit/7f69a7d8f373e3bf66293d5eb423a2ad7b8115b6) Thanks [@constLiakos](https://github.com/constLiakos)! - `Combobox` search is resilient and accurate: the default filter now ranks matches (exact > substring > token subsequence > bounded typo) instead of plain substring filtering — misspelled queries (`gemni`, `gemeni`, `vicion`) still find their models, separator-agnostic subsequences work (`qwen vl` → `qwen2.5-vl:7b`), and unrelated queries return nothing. New `src/lib/fuzzy` exports `fuzzyScore`/`searchScore` for app reuse.
+
+- [`7f69a7d`](https://github.com/neuronection/assistant-ui/commit/7f69a7d8f373e3bf66293d5eb423a2ad7b8115b6) Thanks [@constLiakos](https://github.com/constLiakos)! - The `Combobox` panel popover is now Radix-`modal` so its list scrolls with the mouse wheel inside dialogs — the dialog's scroll lock was swallowing wheel events on the portaled panel. Outside clicks still close the panel; behavior while closed is unchanged.
+
+- [`7f69a7d`](https://github.com/neuronection/assistant-ui/commit/7f69a7d8f373e3bf66293d5eb423a2ad7b8115b6) Thanks [@constLiakos](https://github.com/constLiakos)! - Model-registry modal polish from live testing: the combobox panel re-enables `pointer-events` so catalogs scroll with the mouse inside dialogs (Radix Dialog blocks body-level pointer events on portaled panels); temperature/max-tokens fields use a dedicated number field with spinner chevrons at the far right (native spinners hidden) and an inline clear button; picking a catalog model auto-fills an editable display name (dashes/colons/dots → spaces, version dots preserved, acronym-aware title case — ports the health-assistant beautifier) unless the label was hand-edited.
+
 ## 0.11.0
 
 ### Minor Changes
