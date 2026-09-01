@@ -1,6 +1,6 @@
 {
   "name": "@neuronection/assistant-ui",
-  "version": "0.10.0",
+  "version": "0.11.0",
   "description": "Shared React component library for the Assistant family (career-, study-, health-assistant). Family look by default, app-flavored via CSS-variable tokens.",
   "type": "module",
   "packageManager": "pnpm@11.22.0",
