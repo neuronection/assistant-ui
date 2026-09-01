@@ -1,5 +1,11 @@
 # @neuronection/assistant-ui
 
+## 0.12.1
+
+### Patch Changes
+
+- [`404c345`](https://github.com/neuronection/assistant-ui/commit/404c3453aadafcede9e34dc6bc43f8af68657dca) Thanks [@constLiakos](https://github.com/constLiakos)! - `TaskAssignmentSection` gains an optional `description` rendered as a muted context line under the section label — lets apps carry the explanatory hint once per section instead of repeating it on every row.
+
 ## 0.12.0
 
 ### Minor Changes
