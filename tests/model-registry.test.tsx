@@ -121,6 +121,7 @@ function RegistryDemo(props: Partial<React.ComponentProps<typeof ModelRegistry>>
             reasoningEffort: draft.reasoningEffort,
             temperature: draft.temperature,
             maxTokens: draft.maxTokens,
+            extra: draft.extra,
           },
         ])
       }
@@ -402,5 +403,104 @@ describe('ModelRegistry', () => {
     expect(await axe(container)).toHaveNoViolations()
     await openAddModal(user)
     expect(await axe(document.body)).toHaveNoViolations()
+  })
+})
+
+describe('ModelRegistry extra fields and enable toggle', () => {
+  const extraFields = [
+    { key: 'description', label: 'Description', placeholder: 'What is it for?', multiline: true },
+    { key: 'tier', label: 'Tier' },
+  ]
+
+  it('renders extra fields in the add modal and submits their values', async () => {
+    const user = userEvent.setup()
+    const onAddModel = vi.fn()
+    render(<RegistryDemo onAddModel={onAddModel} extraFields={extraFields} />)
+    const dialog = await openAddModal(user)
+    expect(within(dialog).getByLabelText('Description')).toBeInTheDocument()
+    expect(within(dialog).getByLabelText('Tier')).toBeInTheDocument()
+    await user.type(within(dialog).getByLabelText('Tier'), 'flagship')
+    await user.click(within(dialog).getByRole('combobox', { name: 'Model' }))
+    await user.click(screen.getByRole('option', { name: 'llava' }))
+    await user.click(within(dialog).getByRole('button', { name: 'Add model' }))
+    expect(onAddModel).toHaveBeenCalledWith(
+      'p1',
+      expect.objectContaining({ externalId: 'llava', extra: { tier: 'flagship' } }),
+    )
+  })
+
+  it('round-trips a stored extra value and carries a cleared value in the patch', async () => {
+    const user = userEvent.setup()
+    const onUpdateModel = vi.fn()
+    const withExtra: ModelRegistryModel[] = [
+      { ...models[0]!, extra: { description: 'Vision model.' } },
+    ]
+    render(<RegistryDemo onUpdateModel={onUpdateModel} models={withExtra} extraFields={extraFields} />)
+    await user.click(await screen.findByRole('button', { name: 'Edit qwen2.5-vl' }))
+    const dialog = await screen.findByRole('dialog')
+    expect(within(dialog).getByLabelText('Description')).toHaveValue('Vision model.')
+    await user.clear(within(dialog).getByLabelText('Description'))
+    await user.click(within(dialog).getByRole('button', { name: 'Save' }))
+    expect(onUpdateModel).toHaveBeenCalledWith(
+      withExtra[0],
+      expect.objectContaining({ extra: { description: '' } }),
+    )
+  })
+
+  it('omits extra from the patch when the fields were never touched', async () => {
+    const user = userEvent.setup()
+    const onUpdateModel = vi.fn()
+    render(<RegistryDemo onUpdateModel={onUpdateModel} extraFields={extraFields} />)
+    await user.click(await screen.findByRole('button', { name: 'Edit qwen2.5-vl' }))
+    await user.click(await screen.findByRole('button', { name: 'Save' }))
+    expect(onUpdateModel).toHaveBeenCalledWith(
+      models[0],
+      expect.not.objectContaining({ extra: expect.anything() }),
+    )
+  })
+
+  it('toggles a model via the row checkbox (mouse + keyboard)', async () => {
+    const user = userEvent.setup()
+    function ToggleDemo() {
+      const [modelsState, setModelsState] = React.useState(models)
+      return (
+        <RegistryDemo
+          models={modelsState}
+          onToggleEnabled={(model, enabled) =>
+            setModelsState((current) =>
+              current.map((entry) => (entry.id === model.id ? { ...entry, enabled } : entry)),
+            )
+          }
+        />
+      )
+    }
+    render(<ToggleDemo />)
+    const checkbox = await screen.findByRole('checkbox', { name: 'Enabled — qwen2.5-vl' })
+    expect(checkbox).toBeChecked()
+    await user.click(checkbox)
+    expect(checkbox).not.toBeChecked()
+    checkbox.focus()
+    await user.keyboard(' ')
+    expect(checkbox).toBeChecked()
+  })
+
+  it('hides the row checkbox for readOnly providers and without the handler', async () => {
+    const readOnlyProviders: ModelRegistryProvider[] = [
+      { id: 'p1', name: 'Ollama (local)', type: 'openai_compatible', readOnly: true },
+    ]
+    render(<RegistryDemo providers={readOnlyProviders} onToggleEnabled={vi.fn()} />)
+    await screen.findByText('qwen2.5-vl')
+    expect(screen.queryByRole('checkbox')).not.toBeInTheDocument()
+
+    render(<RegistryDemo models={[]} />)
+    await screen.findByRole('button', { name: 'Add model' })
+    expect(screen.queryByRole('checkbox')).not.toBeInTheDocument()
+  })
+
+  it('has no axe violations with the toggle and extra fields', async () => {
+    const { container } = render(
+      <RegistryDemo onToggleEnabled={vi.fn()} extraFields={extraFields} />,
+    )
+    expect(await axe(container)).toHaveNoViolations()
   })
 })

@@ -27,6 +27,8 @@ export interface ModelRegistryModel {
   reasoningEffort?: string
   temperature?: number | null
   maxTokens?: number | null
+  /** App-defined extra fields (see `extraFields`), carried verbatim. */
+  extra?: Record<string, string>
   missing?: boolean
 }
 
@@ -42,6 +44,7 @@ export interface ModelRegistryDraft {
   reasoningEffort?: string
   temperature?: number | null
   maxTokens?: number | null
+  extra?: Record<string, string>
 }
 
 export interface ModelRegistryPatch {
@@ -50,6 +53,15 @@ export interface ModelRegistryPatch {
   reasoningEffort?: string
   temperature?: number | null
   maxTokens?: number | null
+  extra?: Record<string, string>
+}
+
+export interface ModelRegistryExtraField {
+  key: string
+  label: string
+  placeholder?: string
+  /** Render a multi-line textarea instead of a single-line input. */
+  multiline?: boolean
 }
 
 export type ModelRegistryRemoteState = 'loading' | 'error' | 'ready'
@@ -64,10 +76,16 @@ export interface ModelRegistryProps {
   remoteState?: ModelRegistryRemoteState
   remoteError?: string | null
   onRetryRemote?: () => void
-  onAddModel: (providerId: string, draft: ModelRegistryDraft) => void
-  onAddAll?: (providerId: string, drafts: ModelRegistryDraft[]) => void
-  onUpdateModel: (model: ModelRegistryModel, patch: ModelRegistryPatch) => void
-  onDeleteModel: (model: ModelRegistryModel) => void
+    onAddModel: (providerId: string, draft: ModelRegistryDraft) => void
+    onAddAll?: (providerId: string, drafts: ModelRegistryDraft[]) => void
+    onUpdateModel: (model: ModelRegistryModel, patch: ModelRegistryPatch) => void
+    onDeleteModel: (model: ModelRegistryModel) => void
+    /** Toggle a model's enabled flag; renders the row checkbox when set. */
+    onToggleEnabled?: (model: ModelRegistryModel, enabled: boolean) => void
+    enableLabel?: string
+    /** App-declared extra fields rendered in the add/edit modal (e.g. a
+     *  description line); values ride `extra` on Draft/Patch/Model. */
+    extraFields?: ModelRegistryExtraField[]
   reasoningEffortOptions?: string[]
   addLabel?: string
   addAllLabel?: string
@@ -185,6 +203,8 @@ interface ModalState {
   reasoningCustom: boolean
   temperature: string
   maxTokens: string
+  extra: Record<string, string>
+  extraTouched: boolean
   labelTouched: boolean
   model?: ModelRegistryModel
   manual: boolean
@@ -206,6 +226,9 @@ export const ModelRegistry = React.forwardRef<HTMLDivElement, ModelRegistryProps
       onAddAll,
       onUpdateModel,
       onDeleteModel,
+      onToggleEnabled,
+      enableLabel = 'Enabled',
+      extraFields,
       reasoningEffortOptions,
       addLabel = 'Add model',
       addAllLabel = 'Add all',
@@ -268,6 +291,8 @@ export const ModelRegistry = React.forwardRef<HTMLDivElement, ModelRegistryProps
         reasoningCustom: false,
         temperature: '',
         maxTokens: '',
+        extra: {},
+        extraTouched: false,
         labelTouched: false,
         manual: false,
       })
@@ -289,10 +314,20 @@ export const ModelRegistry = React.forwardRef<HTMLDivElement, ModelRegistryProps
           !(reasoningEffortOptions ?? []).includes(model.reasoningEffort),
         temperature: model.temperature != null ? String(model.temperature) : '',
         maxTokens: model.maxTokens != null ? String(model.maxTokens) : '',
+        extra: { ...(model.extra ?? {}) },
+        extraTouched: false,
         model,
         manual: false,
       })
       setDraftError(null)
+    }
+
+    const patchExtraField = (key: string, value: string) => {
+      setModal((current) =>
+        current
+          ? { ...current, extra: { ...current.extra, [key]: value }, extraTouched: true }
+          : current,
+      )
     }
 
     const selectRemote = (remoteId: string) => {
@@ -340,6 +375,10 @@ export const ModelRegistry = React.forwardRef<HTMLDivElement, ModelRegistryProps
         setDraftError(externalIdRequiredLabel)
         return
       }
+      const extra: Record<string, string> | undefined =
+        modal.extraTouched || Object.values(modal.extra).some((value) => value.trim() !== '')
+          ? { ...modal.extra }
+          : undefined
       const payload: ModelRegistryDraft = {
         externalId,
         label: modal.label.trim() || undefined,
@@ -347,6 +386,7 @@ export const ModelRegistry = React.forwardRef<HTMLDivElement, ModelRegistryProps
         reasoningEffort: modal.reasoningEffort.trim(),
         temperature: numberOr(modal.temperature),
         maxTokens: numberOr(modal.maxTokens),
+        ...(extra !== undefined ? { extra } : {}),
       }
       if (modal.mode === 'add') {
         onAddModel(modal.providerId, payload)
@@ -557,6 +597,33 @@ export const ModelRegistry = React.forwardRef<HTMLDivElement, ModelRegistryProps
                   min="1"
                 />
               </div>
+              {(extraFields ?? []).map((field) => {
+                const value = modal.extra[field.key] ?? ''
+                const common =
+                  'w-full rounded-[var(--as-radius)] border border-[var(--as-border)] bg-[var(--as-surface)] px-3 py-2 text-sm text-[var(--as-fg)]'
+                return (
+                  <label key={field.key} className="block space-y-1 text-sm">
+                    <span className="text-sm font-medium text-[var(--as-fg)]">{field.label}</span>
+                    {field.multiline ? (
+                      <textarea
+                        rows={2}
+                        value={value}
+                        placeholder={field.placeholder}
+                        onChange={(event) => patchExtraField(field.key, event.target.value)}
+                        className={common}
+                      />
+                    ) : (
+                      <input
+                        type="text"
+                        value={value}
+                        placeholder={field.placeholder}
+                        onChange={(event) => patchExtraField(field.key, event.target.value)}
+                        className={common}
+                      />
+                    )}
+                  </label>
+                )
+              })}
               {draftError ? (
                 <p role="alert" className="text-xs text-[var(--as-danger)]">
                   {draftError}
@@ -687,6 +754,15 @@ export const ModelRegistry = React.forwardRef<HTMLDivElement, ModelRegistryProps
                           model.missing && 'opacity-50',
                         )}
                       >
+                        {onToggleEnabled && !provider.readOnly ? (
+                          <input
+                            type="checkbox"
+                            aria-label={`${enableLabel} — ${model.externalId}`}
+                            checked={model.enabled}
+                            onChange={(event) => onToggleEnabled(model, event.target.checked)}
+                            className="size-4 shrink-0 cursor-pointer accent-[var(--as-primary)]"
+                          />
+                        ) : null}
                         <span className="min-w-0 flex-1 truncate font-mono text-xs text-[var(--as-fg)]">
                           {model.externalId}
                         </span>

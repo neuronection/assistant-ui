@@ -16,7 +16,7 @@ import { ModelRegistry } from '@neuronection/assistant-ui/model-registry'
 | prop | type | default | notes |
 |---|---|---|---|
 | `providers` | `ModelRegistryProvider[]` | — | `{ id, name, type?, baseUrl?, readOnly? }` — `readOnly` hides Add/Edit/Remove for that provider |
-| `models` | `ModelRegistryModel[]` | — | `{ id, providerId, externalId, label?, caps, enabled, reasoningEffort?, temperature?, maxTokens?, missing? }` |
+| `models` | `ModelRegistryModel[]` | — | `{ id, providerId, externalId, label?, caps, enabled, reasoningEffort?, temperature?, maxTokens?, extra?, missing? }` |
 | `caps` | `CapabilityDescriptor[]` | — | `{ value, label, icon? }` — labels/icons come from the app |
 | `expandedProviderId` | `string \| null` | — | which provider card is open |
 | `onExpandedProviderChange` | `(providerId: string \| null) => void` | — | disclosure is controlled |
@@ -28,6 +28,9 @@ import { ModelRegistry } from '@neuronection/assistant-ui/model-registry'
 | `onAddAll` | `(providerId: string, drafts: ModelRegistryDraft[]) => void` | — | renders the `Add all (n)` button when set |
 | `onUpdateModel` | `(model: ModelRegistryModel, patch: ModelRegistryPatch) => void` | — | edit modal submit (sparse patch) |
 | `onDeleteModel` | `(model: ModelRegistryModel) => void` | — | row × button; confirm stays app-side |
+| `onToggleEnabled` | `(model: ModelRegistryModel, enabled: boolean) => void` | — | renders a native per-row enable checkbox when set |
+| `enableLabel` | `string` | `'Enabled'` | accessible name prefix for the row checkbox (`Enabled — <id>`) |
+| `extraFields` | `ModelRegistryExtraField[]` | — | app-declared extra modal fields `{ key, label, placeholder?, multiline? }`; values ride `extra` on `Model`/`Draft`/`Patch` |
 | `reasoningEffortOptions` | `string[]` | — | enables the effort select + custom option |
 | `emptyAction` | `ReactNode` | — | extra CTA under the no-providers empty state |
 | ~25 label props | `string` | English | `addLabel`, `addAllLabel`, `addTitle`, `editTitle`, `selectModelLabel`, `manualIdToggleLabel`, `editLabel`, `removeLabel`, `missingLabel`, `capsLabel`, `searchPlaceholder`, `searchLabel`, `emptyProviderLabel`, `externalIdRequiredLabel`, `remoteEmptyLabel`, `remoteLoadingLabel`, `retryLabel`, `customOptionLabel`, `temperatureLabel`, `maxTokensLabel`, `labelLabel`, `reasoningEffortLabel`, `saveLabel`, `cancelLabel`, `addDraftLabel`, `providersEmptyLabel` |
@@ -38,16 +41,19 @@ import { ModelRegistry } from '@neuronection/assistant-ui/model-registry'
 - Disclosure is controlled: you own `expandedProviderId`; the library toggles
   via `onExpandedProviderChange` (clicking the open provider reports `null`).
 - A provider flagged `readOnly` renders its rows without the Edit/Remove
-  controls and without the Add-model button — use it for org-managed /
-  shared providers the current user may not modify (permission is the
-  app's decision; the flag is presentational only).
+  controls, the enable checkbox and the Add-model button — use it for
+  org-managed / shared providers the current user may not modify
+  (permission is the app's decision; the flag is presentational only).
 - Remote catalog data is a prop: fetch for the expanded provider only, map
   `remoteState`/`remoteError` from your query, refetch via `onRetryRemote`.
-- Add/edit/delete/add-all are events out; the app persists and refreshes
-  `models` — the list only changes when props change.
+- Add/edit/delete/add-all/enable-toggle are events out; the app persists and
+  refreshes `models` — the list only changes when props change.
 - The add/edit modal, its draft state (id, label, caps, effort,
-  temperature, max tokens) and its validation are internal; it submits and
-  closes itself. `ModelRegistryPatch` only carries fields the user touched.
+  temperature, max tokens, extra fields) and its validation are internal; it
+  submits and closes itself. `extraFields` are app-declared (e.g. a
+  description line) and carried verbatim on `Model.extra`/`Draft.extra`/
+  `Patch.extra` — an edit only includes `extra` when the user touched a
+  field or the model already carried non-empty values.
 
 ## labels & i18n
 
@@ -73,7 +79,8 @@ minimal:
 />
 ```
 
-realistic (trimmed from study-assistant `ModelsTab.tsx`):
+realistic (trimmed from study-assistant `ModelsTab.tsx`, with health-assistant's
+extra description field and enable toggle):
 
 ```tsx
 <ModelRegistry
@@ -90,6 +97,9 @@ realistic (trimmed from study-assistant `ModelsTab.tsx`):
   onAddAll={(pid, drafts) => void handleAddAll(pid, drafts)}
   onUpdateModel={(model, patch) => void handleUpdate(model, patch)}
   onDeleteModel={(model) => void handleDelete(model)}
+  onToggleEnabled={(model, enabled) => void handleToggle(model, enabled)}
+  enableLabel={t('settings.enabled')}
+  extraFields={[{ key: 'description', label: t('settings.modelDescription'), multiline: true }]}
   reasoningEffortOptions={['none', 'low', 'medium', 'high', 'max', 'xhigh']}
   capsLabel={t('settings.modelCaps')}
   searchPlaceholder={t('settings.searchModels')}

@@ -107,7 +107,7 @@ behavior and focus restoration are listed **only where asserted**.
 | `ModelPicker` | `Combobox` with grouped provider→model options and capability badges | keyboard contract inherited from `Combobox` (asserted there) | clean (closed) |
 | `TaskAssignmentPicker` | task rows (flat or in `sections`) with per-row `ModelPicker` (accessible name = the task label) + row-level clear button; optional fallback picker (name `Fallback — <task>`, `secondaryLabel`-prefixed); `secondaryOnly` rows render the fallback picker alone | clear buttons empty exactly their own assignment (`Clear assignment — <task>`, fallback: `Clear assignment — <fallback> <task>`); pickers inherit the `Combobox` keyboard contract | clean |
 | `CapabilityChips` | `role="group"` of `aria-pressed` toggle buttons (badge variant renders non-interactive spans) | chips are buttons; below `minSelected` the last chip disables instead of silently refusing | clean |
-| `ModelRegistry` | provider headers are disclosure buttons (`aria-expanded`); rows carry labelled icon-only controls (`Add/Edit/Remove/Configure — <id>`, `Enabled — <id>`); draft panel inputs are labelled | header Enter toggles the provider; row chevrons open the draft panel; enable checkbox is a native input | clean |
+| `ModelRegistry` | provider headers are disclosure buttons (`aria-expanded`); rows carry labelled icon-only controls (`Add/Edit/Remove — <id>`, `Enabled — <id>`); modal inputs are labelled | header Enter toggles the provider; row enable checkbox is a native input (`Enabled — <id>`); modal inputs are labelled | clean |
 | `ConnectionTestRow` | status text (`role="status"` while testing); error message; `variant="inline"` drops the card chrome | Enter on *Test* fires `onTest` | clean |
 
 ## Status & feedback

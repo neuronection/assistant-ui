@@ -45,6 +45,7 @@ const models: ModelRegistryModel[] = [
     caps: ['text', 'vision'],
     enabled: true,
     reasoningEffort: 'medium',
+    extra: { description: 'Vision-language model for chart reading.' },
   },
   {
     id: 'm2',
@@ -113,6 +114,7 @@ export const ModelRegistryStory = () => {
               caps: draft.caps,
               enabled: true,
               reasoningEffort: draft.reasoningEffort,
+              extra: draft.extra,
             },
           ])
         }
@@ -136,6 +138,14 @@ export const ModelRegistryStory = () => {
         onDeleteModel={(model) =>
           setRegistry((current) => current.filter((entry) => entry.id !== model.id))
         }
+        onToggleEnabled={(model, enabled) =>
+          setRegistry((current) =>
+            current.map((entry) => (entry.id === model.id ? { ...entry, enabled } : entry)),
+          )
+        }
+        extraFields={[
+          { key: 'description', label: 'Description', placeholder: 'What is this model used for?', multiline: true },
+        ]}
         reasoningEffortOptions={['none', 'low', 'medium', 'high']}
       />
     </div>
