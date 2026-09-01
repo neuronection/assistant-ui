@@ -1,5 +1,15 @@
 # @neuronection/assistant-ui
 
+## 0.13.0
+
+### Minor Changes
+
+- [`f684e2c`](https://github.com/neuronection/assistant-ui/commit/f684e2cece799d89c97de2b334315373e0dacbbf) Thanks [@constLiakos](https://github.com/constLiakos)! - `TaskAssignmentPicker` row polish: every task tile falls back to a default `Cpu` icon, the duplicated "Model: provider / model" status line is removed (the row pickers show the selection themselves), the pickers no longer carry an internal clear button (the row-level X is the single remove affordance, vertically centered), accessible names are now just the task label, and `unassignedLabel`/`modelLabel` props are gone. New `@neuronection/assistant-ui/fuzzy` subpath exports `beautifyId` (display-name beautifier) alongside `fuzzyScore`/`searchScore`.
+
+### Patch Changes
+
+- [`f684e2c`](https://github.com/neuronection/assistant-ui/commit/f684e2cece799d89c97de2b334315373e0dacbbf) Thanks [@constLiakos](https://github.com/constLiakos)! - `Combobox`/`ModelPicker` gain `hideLabel` — keeps the accessible name derived from `label` while suppressing the visible label element, for surfaces where the surrounding component already titles the row (e.g. `TaskAssignmentPicker` rows).
+
 ## 0.12.1
 
 ### Patch Changes
