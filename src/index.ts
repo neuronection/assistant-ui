@@ -201,11 +201,27 @@ export {
   type ModelPickerProps,
   type ModelPickerProvider,
 } from './components/model-picker'
+export {
+  CapabilityChips,
+  type CapabilityChipsProps,
+  type CapabilityDescriptor,
+} from './components/capability-chips'
+export {
+  ModelRegistry,
+  type ModelRegistryDraft,
+  type ModelRegistryModel,
+  type ModelRegistryPatch,
+  type ModelRegistryProps,
+  type ModelRegistryProvider,
+  type ModelRegistryRemoteModel,
+  type ModelRegistryRemoteState,
+} from './components/model-registry'
 export { SelectionBar, type SelectionBarProps } from './components/selection-bar'
 export { Spinner, type SpinnerProps } from './components/spinner'
 export {
   TaskAssignmentPicker,
   type TaskAssignmentPickerProps,
+  type TaskAssignmentSection,
   type TaskAssignmentTask,
 } from './components/task-assignment-picker'
 export { Table, type TableProps } from './components/table'

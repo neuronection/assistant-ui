@@ -143,6 +143,14 @@
       "types": "./dist/model-picker.d.ts",
       "import": "./dist/model-picker.js"
     },
+    "./capability-chips": {
+      "types": "./dist/capability-chips.d.ts",
+      "import": "./dist/capability-chips.js"
+    },
+    "./model-registry": {
+      "types": "./dist/model-registry.d.ts",
+      "import": "./dist/model-registry.js"
+    },
     "./task-assignment-picker": {
       "types": "./dist/task-assignment-picker.d.ts",
       "import": "./dist/task-assignment-picker.js"

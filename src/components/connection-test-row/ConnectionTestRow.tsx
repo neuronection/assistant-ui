@@ -16,6 +16,10 @@ export interface ConnectionTestRowProps {
   errorMessage?: string | null
   onTest?: () => void
   disabled?: boolean
+  /** `row` = standalone bordered row; `inline` = bare, for embedding in app cards. */
+  variant?: 'row' | 'inline'
+  /** Extra app-side context rendered after the status (e.g. model count). */
+  meta?: React.ReactNode
   className?: string
 }
 
@@ -38,6 +42,8 @@ export const ConnectionTestRow = React.forwardRef<
     errorMessage,
     onTest,
     disabled = false,
+    variant = 'row',
+    meta,
     className,
   },
   ref,
@@ -58,8 +64,11 @@ export const ConnectionTestRow = React.forwardRef<
       ref={ref}
       data-as="connection-test-row"
       data-status={status}
+      data-variant={variant}
       className={cn(
-        'flex items-center justify-between gap-3 rounded-[var(--as-radius)] border border-[var(--as-border)] bg-[var(--as-surface)] px-3 py-2',
+        'flex items-center justify-between gap-3 rounded-[var(--as-radius)] px-3 py-2',
+        variant === 'row' && 'border border-[var(--as-border)] bg-[var(--as-surface)]',
+        variant === 'inline' && 'px-0 py-0',
         className,
       )}
     >
@@ -87,6 +96,7 @@ export const ConnectionTestRow = React.forwardRef<
             {errorMessage}
           </span>
         ) : null}
+        {meta ? <span className="text-xs text-[var(--as-muted-fg)]">{meta}</span> : null}
       </div>
       {onTest ? (
         <button

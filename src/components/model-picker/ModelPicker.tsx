@@ -10,6 +10,8 @@ export interface ModelPickerModel {
   name: string
   /** Short capability chip, e.g. `vision` or `tools`. */
   capability?: string
+  /** Full capability set, matched by TaskAssignmentPicker `requires`. */
+  capabilities?: string[]
 }
 
 export interface ModelPickerProvider {

@@ -84,8 +84,9 @@ files in the package's `dist/`. Visual reference:
 | `error-banner` / `undo-notice` / `empty-state` / `spinner` | presentational feedback: alert banner with `action` slot · undo toast · `EmptyState` · `Spinner` |
 | `info-button` / `field-label` / `copy-button` / `breadcrumbs` | `InfoButton` · `FieldLabel` · `CopyButton` (clipboard + copied state) · `Breadcrumbs` (SPA links via `linkComponent`) |
 | `ai-button` / `ai-actions-dropdown` / `ai-magic-fill` | AI affordances: ask-with-suggestions (controlled open, icon-only mode) · action menu + custom prompt · describe-in-words fill modal — API calls stay app-side |
-| `settings-shell` / `provider-form` / `connection-test-row` | `SettingsShell` (controlled two-pane nav) · `ProviderForm` (write-only API-key field) · `ConnectionTestRow` (idle/testing/ok/fail + latency) |
-| `model-picker` / `task-assignment-picker` | `ModelPicker` (grouped provider→model combobox, capability chips) · `TaskAssignmentPicker` (task → model mapping rows) |
+| `settings-shell` / `provider-form` / `connection-test-row` | `SettingsShell` (controlled two-pane nav) · `ProviderForm` (write-only API-key field) · `ConnectionTestRow` (idle/testing/ok/fail + latency, `inline` variant + meta slot) |
+| `model-picker` / `task-assignment-picker` / `capability-chips` | `ModelPicker` (grouped provider→model combobox, capability chips) · `TaskAssignmentPicker` (task → model mapping rows, capability-filtered, sections + fallback assignment, meta slot) · `CapabilityChips` (cap toggle group / badges, min-selected) |
+| `model-registry` | `ModelRegistry` (provider cards → registered model rows + remote catalog with two-stage add: quick-add or expandable draft panel with editable label/caps/reasoning-effort; cap filter + search + add-all; add/edit are one panel) |
 | `upload-dropzone` / `file-card` / `file-queue` | file attachment surface: dropzone (block/row) · card (status, include toggle) · queue (summary + reorder) |
 | `marquee` | `useMarquee`, `MarqueeSurface`, `MarqueeBand` (rubber-band selection) |
 | `portal` / `theme-scope` / `tokens` | `Portal` · `ThemeScope` · token name lists + types |

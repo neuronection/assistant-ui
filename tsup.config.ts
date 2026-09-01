@@ -43,6 +43,8 @@ export default defineConfig({
     'range-bar': 'src/components/range-bar/index.ts',
     'scale-slider': 'src/components/scale-slider/index.ts',
     'search-input': 'src/components/search-input/index.ts',
+    'capability-chips': 'src/components/capability-chips/index.ts',
+    'model-registry': 'src/components/model-registry/index.ts',
     'selection-bar': 'src/components/selection-bar/index.ts',
     spinner: 'src/components/spinner/index.ts',
     table: 'src/components/table/index.ts',

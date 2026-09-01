@@ -67,3 +67,62 @@ export const TaskAssignmentStory = () => {
     />
   )
 }
+
+const localProviders: ModelPickerProvider[] = [
+  {
+    id: 'local',
+    name: 'Ollama (local)',
+    models: [
+      { id: 'qwen-vl', name: 'Qwen 2.5 VL', capabilities: ['text', 'vision'] },
+      { id: 'nomic', name: 'Nomic Embed', capabilities: ['embeddings'] },
+      { id: 'llama', name: 'Llama 4', capabilities: ['text', 'tools'] },
+    ],
+  },
+]
+
+export const TaskAssignmentV2Story = () => {
+  const [value, setValue] = useState<Record<string, string | null>>({
+    text: 'llama',
+    ocr: null,
+    embed: null,
+  })
+  const [secondary, setSecondary] = useState<Record<string, string | null>>({
+    text: null,
+  })
+  return (
+    <TaskAssignmentPicker
+      tasks={[]}
+      sections={[
+        {
+          id: 'defaults',
+          label: 'Default models',
+          secondary: true,
+          tasks: [{ id: 'text', label: 'Default text model', requires: 'text' }],
+        },
+        {
+          id: 'tasks',
+          label: 'Tasks',
+          tasks: [
+            { id: 'ocr', label: 'Page OCR', requires: 'vision' },
+            { id: 'embed', label: 'Embeddings', requires: 'embeddings' },
+          ],
+        },
+      ]}
+      providers={localProviders}
+      value={value}
+      secondaryValue={secondary}
+      onAssign={(taskId, modelId) =>
+        setValue((current) => ({ ...current, [taskId]: modelId }))
+      }
+      onAssignSecondary={(taskId, modelId) =>
+        setSecondary((current) => ({ ...current, [taskId]: modelId }))
+      }
+      secondaryLabel="Fallback model"
+      renderMeta={(task) =>
+        task.id === 'text' ? (
+          <span style={{ fontSize: 11, opacity: 0.7 }}>Used when a task has no override</span>
+        ) : undefined
+      }
+    />
+  )
+}

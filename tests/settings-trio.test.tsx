@@ -171,6 +171,18 @@ describe('ConnectionTestRow', () => {
     expect(screen.getByText('401 unauthorized')).toBeInTheDocument()
   })
 
+  it('inline variant drops the card chrome', () => {
+    const { container } = render(<ConnectionTestRow status="idle" variant="inline" />)
+    const root = container.firstElementChild as HTMLElement
+    expect(root).toHaveAttribute('data-variant', 'inline')
+    expect(root.className).not.toContain('border-[var(--as-border)]')
+  })
+
+  it('renders the meta slot next to the status', () => {
+    render(<ConnectionTestRow status="ok" meta="3 models" />)
+    expect(screen.getByText('3 models')).toBeInTheDocument()
+  })
+
   it('has no axe violations', async () => {
     const { container } = render(
       <ConnectionTestRow status="ok" latencyMs={120} onTest={vi.fn()} />,

@@ -61,6 +61,13 @@ export const ConnectionTestRowStory = () => {
       <ConnectionTestRow status={status} onTest={test} latencyMs={240} />
       <ConnectionTestRow status="ok" latencyMs={312} />
       <ConnectionTestRow status="fail" errorMessage="401 unauthorized" onTest={test} />
+      <ConnectionTestRow
+        variant="inline"
+        status="ok"
+        latencyMs={95}
+        meta="4 models"
+        onTest={test}
+      />
     </div>
   )
 }

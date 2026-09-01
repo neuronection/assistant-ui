@@ -113,3 +113,107 @@ describe('TaskAssignmentPicker', () => {
     expect(await axe(container)).toHaveNoViolations()
   })
 })
+
+describe('TaskAssignmentPicker v2', () => {
+  const capProviders: ModelPickerProvider[] = [
+    {
+      id: 'local',
+      name: 'Ollama',
+      models: [
+        { id: 'qwen-vl', name: 'Qwen VL', capabilities: ['text', 'vision'] },
+        { id: 'nomic', name: 'Nomic Embed', capabilities: ['embeddings'] },
+        { id: 'llama', name: 'Llama', capabilities: ['text', 'tools'] },
+      ],
+    },
+  ]
+
+  const capTasks: TaskAssignmentTask[] = [
+    { id: 'ocr', label: 'Page OCR', requires: 'vision' },
+    { id: 'embed', label: 'Embeddings', requires: 'embeddings' },
+  ]
+
+  it('offers only models matching the task requires', async () => {
+    const user = userEvent.setup()
+    render(
+      <TaskAssignmentPicker
+        tasks={capTasks}
+        providers={capProviders}
+        value={{}}
+        onAssign={vi.fn()}
+      />,
+    )
+    const rows = screen.getAllByRole('combobox')
+    await user.click(rows[0]!)
+    expect(screen.getByRole('option', { name: /Qwen VL/ })).toBeInTheDocument()
+    expect(screen.queryByRole('option', { name: /Llama/ })).not.toBeInTheDocument()
+    expect(screen.queryByRole('option', { name: /Nomic/ })).not.toBeInTheDocument()
+  })
+
+  it('renders sections with the fallback picker when enabled', async () => {
+    const user = userEvent.setup()
+    const onAssignSecondary = vi.fn()
+    render(
+      <TaskAssignmentPicker
+        tasks={[]}
+        sections={[
+          {
+            id: 'defaults',
+            label: 'Default models',
+            secondary: true,
+            tasks: [{ id: 'text', label: 'Default text model', requires: 'text' }],
+          },
+          { id: 'overrides', label: 'Per-task overrides', tasks: capTasks },
+        ]}
+        providers={capProviders}
+        value={{ text: 'llama' }}
+        secondaryValue={{}}
+        onAssign={vi.fn()}
+        onAssignSecondary={onAssignSecondary}
+        secondaryLabel="Fallback model"
+      />,
+    )
+    expect(screen.getByText('Default models')).toBeInTheDocument()
+    expect(screen.getByText('Per-task overrides')).toBeInTheDocument()
+    const fallback = screen.getAllByRole('combobox')[0] as HTMLElement
+    await user.click(fallback)
+    await user.click(screen.getByRole('option', { name: /Qwen VL/ }))
+    expect(onAssignSecondary).toHaveBeenCalledWith('text', 'qwen-vl')
+    expect(screen.getAllByRole('combobox')).toHaveLength(4)
+  })
+
+  it('renders the renderMeta slot per row', () => {
+    render(
+      <TaskAssignmentPicker
+        tasks={capTasks}
+        providers={capProviders}
+        value={{}}
+        onAssign={vi.fn()}
+        renderMeta={(task) => <span data-testid={`meta-${task.id}`}>meta for {task.id}</span>}
+      />,
+    )
+    expect(screen.getByTestId('meta-ocr')).toHaveTextContent('meta for ocr')
+    expect(screen.getByTestId('meta-embed')).toHaveTextContent('meta for embed')
+  })
+
+  it('has no axe violations with sections and fallbacks', async () => {
+    const { container } = render(
+      <TaskAssignmentPicker
+        tasks={[]}
+        sections={[
+          {
+            id: 'defaults',
+            label: 'Default models',
+            secondary: true,
+            tasks: [{ id: 'text', label: 'Default text model', requires: 'text' }],
+          },
+        ]}
+        providers={capProviders}
+        value={{ text: 'llama' }}
+        secondaryValue={{}}
+        onAssign={vi.fn()}
+        onAssignSecondary={vi.fn()}
+      />,
+    )
+    expect(await axe(container)).toHaveNoViolations()
+  })
+})
