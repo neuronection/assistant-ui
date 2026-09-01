@@ -186,6 +186,35 @@ describe('TaskAssignmentPicker v2', () => {
     expect(screen.getAllByRole('combobox')).toHaveLength(4)
   })
 
+  it('clears the fallback assignment with its own X', async () => {
+    const user = userEvent.setup()
+    const onAssignSecondary = vi.fn()
+    render(
+      <TaskAssignmentPicker
+        tasks={[]}
+        sections={[
+          {
+            id: 'defaults',
+            label: 'Default models',
+            secondary: true,
+            tasks: [{ id: 'text', label: 'Default text model', requires: 'text' }],
+          },
+        ]}
+        providers={capProviders}
+        value={{ text: 'llama' }}
+        secondaryValue={{ text: 'qwen-vl' }}
+        onAssign={vi.fn()}
+        onAssignSecondary={onAssignSecondary}
+      />,
+    )
+    await user.click(
+      screen.getByRole('button', {
+        name: 'Clear assignment — Fallback Default text model',
+      }),
+    )
+    expect(onAssignSecondary).toHaveBeenCalledWith('text', null)
+  })
+
   it('renders primary/fallback badges with info popups', async () => {
     const user = userEvent.setup()
     render(

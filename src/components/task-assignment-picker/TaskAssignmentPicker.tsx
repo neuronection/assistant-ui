@@ -139,7 +139,24 @@ export const TaskAssignmentPicker = React.forwardRef<
                 className="w-52"
               />
               {fallbackInfo ? (
-                <InfoButton label={`${secondaryLabel} — ${task.label}`}>{fallbackInfo}</InfoButton>
+                <InfoButton
+                  label={`${secondaryLabel} — ${task.label}`}
+                  showOnHover={false}
+                  openOnHover={false}
+                >
+                  {fallbackInfo}
+                </InfoButton>
+              ) : null}
+              {secondaryValue?.[task.id] ? (
+                <button
+                  type="button"
+                  aria-label={`${clearLabel} — ${secondaryLabel} ${task.label}`}
+                  disabled={disabled}
+                  onClick={() => onAssignSecondary(task.id, null)}
+                  className="cursor-pointer rounded-[var(--as-radius-sm)] p-1.5 text-[var(--as-muted-fg)] transition-colors hover:bg-[var(--as-muted)] hover:text-[var(--as-fg)] focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[var(--as-focus-ring)] disabled:pointer-events-none disabled:opacity-50"
+                >
+                  <X className="size-4" aria-hidden />
+                </button>
               ) : null}
             </div>
             <div className="flex items-center gap-1.5">
@@ -159,7 +176,13 @@ export const TaskAssignmentPicker = React.forwardRef<
                 className="w-52"
               />
               {primaryInfo ? (
-                <InfoButton label={`${primaryLabel} — ${task.label}`}>{primaryInfo}</InfoButton>
+                <InfoButton
+                  label={`${primaryLabel} — ${task.label}`}
+                  showOnHover={false}
+                  openOnHover={false}
+                >
+                  {primaryInfo}
+                </InfoButton>
               ) : null}
               {value[task.id] ? (
                 <button
