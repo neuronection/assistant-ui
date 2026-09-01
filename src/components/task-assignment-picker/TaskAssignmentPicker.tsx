@@ -122,16 +122,30 @@ export const TaskAssignmentPicker = React.forwardRef<
           </div>
         </div>
         {showSecondary && onAssignSecondary ? (
-          <div className="flex shrink-0 items-start gap-3 self-center">
-            <div className="flex flex-col gap-1">
-              <span className="flex items-center gap-1">
-                <span className="inline-flex items-center gap-1 rounded-full bg-[var(--as-muted)] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-[var(--as-muted-fg)]">
-                  <Star className="size-2.5" aria-hidden />
-                  {primaryLabel}
-                </span>
-                {primaryInfo ? (
-                  <InfoButton label={`${primaryLabel} — ${task.label}`}>{primaryInfo}</InfoButton>
-                ) : null}
+          <div className="flex shrink-0 flex-col items-start gap-2 self-center">
+            <div className="flex items-center gap-1.5">
+              <span className="inline-flex items-center gap-1 rounded-full bg-[var(--as-muted)] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-[var(--as-muted-fg)]">
+                {secondaryLabel}
+              </span>
+              <ModelPicker
+                providers={catalog}
+                value={secondaryValue?.[task.id] ?? ''}
+                onChange={(modelId) => onAssignSecondary(task.id, modelId)}
+                disabled={disabled}
+                clearable={false}
+                clearLabel={clearLabel}
+                label={`${secondaryLabel} — ${task.label}`}
+                hideLabel
+                className="w-52"
+              />
+              {fallbackInfo ? (
+                <InfoButton label={`${secondaryLabel} — ${task.label}`}>{fallbackInfo}</InfoButton>
+              ) : null}
+            </div>
+            <div className="flex items-center gap-1.5">
+              <span className="inline-flex items-center gap-1 rounded-full bg-[var(--as-muted)] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-[var(--as-muted-fg)]">
+                <Star className="size-2.5" aria-hidden />
+                {primaryLabel}
               </span>
               <ModelPicker
                 providers={catalog}
@@ -144,31 +158,24 @@ export const TaskAssignmentPicker = React.forwardRef<
                 hideLabel
                 className="w-52"
               />
-            </div>
-            <div className="flex flex-col gap-1">
-              <span className="flex items-center gap-1">
-                <span className="inline-flex items-center gap-1 rounded-full bg-[var(--as-muted)] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-[var(--as-muted-fg)]">
-                  {secondaryLabel}
-                </span>
-                {fallbackInfo ? (
-                  <InfoButton label={`${secondaryLabel} — ${task.label}`}>{fallbackInfo}</InfoButton>
-                ) : null}
-              </span>
-              <ModelPicker
-                providers={catalog}
-                value={secondaryValue?.[task.id] ?? ''}
-                onChange={(modelId) => onAssignSecondary(task.id, modelId)}
-                disabled={disabled}
-                clearable={false}
-                clearLabel={clearLabel}
-                label={`${secondaryLabel} — ${task.label}`}
-                hideLabel
-                className="w-40"
-              />
+              {primaryInfo ? (
+                <InfoButton label={`${primaryLabel} — ${task.label}`}>{primaryInfo}</InfoButton>
+              ) : null}
+              {value[task.id] ? (
+                <button
+                  type="button"
+                  aria-label={`${clearLabel} — ${task.label}`}
+                  disabled={disabled}
+                  onClick={() => onAssign(task.id, null)}
+                  className="cursor-pointer rounded-[var(--as-radius-sm)] p-1.5 text-[var(--as-muted-fg)] transition-colors hover:bg-[var(--as-muted)] hover:text-[var(--as-fg)] focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[var(--as-focus-ring)] disabled:pointer-events-none disabled:opacity-50"
+                >
+                  <X className="size-4" aria-hidden />
+                </button>
+              ) : null}
             </div>
           </div>
         ) : (
-          <div className="flex shrink-0 items-center gap-1.5 self-center">
+          <div className="flex items-center gap-1.5 self-center">
             <ModelPicker
               providers={catalog}
               value={value[task.id] ?? ''}
@@ -180,19 +187,19 @@ export const TaskAssignmentPicker = React.forwardRef<
               hideLabel
               className="w-56"
             />
+            {value[task.id] ? (
+              <button
+                type="button"
+                aria-label={`${clearLabel} — ${task.label}`}
+                disabled={disabled}
+                onClick={() => onAssign(task.id, null)}
+                className="cursor-pointer rounded-[var(--as-radius-sm)] p-1.5 text-[var(--as-muted-fg)] transition-colors hover:bg-[var(--as-muted)] hover:text-[var(--as-fg)] focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[var(--as-focus-ring)] disabled:pointer-events-none disabled:opacity-50"
+              >
+                <X className="size-4" aria-hidden />
+              </button>
+            ) : null}
           </div>
         )}
-        {value[task.id] ? (
-          <button
-            type="button"
-            aria-label={`${clearLabel} — ${task.label}`}
-            disabled={disabled}
-            onClick={() => onAssign(task.id, null)}
-            className="cursor-pointer self-center rounded-[var(--as-radius-sm)] p-1.5 text-[var(--as-muted-fg)] transition-colors hover:bg-[var(--as-muted)] hover:text-[var(--as-fg)] focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[var(--as-focus-ring)] disabled:pointer-events-none disabled:opacity-50"
-          >
-            <X className="size-4" aria-hidden />
-          </button>
-        ) : null}
       </div>
     )
   }
