@@ -26,16 +26,18 @@ import {
 | `onAssign` | `(taskId: string, modelId: string \| null) => void` | — | `null` = cleared |
 | `secondaryValue` | `Record<string, string \| null>` | — | fallback model per taskId |
 | `onAssignSecondary` | `(taskId: string, modelId: string \| null) => void` | — | enables fallback pickers for flagged tasks |
-| `secondaryLabel` | `string` | `'Fallback model'` | picker label prefix |
-| `renderMeta` | `(task: TaskAssignmentTask) => ReactNode` | — | app-rendered per-row context |
+| `secondaryLabel` | `string` | `'Fallback'` | fallback badge + picker label prefix || `renderMeta` | `(task: TaskAssignmentTask) => ReactNode` | — | app-rendered per-row context |
 | `clearLabel` | `string` | `'Clear assignment'` | row-level × accessible name (`Clear assignment — <task>`) |
 | `disabled` | `boolean` | `false` | disables all pickers + clear buttons |
 | `className` | `string` | — | merges onto the root |
 
 `TaskAssignmentTask`: `{ id, label, description?, icon?, requires?,
-secondary? }` — `requires` filters the row's catalog to matching models,
-`secondary` forces the fallback picker for that row. Rows without an `icon`
-fall back to a default `Cpu` glyph.
+secondary?, secondaryOnly? }` — `requires` filters the row's catalog to
+matching models, `secondary` forces the fallback picker for that row, and
+`secondaryOnly` renders ONLY the fallback picker (no primary line) for tasks
+whose assignment itself is a fallback — e.g. an app's single global default
+model; the value round-trips via `secondaryValue`/`onAssignSecondary`. Rows
+without an `icon` fall back to a default `Cpu` glyph.
 
 ## controlled contract
 
@@ -50,7 +52,8 @@ fall back to a default `Cpu` glyph.
   or the legacy single `capability`); providers left with zero models drop
   out of that row's picker.
 - Fallback pickers render when the task (directly or via its section) is
-  `secondary` **and** `onAssignSecondary` is set. Round-trip both ids in
+  `secondary` **and** `onAssignSecondary` is set — a `secondaryOnly` task
+  renders the fallback line alone. Round-trip both ids in
   your handler (see the [ai-settings guide](../guides/ai-settings.md#3-tasks-taskassignmentpicker)).
 
 ## labels & i18n

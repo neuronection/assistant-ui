@@ -258,6 +258,66 @@ describe('TaskAssignmentPicker v2', () => {
     expect(screen.getByTestId('meta-embed')).toHaveTextContent('meta for embed')
   })
 
+  it('renders a fallback-only row without the primary picker', async () => {
+    const user = userEvent.setup()
+    const onAssignSecondary = vi.fn()
+    render(
+      <TaskAssignmentPicker
+        tasks={[]}
+        sections={[
+          {
+            id: 'fallback',
+            label: 'Global fallback',
+            tasks: [{ id: 'default', label: 'Global default model', secondaryOnly: true }],
+          },
+        ]}
+        providers={capProviders}
+        value={{}}
+        secondaryValue={{ default: 'llama' }}
+        onAssign={vi.fn()}
+        onAssignSecondary={onAssignSecondary}
+        secondaryLabel="Fallback model"
+      />,
+    )
+    expect(screen.getByRole('combobox', { name: 'Fallback model — Global default model' })).toBeEnabled()
+    expect(screen.queryByRole('combobox', { name: 'Global default model' })).not.toBeInTheDocument()
+    expect(screen.getByText('Fallback model')).toBeInTheDocument()
+    expect(screen.queryByText('Primary')).not.toBeInTheDocument()
+    await user.click(
+      screen.getByRole('button', { name: 'Clear assignment — Fallback model Global default model' }),
+    )
+    expect(onAssignSecondary).toHaveBeenCalledWith('default', null)
+  })
+
+  it('fallback-only rows are keyboard-reachable and axe-clean', async () => {
+    const user = userEvent.setup()
+    const { container } = render(
+      <TaskAssignmentPicker
+        tasks={[
+          { id: 'default', label: 'Global default model', secondaryOnly: true },
+          { id: 'chat', label: 'Chat' },
+        ]}
+        providers={capProviders}
+        value={{}}
+        secondaryValue={{ default: 'llama' }}
+        onAssign={vi.fn()}
+        onAssignSecondary={vi.fn()}
+      />,
+    )
+    const fallback = screen.getByRole('combobox', { name: 'Fallback — Global default model' })
+    const fallbackClear = screen.getByRole('button', {
+      name: 'Clear assignment — Fallback Global default model',
+    })
+    const primary = screen.getByRole('combobox', { name: 'Chat' })
+    await user.tab()
+    expect(fallback).toHaveFocus()
+    await user.tab()
+    expect(fallbackClear).toHaveFocus()
+    await user.tab()
+    expect(primary).toHaveFocus()
+    expect(await axe(container)).toHaveNoViolations()
+  })
+
   it('has no axe violations with sections and fallbacks', async () => {
     const { container } = render(
       <TaskAssignmentPicker

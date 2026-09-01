@@ -81,6 +81,39 @@ const localProviders: ModelPickerProvider[] = [
   },
 ]
 
+export const TaskAssignmentFallbackOnlyStory = () => {
+  const [secondary, setSecondary] = useState<Record<string, string | null>>({
+    default: 'llama',
+  })
+  return (
+    <div style={{ maxWidth: 720, display: 'grid', gap: 16 }}>
+      <TaskAssignmentPicker
+        tasks={[]}
+        sections={[
+          {
+            id: 'fallback',
+            label: 'Global fallback',
+            description: 'Serves every task without its own assignment.',
+            tasks: [{ id: 'default', label: 'Global default model', secondaryOnly: true }],
+          },
+          {
+            id: 'tasks',
+            label: 'Tasks',
+            tasks: [{ id: 'ocr', label: 'Page OCR', requires: 'vision', icon: Search }],
+          },
+        ]}
+        providers={localProviders}
+        value={{ ocr: null }}
+        secondaryValue={secondary}
+        onAssign={() => {}}
+        onAssignSecondary={(taskId, modelId) =>
+          setSecondary((current) => ({ ...current, [taskId]: modelId }))
+        }
+      />
+    </div>
+  )
+}
+
 export const TaskAssignmentV2Story = () => {
   const [value, setValue] = useState<Record<string, string | null>>({
     text: 'llama',
