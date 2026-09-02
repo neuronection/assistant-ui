@@ -254,6 +254,41 @@ describe('SidebarNav (groups)', () => {
   })
 })
 
+describe('SidebarNav (top-level sections)', () => {
+  const sectioned: NavItem[] = [
+    { id: 'dashboard', label: 'Dashboard', icon: Bell },
+    { id: 'catalog', label: 'Catalog', icon: BookOpen, section: 'Job hunt' },
+    { id: 'generate', label: 'Generate', section: 'Job hunt' },
+    { id: 'profile', label: 'Profile', section: 'Account' },
+    { id: 'about', label: 'About' },
+  ]
+
+  it('renders each section divider once, above its first item', () => {
+    render(<SidebarNav items={sectioned} activeId="catalog" />)
+    expect(screen.getAllByText('Job hunt')).toHaveLength(1)
+    expect(screen.getAllByText('Account')).toHaveLength(1)
+    const catalog = screen.getByRole('button', { name: 'Catalog' })
+    const divider = screen.getByText('Job hunt')
+    expect(divider.compareDocumentPosition(catalog) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+  })
+
+  it('items without a section render without a preceding divider', () => {
+    render(<SidebarNav items={sectioned} activeId="dashboard" />)
+    expect(screen.queryByText('Dashboard')).toBeInTheDocument()
+  })
+
+  it('has no axe violations with sections', async () => {
+    const { container } = render(<SidebarNav items={sectioned} activeId="catalog" />)
+    expect(await axe(container)).toHaveNoViolations()
+  })
+
+  it('collapsed rail ignores sections', () => {
+    render(<SidebarNav items={sectioned} activeId="catalog" collapsed />)
+    expect(screen.queryByText('Job hunt')).toBeNull()
+    expect(screen.queryByText('Account')).toBeNull()
+  })
+})
+
 describe('SidebarNav (collapsed rail)', () => {
   it('renders icon-only buttons with titles instead of labels', () => {
     render(<FlatDemo collapsed collapsible />)

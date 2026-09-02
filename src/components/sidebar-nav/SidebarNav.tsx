@@ -26,6 +26,9 @@ export interface NavItem {
   /** One nesting level; deeper trees stay app-side. */
   children?: NavChild[]
   disabled?: boolean
+  /** Divider label rendered above this item (first occurrence only) —
+   * for flat sidebars with visual groups. Ignored in the collapsed rail. */
+  section?: string
 }
 
 export interface SidebarNavLabels {
@@ -332,12 +335,24 @@ export const SidebarNav = React.forwardRef<HTMLElement, SidebarNavProps>(
           className={cn('min-h-0 flex-1 overflow-y-auto px-3 py-3', navClassName)}
         >
           <ul className="space-y-1">
-            {items.map((item) => {
+            {items.map((item, index) => {
               // Group whose children were all filtered out app-side renders
               // nothing (presentational).
               if (item.children !== undefined && item.children.length === 0) {
                 return null
               }
+              const sectionSeen =
+                !rail &&
+                item.section !== undefined &&
+                items.findIndex((i) => i.section === item.section) === index
+              const sectionDivider = sectionSeen ? (
+                <div
+                  role="presentation"
+                  className="mt-2 border-t border-[var(--as-border)] px-3 pb-1 pt-3 text-[11px] font-bold uppercase tracking-wide text-[var(--as-muted-fg)]"
+                >
+                  {item.section}
+                </div>
+              ) : null
               const active = item.id === activeId
               const childActive = item.children?.some((c) => c.id === activeId) ?? false
               const isExpanded = expanded.includes(item.id)
@@ -347,6 +362,7 @@ export const SidebarNav = React.forwardRef<HTMLElement, SidebarNavProps>(
               if (item.children && item.children.length > 0 && rail) {
                 return (
                   <li key={item.id}>
+                    {sectionDivider}
                     <PopoverPrimitive.Root
                       open={openFlyout === item.id}
                       onOpenChange={(open) => {
@@ -433,6 +449,7 @@ export const SidebarNav = React.forwardRef<HTMLElement, SidebarNavProps>(
               if (item.children && item.children.length > 0) {
                 return (
                   <li key={item.id}>
+                    {sectionDivider}
                     <button
                       type="button"
                       data-as-nav-item
@@ -509,6 +526,7 @@ export const SidebarNav = React.forwardRef<HTMLElement, SidebarNavProps>(
 
               return (
                 <li key={item.id}>
+                  {sectionDivider}
                   <button
                     type="button"
                     data-as-nav-item

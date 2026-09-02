@@ -28,7 +28,27 @@ What it does per package manager:
 | App | Manager | Mechanism |
 |---|---|---|
 | study-assistant | pnpm | `overrides:` entry in the workspace `pnpm-workspace.yaml` → `link:` symlink |
-| career-assistant, health-assistant | npm | dependency swapped to `file:` → npm symlinks it |
+| career-assistant, health-assistant | npm | **not supported — use the tarball flow** (see below) |
+
+**npm apps: `file:` linking is broken for this library — use tarballs.**
+Verified 2026-09-02 (nav primitives program): npm's `file:` symlink makes
+vitest resolve the dist's `react` import from the library repo's own
+node_modules (duplicate React → "Objects are not valid as a React child" /
+hooks-of-null crashes), tsc loads a second `@types/react` (TS2786
+"cannot be used as a JSX component"), and `npm install` in the app wipes
+the library checkout's `node_modules`. `preserveSymlinks`/`dedupe`/
+aliases/`server.deps.inline` do NOT fully fix it. For npm apps:
+
+```bash
+# in the library repo — after every change you want to see:
+pnpm build && pnpm pack --pack-destination /tmp/opencode
+# in the app frontend:
+npm install /tmp/opencode/neuronection-assistant-ui-0.13.1.tgz --no-save
+```
+
+`--no-save` keeps the manifest/lockfile commit-clean; the pin moves to
+`^0.14.0` (or whatever publishes) in the adoption PR once released.
+Verify gates run against this state exactly as CI will see it.
 
 Rules:
 

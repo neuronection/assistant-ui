@@ -7,8 +7,10 @@ import {
   Home,
   Info,
   Pill,
+  Search,
   ShieldCheck,
   Sparkles,
+  Trophy,
   User,
 } from 'lucide-react'
 import { SidebarNav, type NavItem } from '../src/components/sidebar-nav/SidebarNav'
@@ -67,6 +69,34 @@ export const GroupsStory = () => {
         onNavigate={setActive}
         header={<div style={{ padding: "16px 20px 8px" }}><span style={{ fontWeight: 700 }}>Health Assistant</span></div>}
         footer={<span style={{ fontSize: 12, opacity: 0.6 }}>v2.3.1</span>}
+      />
+      <p style={{ fontSize: 14, padding: 16 }}>Route: {active}</p>
+    </div>
+  )
+}
+
+export const SectionedStory = () => {
+  const [active, setActive] = useState('/')
+  return (
+    <div style={{ display: 'flex', height: 420 }}>
+      <SidebarNav
+        items={[
+          { id: '/', label: 'Dashboard', icon: Home },
+          { id: '/catalog', label: 'Catalog', icon: BookOpen, section: 'Job hunt' },
+          { id: '/generate', label: 'Generate', icon: Sparkles, section: 'Job hunt' },
+          { id: '/rankings', label: 'Rankings', icon: Trophy, section: 'Job hunt' },
+          { id: '/explore', label: 'Explore', icon: Search, section: 'Job hunt' },
+          { id: '/profile', label: 'Profile', icon: User, section: 'Account' },
+          { id: '/settings', label: 'Settings', icon: ShieldCheck, section: 'General' },
+          { id: '/about', label: 'About', icon: Info },
+        ]}
+        activeId={active}
+        onNavigate={setActive}
+        footer={
+          <span style={{ fontSize: 12, opacity: 0.6 }}>
+            Part of Neuronection
+          </span>
+        }
       />
       <p style={{ fontSize: 14, padding: 16 }}>Route: {active}</p>
     </div>

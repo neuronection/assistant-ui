@@ -16,7 +16,7 @@ import { SidebarNav, type NavItem, type NavChild } from '@neuronection/assistant
 
 | prop | type | default | notes |
 |---|---|---|---|
-| `items` | `NavItem[]` | — | `{ id, label, icon?, badge?, children?, disabled? }`; children add `section?`; **pre-filtered by the app** (roles, feature flags) |
+| `items` | `NavItem[]` | — | `{ id, label, icon?, badge?, children?, disabled?, section? }`; `section` renders a divider above the item (top-level flat sidebars) or above the child (inside groups, first occurrence only); **pre-filtered by the app** (roles, feature flags) |
 | `activeId` | `string \| null` | — | the app resolves route → id |
 | `onNavigate` | `(id: string) => void` | — | fires for leaves only; group triggers toggle instead |
 | `collapsed` | `boolean` | `false` | controlled icon rail |
