@@ -1,5 +1,11 @@
 # @neuronection/assistant-ui
 
+## 0.17.0
+
+### Minor Changes
+
+- [`6df699b`](https://github.com/neuronection/assistant-ui/commit/6df699b8070318b88a33ba124c7b9d2d90855241) Thanks [@constLiakos](https://github.com/constLiakos)! - SidebarNav: new `compact` prop — a denser layout for short viewports (tighter item padding, smaller icons/typography, slimmer list/pinned/footer regions, `data-as-compact` on the root). Presentational and controlled per ADR-006: the app owns the trigger (e.g. a `max-height` media query hook) and decides whether to hide its footer block in the same state. Composes with `collapsed`; keyboard traversal and the a11y contract are unchanged.
+
 ## 0.16.0
 
 ### Minor Changes
