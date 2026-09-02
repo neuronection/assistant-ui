@@ -1,5 +1,47 @@
 # @neuronection/assistant-ui
 
+## 0.15.0
+
+### Minor Changes
+
+- [`e7a75e3`](https://github.com/neuronection/assistant-ui/commit/e7a75e3a3970e01f7bdcaf9060f54abe145d5a27) Thanks [@constLiakos](https://github.com/constLiakos)! - ChipInput: the typed draft now renders as a dashed pending chip
+  (`data-pending` on the container while a draft exists) so it is visually
+  explicit that each entry is its own separate item, and a new `hint` prop
+  renders helper text below the field wired to the input via
+  `aria-describedby` — use it to spell out the "press Enter or Add after each
+  one" contract.
+
+- [`163e5e4`](https://github.com/neuronection/assistant-ui/commit/163e5e4f13d5a097dea56727447fe7e1070e3395) Thanks [@constLiakos](https://github.com/constLiakos)! - ScaleSlider: modern track + thumb (filled progress, larger thumb, visible
+  focus ring) via new `styles.css` range rules scoped to
+  `[data-as='scale-slider']`; low/high labels are larger and readable
+  (text-xs, medium weight, muted color) instead of 9px uppercase.
+
+  ChipInput: new `addLabel` prop renders an explicit add button that commits
+  the draft (disabled while empty, re-focuses the input) — makes the
+  multi-entry affordance discoverable without keyboard knowledge.
+
+- [`3826518`](https://github.com/neuronection/assistant-ui/commit/3826518fd86f03cbef56344bec9b34b2234086c9) Thanks [@constLiakos](https://github.com/constLiakos)! - New `SidebarNav` component: the family-standard vertical navigation panel
+  (groups + section dividers, icons, badges, controlled `activeId`, optional
+  collapsed icon rail with hover flyouts, header/footer slots). Fully
+  presentational + controlled per ADR-006 — routing, role filtering and i18n
+  stay app-side. Ships with keyboard-nav + axe assertions, Ladle stories and
+  a docs page; adoption across the family apps is tracked in the nav
+  primitives program (family ADR-0007).
+
+- [`3df9ac1`](https://github.com/neuronection/assistant-ui/commit/3df9ac1dbc90079cf1910e34bd213f63e700688b) Thanks [@constLiakos](https://github.com/constLiakos)! - `SidebarNav`: top-level `NavItem` entries now accept `section` — a divider
+  label rendered above the item (first occurrence only) so flat sidebars can
+  group their entries visually without nested expand/collapse. Sections are
+  ignored in the collapsed rail. (Career's sidebar adoption is the first
+  consumer; matches the existing child-level `section` dividers.)
+
+- [`3826518`](https://github.com/neuronection/assistant-ui/commit/3826518fd86f03cbef56344bec9b34b2234086c9) Thanks [@constLiakos](https://github.com/constLiakos)! - New `UserMenu` component: the family-standard user menu (avatar or
+  initials-disc trigger with name/email, identity header in the panel, item
+  model with `tone: 'danger'`, `pending`, and checkable items for
+  theme/language toggles). Built on the `Menu` primitives; also adds
+  `MenuCheckboxItem` (Radix checkbox menu item with an indicator) to the
+  menu module. Health's hand-rolled header dropdown and career's plain
+  sign-out button are the adoption targets (family ADR-0007 program).
+
 ## 0.14.0
 
 ### Minor Changes
