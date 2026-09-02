@@ -86,3 +86,21 @@ When apps adopt it: the app PR **deletes the local copy and imports the
 library in the same commit**. No wrappers, no TODOs. The weekly drift-audit
 workflow in each app (snippet: `.github/drift-audit.snippet.yml`) catches
 regressions.
+
+## Changing an existing component
+
+The docs page **is the spec** — `check-docs.mjs` only verifies the page
+exists, not that it matches the code:
+
+- Any props/behavior change updates the page's props table, controlled
+  contract, and snippets **in the same PR**. Derive the table from the
+  component's Props interface — never hand-patch stale rows.
+- If the component's purpose or scope shifts (what it is for, when to use
+  it, what the ADR-006 boundary keeps out), update the page's purpose and
+  related-modules sections too.
+- Visual changes: refresh the story baselines in the same PR
+  (`pnpm exec playwright test --update-snapshots`).
+- Changeset bump: patch for fixes, minor for new props/features; breaking
+  changes follow semver (consumers pin `^0.x`).
+- Keep snippets honest: prefer copying from a story or test so they
+  compile against the current API.
