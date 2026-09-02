@@ -203,6 +203,14 @@
       "types": "./dist/settings-shell.d.ts",
       "import": "./dist/settings-shell.js"
     },
+    "./sidebar-nav": {
+      "types": "./dist/sidebar-nav.d.ts",
+      "import": "./dist/sidebar-nav.js"
+    },
+    "./user-menu": {
+      "types": "./dist/user-menu.d.ts",
+      "import": "./dist/user-menu.js"
+    },
     "./theme-scope": {
       "types": "./dist/theme-scope.d.ts",
       "import": "./dist/theme-scope.js"

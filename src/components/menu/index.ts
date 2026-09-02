@@ -4,10 +4,12 @@ export {
   MenuContent,
   MenuGroup,
   MenuItem,
+  MenuCheckboxItem,
   MenuSeparator,
   MenuLabel,
   ActionMenu,
   type MenuItemProps,
+  type MenuCheckboxItemProps,
   type ActionMenuItem,
   type ActionMenuProps,
 } from './Menu'

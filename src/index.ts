@@ -159,13 +159,20 @@ export {
   MenuContent,
   MenuGroup,
   MenuItem,
+  MenuCheckboxItem,
   MenuSeparator,
   MenuLabel,
   ActionMenu,
   type MenuItemProps,
+  type MenuCheckboxItemProps,
   type ActionMenuItem,
   type ActionMenuProps,
 } from './components/menu'
+export {
+  UserMenu,
+  type UserMenuItem,
+  type UserMenuProps,
+} from './components/user-menu'
 export {
   Modal,
   PanelModal,
@@ -217,6 +224,13 @@ export {
   type ModelRegistryRemoteState,
 } from './components/model-registry'
 export { SelectionBar, type SelectionBarProps } from './components/selection-bar'
+export {
+  SidebarNav,
+  type NavChild,
+  type NavItem,
+  type SidebarNavLabels,
+  type SidebarNavProps,
+} from './components/sidebar-nav'
 export { Spinner, type SpinnerProps } from './components/spinner'
 export {
   TaskAssignmentPicker,

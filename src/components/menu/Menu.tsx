@@ -77,6 +77,56 @@ export const MenuSeparator = React.forwardRef<
   )
 })
 
+const menuItemBaseClass =
+  'flex w-full cursor-pointer select-none items-center gap-2 rounded-[calc(var(--as-radius-sm)-2px)] px-2 py-1.5 text-left text-sm outline-none transition-colors focus:bg-[var(--as-secondary)] data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg]:size-4 [&_svg]:shrink-0'
+
+export interface MenuCheckboxItemProps
+  extends React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.CheckboxItem> {
+  icon?: LucideIcon
+  danger?: boolean
+  pending?: boolean
+}
+
+export const MenuCheckboxItem = React.forwardRef<
+  React.ComponentRef<typeof DropdownMenuPrimitive.CheckboxItem>,
+  MenuCheckboxItemProps
+>(function MenuCheckboxItem(
+  { className, icon: Icon, danger, disabled, pending, children, ...props },
+  ref,
+) {
+  return (
+    <DropdownMenuPrimitive.CheckboxItem
+      ref={ref}
+      disabled={disabled || pending}
+      aria-busy={pending || undefined}
+      className={cn(
+        menuItemBaseClass,
+        danger && 'text-[var(--as-danger)] focus:bg-[var(--as-danger)]/10',
+        className,
+      )}
+      {...props}
+    >
+      {Icon ? <Icon aria-hidden /> : null}
+      {children}
+      <DropdownMenuPrimitive.ItemIndicator
+        className="ml-auto inline-flex items-center justify-center"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden
+        >
+          <path d="M20 6 9 17l-5-5" />
+        </svg>
+      </DropdownMenuPrimitive.ItemIndicator>
+    </DropdownMenuPrimitive.CheckboxItem>
+  )
+})
+
 export const MenuLabel = React.forwardRef<
   React.ComponentRef<typeof DropdownMenuPrimitive.Label>,
   React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Label>

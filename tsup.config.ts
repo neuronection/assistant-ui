@@ -51,6 +51,8 @@ export default defineConfig({
     table: 'src/components/table/index.ts',
     'task-assignment-picker': 'src/components/task-assignment-picker/index.ts',
     'settings-shell': 'src/components/settings-shell/index.ts',
+    'sidebar-nav': 'src/components/sidebar-nav/index.ts',
+    'user-menu': 'src/components/user-menu/index.ts',
     'theme-scope': 'src/components/theme-scope/index.ts',
     'time-picker': 'src/components/time-picker/index.ts',
     'time-list': 'src/components/time-list/index.ts',
