@@ -1,5 +1,19 @@
 # @neuronection/assistant-ui
 
+## 0.16.0
+
+### Minor Changes
+
+- [`d0d648b`](https://github.com/neuronection/assistant-ui/commit/d0d648b3a5142badd32de81fdd992fdff803127c) Thanks [@constLiakos](https://github.com/constLiakos)! - SidebarNav: add `secondaryItems` — flat nav items pinned below the scroll area, above `footer` (the Settings/About pattern). Pinned items share the main list's rendering, active state, collapsed-rail behavior and keyboard traversal order (arrows and Home/End cross between regions).
+
+### Patch Changes
+
+- [`d0d648b`](https://github.com/neuronection/assistant-ui/commit/d0d648b3a5142badd32de81fdd992fdff803127c) Thanks [@constLiakos](https://github.com/constLiakos)! - SponsorCard: compact redesign — the decorative primary glow blob, large icon chip and tinted highlight block are gone. The title is bolder with a small inline heart, the footnote renders as a plain second line under the description, and the highlighted channel is emphasized with a primary border and primary name instead of a filled background. The channel list is a responsive grid — one column below the `sm` viewport breakpoint, two above — with a new `columns` prop (`'auto'` default, `1`, `2`) for narrow surfaces like modals.
+
+  FamilyBadge: the current app's card is now clickable to its own hub page (it was rendered as a non-interactive div; the ring and "Current app" badge still mark it).
+
+- [`d0d648b`](https://github.com/neuronection/assistant-ui/commit/d0d648b3a5142badd32de81fdd992fdff803127c) Thanks [@constLiakos](https://github.com/constLiakos)! - SponsorCard: the highlighted channel renders as a soft primary tint (8–12% color-mix fill, primary-mix border, primary text/icon) instead of a solid primary block, with slightly tighter row padding — calmer, more modern hierarchy.
+
 ## 0.15.0
 
 ### Minor Changes
