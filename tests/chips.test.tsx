@@ -109,6 +109,29 @@ describe('ChipInput', () => {
     expect(screen.getByRole('button', { name: 'Add' })).toBeDisabled()
   })
 
+  it('marks the input as pending while there is a draft', async () => {
+    const user = userEvent.setup()
+    const { container } = render(<ChipInput value={['one']} onChange={() => {}} />)
+    const group = container.querySelector('[data-as="chip-input"]')
+    const input = screen.getByLabelText('Add')
+    expect(group).not.toHaveAttribute('data-pending')
+    await user.type(input, 'drafting')
+    expect(group).toHaveAttribute('data-pending')
+    await user.type(input, '{Enter}')
+    expect(group).not.toHaveAttribute('data-pending')
+  })
+
+  it('renders the hint and wires it to the input', async () => {
+    const { container } = render(
+      <ChipInput value={[]} onChange={() => {}} hint="Press Enter or , to add each item" />,
+    )
+    const hint = container.querySelector('[data-as="chip-input-hint"]')
+    expect(hint).toHaveTextContent('Press Enter or , to add each item')
+    expect(screen.getByLabelText('Add')).toHaveAccessibleDescription(
+      'Press Enter or , to add each item',
+    )
+  })
+
   it('has no axe violations with the add button', async () => {
     const { container } = render(
       <ChipInput value={['one']} onChange={() => {}} inputLabel="New item" addLabel="Add" />,

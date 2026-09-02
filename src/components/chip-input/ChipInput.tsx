@@ -11,6 +11,7 @@ export interface ChipInputProps
   inputLabel?: string
   removeLabel?: string
   addLabel?: string
+  hint?: string
   disabled?: boolean
 }
 
@@ -28,6 +29,7 @@ export const ChipInput = React.forwardRef<HTMLDivElement, ChipInputProps>(
       inputLabel = 'Add',
       removeLabel = 'Remove',
       addLabel,
+      hint,
       disabled = false,
       className,
       ...props
@@ -36,6 +38,8 @@ export const ChipInput = React.forwardRef<HTMLDivElement, ChipInputProps>(
   ) {
     const [draft, setDraft] = React.useState('')
     const inputRef = React.useRef<HTMLInputElement>(null)
+    const hintId = React.useId()
+    const hasDraft = draft.trim().length > 0
 
     const commit = (raw: string) => {
       const separatorPattern = new RegExp(
@@ -80,6 +84,7 @@ export const ChipInput = React.forwardRef<HTMLDivElement, ChipInputProps>(
       <div
         ref={ref}
         data-as="chip-input"
+        data-pending={hasDraft || undefined}
         role="group"
         onClick={() => {
           if (!disabled) inputRef.current?.focus()
@@ -124,8 +129,22 @@ export const ChipInput = React.forwardRef<HTMLDivElement, ChipInputProps>(
             if (draft.trim()) commit(draft)
           }}
           placeholder={value.length === 0 ? placeholder : ''}
-          className="min-w-24 flex-1 bg-transparent text-sm text-[var(--as-fg)] outline-none placeholder:text-[var(--as-muted-fg)]"
+          aria-describedby={hint ? hintId : undefined}
+          className={cn(
+            'min-w-24 flex-1 bg-transparent text-sm text-[var(--as-fg)] outline-none placeholder:text-[var(--as-muted-fg)]',
+            hasDraft &&
+              'rounded-[calc(var(--as-radius-sm)-2px)] border border-dashed border-[var(--as-primary)] bg-[color-mix(in_srgb,var(--as-primary)_8%,transparent)] px-2 py-0.5',
+          )}
         />
+        {hint ? (
+          <span
+            id={hintId}
+            data-as="chip-input-hint"
+            className="w-full text-xs text-[var(--as-muted-fg)]"
+          >
+            {hint}
+          </span>
+        ) : null}
         {addLabel ? (
           <button
             type="button"

@@ -25,6 +25,7 @@ Extends `React.ComponentProps<'div'>` (minus `onChange`).
 | `inputLabel` | `string` | `'Add'` | input accessible name |
 | `removeLabel` | `string` | `'Remove'` | prefixed per chip (`Remove <chip>`) |
 | `addLabel` | `string` | — | when set, renders an explicit add button with this accessible name |
+| `hint` | `string` | — | helper text rendered below the field, wired to the input via `aria-describedby` |
 | `disabled` | `boolean` | `false` | |
 | `className` | `string` | — | merges |
 
@@ -34,6 +35,10 @@ Extends `React.ComponentProps<'div'>` (minus `onChange`).
 The draft text is internal and cleared on commit. Clicking the container
 focuses the input. The add button commits the draft, re-focuses the input,
 and is disabled while the draft is empty.
+
+While the draft is non-empty the container sets `data-pending` and the input
+is styled as a dashed pending chip, so it is visually explicit that the typed
+text is its own separate item that Enter/comma/the add button will commit.
 
 ## labels & i18n
 
@@ -70,6 +75,7 @@ with an explicit add button:
   inputLabel="New hobby"
   addLabel="Add"
   placeholder="e.g. chess, sketching"
+  hint="One entry per chip — press Enter or Add after each one."
 />
 ```
 

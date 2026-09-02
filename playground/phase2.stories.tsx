@@ -23,6 +23,7 @@ export const ChipEditing = () => {
         inputLabel="New skill"
         addLabel="Add"
         placeholder="Type and use the Add button…"
+        hint="Each entry is its own chip — press Enter or Add after each one."
       />
       <ChipList items={skills} onRemove={(item) => setSkills(skills.filter((s) => s !== item))} />
     </div>
