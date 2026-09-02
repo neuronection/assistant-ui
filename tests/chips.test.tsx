@@ -76,9 +76,49 @@ describe('ChipInput', () => {
     expect(container.querySelector('[data-as="chip-input"]')).toBeInTheDocument()
   })
 
+  it('renders no add button without addLabel', () => {
+    render(<ChipInput value={[]} onChange={() => {}} />)
+    expect(screen.queryByRole('button', { name: 'Add' })).not.toBeInTheDocument()
+  })
+
+  it('commits the draft via the add button', async () => {
+    const user = userEvent.setup()
+    const onChange = vi.fn()
+    render(
+      <ChipInput value={['one']} onChange={onChange} inputLabel="New item" addLabel="Add" />,
+    )
+    await user.type(screen.getByRole('textbox', { name: 'New item' }), 'two')
+    await user.click(screen.getByRole('button', { name: 'Add' }))
+    expect(onChange).toHaveBeenCalledWith(['one', 'two'])
+  })
+
+  it('keeps the input focused after using the add button', async () => {
+    const user = userEvent.setup()
+    const onChange = vi.fn()
+    render(
+      <ChipInput value={['one']} onChange={onChange} inputLabel="New item" addLabel="Add" />,
+    )
+    const input = screen.getByRole('textbox', { name: 'New item' })
+    await user.type(input, 'two')
+    await user.click(screen.getByRole('button', { name: 'Add' }))
+    expect(input).toHaveFocus()
+  })
+
+  it('disables the add button while the draft is empty', () => {
+    render(<ChipInput value={[]} onChange={() => {}} addLabel="Add" />)
+    expect(screen.getByRole('button', { name: 'Add' })).toBeDisabled()
+  })
+
+  it('has no axe violations with the add button', async () => {
+    const { container } = render(
+      <ChipInput value={['one']} onChange={() => {}} inputLabel="New item" addLabel="Add" />,
+    )
+    expect(await axe(container)).toHaveNoViolations()
+  })
+
   it('has no axe violations', async () => {
     const { container } = render(
-      <ChipInput value={['one', 'two']} onChange={() => {}} placeholder="Tags" />,
+      <ChipInput value={['one', 'two']} onChange={() => {}} placeholder="Tags" addLabel="Add" />,
     )
     expect(await axe(container)).toHaveNoViolations()
   })

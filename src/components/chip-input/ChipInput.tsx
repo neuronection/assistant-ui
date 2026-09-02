@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { X } from 'lucide-react'
+import { Plus, X } from 'lucide-react'
 import { cn } from '../../lib/utils'
 
 export interface ChipInputProps
@@ -10,6 +10,7 @@ export interface ChipInputProps
   separators?: string[]
   inputLabel?: string
   removeLabel?: string
+  addLabel?: string
   disabled?: boolean
 }
 
@@ -26,6 +27,7 @@ export const ChipInput = React.forwardRef<HTMLDivElement, ChipInputProps>(
       separators = [','],
       inputLabel = 'Add',
       removeLabel = 'Remove',
+      addLabel,
       disabled = false,
       className,
       ...props
@@ -124,6 +126,23 @@ export const ChipInput = React.forwardRef<HTMLDivElement, ChipInputProps>(
           placeholder={value.length === 0 ? placeholder : ''}
           className="min-w-24 flex-1 bg-transparent text-sm text-[var(--as-fg)] outline-none placeholder:text-[var(--as-muted-fg)]"
         />
+        {addLabel ? (
+          <button
+            type="button"
+            disabled={disabled || !draft.trim()}
+            aria-label={addLabel}
+            onMouseDown={(event) => event.preventDefault()}
+            onClick={(event) => {
+              event.stopPropagation()
+              commit(draft)
+              inputRef.current?.focus()
+            }}
+            className="inline-flex shrink-0 items-center gap-1 rounded-[calc(var(--as-radius-sm)-2px)] border border-[var(--as-border)] bg-[var(--as-surface-raised)] px-2 py-0.5 text-xs font-medium text-[var(--as-fg)] transition-colors hover:border-[var(--as-primary)] hover:text-[var(--as-primary)] focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[var(--as-focus-ring)] disabled:pointer-events-none disabled:opacity-50"
+          >
+            <Plus className="size-3" aria-hidden />
+            {addLabel}
+          </button>
+        ) : null}
       </div>
     )
   },

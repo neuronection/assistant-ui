@@ -17,6 +17,13 @@ export const ChipEditing = () => {
         onChange={setSkills}
         placeholder="Add a skill and press Enter…"
       />
+      <ChipInput
+        value={skills}
+        onChange={setSkills}
+        inputLabel="New skill"
+        addLabel="Add"
+        placeholder="Type and use the Add button…"
+      />
       <ChipList items={skills} onRemove={(item) => setSkills(skills.filter((s) => s !== item))} />
     </div>
   )

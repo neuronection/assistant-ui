@@ -57,9 +57,9 @@ behavior and focus restoration are listed **only where asserted**.
 | `Textarea` | same as `Input` | typing | clean |
 | `SearchInput` | `role="search"` wrapper + textbox + clear button | Enter submits (`onSubmit`); clear button empties | clean |
 | `ExpandableSearch` | trigger reveals a `role="search"` input | first Escape clears the value, second Escape collapses (collapsed trigger `aria-hidden`) | clean |
-| `ChipInput` | labelled input + chip remove buttons | Enter commits a chip; separator keys (`,`) commit; Backspace on empty input removes the last chip; paste splits into chips; blur commits the draft; Tab reaches remove buttons and the input | clean |
+| `ChipInput` | labelled input + chip remove buttons | Enter commits a chip; separator keys (`,`) commit; Backspace on empty input removes the last chip; paste splits into chips; blur commits the draft; Tab reaches remove buttons and the input; optional add button commits the draft | clean |
 | `ChipList` | presentational pills; remove buttons named `<removeLabel> — <item>`; clickable chips are real buttons | remove/click via native button semantics (asserted: accessible names, Enter activation) | clean |
-| `ScaleSlider` | `role="slider"` (native range) paired with a number input | slider `change` emits numeric values; typed input syncs; blur clamps to `min`/`max`; clearing emits `''` | clean |
+| `ScaleSlider` | `role="slider"` (native range) paired with a number input | slider `change` emits numeric values; typed input syncs; blur clamps to `min`/`max`; clearing emits `''`; focus ring visible on the range input | clean |
 | `ProviderForm` | labelled fields; write-only API-key input (never renders a stored value); error `role="alert"` | typing reports `onApiKeyChange` | clean |
 
 ## Composite widgets

@@ -84,6 +84,10 @@ export const ScaleSlider = React.forwardRef<HTMLDivElement, ScaleSliderProps>(
     }
 
     const showLabels = Boolean(lowLabel || highLabel)
+    const progress =
+      numericValue === null
+        ? 0
+        : Math.max(0, Math.min(100, ((numericValue - min) / (max - min)) * 100))
 
     return (
       <div
@@ -97,7 +101,7 @@ export const ScaleSlider = React.forwardRef<HTMLDivElement, ScaleSliderProps>(
             type="range"
             aria-label={ariaLabel}
             className={cn(
-              'h-1.5 flex-1 cursor-pointer accent-[var(--as-primary)]',
+              'flex-1 cursor-pointer',
               disabled && 'cursor-not-allowed opacity-50',
             )}
             min={min}
@@ -106,6 +110,12 @@ export const ScaleSlider = React.forwardRef<HTMLDivElement, ScaleSliderProps>(
             value={sliderValue}
             disabled={disabled}
             onChange={handleSlider}
+            style={
+              {
+                '--as-slider-color': thumbColor,
+                '--as-slider-progress': `${progress}%`,
+              } as React.CSSProperties
+            }
           />
           {showInput ? (
             <input
@@ -124,9 +134,9 @@ export const ScaleSlider = React.forwardRef<HTMLDivElement, ScaleSliderProps>(
           ) : null}
         </div>
         {showLabels ? (
-          <div className="flex justify-between text-[9px] font-bold uppercase tracking-wider opacity-50">
-            <span style={{ color: positionColor(0) }}>{lowLabel}</span>
-            <span style={{ color: positionColor(1) }}>{highLabel}</span>
+          <div className="flex justify-between text-xs font-medium">
+            <span className="text-[var(--as-muted-fg)]">{lowLabel}</span>
+            <span className="text-[var(--as-muted-fg)]">{highLabel}</span>
           </div>
         ) : null}
       </div>

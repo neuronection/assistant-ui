@@ -1,8 +1,10 @@
 # ScaleSlider
 
 Native range input paired with a numeric input, colored by position on a
-green→red hue scale (`scaleColorForValue` exported). Emits `''` when cleared
-— "no value" is a first-class state.
+green→red hue scale (`scaleColorForValue` exported). The track fills with
+progress; thumb and fill colorize via the `--as-slider-color` custom
+property (set by the component from `scaleColorForValue`). Emits `''` when
+cleared — "no value" is a first-class state.
 
 ## import
 
@@ -31,7 +33,10 @@ Extends `React.ComponentProps<'div'>` (minus `onChange`).
 `value` in, `onChange(number | '')` out: slider `change` emits numeric
 values, typed input syncs, clearing the input emits `''`, blur clamps to
 `min`/`max`. The thumb/border color is derived via `scaleColorForValue(min,
-max, value)` (hue 142 → 0 across the domain).
+max, value)` (hue 142 → 0 across the domain). The filled-track progress is
+exposed as the `--as-slider-progress` custom property on the range input;
+thumb/track styling ships in `styles.css` under `[data-as='scale-slider']`
+and can be re-themed per app via `--as-slider-color`.
 
 ## labels & i18n
 
