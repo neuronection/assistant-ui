@@ -393,3 +393,85 @@ describe('SidebarNav (collapsed rail)', () => {
     expect(results).toHaveNoViolations()
   })
 })
+
+describe('SidebarNav (secondary items)', () => {
+  const secondary: NavItem[] = [
+    { id: 'settings', label: 'Settings', icon: ShieldCheck },
+    { id: 'help', label: 'Help', icon: BookOpen },
+  ]
+
+  function SecondaryDemo(props: Partial<React.ComponentProps<typeof SidebarNav>>) {
+    const [active, setActive] = React.useState<string | null>('dashboard')
+    return (
+      <div style={{ height: 400 }}>
+        <SidebarNav
+          items={flatItems}
+          secondaryItems={secondary}
+          activeId={active}
+          onNavigate={setActive}
+          {...props}
+        />
+      </div>
+    )
+  }
+
+  it('renders pinned items below the main list, after a divider', () => {
+    const { container } = render(<SecondaryDemo />)
+    const last = screen.getByRole('button', { name: 'Help' })
+    const main = screen.getByRole('button', { name: 'Dashboard' })
+    expect(
+      main.compareDocumentPosition(last) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy()
+    expect(container.querySelectorAll('ul.space-y-1')).toHaveLength(2)
+  })
+
+  it('navigates and marks the active pinned item', async () => {
+    const user = userEvent.setup()
+    render(<SecondaryDemo />)
+    await user.click(screen.getByRole('button', { name: 'Settings' }))
+    expect(screen.getByRole('button', { name: 'Settings' })).toHaveAttribute(
+      'aria-current',
+      'page',
+    )
+    expect(screen.getByRole('button', { name: 'Dashboard' })).not.toHaveAttribute(
+      'aria-current',
+    )
+  })
+
+  it('keyboard: arrows and End traverse from the main list into pinned items', async () => {
+    const user = userEvent.setup()
+    render(<SecondaryDemo />)
+    const first = screen.getByRole('button', { name: 'Dashboard' })
+    const lastMain = screen.getByRole('button', { name: 'About' })
+    lastMain.focus()
+    await user.keyboard('{Home}')
+    expect(first).toHaveFocus()
+    await user.keyboard('{End}')
+    expect(screen.getByRole('button', { name: 'Help' })).toHaveFocus()
+    const settings = screen.getByRole('button', { name: 'Settings' })
+    settings.focus()
+    await user.keyboard('{ArrowUp}')
+    expect(lastMain).toHaveFocus()
+  })
+
+  it('renders pinned items icon-only with titles in the collapsed rail', () => {
+    render(<SecondaryDemo collapsed />)
+    expect(screen.queryByText('Settings')).toBeNull()
+    const settings = screen.getByRole('button', { name: 'Settings' })
+    expect(settings).toHaveAttribute('title', 'Settings')
+    expect(settings).toHaveAttribute('aria-label', 'Settings')
+  })
+
+  it('renders no pinned region when secondaryItems is empty or omitted', () => {
+    const { container, rerender } = render(<SecondaryDemo secondaryItems={[]} />)
+    expect(container.querySelectorAll('ul.space-y-1')).toHaveLength(1)
+    rerender(<FlatDemo />)
+    expect(container.querySelectorAll('ul.space-y-1')).toHaveLength(1)
+  })
+
+  it('has no axe violations with pinned items', async () => {
+    const { container } = render(<SecondaryDemo activeId="settings" />)
+    expect(await axe(container)).toHaveNoViolations()
+  })
+})
+

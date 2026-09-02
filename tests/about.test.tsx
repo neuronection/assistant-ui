@@ -138,6 +138,18 @@ describe('FamilyBadge', () => {
     )
   })
 
+  it('keeps the current app card clickable to its own hub page', () => {
+    render(<FamilyBadge current="career" />)
+    const tile = screen
+      .getByText('Career Assistant')
+      .closest('li[data-current]') as HTMLElement
+    const link = within(tile)
+      .getAllByRole('link')
+      .find((a) => a.getAttribute('href') === 'https://neuronection.com/en/career/')
+    expect(link).toBeTruthy()
+    expect(link).toHaveAttribute('target', '_blank')
+  })
+
   it('renders the family blurb and prominent site CTA', () => {
     render(<FamilyBadge current="health" />)
     expect(screen.getByText(/open-source, self-hosted AI assistants/i)).toBeInTheDocument()
@@ -169,6 +181,7 @@ describe('FamilyBadge', () => {
     const expected = [
       'Part of the Neuronection family',
       'Visit neuronection.com',
+      /Health Assistant/,
       'Health Assistant on GitHub',
       'Health Assistant website',
       /Career Assistant/,
@@ -246,6 +259,27 @@ describe('SponsorCard', () => {
     expect(screen.getByText('Support the family')).toBeInTheDocument()
     expect(screen.getByText('Funding keeps the servers running.')).toBeInTheDocument()
     expect(screen.getByText('One-time support')).toBeInTheDocument()
+  })
+
+  it('defaults the channel list to a responsive grid, one column below sm', () => {
+    const { container } = render(<SponsorCard channels={channels} />)
+    const list = screen.getByRole('list', { name: 'Ways to support' })
+    expect(list).toHaveClass('grid')
+    expect(list).toHaveClass('grid-cols-1')
+    expect(list).toHaveClass('sm:grid-cols-2')
+    expect(container.querySelectorAll('[data-as-channel]')).toHaveLength(2)
+  })
+
+  it('columns={1} forces a single column for narrow surfaces', () => {
+    render(<SponsorCard channels={channels} columns={1} />)
+    const list = screen.getByRole('list', { name: 'Ways to support' })
+    expect(list).toHaveClass('grid-cols-1')
+    expect(list).not.toHaveClass('sm:grid-cols-2')
+  })
+
+  it('columns={2} forces two columns', () => {
+    render(<SponsorCard channels={channels} columns={2} />)
+    expect(screen.getByRole('list', { name: 'Ways to support' })).toHaveClass('grid-cols-2')
   })
 
   it('renders default title, description and footnote', () => {

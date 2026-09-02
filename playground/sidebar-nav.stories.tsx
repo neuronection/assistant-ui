@@ -103,6 +103,34 @@ export const SectionedStory = () => {
   )
 }
 
+export const SecondaryItemsStory = () => {
+  const [active, setActive] = useState('/catalog')
+  return (
+    <div style={{ display: 'flex', height: 420 }}>
+      <SidebarNav
+        items={[
+          { id: '/', label: 'Dashboard', icon: Home },
+          { id: '/catalog', label: 'Catalog', icon: BookOpen, section: 'Job hunt' },
+          { id: '/generate', label: 'Generate', icon: Sparkles, section: 'Job hunt' },
+          { id: '/profile', label: 'Profile', icon: User, section: 'Account' },
+        ]}
+        secondaryItems={[
+          { id: '/settings', label: 'Settings', icon: ShieldCheck },
+          { id: '/about', label: 'About', icon: Info },
+        ]}
+        activeId={active}
+        onNavigate={setActive}
+        footer={
+          <span style={{ fontSize: 12, opacity: 0.6 }}>
+            Part of Neuronection
+          </span>
+        }
+      />
+      <p style={{ fontSize: 14, padding: 16 }}>Route: {active}</p>
+    </div>
+  )
+}
+
 export const CollapsedRailStory = () => {
   const [active, setActive] = useState('exams')
   const [collapsed, setCollapsed] = useState(true)

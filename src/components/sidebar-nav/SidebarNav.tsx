@@ -45,6 +45,10 @@ export interface SidebarNavLabels {
 export interface SidebarNavProps {
   /** Pre-filtered by the app (roles, feature flags); order = render order. */
   items: NavItem[]
+  /** Flat items pinned below the scroll area, above `footer` (the
+   * Settings/About pattern). Same rendering, active state, rail behavior
+   * and keyboard traversal order as `items`. */
+  secondaryItems?: NavItem[]
   /** The app resolves route → id; matching logic stays app-side. */
   activeId?: string | null
   /** Fires for leaves only; group triggers toggle expansion instead. */
@@ -60,7 +64,7 @@ export interface SidebarNavProps {
   onExpandedIdsChange?: (ids: string[]) => void
   /** Slot above the list (brand, logo). */
   header?: React.ReactNode
-  /** Slot below the list (settings, profile, version). */
+  /** Slot below the list and pinned items (version, legal links). */
   footer?: React.ReactNode
   labels?: SidebarNavLabels
   className?: string
@@ -109,6 +113,7 @@ export const SidebarNav = React.forwardRef<HTMLElement, SidebarNavProps>(
   function SidebarNav(
     {
       items,
+      secondaryItems,
       activeId,
       onNavigate,
       collapsed = false,
@@ -126,6 +131,7 @@ export const SidebarNav = React.forwardRef<HTMLElement, SidebarNavProps>(
   ) {
     const baseId = React.useId()
     const listRef = React.useRef<HTMLDivElement>(null)
+    const secondaryRef = React.useRef<HTMLDivElement>(null)
     const flyoutTimer = React.useRef<ReturnType<typeof setTimeout> | null>(null)
     const [openFlyout, setOpenFlyout] = React.useState<string | null>(null)
     const [internalExpanded, setInternalExpanded] = React.useState<string[]>([])
@@ -158,12 +164,14 @@ export const SidebarNav = React.forwardRef<HTMLElement, SidebarNavProps>(
     // expansion when controlled).
     React.useEffect(() => {
       if (controlledExpanded || activeId == null) return
-      const owner = items.find((it) => it.children?.some((c) => c.id === activeId))
+      const owner =
+        items.find((it) => it.children?.some((c) => c.id === activeId)) ??
+        secondaryItems?.find((it) => it.children?.some((c) => c.id === activeId))
       if (owner && !expanded.includes(owner.id)) {
         setExpandedList([...expanded, owner.id])
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [activeId, items, controlledExpanded])
+    }, [activeId, items, secondaryItems, controlledExpanded])
 
     React.useEffect(() => {
       return () => {
@@ -189,12 +197,17 @@ export const SidebarNav = React.forwardRef<HTMLElement, SidebarNavProps>(
     }
 
     // ---- keyboard navigation over the visible list ----
+    const navRegions = () =>
+      [listRef.current, secondaryRef.current].filter(
+        (r): r is HTMLDivElement => r !== null,
+      )
+
     const visibleItems = (): HTMLButtonElement[] => {
-      const list = listRef.current
-      if (!list) return []
-      return Array.from(
-        list.querySelectorAll<HTMLButtonElement>('[data-as-nav-item]'),
-      ).filter((el) => el.closest('[hidden]') === null)
+      return navRegions().flatMap((region) =>
+        Array.from(
+          region.querySelectorAll<HTMLButtonElement>('[data-as-nav-item]'),
+        ).filter((el) => el.closest('[hidden]') === null),
+      )
     }
 
     const focusSibling = (current: HTMLElement, offset: number) => {
@@ -219,18 +232,18 @@ export const SidebarNav = React.forwardRef<HTMLElement, SidebarNavProps>(
     }
 
     const groupTriggerFor = (id: string) =>
-      Array.from(
-        listRef.current?.querySelectorAll<HTMLButtonElement>(
-          '[data-as-nav-group-id]',
-        ) ?? [],
-      ).find((b) => b.dataset.asNavGroupId === id)
+      navRegions()
+        .flatMap((r) =>
+          Array.from(r.querySelectorAll<HTMLButtonElement>('[data-as-nav-group-id]')),
+        )
+        .find((b) => b.dataset.asNavGroupId === id)
 
     const firstChildFor = (id: string) =>
-      Array.from(
-        listRef.current?.querySelectorAll<HTMLButtonElement>(
-          '[data-as-nav-parent-id]',
-        ) ?? [],
-      ).find((b) => b.dataset.asNavParentId === id && !b.disabled)
+      navRegions()
+        .flatMap((r) =>
+          Array.from(r.querySelectorAll<HTMLButtonElement>('[data-as-nav-parent-id]')),
+        )
+        .find((b) => b.dataset.asNavParentId === id && !b.disabled)
 
     const handleListKeyDown = (e: React.KeyboardEvent) => {
       const button = (e.target as HTMLElement).closest<HTMLButtonElement>(
@@ -290,6 +303,225 @@ export const SidebarNav = React.forwardRef<HTMLElement, SidebarNavProps>(
       </div>
     )
 
+    const renderItem = (item: NavItem, index: number, list: NavItem[]) => {
+      // Group whose children were all filtered out app-side renders
+      // nothing (presentational).
+      if (item.children !== undefined && item.children.length === 0) {
+        return null
+      }
+      const sectionSeen =
+        !rail &&
+        item.section !== undefined &&
+        list.findIndex((i) => i.section === item.section) === index
+      const sectionDivider = sectionSeen ? (
+        <div
+          role="presentation"
+          className="mt-2 border-t border-[var(--as-border)] px-3 pb-1 pt-3 text-[11px] font-bold uppercase tracking-wide text-[var(--as-muted-fg)]"
+        >
+          {item.section}
+        </div>
+      ) : null
+      const active = item.id === activeId
+      const childActive = item.children?.some((c) => c.id === activeId) ?? false
+      const isExpanded = expanded.includes(item.id)
+      const Icon = item.icon
+      const groupId = `${baseId}-group-${item.id}`
+
+      if (item.children && item.children.length > 0 && rail) {
+        return (
+          <li key={item.id}>
+            {sectionDivider}
+            <PopoverPrimitive.Root
+              open={openFlyout === item.id}
+              onOpenChange={(open) => {
+                if (!open) setOpenFlyout(null)
+              }}
+            >
+              <PopoverPrimitive.Anchor asChild>
+                <button
+                  type="button"
+                  data-as-nav-item
+                  data-as-nav-group-id={item.id}
+                  disabled={item.disabled}
+                  aria-label={labels?.openGroup ?? `Open ${item.label} menu`}
+                  aria-haspopup="true"
+                  aria-expanded={openFlyout === item.id}
+                  onClick={() => setOpenFlyout(item.id)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault()
+                      setOpenFlyout(item.id)
+                    }
+                  }}
+                  onMouseEnter={() => flyoutEnter(item.id)}
+                  onMouseLeave={flyoutLeave}
+                  className={cn(itemButtonClass(active || childActive), 'justify-center px-0')}
+                >
+                  {Icon ? (
+                    <Icon
+                      className={cn(
+                        'size-5 shrink-0',
+                        active || childActive
+                          ? 'text-[var(--as-primary)]'
+                          : 'text-[var(--as-muted-fg)]',
+                      )}
+                      aria-hidden
+                    />
+                  ) : null}
+                </button>
+              </PopoverPrimitive.Anchor>
+              <PopoverPrimitive.Portal>
+                <PopoverPrimitive.Content
+                  side="right"
+                  sideOffset={8}
+                  aria-label={item.label}
+                  onCloseAutoFocus={(e) => {
+                    // Menu-standard: focus returns to the trigger.
+                    e.preventDefault()
+                    groupTriggerFor(item.id)?.focus()
+                  }}
+                  onMouseEnter={flyoutEnterCancel}
+                  onMouseLeave={flyoutLeave}
+                  onKeyDown={handleFlyoutArrowKeys}
+                  className={flyoutContentClass}
+                >
+                  {flyoutHeader(item.label)}
+                  <ul className="mt-1 space-y-0.5">
+                    {item.children.map((child) => (
+                      <li key={child.id}>
+                        <button
+                          type="button"
+                          data-as-flyout-item
+                          disabled={child.disabled}
+                          onClick={() => navigate(child.id)}
+                          aria-current={child.id === activeId ? 'page' : undefined}
+                          className={cn(
+                            'flex w-full cursor-pointer items-center gap-2 rounded-[calc(var(--as-radius-sm)-2px)] px-2 py-1.5 text-left text-sm outline-none transition-colors focus:bg-[var(--as-secondary)] disabled:pointer-events-none disabled:opacity-50',
+                            child.id === activeId && 'font-bold text-[var(--as-primary)]',
+                          )}
+                        >
+                          {child.icon ? <child.icon aria-hidden /> : null}
+                          <span className="min-w-0 flex-1 truncate">{child.label}</span>
+                          <ItemBadge badge={child.badge} active={child.id === activeId} />
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </PopoverPrimitive.Content>
+              </PopoverPrimitive.Portal>
+            </PopoverPrimitive.Root>
+          </li>
+        )
+      }
+
+      if (item.children && item.children.length > 0) {
+        return (
+          <li key={item.id}>
+            {sectionDivider}
+            <button
+              type="button"
+              data-as-nav-item
+              data-as-nav-group-id={item.id}
+              disabled={item.disabled}
+              aria-expanded={isExpanded}
+              aria-controls={groupId}
+              onClick={() => toggleGroup(item.id)}
+              className={itemButtonClass(active || childActive)}
+            >
+              {Icon ? (
+                <Icon
+                  className={cn(
+                    'size-4 shrink-0',
+                    active || childActive
+                      ? 'text-[var(--as-primary)]'
+                      : 'text-[var(--as-muted-fg)]',
+                  )}
+                  aria-hidden
+                />
+              ) : null}
+              <span className="min-w-0 flex-1 truncate">{item.label}</span>
+              <ItemBadge badge={item.badge} active={active || childActive} />
+              {isExpanded ? (
+                <ChevronDown className="size-4 shrink-0 text-[var(--as-muted-fg)]" aria-hidden />
+              ) : (
+                <ChevronRight className="size-4 shrink-0 text-[var(--as-muted-fg)]" aria-hidden />
+              )}
+            </button>
+            <ul id={groupId} hidden={!isExpanded} className="mt-1 space-y-0.5 pl-6">
+              {item.children.map((child) => {
+                const childActiveItem = child.id === activeId
+                const ChildIcon = child.icon
+                const sectionSeen =
+                  child.section !== undefined &&
+                  item.children!.findIndex(
+                    (c) => c.section === child.section,
+                  ) === item.children!.indexOf(child)
+                return (
+                  <li key={child.id}>
+                    {sectionSeen ? (
+                      <div
+                        role="presentation"
+                        className="mt-2 border-t border-[var(--as-border)] px-3 pb-1 pt-3 text-[11px] font-bold uppercase tracking-wide text-[var(--as-muted-fg)]"
+                      >
+                        {child.section}
+                      </div>
+                    ) : null}
+                    <button
+                      type="button"
+                      data-as-nav-item
+                      data-as-nav-parent-id={item.id}
+                      disabled={child.disabled}
+                      aria-current={childActiveItem ? 'page' : undefined}
+                      onClick={() => navigate(child.id)}
+                      className={cn(
+                        itemButtonClass(childActiveItem),
+                        'py-2 pl-3 pr-2',
+                      )}
+                    >
+                      {ChildIcon ? (
+                        <ChildIcon className="size-4 shrink-0" aria-hidden />
+                      ) : null}
+                      <span className="min-w-0 flex-1 truncate">{child.label}</span>
+                      <ItemBadge badge={child.badge} active={childActiveItem} />
+                    </button>
+                  </li>
+                )
+              })}
+            </ul>
+          </li>
+        )
+      }
+
+      return (
+        <li key={item.id}>
+          {sectionDivider}
+          <button
+            type="button"
+            data-as-nav-item
+            disabled={item.disabled}
+            title={rail ? item.label : undefined}
+            aria-label={rail ? item.label : undefined}
+            aria-current={active ? 'page' : undefined}
+            onClick={() => navigate(item.id)}
+            className={cn(itemButtonClass(active), rail && 'justify-center px-0')}
+          >
+            {Icon ? (
+              <Icon
+                className={cn(
+                  'shrink-0',
+                  rail ? 'size-5' : 'size-4',
+                  active ? 'text-[var(--as-primary)]' : 'text-[var(--as-muted-fg)]',
+                )}
+                aria-hidden
+              />
+            ) : null}
+            {!rail ? <span className="min-w-0 flex-1 truncate">{item.label}</span> : null}
+            {!rail ? <ItemBadge badge={item.badge} active={active} /> : null}
+          </button>
+        </li>
+      )
+    }
+
     return (
       <nav
         ref={ref}
@@ -335,226 +567,21 @@ export const SidebarNav = React.forwardRef<HTMLElement, SidebarNavProps>(
           className={cn('min-h-0 flex-1 overflow-y-auto px-3 py-3', navClassName)}
         >
           <ul className="space-y-1">
-            {items.map((item, index) => {
-              // Group whose children were all filtered out app-side renders
-              // nothing (presentational).
-              if (item.children !== undefined && item.children.length === 0) {
-                return null
-              }
-              const sectionSeen =
-                !rail &&
-                item.section !== undefined &&
-                items.findIndex((i) => i.section === item.section) === index
-              const sectionDivider = sectionSeen ? (
-                <div
-                  role="presentation"
-                  className="mt-2 border-t border-[var(--as-border)] px-3 pb-1 pt-3 text-[11px] font-bold uppercase tracking-wide text-[var(--as-muted-fg)]"
-                >
-                  {item.section}
-                </div>
-              ) : null
-              const active = item.id === activeId
-              const childActive = item.children?.some((c) => c.id === activeId) ?? false
-              const isExpanded = expanded.includes(item.id)
-              const Icon = item.icon
-              const groupId = `${baseId}-group-${item.id}`
-
-              if (item.children && item.children.length > 0 && rail) {
-                return (
-                  <li key={item.id}>
-                    {sectionDivider}
-                    <PopoverPrimitive.Root
-                      open={openFlyout === item.id}
-                      onOpenChange={(open) => {
-                        if (!open) setOpenFlyout(null)
-                      }}
-                    >
-                      <PopoverPrimitive.Anchor asChild>
-                        <button
-                          type="button"
-                          data-as-nav-item
-                          data-as-nav-group-id={item.id}
-                          disabled={item.disabled}
-                          aria-label={labels?.openGroup ?? `Open ${item.label} menu`}
-                          aria-haspopup="true"
-                          aria-expanded={openFlyout === item.id}
-                          onClick={() => setOpenFlyout(item.id)}
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter' || e.key === ' ') {
-                              e.preventDefault()
-                              setOpenFlyout(item.id)
-                            }
-                          }}
-                          onMouseEnter={() => flyoutEnter(item.id)}
-                          onMouseLeave={flyoutLeave}
-                          className={cn(itemButtonClass(active || childActive), 'justify-center px-0')}
-                        >
-                          {Icon ? (
-                            <Icon
-                              className={cn(
-                                'size-5 shrink-0',
-                                active || childActive
-                                  ? 'text-[var(--as-primary)]'
-                                  : 'text-[var(--as-muted-fg)]',
-                              )}
-                              aria-hidden
-                            />
-                          ) : null}
-                        </button>
-                      </PopoverPrimitive.Anchor>
-                      <PopoverPrimitive.Portal>
-                        <PopoverPrimitive.Content
-                          side="right"
-                          sideOffset={8}
-                          aria-label={item.label}
-                          onCloseAutoFocus={(e) => {
-                            // Menu-standard: focus returns to the trigger.
-                            e.preventDefault()
-                            groupTriggerFor(item.id)?.focus()
-                          }}
-                          onMouseEnter={flyoutEnterCancel}
-                          onMouseLeave={flyoutLeave}
-                          onKeyDown={handleFlyoutArrowKeys}
-                          className={flyoutContentClass}
-                        >
-                          {flyoutHeader(item.label)}
-                          <ul className="mt-1 space-y-0.5">
-                            {item.children.map((child) => (
-                              <li key={child.id}>
-                                <button
-                                  type="button"
-                                  data-as-flyout-item
-                                  disabled={child.disabled}
-                                  onClick={() => navigate(child.id)}
-                                  aria-current={child.id === activeId ? 'page' : undefined}
-                                  className={cn(
-                                    'flex w-full cursor-pointer items-center gap-2 rounded-[calc(var(--as-radius-sm)-2px)] px-2 py-1.5 text-left text-sm outline-none transition-colors focus:bg-[var(--as-secondary)] disabled:pointer-events-none disabled:opacity-50',
-                                    child.id === activeId && 'font-bold text-[var(--as-primary)]',
-                                  )}
-                                >
-                                  {child.icon ? <child.icon aria-hidden /> : null}
-                                  <span className="min-w-0 flex-1 truncate">{child.label}</span>
-                                  <ItemBadge badge={child.badge} active={child.id === activeId} />
-                                </button>
-                              </li>
-                            ))}
-                          </ul>
-                        </PopoverPrimitive.Content>
-                      </PopoverPrimitive.Portal>
-                    </PopoverPrimitive.Root>
-                  </li>
-                )
-              }
-
-              if (item.children && item.children.length > 0) {
-                return (
-                  <li key={item.id}>
-                    {sectionDivider}
-                    <button
-                      type="button"
-                      data-as-nav-item
-                      data-as-nav-group-id={item.id}
-                      disabled={item.disabled}
-                      aria-expanded={isExpanded}
-                      aria-controls={groupId}
-                      onClick={() => toggleGroup(item.id)}
-                      className={itemButtonClass(active || childActive)}
-                    >
-                      {Icon ? (
-                        <Icon
-                          className={cn(
-                            'size-4 shrink-0',
-                            active || childActive
-                              ? 'text-[var(--as-primary)]'
-                              : 'text-[var(--as-muted-fg)]',
-                          )}
-                          aria-hidden
-                        />
-                      ) : null}
-                      <span className="min-w-0 flex-1 truncate">{item.label}</span>
-                      <ItemBadge badge={item.badge} active={active || childActive} />
-                      {isExpanded ? (
-                        <ChevronDown className="size-4 shrink-0 text-[var(--as-muted-fg)]" aria-hidden />
-                      ) : (
-                        <ChevronRight className="size-4 shrink-0 text-[var(--as-muted-fg)]" aria-hidden />
-                      )}
-                    </button>
-                    <ul id={groupId} hidden={!isExpanded} className="mt-1 space-y-0.5 pl-6">
-                      {item.children.map((child) => {
-                        const childActiveItem = child.id === activeId
-                        const ChildIcon = child.icon
-                        const sectionSeen =
-                          child.section !== undefined &&
-                          item.children!.findIndex(
-                            (c) => c.section === child.section,
-                          ) === item.children!.indexOf(child)
-                        return (
-                          <li key={child.id}>
-                            {sectionSeen ? (
-                              <div
-                                role="presentation"
-                                className="mt-2 border-t border-[var(--as-border)] px-3 pb-1 pt-3 text-[11px] font-bold uppercase tracking-wide text-[var(--as-muted-fg)]"
-                              >
-                                {child.section}
-                              </div>
-                            ) : null}
-                            <button
-                              type="button"
-                              data-as-nav-item
-                              data-as-nav-parent-id={item.id}
-                              disabled={child.disabled}
-                              aria-current={childActiveItem ? 'page' : undefined}
-                              onClick={() => navigate(child.id)}
-                              className={cn(
-                                itemButtonClass(childActiveItem),
-                                'py-2 pl-3 pr-2',
-                              )}
-                            >
-                              {ChildIcon ? (
-                                <ChildIcon className="size-4 shrink-0" aria-hidden />
-                              ) : null}
-                              <span className="min-w-0 flex-1 truncate">{child.label}</span>
-                              <ItemBadge badge={child.badge} active={childActiveItem} />
-                            </button>
-                          </li>
-                        )
-                      })}
-                    </ul>
-                  </li>
-                )
-              }
-
-              return (
-                <li key={item.id}>
-                  {sectionDivider}
-                  <button
-                    type="button"
-                    data-as-nav-item
-                    disabled={item.disabled}
-                    title={rail ? item.label : undefined}
-                    aria-label={rail ? item.label : undefined}
-                    aria-current={active ? 'page' : undefined}
-                    onClick={() => navigate(item.id)}
-                    className={cn(itemButtonClass(active), rail && 'justify-center px-0')}
-                  >
-                    {Icon ? (
-                      <Icon
-                        className={cn(
-                          'shrink-0',
-                          rail ? 'size-5' : 'size-4',
-                          active ? 'text-[var(--as-primary)]' : 'text-[var(--as-muted-fg)]',
-                        )}
-                        aria-hidden
-                      />
-                    ) : null}
-                    {!rail ? <span className="min-w-0 flex-1 truncate">{item.label}</span> : null}
-                    {!rail ? <ItemBadge badge={item.badge} active={active} /> : null}
-                  </button>
-                </li>
-              )
-            })}
+            {items.map((item, index) => renderItem(item, index, items))}
           </ul>
         </div>
+
+        {secondaryItems && secondaryItems.length > 0 ? (
+          <div
+            ref={secondaryRef}
+            onKeyDown={handleListKeyDown}
+            className="shrink-0 border-t border-[var(--as-border)] px-3 py-3"
+          >
+            <ul className="space-y-1">
+              {secondaryItems.map((item, index) => renderItem(item, index, secondaryItems))}
+            </ul>
+          </div>
+        ) : null}
 
         {footer ? (
           <div className="shrink-0 border-t border-[var(--as-border)] p-3">{footer}</div>

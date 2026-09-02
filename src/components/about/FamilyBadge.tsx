@@ -160,7 +160,7 @@ export const FamilyBadge = React.forwardRef<HTMLDivElement, FamilyBadgeProps>(
             const header = (
               <>
                 <Mark size={56} theme={theme} />
-                {member.href && !isCurrent ? (
+                {member.href ? (
                   <span className="text-base font-bold leading-snug text-[var(--as-primary)] underline decoration-transparent underline-offset-4 transition-colors group-hover:decoration-current">
                     {member.name}
                   </span>
@@ -184,7 +184,7 @@ export const FamilyBadge = React.forwardRef<HTMLDivElement, FamilyBadgeProps>(
             return (
               <li key={member.app} data-current={isCurrent ? 'true' : undefined} className="flex">
                 <div className={cn(card, 'w-full')}>
-                  {member.href && !isCurrent ? (
+                  {member.href ? (
                     <a
                       href={member.href}
                       target="_blank"

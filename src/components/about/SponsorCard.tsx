@@ -19,12 +19,16 @@ export interface SponsorCardProps
   description?: React.ReactNode
   footnote?: React.ReactNode
   channelsLabel?: string
+  /** Channel list columns. `auto` = one column below the `sm` viewport
+   * breakpoint, two above; `1`/`2` force a count (use `1` inside narrow
+   * surfaces like modals — breakpoints track the viewport, not the card). */
+  columns?: 'auto' | 1 | 2
   icon?: React.ReactNode
   heading?: 'h2' | 'h3' | 'h4'
 }
 
 const rowBase =
-  'group flex w-full items-center gap-3 rounded-[var(--as-radius)] p-3.5 text-left no-underline transition-[color,box-shadow,border-color] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--as-primary)]'
+  'group flex w-full items-center gap-2.5 rounded-[var(--as-radius)] px-2.5 py-2 text-left no-underline transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--as-primary)]'
 
 export const SponsorCard = React.forwardRef<HTMLElement, SponsorCardProps>(
   function SponsorCard(
@@ -34,6 +38,7 @@ export const SponsorCard = React.forwardRef<HTMLElement, SponsorCardProps>(
       description = 'This project is free and open source. Contributions directly fund servers, maintenance and new development.',
       footnote = 'Every contribution keeps the project independent and free.',
       channelsLabel = 'Ways to support',
+      columns = 'auto',
       icon,
       heading: Heading = 'h2',
       className,
@@ -48,41 +53,45 @@ export const SponsorCard = React.forwardRef<HTMLElement, SponsorCardProps>(
         ref={ref}
         data-as="sponsor-card"
         className={cn(
-          'relative flex flex-col gap-4 overflow-hidden rounded-[var(--as-radius-lg)] border border-[var(--as-border)] bg-[var(--as-surface)] p-6 shadow-[var(--as-shadow-1)]',
+          'flex flex-col gap-3 rounded-[var(--as-radius-lg)] border border-[var(--as-border)] bg-[var(--as-surface)] p-4',
           className,
         )}
         {...props}
       >
-        <div
-          aria-hidden
-          className="pointer-events-none absolute -right-12 -top-12 size-36 rounded-full bg-[var(--as-primary)] opacity-10 blur-2xl"
-        />
-        <div className="relative flex items-start gap-3.5">
-          <span
-            aria-hidden
-            className="flex size-10 shrink-0 items-center justify-center rounded-[var(--as-radius)] bg-[color-mix(in_srgb,var(--as-danger)_12%,transparent)] text-[var(--as-danger)] [&_svg]:size-5"
+        <div className="flex min-w-0 flex-col gap-1">
+          <Heading
+            data-as="sponsor-title"
+            className="flex items-center gap-2 text-base font-bold leading-tight tracking-tight text-[var(--as-fg)]"
           >
-            {icon ?? <Heart />}
-          </span>
-          <div className="flex min-w-0 flex-col gap-1.5 pt-0.5">
-            <Heading
-              data-as="sponsor-title"
-              className="text-base font-semibold leading-tight tracking-tight text-[var(--as-fg)]"
-            >
-              {title}
-            </Heading>
-            {description ? (
-              <p className="text-sm leading-relaxed text-[var(--as-muted-fg)]">
-                {description}
-              </p>
-            ) : null}
-          </div>
+            {icon ?? (
+              <Heart
+                aria-hidden
+                className="size-[18px] shrink-0 fill-[var(--as-danger)] text-[var(--as-danger)]"
+              />
+            )}
+            {title}
+          </Heading>
+          {description ? (
+            <p className="text-xs leading-relaxed text-[var(--as-muted-fg)]">
+              {description}
+            </p>
+          ) : null}
+          {footnote ? (
+            <p className="text-xs leading-relaxed text-[var(--as-muted-fg)]">
+              {footnote}
+            </p>
+          ) : null}
         </div>
 
         <ul
           data-as="sponsor-channels"
           aria-label={channelsLabel}
-          className="relative flex list-none flex-col gap-2"
+          className={cn(
+            'grid list-none gap-1.5',
+            columns === 'auto' && 'grid-cols-1 sm:grid-cols-2',
+            columns === 1 && 'grid-cols-1',
+            columns === 2 && 'grid-cols-2',
+          )}
         >
           {channels.map((channel) => {
             const Icon = channel.icon ?? Heart
@@ -98,71 +107,48 @@ export const SponsorCard = React.forwardRef<HTMLElement, SponsorCardProps>(
                   className={cn(
                     rowBase,
                     channel.highlight
-                      ? 'bg-[var(--as-primary)] text-[var(--as-primary-fg)] shadow-[var(--as-shadow-2)] hover:bg-[var(--as-accent-strong)] hover:shadow-[var(--as-shadow-3)]'
-                      : 'border border-[var(--as-border)] bg-[var(--as-surface-raised)] hover:border-[var(--as-primary)] hover:shadow-[var(--as-shadow-2)]',
+                      ? 'border border-[color-mix(in_srgb,var(--as-primary)_40%,transparent)] hover:border-[var(--as-primary)]'
+                      : 'border border-[var(--as-border)] bg-[var(--as-surface-raised)] hover:border-[var(--as-primary)]',
                   )}
                 >
                   <span
                     aria-hidden
                     className={cn(
-                      'flex size-9 shrink-0 items-center justify-center rounded-[var(--as-radius)] transition-transform group-hover:scale-105 [&_svg]:size-[18px]',
+                      'flex size-7 shrink-0 items-center justify-center rounded-[var(--as-radius-sm)]',
                       channel.highlight
-                        ? 'bg-[color-mix(in_srgb,var(--as-primary-fg)_18%,transparent)]'
+                        ? 'text-[var(--as-primary)]'
                         : 'bg-[var(--as-secondary)] text-[var(--as-secondary-fg)]',
                     )}
                   >
-                    <Icon className="size-[18px]" />
+                    <Icon className="size-4" />
                   </span>
                   <span className="min-w-0 flex-1">
                     <span
                       className={cn(
-                        'block truncate text-sm font-semibold',
+                        'truncate text-sm',
                         channel.highlight
-                          ? 'text-[var(--as-primary-fg)]'
-                          : 'text-[var(--as-fg)]',
+                          ? 'font-semibold text-[var(--as-primary)]'
+                          : 'font-medium text-[var(--as-fg)]',
                       )}
                     >
                       {channel.name}
                     </span>
                     {channel.description ? (
-                      <span
-                        className={cn(
-                          'block truncate text-xs',
-                          channel.highlight
-                            ? 'text-[color-mix(in_srgb,var(--as-primary-fg)_78%,transparent)]'
-                            : 'text-[var(--as-muted-fg)]',
-                        )}
-                      >
+                      <span className="block truncate text-xs text-[var(--as-muted-fg)]">
                         {channel.description}
                       </span>
                     ) : null}
                   </span>
-                  <span
+                  <ArrowUpRight
                     aria-hidden
-                    className={cn(
-                      'flex size-7 shrink-0 items-center justify-center rounded-full transition-all group-hover:scale-110',
-                      channel.highlight
-                        ? 'bg-[color-mix(in_srgb,var(--as-primary-fg)_20%,transparent)] group-hover:bg-[color-mix(in_srgb,var(--as-primary-fg)_32%,transparent)]'
-                        : 'text-[var(--as-muted-fg)] group-hover:text-[var(--as-primary)]',
-                    )}
-                  >
-                    <ArrowUpRight className="size-4" />
-                  </span>
+                    className="size-4 shrink-0 text-[var(--as-muted-fg)] transition-colors group-hover:text-[var(--as-primary)]"
+                  />
                 </a>
               </li>
             )
           })}
         </ul>
 
-        {footnote ? (
-          <p className="relative flex items-center gap-2 border-t border-[var(--as-border)] pt-4 text-xs leading-relaxed text-[var(--as-muted-fg)]">
-            <Heart
-              aria-hidden
-              className="size-3.5 shrink-0 fill-[var(--as-danger)] text-[var(--as-danger)]"
-            />
-            {footnote}
-          </p>
-        ) : null}
         {children}
       </section>
     )

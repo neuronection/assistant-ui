@@ -2,9 +2,9 @@
 
 Family-standard vertical navigation panel: items with icons and badges,
 one nesting level with section dividers, controlled active state, optional
-collapsed icon rail with hover flyouts, and header/footer slots. Fully
-presentational + controlled (ADR-006) — the router, role filtering, i18n
-and drawer shells stay app-side.
+collapsed icon rail with hover flyouts, pinned secondary items, and
+header/footer slots. Fully presentational + controlled (ADR-006) — the
+router, role filtering, i18n and drawer shells stay app-side.
 
 ## import
 
@@ -17,6 +17,7 @@ import { SidebarNav, type NavItem, type NavChild } from '@neuronection/assistant
 | prop | type | default | notes |
 |---|---|---|---|
 | `items` | `NavItem[]` | — | `{ id, label, icon?, badge?, children?, disabled?, section? }`; `section` renders a divider above the item (top-level flat sidebars) or above the child (inside groups, first occurrence only); **pre-filtered by the app** (roles, feature flags) |
+| `secondaryItems` | `NavItem[]` | — | flat items pinned below the scroll area, above `footer` (the Settings/About pattern); same rendering, active state, rail behavior and keyboard traversal order as `items`; rendered as a separate bordered region, omitted when empty |
 | `activeId` | `string \| null` | — | the app resolves route → id |
 | `onNavigate` | `(id: string) => void` | — | fires for leaves only; group triggers toggle instead |
 | `collapsed` | `boolean` | `false` | controlled icon rail |
@@ -63,7 +64,7 @@ minimal:
 />
 ```
 
-realistic (groups + sections + rail + slots):
+realistic (groups + sections + rail + pinned items + slots):
 
 ```tsx
 <SidebarNav
@@ -73,6 +74,10 @@ realistic (groups + sections + rail + slots):
     icon,
     children: subItems?.map((s) => ({ id: s.path, label: t(s.labelKey), section: s.section })),
   }))}
+  secondaryItems={[
+    { id: '/settings', label: t('nav.settings'), icon: Settings },
+    { id: '/about', label: t('nav.about'), icon: Info },
+  ]}
   activeId={resolveActiveId(location)}
   onNavigate={(id) => navigate(id)}
   collapsed={sidebarCollapsed}
@@ -88,8 +93,10 @@ realistic (groups + sections + rail + slots):
 See [accessibility.md](../accessibility.md#navigation--structure):
 `<nav aria-label>` root, `aria-current="page"` on the active entry,
 `aria-expanded`/`aria-controls` on group triggers, flyouts labelled by
-their group. Keyboard: Tab traverses in order; Enter/Space activates;
-ArrowUp/ArrowDown move; ArrowRight expands (or enters) a group;
+their group. Keyboard: Tab traverses in order (main list first, then
+pinned `secondaryItems`); Enter/Space activates; ArrowUp/ArrowDown move
+(with arrows and Home/End crossing between the main list and pinned
+items in visual order); ArrowRight expands (or enters) a group;
 ArrowLeft collapses (or returns to the trigger); Home/End jump; rail
 flyouts support arrows and Escape (focus returns to the trigger).
 
