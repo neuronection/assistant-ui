@@ -59,9 +59,9 @@ Extends `React.ComponentProps<'div'>`.
 | `AboutLinkList` | `{ links: AboutLinkItem[] }` — link rows; `copyValue` turns a row into a copy-to-clipboard button (`copyLabel`/`copiedLabel` name it) |
 | `AboutNote` | `{ tone?: 'info' \| 'warning', title? }` — tinted callout |
 | `AboutFooterLine` | `{ version?, copyright? }` — centered muted line |
-| `FamilyBadge` | `{ current, members?, creator?, hubUrl?, label?, blurb?, ctaLabel?, currentLabel?, githubLabel?, websiteLabel?, theme? }` |
+| `FamilyBadge` | `{ current, members?, creator?, hubUrl?, label?, blurb?, ctaLabel?, currentLabel?, githubLabel?, websiteLabel?, theme? }` — every member with an `href` links to it, including the current app (ring + `currentLabel` badge mark it) |
 | `TechChips` | `{ items: ReadonlyArray<string \| null \| undefined> }` — chip row, falsy entries dropped |
-| `SponsorCard` | `{ channels (required), title?, description?, footnote?, channelsLabel?, icon?, heading? }` — `SponsorChannel = { id, name, href, description?, icon?, external?, highlight? }` |
+| `SponsorCard` | `{ channels (required), title?, description?, footnote?, channelsLabel?, columns? ('auto' \| 1 \| 2 — responsive two-column channel grid above the `sm` breakpoint by default; force `1` inside modals), icon?, heading? }` — `SponsorChannel = { id, name, href, description?, icon?, external?, highlight? }` |
 
 ## controlled contract
 
