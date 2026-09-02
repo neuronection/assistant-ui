@@ -55,10 +55,14 @@ Then wire it up:
   documented contract may not promise anything the tests don't assert —
   write the test first, the doc row second.
 - **Ladle story** (`playground/<name>.stories.tsx`): the gallery is the
-  review surface for design — and CI screenshots it. New or intentionally
-  changed stories need refreshed baselines in the same PR:
-  `pnpm exec playwright test --update-snapshots`, commit
-  `tests/visual/__screenshots__/`.
+  review surface for design — and CI screenshots it. Visual baselines are
+  **CI-shot**: local `--update-snapshots` output may differ from CI
+  rendering (font/antialiasing). If the CI visual job fails on stories
+  your PR didn't intentionally change — or after merging an intentional
+  visual change — trigger **Actions → CI → Run workflow**: the
+  `visual-rebaseline` job regenerates baselines on the CI runner,
+  commits them and re-runs CI. Never fix CI visual failures by
+  hand-committing locally-shot baselines.
 - **Docs page** (`docs/components/<name>.md`): purpose, import line, props
   table (derive it from the component's Props interface — never invent),
   controlled contract, label/i18n contract, minimal + realistic snippets,
