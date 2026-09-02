@@ -66,6 +66,11 @@ export interface SidebarNavProps {
   header?: React.ReactNode
   /** Slot below the list and pinned items (version, legal links). */
   footer?: React.ReactNode
+  /** Denser layout for short viewports: tighter item padding, smaller
+   * icons/typography, slimmer regions. Presentational only — the app
+   * decides when (e.g. a `max-height` media query). Composes with
+   * `collapsed`. */
+  compact?: boolean
   labels?: SidebarNavLabels
   className?: string
   /** Targets the scrollable list region. */
@@ -74,9 +79,12 @@ export interface SidebarNavProps {
 
 const FLYOUT_DELAY_MS = 150
 
-const itemButtonClass = (active: boolean) =>
+const itemButtonClass = (active: boolean, compact: boolean) =>
   cn(
-    'flex w-full cursor-pointer items-center gap-3 rounded-[var(--as-radius)] px-3 py-2.5 text-left text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[var(--as-focus-ring)] disabled:pointer-events-none disabled:opacity-50',
+    'flex w-full cursor-pointer items-center rounded-[var(--as-radius)] text-left transition-colors focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[var(--as-focus-ring)] disabled:pointer-events-none disabled:opacity-50',
+    compact
+      ? 'gap-2 px-2.5 py-1.5 text-xs'
+      : 'gap-3 px-3 py-2.5 text-sm',
     active
       ? 'bg-[color-mix(in_srgb,var(--as-primary)_12%,transparent)] font-bold text-[var(--as-primary)]'
       : 'font-medium text-[var(--as-fg)] hover:bg-[var(--as-muted)]',
@@ -123,6 +131,7 @@ export const SidebarNav = React.forwardRef<HTMLElement, SidebarNavProps>(
       onExpandedIdsChange,
       header,
       footer,
+      compact = false,
       labels,
       className,
       navClassName,
@@ -303,6 +312,13 @@ export const SidebarNav = React.forwardRef<HTMLElement, SidebarNavProps>(
       </div>
     )
 
+    const sectionDividerClass = compact
+      ? 'mt-1 border-t border-[var(--as-border)] px-3 pb-0.5 pt-2 text-[10px] font-bold uppercase tracking-wide text-[var(--as-muted-fg)]'
+      : 'mt-2 border-t border-[var(--as-border)] px-3 pb-1 pt-3 text-[11px] font-bold uppercase tracking-wide text-[var(--as-muted-fg)]'
+    const listGapClass = compact ? 'space-y-0.5' : 'space-y-1'
+    const iconClass = compact ? 'size-3.5' : 'size-4'
+    const regionClass = compact ? 'px-2.5 py-2' : 'px-3 py-3'
+
     const renderItem = (item: NavItem, index: number, list: NavItem[]) => {
       // Group whose children were all filtered out app-side renders
       // nothing (presentational).
@@ -314,10 +330,7 @@ export const SidebarNav = React.forwardRef<HTMLElement, SidebarNavProps>(
         item.section !== undefined &&
         list.findIndex((i) => i.section === item.section) === index
       const sectionDivider = sectionSeen ? (
-        <div
-          role="presentation"
-          className="mt-2 border-t border-[var(--as-border)] px-3 pb-1 pt-3 text-[11px] font-bold uppercase tracking-wide text-[var(--as-muted-fg)]"
-        >
+        <div role="presentation" className={sectionDividerClass}>
           {item.section}
         </div>
       ) : null
@@ -355,7 +368,7 @@ export const SidebarNav = React.forwardRef<HTMLElement, SidebarNavProps>(
                   }}
                   onMouseEnter={() => flyoutEnter(item.id)}
                   onMouseLeave={flyoutLeave}
-                  className={cn(itemButtonClass(active || childActive), 'justify-center px-0')}
+                  className={cn(itemButtonClass(active || childActive, compact), 'justify-center px-0')}
                 >
                   {Icon ? (
                     <Icon
@@ -426,12 +439,13 @@ export const SidebarNav = React.forwardRef<HTMLElement, SidebarNavProps>(
               aria-expanded={isExpanded}
               aria-controls={groupId}
               onClick={() => toggleGroup(item.id)}
-              className={itemButtonClass(active || childActive)}
+              className={itemButtonClass(active || childActive, compact)}
             >
               {Icon ? (
                 <Icon
                   className={cn(
-                    'size-4 shrink-0',
+                    iconClass,
+                    'shrink-0',
                     active || childActive
                       ? 'text-[var(--as-primary)]'
                       : 'text-[var(--as-muted-fg)]',
@@ -442,12 +456,12 @@ export const SidebarNav = React.forwardRef<HTMLElement, SidebarNavProps>(
               <span className="min-w-0 flex-1 truncate">{item.label}</span>
               <ItemBadge badge={item.badge} active={active || childActive} />
               {isExpanded ? (
-                <ChevronDown className="size-4 shrink-0 text-[var(--as-muted-fg)]" aria-hidden />
+                <ChevronDown className={cn(iconClass, 'shrink-0 text-[var(--as-muted-fg)]')} aria-hidden />
               ) : (
-                <ChevronRight className="size-4 shrink-0 text-[var(--as-muted-fg)]" aria-hidden />
+                <ChevronRight className={cn(iconClass, 'shrink-0 text-[var(--as-muted-fg)]')} aria-hidden />
               )}
             </button>
-            <ul id={groupId} hidden={!isExpanded} className="mt-1 space-y-0.5 pl-6">
+            <ul id={groupId} hidden={!isExpanded} className={cn("mt-1 space-y-0.5", compact ? "pl-4" : "pl-6")}>
               {item.children.map((child) => {
                 const childActiveItem = child.id === activeId
                 const ChildIcon = child.icon
@@ -459,10 +473,7 @@ export const SidebarNav = React.forwardRef<HTMLElement, SidebarNavProps>(
                 return (
                   <li key={child.id}>
                     {sectionSeen ? (
-                      <div
-                        role="presentation"
-                        className="mt-2 border-t border-[var(--as-border)] px-3 pb-1 pt-3 text-[11px] font-bold uppercase tracking-wide text-[var(--as-muted-fg)]"
-                      >
+                      <div role="presentation" className={sectionDividerClass}>
                         {child.section}
                       </div>
                     ) : null}
@@ -474,12 +485,12 @@ export const SidebarNav = React.forwardRef<HTMLElement, SidebarNavProps>(
                       aria-current={childActiveItem ? 'page' : undefined}
                       onClick={() => navigate(child.id)}
                       className={cn(
-                        itemButtonClass(childActiveItem),
-                        'py-2 pl-3 pr-2',
+                        itemButtonClass(childActiveItem, compact),
+                        compact ? 'py-1.5 pl-2.5 pr-1.5' : 'py-2 pl-3 pr-2',
                       )}
                     >
                       {ChildIcon ? (
-                        <ChildIcon className="size-4 shrink-0" aria-hidden />
+                        <ChildIcon className={cn(iconClass, 'shrink-0')} aria-hidden />
                       ) : null}
                       <span className="min-w-0 flex-1 truncate">{child.label}</span>
                       <ItemBadge badge={child.badge} active={childActiveItem} />
@@ -503,13 +514,13 @@ export const SidebarNav = React.forwardRef<HTMLElement, SidebarNavProps>(
             aria-label={rail ? item.label : undefined}
             aria-current={active ? 'page' : undefined}
             onClick={() => navigate(item.id)}
-            className={cn(itemButtonClass(active), rail && 'justify-center px-0')}
+            className={cn(itemButtonClass(active, compact), rail && 'justify-center px-0')}
           >
             {Icon ? (
               <Icon
                 className={cn(
                   'shrink-0',
-                  rail ? 'size-5' : 'size-4',
+                  rail ? 'size-5' : iconClass,
                   active ? 'text-[var(--as-primary)]' : 'text-[var(--as-muted-fg)]',
                 )}
                 aria-hidden
@@ -526,6 +537,7 @@ export const SidebarNav = React.forwardRef<HTMLElement, SidebarNavProps>(
       <nav
         ref={ref}
         data-as="sidebar-nav"
+        data-as-compact={compact ? '' : undefined}
         aria-label={navAria}
         className={cn(
           'relative flex h-full flex-col border-r border-[var(--as-border)] bg-[var(--as-surface)] text-[var(--as-fg)] transition-[width] duration-200',
@@ -564,9 +576,9 @@ export const SidebarNav = React.forwardRef<HTMLElement, SidebarNavProps>(
         <div
           ref={listRef}
           onKeyDown={handleListKeyDown}
-          className={cn('min-h-0 flex-1 overflow-y-auto px-3 py-3', navClassName)}
+          className={cn('min-h-0 flex-1 overflow-y-auto', regionClass, navClassName)}
         >
-          <ul className="space-y-1">
+          <ul className={listGapClass}>
             {items.map((item, index) => renderItem(item, index, items))}
           </ul>
         </div>
@@ -575,16 +587,23 @@ export const SidebarNav = React.forwardRef<HTMLElement, SidebarNavProps>(
           <div
             ref={secondaryRef}
             onKeyDown={handleListKeyDown}
-            className="shrink-0 border-t border-[var(--as-border)] px-3 py-3"
+            className={cn('shrink-0 border-t border-[var(--as-border)]', regionClass)}
           >
-            <ul className="space-y-1">
+            <ul className={listGapClass}>
               {secondaryItems.map((item, index) => renderItem(item, index, secondaryItems))}
             </ul>
           </div>
         ) : null}
 
         {footer ? (
-          <div className="shrink-0 border-t border-[var(--as-border)] p-3">{footer}</div>
+          <div
+            className={cn(
+              'shrink-0 border-t border-[var(--as-border)]',
+              compact ? 'px-2.5 py-2' : 'p-3',
+            )}
+          >
+            {footer}
+          </div>
         ) : null}
       </nav>
     )

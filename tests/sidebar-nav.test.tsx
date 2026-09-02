@@ -475,3 +475,63 @@ describe('SidebarNav (secondary items)', () => {
   })
 })
 
+describe('SidebarNav (compact)', () => {
+  const secondary: NavItem[] = [{ id: 'settings', label: 'Settings', icon: ShieldCheck }]
+
+  function CompactDemo(props: Partial<React.ComponentProps<typeof SidebarNav>>) {
+    const [active, setActive] = React.useState<string | null>('dashboard')
+    return (
+      <div style={{ height: 300 }}>
+        <SidebarNav
+          items={flatItems}
+          secondaryItems={secondary}
+          activeId={active}
+          onNavigate={setActive}
+          footer={<span>v1.0</span>}
+          compact
+          {...props}
+        />
+      </div>
+    )
+  }
+
+  it('marks the nav root and renders denser items, regions and footer', () => {
+    const { container } = render(<CompactDemo />)
+    expect(container.querySelector('nav[data-as-compact]')).toBeInTheDocument()
+    const item = screen.getByRole('button', { name: 'Dashboard' })
+    expect(item.className).toContain('py-1.5')
+    expect(item.className).toContain('text-xs')
+    expect(item.className).not.toContain('py-2.5')
+    // list + pinned regions and the footer wrapper all slim down
+    const denseLists = Array.from(container.querySelectorAll('ul')).filter((ul) =>
+      ul.classList.contains('space-y-0.5'),
+    )
+    expect(denseLists).toHaveLength(2)
+    expect(container.querySelector('nav > div.border-t.p-3')).toBeNull()
+    expect(container.textContent).toContain('v1.0')
+  })
+
+  it('keeps the default density without the prop', () => {
+    const { container } = render(<FlatDemo />)
+    expect(container.querySelector('nav[data-as-compact]')).toBeNull()
+    const item = screen.getByRole('button', { name: 'Dashboard' })
+    expect(item.className).toContain('py-2.5')
+    expect(container.querySelectorAll('ul.space-y-1')).toHaveLength(1)
+  })
+
+  it('keyboard traversal is unchanged in compact mode', async () => {
+    const user = userEvent.setup()
+    render(<CompactDemo />)
+    screen.getByRole('button', { name: 'About' }).focus()
+    await user.keyboard('{End}')
+    expect(screen.getByRole('button', { name: 'Settings' })).toHaveFocus()
+    await user.keyboard('{ArrowUp}')
+    expect(screen.getByRole('button', { name: 'About' })).toHaveFocus()
+  })
+
+  it('has no axe violations in compact mode', async () => {
+    const { container } = render(<CompactDemo activeId="dashboard" />)
+    expect(await axe(container)).toHaveNoViolations()
+  })
+})
+

@@ -27,6 +27,7 @@ import { SidebarNav, type NavItem, type NavChild } from '@neuronection/assistant
 | `onExpandedIdsChange` | `(ids: string[]) => void` | — | |
 | `header` | `ReactNode` | — | slot above the list (brand, logo) |
 | `footer` | `ReactNode` | — | slot below the list (settings, profile, version) |
+| `compact` | `boolean` | `false` | denser layout for short viewports: tighter item padding, smaller icons/typography, slimmer list/pinned/footer regions; sets `data-as-compact` on the root for styling hooks. Presentational only — the app owns the trigger (e.g. `useMediaQuery('(max-height: 720px)')`) and typically hides its footer block in the same state |
 | `labels` | `{ navAria?, expand?, collapse?, openGroup? }` | English defaults | aria-labels; apps translate |
 | `className` | `string` | — | on the root `<nav>` (width default `w-64` / `w-20` rail) |
 | `navClassName` | `string` | — | on the scrollable list region |
@@ -85,6 +86,23 @@ realistic (groups + sections + rail + pinned items + slots):
   collapsible
   header={<BrandBlock />}
   footer={<SidebarFooter />}
+/>
+```
+
+short viewports (controlled `compact` + app-side footer hide):
+
+```tsx
+// the app owns the trigger and what to hide (ADR-006) — the library only
+// renders the denser layout
+const short = useMediaQuery('(max-height: 720px)')
+
+<SidebarNav
+  items={menuItems}
+  secondaryItems={[{ id: '/settings', label: t('nav.settings'), icon: Settings }]}
+  activeId={resolveActiveId(location)}
+  onNavigate={(id) => navigate(id)}
+  compact={short}
+  footer={short ? null : <SidebarFooter />}
 />
 ```
 

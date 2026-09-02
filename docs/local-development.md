@@ -58,6 +58,10 @@ Rules:
 - Run the app's install command once after `link` (and once after `unlink`).
 - Prefer reproducing bugs in the Ladle playground (`pnpm dev`) when possible —
   faster loop, no app wiring.
+- **study-assistant enforces this automatically**: `scripts/check-dev-link.sh`
+  fails when a `link:`/`file:` override sits in a tracked manifest — wired as
+  a CI step and as a pre-commit hook (one-time per clone:
+  `git config core.hooksPath scripts/githooks`).
 
 ## Required: one line in each app's Vite config
 

@@ -131,6 +131,35 @@ export const SecondaryItemsStory = () => {
   )
 }
 
+export const CompactStory = () => {
+  const [active, setActive] = useState('/catalog')
+  return (
+    <div style={{ display: 'flex', height: 300 }}>
+      <SidebarNav
+        items={[
+          { id: '/', label: 'Dashboard', icon: Home },
+          { id: '/catalog', label: 'Catalog', icon: BookOpen, section: 'Job hunt' },
+          { id: '/generate', label: 'Generate', icon: Sparkles, section: 'Job hunt' },
+          { id: '/profile', label: 'Profile', icon: User, section: 'Account' },
+        ]}
+        secondaryItems={[{ id: '/settings', label: 'Settings', icon: ShieldCheck }]}
+        activeId={active}
+        onNavigate={setActive}
+        compact
+        footer={
+          <span style={{ fontSize: 12, opacity: 0.6 }}>
+            Part of Neuronection
+          </span>
+        }
+      />
+      <p style={{ fontSize: 14, padding: 16 }}>
+        Denser layout for short viewports — the app owns the trigger
+        (e.g. a max-height media query).
+      </p>
+    </div>
+  )
+}
+
 export const CollapsedRailStory = () => {
   const [active, setActive] = useState('exams')
   const [collapsed, setCollapsed] = useState(true)
