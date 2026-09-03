@@ -1,5 +1,16 @@
 # @neuronection/assistant-ui
 
+## 0.18.0
+
+### Minor Changes
+
+- [`f3f37bc`](https://github.com/neuronection/assistant-ui/commit/f3f37bc8ad65e3219e0d7997a786e8131c0de2c1) Thanks [@constLiakos](https://github.com/constLiakos)! - New `flow-status` module: `FlowStatusCard`, a presentational + controlled
+  card for multi-step AI flows (per-node status, current-step emphasis,
+  progress summary, error + `retryable`, controlled `onRetry`/`onCancel`/
+  `onResume`, `detail` payload slot). Apps map the family event vocabulary
+  (`flow_started`/`node_*`/`flow_failed`/`interrupt`) to props; the component
+  never sees transports.
+
 ## 0.17.0
 
 ### Minor Changes
