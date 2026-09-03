@@ -93,6 +93,7 @@ behavior and focus restoration are listed **only where asserted**.
 | `AiButton` | dialog panel; loading `role="status"`; error `role="alert"` | Enter submits the typed prompt and clears the input; suggestion chips clickable; `closeOnSubmit` closes after submit; controlled `open` defers closing to the app (asserted: app closes on success) | clean (open) |
 | `AiActionsDropdown` | menu + custom-prompt field | Enter submits the prompt; Escape closes | clean (open) |
 | `AiMagicFill` | prompt textarea + Apply | submit disabled until a prompt exists | clean |
+| `FlowStatusCard` | step `<ol>` with per-step status icons; running step `aria-current="step"`; header summary `role="status"`; failure block `role="alert"` (code + message); derived action buttons (*Cancel* while running, *Resume* when interrupted, *Retry* on retryable failure) | Tab reaches the visible action(s) in DOM order; Enter fires `onCancel`/`onResume`/`onRetry` | clean (running, failed, interrupted) |
 
 ## File surface
 

@@ -103,6 +103,10 @@
       "types": "./dist/file-queue.d.ts",
       "import": "./dist/file-queue.js"
     },
+    "./flow-status": {
+      "types": "./dist/flow-status.d.ts",
+      "import": "./dist/flow-status.js"
+    },
     "./expandable-search": {
       "types": "./dist/expandable-search.d.ts",
       "import": "./dist/expandable-search.js"

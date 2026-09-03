@@ -76,6 +76,13 @@ export {
   AiMagicFill,
   type AiMagicFillProps,
 } from './components/ai-magic-fill'
+export {
+  FlowStatusCard,
+  type FlowError,
+  type FlowStatusCardProps,
+  type FlowStep,
+  type FlowStepStatus,
+} from './components/flow-status'
 export { Badge, badgeVariants, type BadgeProps } from './components/badge'
 export {
   Breadcrumbs,
