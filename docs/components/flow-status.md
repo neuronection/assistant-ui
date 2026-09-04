@@ -44,7 +44,9 @@ step is emphasized and marked `aria-current="step"`. A header summary line
 running, the current node's label. Action visibility is derived, never
 stored: *Cancel* only while running, *Resume* only when interrupted,
 *Retry* only on a retryable failure. The root carries
-`data-status="<status>"` for token-safe overrides.
+`data-status="<status>"` for token-safe overrides; each step `<li>` carries
+`data-status="<step-status>"` and the failure block carries
+`data-as="flow-status-card-error"` as stable styling hooks.
 
 ## labels & i18n
 
