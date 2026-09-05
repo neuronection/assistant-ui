@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { axe } from 'jest-axe'
+import Link from '@tiptap/extension-link'
 
 import {
   RichTextEditor,
@@ -157,5 +158,22 @@ describe('RichTextEditor', () => {
     await screen.findByLabelText('Note body')
     const results = await axe(container)
     expect(results).toHaveNoViolations()
+  })
+})
+
+describe('RichTextEditor app extensions', () => {
+  it('accepts extra extensions and survives rerenders with fresh arrays', async () => {
+    const user = userEvent.setup()
+    const extension = Link
+    const { rerender } = render(
+      <Editor value="stable" extensions={[extension]} />,
+    )
+    const editable = await getEditable()
+    await waitFor(() => expect(editable.textContent).toContain('stable'))
+    await user.click(editable)
+    rerender(<Editor value="stable" extensions={[Link]} />)
+    await new Promise((resolve) => setTimeout(resolve, 30))
+    expect(editable.textContent).toContain('stable')
+    expect(editable).toHaveFocus()
   })
 })

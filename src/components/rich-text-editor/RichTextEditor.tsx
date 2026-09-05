@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Editor, EditorContent, useEditor } from '@tiptap/react'
+import { Editor, EditorContent, useEditor, type Extensions } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import {
   Bold,
@@ -88,7 +88,14 @@ export interface RichTextEditorProps {
   ariaLabel: string
   disabled?: boolean
   toolbar?: RichTextToolbarGroup[] | false
-  toolbarExtra?: React.ReactNode
+  /** App-owned controls at the end of the toolbar; render-prop form receives the editor. */
+  toolbarExtra?: React.ReactNode | ((editor: Editor | null) => React.ReactNode)
+  /** App extensions merged after the starter kit (math, tables, custom nodes…). */
+  extensions?: Extensions
+  /** Map incoming app-domain markdown before it reaches the document. */
+  parseMarkdown?: (markdown: string) => string
+  /** Map the serialized document before it is emitted / echo-compared. */
+  serializeMarkdown?: (markdown: string) => string
   labels?: Partial<RichTextEditorLabels>
   icons?: Partial<RichTextEditorIcons>
   className?: string
@@ -118,6 +125,9 @@ export const RichTextEditor = React.forwardRef<HTMLDivElement, RichTextEditorPro
       disabled = false,
       toolbar = DEFAULT_TOOLBAR,
       toolbarExtra,
+      extensions,
+      parseMarkdown,
+      serializeMarkdown,
       labels,
       icons,
       className,
@@ -129,12 +139,26 @@ export const RichTextEditor = React.forwardRef<HTMLDivElement, RichTextEditorPro
     const lastEmittedRef = React.useRef<string>(value)
     const onValueChangeRef = React.useRef(onValueChange)
     onValueChangeRef.current = onValueChange
+    const hooksRef = React.useRef({ parseMarkdown, serializeMarkdown })
+    hooksRef.current = { parseMarkdown, serializeMarkdown }
     const [, bump] = React.useReducer((count: number) => count + 1, 0)
+
+    const toDocument = React.useCallback(
+      (markdown: string) => (parseMarkdown ? parseMarkdown(markdown) : markdown),
+      [parseMarkdown],
+    )
+    const toApp = React.useCallback(
+      (markdown: string) => (serializeMarkdown ? serializeMarkdown(markdown) : markdown),
+      [serializeMarkdown],
+    )
 
     const editor = useEditor(
       {
-        extensions: [StarterKit, Markdown],
-        content: value,
+        extensions: React.useMemo(
+          () => [StarterKit, Markdown, ...(extensions ?? [])],
+          [extensions],
+        ),
+        content: toDocument(value),
         editable: !disabled,
         immediatelyRender: false,
         editorProps: {
@@ -145,7 +169,7 @@ export const RichTextEditor = React.forwardRef<HTMLDivElement, RichTextEditorPro
           },
         },
         onUpdate: ({ editor: current }) => {
-          const markdown = getMarkdown(current)
+          const markdown = toApp(getMarkdown(current))
           lastEmittedRef.current = markdown
           onValueChangeRef.current(markdown)
         },
@@ -181,14 +205,14 @@ export const RichTextEditor = React.forwardRef<HTMLDivElement, RichTextEditorPro
       if (value === lastEmittedRef.current) {
         return
       }
-      const current = getMarkdown(editor)
+      const current = toApp(getMarkdown(editor))
       if (value === current) {
         lastEmittedRef.current = value
         return
       }
-      applyExternalValue(editor, value)
+      applyExternalValue(editor, toDocument(value))
       lastEmittedRef.current = value
-    }, [editor, value])
+    }, [editor, value, toApp, toDocument])
 
     const groups = toolbar === false ? [] : (toolbar ?? DEFAULT_TOOLBAR)
 
@@ -314,7 +338,7 @@ export const RichTextEditor = React.forwardRef<HTMLDivElement, RichTextEditorPro
                   editor?.isActive('blockquote') === true,
                 )
               : null}
-            {toolbarExtra}
+            {typeof toolbarExtra === 'function' ? toolbarExtra(editor) : toolbarExtra}
           </div>
         ) : null}
         <EditorContent editor={editor} />

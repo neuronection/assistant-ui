@@ -22,7 +22,10 @@ import { RichTextEditor } from '@neuronection/assistant-ui/rich-text-editor'
 | `ariaLabel` | `string` | — (required) | Accessible name for the editable region (also names nothing else — the toolbar names itself via `labels.toolbar`). |
 | `disabled` | `boolean` | `false` | Sets the document non-editable and disables toolbar buttons. |
 | `toolbar` | `RichTextToolbarGroup[] \| false` | all groups | Groups in render order: `'history'`, `'heading'`, `'format'`, `'list'`, `'quote'`. `false` renders no toolbar. |
-| `toolbarExtra` | `ReactNode` | — | App-owned controls rendered at the end of the toolbar (use for AI/dictation/etc.). |
+| `toolbarExtra` | `ReactNode \| ((editor: Editor \| null) => ReactNode)` | — | App-owned controls rendered at the end of the toolbar (AI assist, dictation, …). The render-prop form receives the editor for command buttons. |
+| `extensions` | `Extensions` | `[]` | App extensions merged after the starter kit (math, tables, custom nodes). Keep the array stable/memoized. |
+| `parseMarkdown` | `(markdown: string) => string` | — | Map incoming app-domain markdown before it reaches the document (fidelity conventions). |
+| `serializeMarkdown` | `(markdown: string) => string` | — | Map the serialized document before emission and echo comparison. |
 | `labels` | `Partial<RichTextEditorLabels>` | English defaults | `toolbar` (toolbar name, default *Formatting*), `bold`, `italic`, `strike`, `code`, `heading`, `bulletList`, `orderedList`, `blockquote`, `undo`, `redo`. |
 | `icons` | `Partial<RichTextEditorIcons>` | Lucide defaults | Per-button icon overrides. |
 | `className` | `string` | — | Merged onto the root (`data-as="rich-text-editor"`). |
