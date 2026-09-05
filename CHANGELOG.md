@@ -1,5 +1,12 @@
 # @neuronection/assistant-ui
 
+## 0.21.0
+
+### Minor Changes
+
+- [`ead8dd8`](https://github.com/neuronection/assistant-ui/commit/ead8dd8297e1fe5b090fc1f92dead8d573a975c4) Thanks [@constLiakos](https://github.com/constLiakos)! - SettingsShell nav items accept an optional `trailing` node rendered at the
+  row's trailing edge — for status dots, counts or badges next to the label.
+
 ## 0.20.0
 
 ### Minor Changes
