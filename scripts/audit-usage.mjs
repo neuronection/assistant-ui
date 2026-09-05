@@ -29,6 +29,8 @@ const LIBRARY_COMPONENTS = [
   'ChipList',
   'Combobox',
   'RichTextEditor',
+  'DictationButton',
+  'DictationStrip',
   'ComboboxMulti',
   'ConfirmationModal',
   'ContextMenu',

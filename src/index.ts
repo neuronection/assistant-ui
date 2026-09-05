@@ -279,3 +279,22 @@ export {
   type RichTextEditorIcons,
   type RichTextToolbarGroup,
 } from './components/rich-text-editor'
+export {
+  DictationButton,
+  type DictationButtonProps,
+  DictationStrip,
+  type DictationStripProps,
+  type DictationStripLabels,
+  useDictation,
+  type UseDictationOptions,
+  type DictationStatus,
+  type DictationError,
+  type DictationResult,
+} from './components/dictation'
+export {
+  useAiTextTransform,
+  type UseAiTextTransformOptions,
+  type AiTextTransformTransport,
+  type AiTextTransformStatus,
+  type AiTextTransformEventHandlers,
+} from './components/ai-text-transform'

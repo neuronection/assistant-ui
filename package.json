@@ -207,6 +207,14 @@
       "types": "./dist/rich-text-editor.d.ts",
       "import": "./dist/rich-text-editor.js"
     },
+    "./dictation": {
+      "types": "./dist/dictation.d.ts",
+      "import": "./dist/dictation.js"
+    },
+    "./ai-text-transform": {
+      "types": "./dist/ai-text-transform.d.ts",
+      "import": "./dist/ai-text-transform.js"
+    },
     "./settings-shell": {
       "types": "./dist/settings-shell.d.ts",
       "import": "./dist/settings-shell.js"

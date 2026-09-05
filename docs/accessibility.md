@@ -62,6 +62,7 @@ behavior and focus restoration are listed **only where asserted**.
 | `ScaleSlider` | `role="slider"` (native range) paired with a number input | slider `change` emits numeric values; typed input syncs; blur clamps to `min`/`max`; clearing emits `''`; focus ring visible on the range input | clean |
 | `ProviderForm` | labelled fields; write-only API-key input (never renders a stored value); error `role="alert"` | typing reports `onApiKeyChange` | clean |
 | `RichTextEditor` | toolbar `role="toolbar"` (name via `labels.toolbar`, default *Formatting*); toolbar buttons are `aria-pressed` toggles named via `labels`; editable region is a labelled contenteditable (`aria-label` = required `ariaLabel` prop) | toolbar buttons are tabbable; Enter on a focused button runs its command; `Control+B` toggles bold (editor-level `aria-pressed` follows) | clean (with default toolbar + `toolbarExtra`) |
+| `DictationButton` / `DictationStrip` | mic button `aria-pressed` while recording; strip `role="status"` (recording/transcribing) and `role="alert"` for errors; Stop/Cancel/Dismiss are labelled buttons | Enter/click on mic starts; labelled Stop/Cancel/Dismiss buttons | clean (recording, error) |
 
 ## Composite widgets
 
@@ -123,6 +124,8 @@ behavior and focus restoration are listed **only where asserted**.
 | `UndoNotice` | `role="status"` | see Actions | clean |
 
 ## Utilities (no ARIA contract)
+
+`useDictation` / `useAiTextTransform` (with `AiTextTransformTransport`) are transport-injected state-machine hooks (no rendered contract of their own); their UI companions above / `FlowStatusCard` carry the ARIA contract and the tests.
 
 - `Portal`, `ThemeScope`, `cn` — rendering/theming primitives (`ThemeScope`
   is axe-checked).
