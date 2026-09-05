@@ -31,6 +31,7 @@ const LIBRARY_COMPONENTS = [
   'RichTextEditor',
   'DictationButton',
   'DictationStrip',
+  'TextDiffView',
   'ComboboxMulti',
   'ConfirmationModal',
   'ContextMenu',

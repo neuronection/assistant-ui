@@ -298,3 +298,15 @@ export {
   type AiTextTransformStatus,
   type AiTextTransformEventHandlers,
 } from './components/ai-text-transform'
+export {
+  TextDiffView,
+  type TextDiffViewProps,
+  type TextDiffViewLabels,
+  computeLineDiff,
+  wordSegments,
+  type DiffCell,
+  type DiffSegment,
+  type DiffRow,
+  type LineDiffOptions,
+  type LineDiffResult,
+} from './components/text-diff-view'
