@@ -20,6 +20,8 @@ import { cn } from '../../lib/utils'
 
 export type RichTextToolbarGroup = 'history' | 'heading' | 'format' | 'list' | 'quote'
 
+export type RichTextHeadingLevel = 1 | 2 | 3 | 4
+
 const DEFAULT_TOOLBAR: RichTextToolbarGroup[] = [
   'history',
   'heading',
@@ -28,13 +30,17 @@ const DEFAULT_TOOLBAR: RichTextToolbarGroup[] = [
   'quote',
 ]
 
+const DEFAULT_HEADING_LEVELS: RichTextHeadingLevel[] = [2]
+
+const DEFAULT_EXTENSIONS: Extensions = [StarterKit, Markdown]
+
 export interface RichTextEditorLabels {
   toolbar?: string
   bold?: string
   italic?: string
   strike?: string
   code?: string
-  heading?: string
+  heading?: (level: number) => string
   bulletList?: string
   orderedList?: string
   blockquote?: string
@@ -61,7 +67,7 @@ const DEFAULT_LABELS: Required<RichTextEditorLabels> = {
   italic: 'Italic',
   strike: 'Strikethrough',
   code: 'Code',
-  heading: 'Heading',
+  heading: (level) => `Heading ${level}`,
   bulletList: 'Bulleted list',
   orderedList: 'Numbered list',
   blockquote: 'Quote',
@@ -82,6 +88,17 @@ const DEFAULT_ICONS: Required<RichTextEditorIcons> = {
   redo: Redo2,
 }
 
+type FormatKey =
+  | 'bold'
+  | 'italic'
+  | 'strike'
+  | 'code'
+  | 'bulletList'
+  | 'orderedList'
+  | 'blockquote'
+  | 'undo'
+  | 'redo'
+
 export interface RichTextEditorProps {
   value: string
   onValueChange: (markdown: string) => void
@@ -90,8 +107,14 @@ export interface RichTextEditorProps {
   toolbar?: RichTextToolbarGroup[] | false
   /** App-owned controls at the end of the toolbar; render-prop form receives the editor. */
   toolbarExtra?: React.ReactNode | ((editor: Editor | null) => React.ReactNode)
-  /** App extensions merged after the starter kit (math, tables, custom nodes…). */
+  /** Full override of the document extension set; default is `[StarterKit, Markdown]`. Apps declare their complete set. */
   extensions?: Extensions
+  /** Extra classes for the editable region (merged after the built-ins via tailwind-merge). */
+  contentClassName?: string
+  /** Called once when the editor instance is created and again with `null` on destroy/unmount. */
+  onReady?: (editor: Editor | null) => void
+  /** Heading toggles rendered for the `heading` toolbar group, one button per level. */
+  headingLevels?: RichTextHeadingLevel[]
   /** Map incoming app-domain markdown before it reaches the document. */
   parseMarkdown?: (markdown: string) => string
   /** Map the serialized document before it is emitted / echo-compared. */
@@ -126,6 +149,9 @@ export const RichTextEditor = React.forwardRef<HTMLDivElement, RichTextEditorPro
       toolbar = DEFAULT_TOOLBAR,
       toolbarExtra,
       extensions,
+      contentClassName,
+      onReady,
+      headingLevels,
       parseMarkdown,
       serializeMarkdown,
       labels,
@@ -136,9 +162,16 @@ export const RichTextEditor = React.forwardRef<HTMLDivElement, RichTextEditorPro
   ) {
     const mergedLabels = { ...DEFAULT_LABELS, ...labels }
     const mergedIcons = { ...DEFAULT_ICONS, ...icons }
+    const resolvedExtensions = React.useMemo(
+      () => extensions ?? DEFAULT_EXTENSIONS,
+      [extensions],
+    )
+    const levels = headingLevels ?? DEFAULT_HEADING_LEVELS
     const lastEmittedRef = React.useRef<string>(value)
     const onValueChangeRef = React.useRef(onValueChange)
     onValueChangeRef.current = onValueChange
+    const onReadyRef = React.useRef(onReady)
+    onReadyRef.current = onReady
     const hooksRef = React.useRef({ parseMarkdown, serializeMarkdown })
     hooksRef.current = { parseMarkdown, serializeMarkdown }
     const [, bump] = React.useReducer((count: number) => count + 1, 0)
@@ -154,18 +187,17 @@ export const RichTextEditor = React.forwardRef<HTMLDivElement, RichTextEditorPro
 
     const editor = useEditor(
       {
-        extensions: React.useMemo(
-          () => [StarterKit, Markdown, ...(extensions ?? [])],
-          [extensions],
-        ),
+        extensions: resolvedExtensions,
         content: toDocument(value),
         editable: !disabled,
         immediatelyRender: false,
         editorProps: {
           attributes: {
             'aria-label': ariaLabel,
-            class:
+            class: cn(
               'as-rich-text-editor__content min-h-24 w-full bg-transparent px-3 py-2 text-sm text-[var(--as-fg)] outline-none',
+              contentClassName,
+            ),
           },
         },
         onUpdate: ({ editor: current }) => {
@@ -177,6 +209,16 @@ export const RichTextEditor = React.forwardRef<HTMLDivElement, RichTextEditorPro
     )
 
     const isMounted = editor !== null
+
+    React.useEffect(() => {
+      if (editor === null) {
+        return
+      }
+      onReadyRef.current?.(editor)
+      return () => {
+        onReadyRef.current?.(null)
+      }
+    }, [editor])
 
     React.useEffect(() => {
       if (!isMounted || editor === null) {
@@ -216,26 +258,53 @@ export const RichTextEditor = React.forwardRef<HTMLDivElement, RichTextEditorPro
 
     const groups = toolbar === false ? [] : (toolbar ?? DEFAULT_TOOLBAR)
 
+    const buttonClass = (active: boolean) =>
+      cn(
+        'rounded p-1.5 text-[var(--as-muted-fg)] transition-colors hover:text-[var(--as-fg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--as-focus-ring)] disabled:cursor-not-allowed disabled:opacity-50',
+        active && 'bg-[var(--as-surface-active)] text-[var(--as-fg)]',
+      )
+
     const renderButton = (
-      key: Exclude<keyof RichTextEditorLabels, 'toolbar'>,
-      group: Exclude<RichTextToolbarGroup, 'history'> | 'history',
+      key: FormatKey,
+      group: RichTextToolbarGroup,
       onClick: () => void,
       active: boolean,
+      buttonDisabled = disabled,
     ) => {
       const Icon = mergedIcons[key]
+      const label = mergedLabels[key]
       return (
         <button
           key={`${group}-${key}`}
           type="button"
-          aria-label={mergedLabels[key]}
+          aria-label={label}
           aria-pressed={active}
-          title={mergedLabels[key]}
-          disabled={disabled}
-          className={cn(
-            'rounded p-1.5 text-[var(--as-muted-fg)] transition-colors hover:text-[var(--as-fg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--as-focus-ring)] disabled:cursor-not-allowed disabled:opacity-50',
-            active && 'bg-[var(--as-surface-active)] text-[var(--as-fg)]',
-          )}
+          title={label}
+          disabled={buttonDisabled}
+          className={buttonClass(active)}
           onClick={onClick}
+        >
+          <Icon className="size-4" aria-hidden />
+        </button>
+      )
+    }
+
+    const historyDisabled = (can: 'undo' | 'redo') =>
+      disabled || editor === null || editor.can()[can]() !== true
+
+    const renderHeadingButton = (level: RichTextHeadingLevel) => {
+      const Icon = mergedIcons.heading
+      const label = mergedLabels.heading(level)
+      return (
+        <button
+          key={`heading-${level}`}
+          type="button"
+          aria-label={label}
+          aria-pressed={editor?.isActive('heading', { level }) === true}
+          title={label}
+          disabled={disabled}
+          className={buttonClass(editor?.isActive('heading', { level }) === true)}
+          onClick={() => editor?.chain().focus().toggleHeading({ level }).run()}
         >
           <Icon className="size-4" aria-hidden />
         </button>
@@ -264,6 +333,7 @@ export const RichTextEditor = React.forwardRef<HTMLDivElement, RichTextEditorPro
                   'history',
                   () => editor?.chain().focus().undo().run(),
                   false,
+                  historyDisabled('undo'),
                 )
               : null}
             {groups.includes('history')
@@ -272,16 +342,10 @@ export const RichTextEditor = React.forwardRef<HTMLDivElement, RichTextEditorPro
                   'history',
                   () => editor?.chain().focus().redo().run(),
                   false,
+                  historyDisabled('redo'),
                 )
               : null}
-            {groups.includes('heading')
-              ? renderButton(
-                  'heading',
-                  'heading',
-                  () => editor?.chain().focus().toggleHeading({ level: 2 }).run(),
-                  editor?.isActive('heading', { level: 2 }) === true,
-                )
-              : null}
+            {groups.includes('heading') ? levels.map((level) => renderHeadingButton(level)) : null}
             {groups.includes('format')
               ? renderButton(
                   'bold',

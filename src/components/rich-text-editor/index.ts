@@ -4,4 +4,5 @@ export {
   type RichTextEditorLabels,
   type RichTextEditorIcons,
   type RichTextToolbarGroup,
+  type RichTextHeadingLevel,
 } from './RichTextEditor'

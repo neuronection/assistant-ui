@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import { Sparkles } from 'lucide-react'
+import StarterKit from '@tiptap/starter-kit'
+import { Markdown } from 'tiptap-markdown'
 import { RichTextEditor } from '../src/components/rich-text-editor/RichTextEditor'
 
 export const Default = () => {
@@ -64,6 +66,39 @@ export const Disabled = () => {
   return (
     <div style={{ maxWidth: 640 }}>
       <RichTextEditor value="Read-only content" onValueChange={() => {}} ariaLabel="Report" disabled />
+    </div>
+  )
+}
+
+export const TwoLevelHeadings = () => {
+  const [markdown, setMarkdown] = useState('## Section\n\nBody with a **sub-heading** toolbar.')
+  const [ready, setReady] = useState<'no' | 'yes'>('no')
+  return (
+    <div style={{ maxWidth: 640 }}>
+      <RichTextEditor
+        value={markdown}
+        onValueChange={setMarkdown}
+        ariaLabel="Section body"
+        headingLevels={[2, 3]}
+        labels={{ heading: (level) => `Heading ${level}` }}
+        contentClassName="min-h-32"
+        onReady={(editor) => setReady(editor === null ? 'no' : 'yes')}
+      />
+      <p style={{ marginTop: 8, fontSize: 12 }}>editor ready: {ready}</p>
+    </div>
+  )
+}
+
+export const FullExtensionOverride = () => {
+  const [markdown, setMarkdown] = useState('Only the extensions the app declares survive.')
+  return (
+    <div style={{ maxWidth: 640 }}>
+      <RichTextEditor
+        value={markdown}
+        onValueChange={setMarkdown}
+        ariaLabel="Override"
+        extensions={[StarterKit.configure({ strike: false }), Markdown]}
+      />
     </div>
   )
 }
