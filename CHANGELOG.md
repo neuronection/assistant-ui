@@ -1,5 +1,23 @@
 # @neuronection/assistant-ui
 
+## 0.22.0
+
+### Minor Changes
+
+- [`7537028`](https://github.com/neuronection/assistant-ui/commit/75370281e944b43b295ff6a315ff4fb7112d471f) Thanks [@constLiakos](https://github.com/constLiakos)! - Combobox and ComboboxMulti gain `allowCreate` (+ optional `createLabel`):
+  when the search term matches no option, an `Add "term"` row is offered
+  (keyboard included) and picking it reports the raw trimmed term — for
+  free-text entry into taxonomy-backed pickers.
+
+- [`2b7e756`](https://github.com/neuronection/assistant-ui/commit/2b7e7566529af6e43528b63908ab590c04085864) Thanks [@constLiakos](https://github.com/constLiakos)! - RichTextEditor becomes hostable by full apps: `extensions` is now a **full
+  override** of the built-in `[StarterKit, Markdown]` set (apps declare their
+  complete extension set), and three composition props land — `contentClassName`
+  (merged onto the editable region), `onReady` (editor instance on create,
+  `null` on destroy — the app handle for commands and event wiring), and
+  `headingLevels` (one toggle per level; `labels.heading` is now
+  `(level) => string`, default `Heading ${level}`). History buttons now reflect
+  undo/redo availability and disable while there is nothing to undo/redo.
+
 ## 0.21.0
 
 ### Minor Changes
