@@ -1,5 +1,11 @@
 # @neuronection/assistant-ui
 
+## 0.19.0
+
+### Minor Changes
+
+- [`f196345`](https://github.com/neuronection/assistant-ui/commit/f19634559278d1b33ba6e14884dba46ca0c405ed) Thanks [@constLiakos](https://github.com/constLiakos)! - AiActionsDropdown: split-button mode via `primaryAction` — the main segment runs the primary action directly, a chevron opens the panel with the remaining actions (primary excluded, name via `moreLabel`).
+
 ## 0.18.0
 
 ### Minor Changes
