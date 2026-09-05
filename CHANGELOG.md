@@ -1,5 +1,15 @@
 # @neuronection/assistant-ui
 
+## 0.20.0
+
+### Minor Changes
+
+- [`e973c82`](https://github.com/neuronection/assistant-ui/commit/e973c8242355efe8cf6748615d8638211274bc8f) Thanks [@constLiakos](https://github.com/constLiakos)! - New tier-2 "transport-injected hooks" modules: `dictation` (`useDictation` state machine + `DictationButton` + `DictationStrip` — the app injects `transcribe(blob)`, the library owns recording/timer/level/cancel UI) and `ai-text-transform` (`useAiTextTransform` — streaming transform state machine with delta coalescing, poll fallback, hard timeout and terminal-event guard; the app injects start/subscribe/cancel/poll closures). No fetching inside the library — ADR-006 holds.
+
+- [`c00baa9`](https://github.com/neuronection/assistant-ui/commit/c00baa97d3c6446e624bd8b9da30af2eb3fbf743) Thanks [@constLiakos](https://github.com/constLiakos)! - New `rich-text-editor` module: controlled tiptap-based markdown editor with a configurable toolbar (groups + `toolbarExtra` app slot), label/icon props with English defaults, caret-preserving external sync, and a markdown round-trip contract. Adds `@tiptap/react`, `@tiptap/starter-kit`, `@tiptap/pm` and `tiptap-markdown` as dependencies.
+
+- [`5d965d8`](https://github.com/neuronection/assistant-ui/commit/5d965d8425fe46f93da2ab24b52e36593fdbf965) Thanks [@constLiakos](https://github.com/constLiakos)! - New `text-diff-view` module: gitlens-style side-by-side diff view (line-level LCS diff with word-level intra-line highlighting, per-side line numbers, prev/next change navigation with active-block tint, expandable/re-collapsible unchanged-line folds, virtualized rows) plus exported `computeLineDiff` / `wordSegments` engine. Adds `@tanstack/react-virtual` as a dependency. Labels are props/callbacks with English defaults.
+
 ## 0.19.0
 
 ### Minor Changes
