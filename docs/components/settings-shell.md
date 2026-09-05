@@ -14,13 +14,17 @@ import { SettingsShell, type SettingsNavItem } from '@neuronection/assistant-ui/
 
 | prop | type | default | notes |
 |---|---|---|---|
-| `nav` | `SettingsNavItem[]` | — | `{ id, label, description?, icon? }` |
+| `nav` | `SettingsNavItem[]` | — | `{ id, label, description?, icon?, trailing? }` |
 | `active` | `string` | — | active nav id |
 | `onNavigate` | `(id: string) => void` | — | |
 | `header` | `{ icon?: LucideIcon; title: string }` | — | small header above the nav |
 | `children` | `ReactNode` | — | content pane (`lg:col-span-3`) |
 | `className` | `string` | — | on the outer grid (`grid lg:grid-cols-4` default) |
 | `navClassName` | `string` | — | on the nav card (e.g. sticky offset) |
+
+`trailing` is a ReactNode rendered at the row's trailing edge (`ml-auto`,
+vertically centered) — use it for status dots, counts or badges that belong
+to the nav entry itself rather than its description.
 
 ## controlled contract
 

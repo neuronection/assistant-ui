@@ -7,6 +7,8 @@ export interface SettingsNavItem {
   label: string
   description?: string
   icon?: LucideIcon
+  /** Optional trailing node (status dot, count, badge) at the row edge. */
+  trailing?: React.ReactNode
 }
 
 export interface SettingsShellProps {
@@ -51,7 +53,7 @@ export const SettingsShell = React.forwardRef<HTMLDivElement, SettingsShellProps
                 </span>
               </div>
             ) : null}
-            {nav.map(({ id, label, description, icon: Icon }) => {
+            {nav.map(({ id, label, description, icon: Icon, trailing }) => {
               const isActive = id === active
               return (
                 <button
@@ -80,6 +82,11 @@ export const SettingsShell = React.forwardRef<HTMLDivElement, SettingsShellProps
                       </span>
                     ) : null}
                   </span>
+                  {trailing ? (
+                    <span className="ml-auto flex items-center self-center pl-2">
+                      {trailing}
+                    </span>
+                  ) : null}
                 </button>
               )
             })}
