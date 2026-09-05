@@ -233,11 +233,16 @@ export const RichTextEditor = React.forwardRef<HTMLDivElement, RichTextEditorPro
       }
     }, [editor, isMounted])
 
+    const editableRef = React.useRef(!disabled)
     React.useEffect(() => {
       if (editor === null || editor.isDestroyed) {
         return
       }
-      editor.setEditable(!disabled)
+      if (editableRef.current === !disabled) {
+        return
+      }
+      editableRef.current = !disabled
+      editor.setEditable(!disabled, false)
     }, [editor, disabled])
 
     React.useEffect(() => {

@@ -131,6 +131,18 @@ describe('RichTextEditor', () => {
     expect(editable.textContent).toContain('same')
   })
 
+  it('never emits on mount or when only the editable state changes', async () => {
+    const onValueChange = vi.fn()
+    const { rerender } = render(<Editor value="quiet" onValueChange={onValueChange} />)
+    const editable = await getEditable()
+    await waitFor(() => expect(editable.textContent).toContain('quiet'))
+    rerender(<Editor value="quiet" onValueChange={onValueChange} disabled />)
+    await new Promise((resolve) => setTimeout(resolve, 30))
+    rerender(<Editor value="quiet" onValueChange={onValueChange} />)
+    await new Promise((resolve) => setTimeout(resolve, 30))
+    expect(onValueChange).not.toHaveBeenCalled()
+  })
+
   it('toolbar={false} renders no toolbar', async () => {
     render(<Editor value="plain" toolbar={false} />)
     await getEditable()
