@@ -158,4 +158,85 @@ describe('AiActionsDropdown', () => {
     await user.click(screen.getByRole('button', { name: 'AI actions' }))
     expect(await axe(document.body)).toHaveNoViolations()
   })
+
+  it('split mode runs the primary action from the main segment', async () => {
+    const user = userEvent.setup()
+    const onAction = vi.fn()
+    render(
+      <AiActionsDropdown
+        actions={actions}
+        onAction={onAction}
+        primaryAction={actions[0]}
+        title="AI tools"
+      />,
+    )
+    await user.click(
+      screen.getByRole('button', { name: 'Summarize' }),
+    )
+    expect(onAction).toHaveBeenCalledWith(actions[0])
+    expect(screen.queryByRole('menu')).not.toBeInTheDocument()
+  })
+
+  it('split mode opens the panel from the chevron without the primary action', async () => {
+    const user = userEvent.setup()
+    const onAction = vi.fn()
+    render(
+      <AiActionsDropdown
+        actions={actions}
+        onAction={onAction}
+        primaryAction={actions[0]}
+        title="AI tools"
+      />,
+    )
+    await user.click(screen.getByRole('button', { name: 'More AI actions' }))
+    expect(screen.getByRole('menu')).toBeInTheDocument()
+    expect(screen.getByRole('menuitem', { name: /Translate/ })).toBeInTheDocument()
+    expect(
+      screen.queryByRole('menuitem', { name: /Summarize/ }),
+    ).not.toBeInTheDocument()
+    await user.click(screen.getByRole('menuitem', { name: /Translate/ }))
+    expect(onAction).toHaveBeenCalledWith(actions[1])
+  })
+
+  it('split mode closes the panel with Escape (keyboard)', async () => {
+    const user = userEvent.setup()
+    render(
+      <AiActionsDropdown
+        actions={actions}
+        onAction={vi.fn()}
+        primaryAction={actions[0]}
+      />,
+    )
+    await user.click(screen.getByRole('button', { name: 'More AI actions' }))
+    await user.keyboard('{Escape}')
+    expect(screen.queryByRole('menu')).not.toBeInTheDocument()
+  })
+
+  it('split mode disables both segments while busy', () => {
+    render(
+      <AiActionsDropdown
+        actions={actions}
+        onAction={vi.fn()}
+        primaryAction={actions[0]}
+        busy
+        title="AI tools"
+      />,
+    )
+    expect(screen.getByRole('button', { name: 'Summarize' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'More AI actions' })).toBeDisabled()
+  })
+
+  it('split mode has no axe violations open', async () => {
+    const user = userEvent.setup()
+    render(
+      <AiActionsDropdown
+        actions={actions}
+        onAction={vi.fn()}
+        primaryAction={actions[0]}
+        title="AI tools"
+      />,
+    )
+    await user.click(screen.getByRole('button', { name: 'More AI actions' }))
+    expect(await axe(document.body)).toHaveNoViolations()
+  })
 })

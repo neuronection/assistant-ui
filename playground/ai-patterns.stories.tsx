@@ -56,6 +56,27 @@ export const AiActions = () => {
   )
 }
 
+export const AiActionsSplit = () => {
+  const [busy, setBusy] = useState(false)
+  const [last, setLast] = useState('')
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+      <AiActionsDropdown
+        actions={actions}
+        busy={busy}
+        primaryAction={actions[0]}
+        onPrompt={() => setBusy(true)}
+        onAction={(action) => {
+          setBusy(true)
+          setLast(action.label)
+          setTimeout(() => setBusy(false), 400)
+        }}
+      />
+      <span style={{ fontSize: 13 }}>{busy ? 'Running…' : last ? `Ran: ${last}` : 'Pick an action'}</span>
+    </div>
+  )
+}
+
 export const AiMagicFillStory = () => {
   const [open, setOpen] = useState(false)
   const [busy, setBusy] = useState(false)

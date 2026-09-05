@@ -47,7 +47,7 @@ behavior and focus restoration are listed **only where asserted**.
 | `InfoTooltip` | trigger with default accessible label; `mode="click"` becomes a popover | focus/click per mode | clean |
 | `Menu` / `ActionMenu` | `role="menu"` / `menuitem` | ArrowDown moves focus between items; Enter selects; Escape closes; `disabled` items carry `data-disabled` and are not selectable | clean (open) |
 | `ContextMenu` | `role="menu"` / `menuitem` at x/y | Enter selects and reports `onClose`; Escape closes | clean (open) |
-| `AiActionsDropdown` | `role="menu"` with action items | Enter submits the custom prompt; Escape closes the menu; busy disables the trigger | clean (open) |
+| `AiActionsDropdown` | `role="menu"` with action items; split mode adds primary + chevron `aria-expanded` buttons | Enter submits the custom prompt; Escape closes the menu; busy disables the trigger | clean (open) |
 
 ## Inputs
 
