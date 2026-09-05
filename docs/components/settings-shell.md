@@ -19,12 +19,22 @@ import { SettingsShell, type SettingsNavItem } from '@neuronection/assistant-ui/
 | `onNavigate` | `(id: string) => void` | — | |
 | `header` | `{ icon?: LucideIcon; title: string }` | — | small header above the nav |
 | `children` | `ReactNode` | — | content pane (`lg:col-span-3`) |
-| `className` | `string` | — | on the outer grid (`grid lg:grid-cols-4` default) |
+| `className` | `string` | — | on the outer grid (`grid gap-8` default; columns come from component CSS) |
 | `navClassName` | `string` | — | on the nav card (e.g. sticky offset) |
 
 `trailing` is a ReactNode rendered at the row's trailing edge (`ml-auto`,
 vertically centered) — use it for status dots, counts or badges that belong
 to the nav entry itself rather than its description.
+
+## layout & theming
+
+The responsive columns are owned by component CSS
+(`[data-as='settings-shell']`: one column, four at `64rem`) instead of
+`grid-cols-*` utilities. Host apps compile their own utilities **after** the
+library stylesheet, so an app-side `.grid-cols-1` would silently override a
+utility-based media-query rule and stack the nav on top — component CSS
+removes that collision. Override via `className` utilities still works (they
+win by source order), e.g. `className="lg:grid-cols-[1fr_3fr]"`.
 
 ## controlled contract
 

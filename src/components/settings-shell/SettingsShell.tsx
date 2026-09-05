@@ -33,7 +33,7 @@ export const SettingsShell = React.forwardRef<HTMLDivElement, SettingsShellProps
       <div
         ref={ref}
         data-as="settings-shell"
-        className={cn('grid grid-cols-1 gap-8 lg:grid-cols-4', className)}
+        className={cn('grid gap-8', className)}
       >
         <nav
           className="lg:col-span-1"

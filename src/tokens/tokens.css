@@ -109,6 +109,24 @@
   animation: as-drawer-in 0.2s ease-out;
 }
 
+/*
+ * SettingsShell owns its responsive columns here instead of via
+ * `grid-cols-1 lg:grid-cols-4` utilities: apps load their own compiled
+ * utilities AFTER this stylesheet, so an unconditional app-side
+ * `.grid-cols-1` (matched because the shell carried the class) would
+ * override the media-query rule and force the nav on top at every
+ * viewport. Class selectors never match here, so no collision.
+ */
+[data-as='settings-shell'] {
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+}
+
+@media (min-width: 64rem) {
+  [data-as='settings-shell'] {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
 [data-as='scale-slider'] input[type='range'] {
   -webkit-appearance: none;
   appearance: none;

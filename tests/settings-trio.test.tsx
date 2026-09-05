@@ -58,6 +58,17 @@ describe('SettingsShell', () => {
     const { container } = render(<ShellDemo />)
     expect(await axe(container)).toHaveNoViolations()
   })
+
+  it('owns its responsive columns via component CSS, not collidable utilities', () => {
+    const { container } = render(<ShellDemo />)
+    const root = container.firstElementChild as HTMLElement
+    expect(root).toHaveAttribute('data-as', 'settings-shell')
+    // App builds ship `.grid-cols-1` AFTER the library stylesheet; if the
+    // shell carried that class it would override `lg:grid-cols-4` (same
+    // specificity, later source order) and stack the nav on top.
+    expect(root.className).not.toContain('grid-cols-1')
+    expect(root.className).not.toContain('lg:grid-cols-4')
+  })
 })
 
 describe('ProviderForm', () => {
