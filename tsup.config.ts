@@ -33,6 +33,7 @@ export default defineConfig({
     input: 'src/components/input/index.ts',
     logo: 'src/components/logo/index.ts',
     textarea: 'src/components/textarea/index.ts',
+    'rich-text-editor': 'src/components/rich-text-editor/index.ts',
     marquee: 'src/components/marquee/index.ts',
     menu: 'src/components/menu/index.ts',
     'model-picker': 'src/components/model-picker/index.ts',

@@ -61,6 +61,7 @@ behavior and focus restoration are listed **only where asserted**.
 | `ChipList` | presentational pills; remove buttons named `<removeLabel> — <item>`; clickable chips are real buttons | remove/click via native button semantics (asserted: accessible names, Enter activation) | clean |
 | `ScaleSlider` | `role="slider"` (native range) paired with a number input | slider `change` emits numeric values; typed input syncs; blur clamps to `min`/`max`; clearing emits `''`; focus ring visible on the range input | clean |
 | `ProviderForm` | labelled fields; write-only API-key input (never renders a stored value); error `role="alert"` | typing reports `onApiKeyChange` | clean |
+| `RichTextEditor` | toolbar `role="toolbar"` (name via `labels.toolbar`, default *Formatting*); toolbar buttons are `aria-pressed` toggles named via `labels`; editable region is a labelled contenteditable (`aria-label` = required `ariaLabel` prop) | toolbar buttons are tabbable; Enter on a focused button runs its command; `Control+B` toggles bold (editor-level `aria-pressed` follows) | clean (with default toolbar + `toolbarExtra`) |
 
 ## Composite widgets
 

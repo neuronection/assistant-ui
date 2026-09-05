@@ -272,3 +272,10 @@ export {
   type WizardStep,
   type WizardContext,
 } from './components/wizard'
+export {
+  RichTextEditor,
+  type RichTextEditorProps,
+  type RichTextEditorLabels,
+  type RichTextEditorIcons,
+  type RichTextToolbarGroup,
+} from './components/rich-text-editor'
