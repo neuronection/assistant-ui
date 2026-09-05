@@ -272,3 +272,41 @@ export {
   type WizardStep,
   type WizardContext,
 } from './components/wizard'
+export {
+  RichTextEditor,
+  type RichTextEditorProps,
+  type RichTextEditorLabels,
+  type RichTextEditorIcons,
+  type RichTextToolbarGroup,
+} from './components/rich-text-editor'
+export {
+  DictationButton,
+  type DictationButtonProps,
+  DictationStrip,
+  type DictationStripProps,
+  type DictationStripLabels,
+  useDictation,
+  type UseDictationOptions,
+  type DictationStatus,
+  type DictationError,
+  type DictationResult,
+} from './components/dictation'
+export {
+  useAiTextTransform,
+  type UseAiTextTransformOptions,
+  type AiTextTransformTransport,
+  type AiTextTransformStatus,
+  type AiTextTransformEventHandlers,
+} from './components/ai-text-transform'
+export {
+  TextDiffView,
+  type TextDiffViewProps,
+  type TextDiffViewLabels,
+  computeLineDiff,
+  wordSegments,
+  type DiffCell,
+  type DiffSegment,
+  type DiffRow,
+  type LineDiffOptions,
+  type LineDiffResult,
+} from './components/text-diff-view'
