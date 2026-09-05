@@ -27,6 +27,8 @@ import { Combobox, ComboboxMulti, type ComboboxOption } from '@neuronection/assi
 | `loading` | `boolean` | `false` | swaps the list for a spinner row |
 | `disabled` | `boolean` | `false` | |
 | `clearable` | `boolean` | `false` | shows the × clear button when a value is set |
+| `allowCreate` | `boolean` | `false` | offers an `Add "…"` row for search terms matching no option; picking it reports the raw trimmed term |
+| `createLabel` | `(term: string) => string` | — | custom label for the create row |
 | `clearLabel` | `string` | `'Clear'` | clear button accessible name |
 | `onSearchChange` | `(term: string) => void` | — | **async mode**: disables internal filtering, you filter `options` |
 | `onOpenChange` | `(open: boolean) => void` | — | panel open state reports |

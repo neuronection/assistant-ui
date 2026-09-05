@@ -35,6 +35,28 @@ function defaultFilter(options: ComboboxOption[], term: string): ComboboxOption[
   return scored.map((entry) => entry.option)
 }
 
+/** The option appended when `allowCreate` is on and the search term does
+ * not exactly match an existing option. `value` is the raw trimmed term. */
+function createOption(
+  options: ComboboxOption[],
+  term: string,
+  createLabel?: (term: string) => string,
+): ComboboxOption | null {
+  const trimmed = term.trim()
+  if (!trimmed) return null
+  const needle = trimmed.toLowerCase()
+  const exists = options.some(
+    (option) =>
+      option.value.toLowerCase() === needle ||
+      option.label.toLowerCase() === needle,
+  )
+  if (exists) return null
+  return {
+    value: trimmed,
+    label: createLabel ? createLabel(trimmed) : `Add "${trimmed}"`,
+  }
+}
+
 interface ComboboxListProps {
   id: string
   options: ComboboxOption[]
@@ -290,6 +312,10 @@ export interface ComboboxProps {
   disabled?: boolean
   clearable?: boolean
   clearLabel?: string
+  /** Offer an "Add …" row for search terms that match no option. */
+  allowCreate?: boolean
+  /** Custom label for the create row; receives the trimmed term. */
+  createLabel?: (term: string) => string
   onSearchChange?: (term: string) => void
   onOpenChange?: (open: boolean) => void
   label?: string
@@ -315,6 +341,8 @@ export const Combobox = React.forwardRef<HTMLButtonElement, ComboboxProps>(funct
     disabled = false,
     clearable = false,
     clearLabel = 'Clear',
+    allowCreate = false,
+    createLabel,
     onSearchChange,
     onOpenChange,
     label,
@@ -334,6 +362,8 @@ export const Combobox = React.forwardRef<HTMLButtonElement, ComboboxProps>(funct
   const [activeIndex, setActiveIndex] = React.useState(-1)
 
   const filtered = onSearchChange ? options : defaultFilter(options, search)
+  const created = allowCreate ? createOption(options, search, createLabel) : null
+  const panelOptions = created ? [...filtered, created] : filtered
   const selectedOption = options.find((option) => option.value === value)
 
   const handleOpenChange = (next: boolean) => {
@@ -414,7 +444,7 @@ export const Combobox = React.forwardRef<HTMLButtonElement, ComboboxProps>(funct
           {open ? (
             <ComboboxPanel
               listId={listId}
-              options={filtered}
+              options={panelOptions}
               activeIndex={activeIndex}
               setActiveIndex={setActiveIndex}
               selected={(optionValue) => optionValue === value}
@@ -459,6 +489,10 @@ export interface ComboboxMultiProps {
   loading?: boolean
   disabled?: boolean
   maxTriggerLabels?: number
+  /** Offer an "Add …" row for search terms that match no option. */
+  allowCreate?: boolean
+  /** Custom label for the create row; receives the trimmed term. */
+  createLabel?: (term: string) => string
   onSearchChange?: (term: string) => void
   onOpenChange?: (open: boolean) => void
   label?: string
@@ -482,6 +516,8 @@ export const ComboboxMulti = React.forwardRef<HTMLButtonElement, ComboboxMultiPr
       loading = false,
       disabled = false,
       maxTriggerLabels = 3,
+      allowCreate = false,
+      createLabel,
       onSearchChange,
       onOpenChange,
       label,
@@ -500,6 +536,8 @@ export const ComboboxMulti = React.forwardRef<HTMLButtonElement, ComboboxMultiPr
     const [activeIndex, setActiveIndex] = React.useState(-1)
 
     const filtered = onSearchChange ? options : defaultFilter(options, search)
+    const created = allowCreate ? createOption(options, search, createLabel) : null
+    const panelOptions = created ? [...filtered, created] : filtered
     const selectedOptions = options.filter((option) => value.includes(option.value))
     const triggerLabel =
       selectedOptions.length === 0
@@ -575,7 +613,7 @@ export const ComboboxMulti = React.forwardRef<HTMLButtonElement, ComboboxMultiPr
             {open ? (
               <ComboboxPanel
                 listId={listId}
-                options={filtered}
+                options={panelOptions}
                 activeIndex={activeIndex}
                 setActiveIndex={setActiveIndex}
                 selected={(optionValue) => value.includes(optionValue)}

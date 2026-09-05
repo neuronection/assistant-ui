@@ -191,3 +191,67 @@ describe('ComboboxMulti', () => {
     expect(await axe(container)).toHaveNoViolations()
   })
 })
+
+describe('allowCreate', () => {
+  const opts = [
+    { value: 'python', label: 'Python' },
+    { value: 'sql', label: 'SQL' },
+  ]
+
+  it('single: offers the term as "Add …" when nothing matches, picks it', async () => {
+    const user = userEvent.setup()
+    const onChange = vi.fn()
+    render(<Combobox options={opts} value="" onChange={onChange} allowCreate />)
+    await user.click(screen.getByRole('combobox'))
+    await user.type(await screen.findByRole('combobox', { name: 'Search options' }), 'rust')
+    const row = await screen.findByRole('option', { name: 'Add "rust"' })
+    await user.click(row)
+    expect(onChange).toHaveBeenCalledWith('rust')
+  })
+
+  it('single: no create row when the term matches an option', async () => {
+    const user = userEvent.setup()
+    render(<Combobox options={opts} value="" onChange={() => {}} allowCreate />)
+    await user.click(screen.getByRole('combobox'))
+    await user.type(await screen.findByRole('combobox', { name: 'Search options' }), 'python')
+    expect(screen.queryByRole('option', { name: /Add/ })).not.toBeInTheDocument()
+  })
+
+  it('single: custom createLabel is used', async () => {
+    const user = userEvent.setup()
+    render(
+      <Combobox
+        options={opts}
+        value=""
+        onChange={() => {}}
+        allowCreate
+        createLabel={(term) => `Add skill "${term}"`}
+      />,
+    )
+    await user.click(screen.getByRole('combobox'))
+    await user.type(await screen.findByRole('combobox', { name: 'Search options' }), 'rust')
+    expect(await screen.findByRole('option', { name: 'Add skill "rust"' })).toBeInTheDocument()
+  })
+
+  it('multi: picking the create row appends the term to the value', async () => {
+    const user = userEvent.setup()
+    const onChange = vi.fn()
+    render(
+      <ComboboxMulti options={opts} value={['python']} onChange={onChange} allowCreate />,
+    )
+    await user.click(screen.getByRole('combobox'))
+    await user.type(await screen.findByRole('combobox', { name: 'Search options' }), 'rust')
+    await user.click(await screen.findByRole('option', { name: 'Add "rust"' }))
+    expect(onChange).toHaveBeenCalledWith(['python', 'rust'])
+  })
+
+  it('multi: keyboard Enter picks the create row', async () => {
+    const user = userEvent.setup()
+    const onChange = vi.fn()
+    render(<ComboboxMulti options={opts} value={[]} onChange={onChange} allowCreate />)
+    await user.click(screen.getByRole('combobox'))
+    await user.type(await screen.findByRole('combobox', { name: 'Search options' }), 'rust')
+    await user.keyboard('{Enter}')
+    expect(onChange).toHaveBeenCalledWith(['rust'])
+  })
+})

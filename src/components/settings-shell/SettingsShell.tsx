@@ -19,11 +19,13 @@ export interface SettingsShellProps {
   children: React.ReactNode
   className?: string
   navClassName?: string
+  /** Test hook: data-testid for the `<nav>` element. */
+  navTestId?: string
 }
 
 export const SettingsShell = React.forwardRef<HTMLDivElement, SettingsShellProps>(
   function SettingsShell(
-    { nav, active, onNavigate, header, children, className, navClassName },
+    { nav, active, onNavigate, header, children, className, navClassName, navTestId },
     ref,
   ) {
     const HeaderIcon = header?.icon
@@ -33,7 +35,11 @@ export const SettingsShell = React.forwardRef<HTMLDivElement, SettingsShellProps
         data-as="settings-shell"
         className={cn('grid grid-cols-1 gap-8 lg:grid-cols-4', className)}
       >
-        <nav className="lg:col-span-1" aria-label="Settings sections">
+        <nav
+          className="lg:col-span-1"
+          aria-label="Settings sections"
+          data-testid={navTestId}
+        >
           <div
             className={cn(
               'space-y-1 rounded-[var(--as-radius-lg)] border border-[var(--as-border)] bg-[var(--as-surface-raised)] p-3 lg:sticky lg:top-24',
