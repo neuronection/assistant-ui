@@ -101,6 +101,9 @@ behavior and focus restoration are listed **only where asserted**.
 | `ChatReasoning` | toggle `aria-expanded` + `aria-controls`; streaming announced via `role="status"` + sr-only label | Enter/Space toggles | clean (open, streaming) |
 | `ChatToolCard` | expandable header is a button with `aria-expanded`/`aria-controls`; running state `role="status"`; sr-only status otherwise; no dead controls on static rows | Enter/Space expands | clean (running, expanded done) |
 | `ChatComposer` | labelled textarea + labelled send/stop buttons with focus rings; `focus-within` container affordance; drag-drop announced via `role="status"` | Enter submits (Shift+Enter newlines, IME-guarded); Tab reaches toolbar slots then send/stop | clean (idle, sending) |
+| `ChatTranscript` | `role="log"` with label; `aria-busy` while streaming; turn completion via visually-hidden `aria-live="polite"` region; labelled jump pill | scroll follows the user; jump pill keyboard-reachable | clean (items+live) |
+| `ChatBranchTree` | `role="tree"` / `treeitem` (`aria-selected` on active path, `aria-level` nesting) / `group`; roving tabindex | ArrowUp/Down/Home/End navigate; Enter/Space selects | clean (branched tree) |
+| `ChatSessionList` | `role="list"`/`listitem`, `aria-current` on active; labelled searchbox; row actions a labelled `role="group"` revealed on hover AND focus-within | Enter/Space selects; actions keyboard-reachable | clean (grouped, actions) |
 | `FlowStatusCard` | step `<ol>` with per-step status icons; running step `aria-current="step"`; header summary `role="status"`; failure block `role="alert"` (code + message); derived action buttons (*Cancel* while running, *Resume* when interrupted, *Retry* on retryable failure) | Tab reaches the visible action(s) in DOM order; Enter fires `onCancel`/`onResume`/`onRetry` | clean (running, failed, interrupted) |
 
 ## File surface
