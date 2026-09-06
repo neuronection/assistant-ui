@@ -55,9 +55,17 @@
       "types": "./dist/chat-core.d.ts",
       "import": "./dist/chat-core.js"
     },
+    "./chat-launcher": {
+      "types": "./dist/chat-launcher.d.ts",
+      "import": "./dist/chat-launcher.js"
+    },
     "./chat-composer": {
       "types": "./dist/chat-composer.d.ts",
       "import": "./dist/chat-composer.js"
+    },
+    "./chat-panel": {
+      "types": "./dist/chat-panel.d.ts",
+      "import": "./dist/chat-panel.js"
     },
     "./chat-transcript": {
       "types": "./dist/chat-transcript.d.ts",
@@ -70,6 +78,10 @@
     "./chat-branch-tree": {
       "types": "./dist/chat-branch-tree.d.ts",
       "import": "./dist/chat-branch-tree.js"
+    },
+    "./chat-drawer": {
+      "types": "./dist/chat-drawer.d.ts",
+      "import": "./dist/chat-drawer.js"
     },
     "./chat-markdown": {
       "types": "./dist/chat-markdown.d.ts",

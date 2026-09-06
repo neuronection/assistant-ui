@@ -397,3 +397,16 @@ export {
   type ChatSessionListIcons,
   type ChatSessionView,
 } from './components/chat-session-list'
+export {
+  ChatPanel,
+  type ChatPanelProps,
+  type ChatPanelVariant,
+} from './components/chat-panel'
+export {
+  ChatDrawer,
+  type ChatDrawerProps,
+} from './components/chat-drawer'
+export {
+  ChatLauncher,
+  type ChatLauncherProps,
+} from './components/chat-launcher'

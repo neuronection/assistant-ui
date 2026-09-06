@@ -4,6 +4,10 @@ import { GitBranch } from 'lucide-react'
 import { ChatTranscript } from '../src/components/chat-transcript/ChatTranscript'
 import { ChatBranchTree } from '../src/components/chat-branch-tree/ChatBranchTree'
 import { ChatSessionList } from '../src/components/chat-session-list/ChatSessionList'
+import { ChatPanel } from '../src/components/chat-panel/ChatPanel'
+import { ChatLauncher } from '../src/components/chat-launcher/ChatLauncher'
+import { ChatDrawer } from '../src/components/chat-drawer/ChatDrawer'
+import { ChatComposer } from '../src/components/chat-composer/ChatComposer'
 import { ChatMessage } from '../src/components/chat-message/ChatMessage'
 import { ChatReasoning } from '../src/components/chat-reasoning/ChatReasoning'
 import { MarkdownSurface } from '../src/components/chat-markdown/MarkdownSurface'
@@ -97,6 +101,58 @@ export function SessionList() {
         onRename={() => {}}
         onDelete={() => {}}
         onExport={() => {}}
+      />
+    </div>
+  )
+}
+
+export function BubbleSurface() {
+  return (
+    <div style={{ position: 'relative', height: 480, border: '1px dashed var(--as-border)', borderRadius: 'var(--as-radius-lg)', overflow: 'hidden' }}>
+      <p style={{ padding: 12, fontSize: 12, color: 'var(--as-muted-fg)' }}>app page behind the launcher…</p>
+      <ChatLauncher
+        defaultOpen
+        panel={
+          <ChatPanel
+            variant="bubble"
+            title="Assistant"
+            transcript={<ChatTranscript items={messages.slice(0, 2)} />}
+            composer={<ChatComposer value="" onValueChange={() => {}} onSubmit={() => {}} />}
+            footer="AI can make mistakes"
+          />
+        }
+      />
+    </div>
+  )
+}
+
+
+export function DrawerSurface() {
+  const [open, setOpen] = useState(true)
+  const [width, setWidth] = useState(440)
+  return (
+    <div style={{ minHeight: 160 }}>
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        style={{ padding: '6px 12px', borderRadius: 'var(--as-radius)', border: '1px solid var(--as-border)' }}
+      >
+        {open ? 'Hide' : 'Show'} drawer
+      </button>
+      <ChatDrawer
+        open={open}
+        onOpenChange={setOpen}
+        width={width}
+        onWidthChange={setWidth}
+        title="Study chat"
+        panel={
+          <ChatPanel
+            variant="sidebar"
+            title="Tutor"
+            transcript={<ChatTranscript items={messages} />}
+            composer={<ChatComposer value="" onValueChange={() => {}} onSubmit={() => {}} />}
+          />
+        }
       />
     </div>
   )

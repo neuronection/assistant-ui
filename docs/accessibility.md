@@ -104,6 +104,9 @@ behavior and focus restoration are listed **only where asserted**.
 | `ChatTranscript` | `role="log"` with label; `aria-busy` while streaming; turn completion via visually-hidden `aria-live="polite"` region; labelled jump pill | scroll follows the user; jump pill keyboard-reachable | clean (items+live) |
 | `ChatBranchTree` | `role="tree"` / `treeitem` (`aria-selected` on active path, `aria-level` nesting) / `group`; roving tabindex | ArrowUp/Down/Home/End navigate; Enter/Space selects | clean (branched tree) |
 | `ChatSessionList` | `role="list"`/`listitem`, `aria-current` on active; labelled searchbox; row actions a labelled `role="group"` revealed on hover AND focus-within | Enter/Space selects; actions keyboard-reachable | clean (grouped, actions) |
+| `ChatPanel` | layout host — inherits slot semantics; nothing focusable of its own | n/a | clean (page/sidebar/bubble) |
+| `ChatDrawer` | Radix Dialog semantics (labelled `role="dialog"`, focus trap, Escape); resize handle is a focusable `role="separator"` | arrows resize (±16, Shift ±48); Escape closes | clean (open) |
+| `ChatLauncher` | launcher `aria-expanded` with swapped label; panel is labelled `role="complementary"` + close button; Escape closes while focus is inside | toggle + close buttons keyboard-reachable | clean (open, closed, badge) |
 | `FlowStatusCard` | step `<ol>` with per-step status icons; running step `aria-current="step"`; header summary `role="status"`; failure block `role="alert"` (code + message); derived action buttons (*Cancel* while running, *Resume* when interrupted, *Retry* on retryable failure) | Tab reaches the visible action(s) in DOM order; Enter fires `onCancel`/`onResume`/`onRetry` | clean (running, failed, interrupted) |
 
 ## File surface
