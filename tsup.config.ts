@@ -24,6 +24,7 @@ export default defineConfig({
     'chat-reasoning': 'src/components/chat-reasoning/index.ts',
     'chat-session-list': 'src/components/chat-session-list/index.ts',
     'chat-tool-card': 'src/components/chat-tool-card/index.ts',
+    'chat-turn-status': 'src/components/chat-turn-status/index.ts',
     'connection-test-row': 'src/components/connection-test-row/index.ts',
     'check-indicator': 'src/components/check-indicator/index.ts',
     'chip-input': 'src/components/chip-input/index.ts',

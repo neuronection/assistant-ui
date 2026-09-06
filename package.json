@@ -99,6 +99,10 @@
       "types": "./dist/chat-tool-card.d.ts",
       "import": "./dist/chat-tool-card.js"
     },
+    "./chat-turn-status": {
+      "types": "./dist/chat-turn-status.d.ts",
+      "import": "./dist/chat-turn-status.js"
+    },
     "./connection-test-row": {
       "types": "./dist/connection-test-row.d.ts",
       "import": "./dist/connection-test-row.js"

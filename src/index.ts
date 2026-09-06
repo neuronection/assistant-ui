@@ -373,6 +373,11 @@ export {
   type ChatToolCardLabels,
 } from './components/chat-tool-card'
 export {
+  ChatTurnStatus,
+  type ChatTurnStatusProps,
+  type ChatTurnStatusLabels,
+} from './components/chat-turn-status'
+export {
   ChatComposer,
   type ChatComposerProps,
   type ChatComposerLabels,

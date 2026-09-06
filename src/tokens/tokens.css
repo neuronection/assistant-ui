@@ -288,3 +288,29 @@
   overflow-y: hidden;
   padding: 0.25rem 0;
 }
+
+/* chat-turn-status dots (plan 12 L1): study-proven bounce, token-colored;
+   motion-reduce users get a static row. */
+[data-as='chat-turn-status'] .as-dot {
+  animation: as-dot-bounce 1.15s ease-in-out infinite;
+}
+
+@keyframes as-dot-bounce {
+  0%,
+  80%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.35;
+  }
+
+  40% {
+    transform: translateY(-0.25rem);
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-as='chat-turn-status'] .as-dot {
+    animation: none;
+  }
+}
