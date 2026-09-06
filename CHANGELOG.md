@@ -1,5 +1,80 @@
 # @neuronection/assistant-ui
 
+## 0.24.0
+
+### Minor Changes
+
+- [`b926d22`](https://github.com/neuronection/assistant-ui/commit/b926d224031f657cdc281afac838cec0268573b6) Thanks [@constLiakos](https://github.com/constLiakos)! - chat bubbles (plan 11 L3): `ChatMessage` — the family chat bubble with
+  role alignment, hover+focus action row (copy/edit/regenerate + app
+  extras), OpenWebUI-style `‹ n/N ›` variant switcher, inline
+  edit-and-resend (`ChatMessageEditor`: Cmd/Ctrl+Enter saves, Escape
+  cancels), reasoning and below-content slots, badge/chip/attachment rows,
+  and accessible error + interrupted states; `ChatReasoning` — the
+  collapsible thinking block that streams live reasoning deltas;
+  `ChatToolCard` — inline tool-call observation with status, duration and
+  expandable args/result panes.
+
+- [`7bd487b`](https://github.com/neuronection/assistant-ui/commit/7bd487bca97d87a6d12d0b483f94a642df327a16) Thanks [@constLiakos](https://github.com/constLiakos)! - chat-composer (plan 11 L4): `ChatComposer` — the family chat input.
+  Auto-growing IME-safe textarea (Enter sends, Shift+Enter newlines,
+  composition never submits — a correctness gap in all three apps today),
+  send/stop swap while a turn is in flight, toolbar slots for app
+  attach/equation/dictation controls, attachment rail and suggestion strip
+  slots, and drag-drop + paste file wiring behind `onAttachFiles`.
+
+- [`062fca5`](https://github.com/neuronection/assistant-ui/commit/062fca561466dd9d2985fc2ea7a3d9e751e3cab9) Thanks [@constLiakos](https://github.com/constLiakos)! - chat-core — the headless core of the shared chat layer (plan dev/plans/11,
+  ADR-0009): `useChatStream`, a transport-injected live-turn state machine
+  (send → pending → streaming → done/error/interrupted) with coalesced
+  text/reasoning deltas, tool-call observations, HITL interrupts (resumable)
+  and a retryable watchdog; `liveTurnReducer`, the pure fixture-testable turn
+  machine; `ChatMessageView`, the normalized message contract every chat
+  renderer speaks; `ChatStreamEvent`, the family §5 vocabulary (+ `tool_call`
+  observation event); and the branch-tree utilities behind OpenWebUI-style
+  versioning (`buildBranchTree`, `linearTree`, `walkActivePath`,
+  `activePathSet`, `variantInfo`). No fetching, stores or i18n — apps inject
+  the transport (WS/SSE adapters ~50 lines), own sessions and persistence.
+
+- [`1ab36a8`](https://github.com/neuronection/assistant-ui/commit/1ab36a820e526094ef2135fe539dead2fb8549ee) Thanks [@constLiakos](https://github.com/constLiakos)! - chat lists (plan 11 L5): `ChatTranscript` — the conversation list with
+  `role="log"` semantics, polite screen-reader announcements on assistant
+  turn completion (never per token), stick-to-bottom auto-scroll with a
+  jump-to-latest pill, and optional dynamic-measurement virtualization for
+  thousand-message threads; `ChatBranchTree` — the OpenWebUI-style branch
+  rail (commit-graph rows, active-path dots, fork badges, full WAI-ARIA
+  tree keyboard navigation) over the family branch-tree contract;
+  `ChatSessionList` — fuzzy-searchable, date-grouped session list with
+  opt-in rename/delete/export row actions.
+
+- [`f27eba3`](https://github.com/neuronection/assistant-ui/commit/f27eba3731f370d8bb49b10c743c2c78aba0666f) Thanks [@constLiakos](https://github.com/constLiakos)! - chat-markdown — the family's read-only streaming markdown surface (plan 11
+  L2): `MarkdownSurface` renders GFM tables, KaTeX math (error-tolerant
+  while streaming), lazily-imported mermaid diagrams (strict security,
+  code-block fallback), and copyable code blocks with language tags. Raw
+  HTML never renders (model output is untrusted); URLs pass a safe default
+  transform with an override for app schemes (mentions, citations). KaTeX
+  CSS joins `styles.css` with fonts shipped in `dist/fonts`; base chat
+  typography is scoped to `[data-as="chat-markdown"]` so it survives app
+  preflight. First markdown/math/diagram dependencies in the package —
+  isolated behind the `chat-markdown` subpath; apps that don't import it
+  bundle nothing extra.
+
+- [`2220f90`](https://github.com/neuronection/assistant-ui/commit/2220f9077ba1a85d9427e1b00ef02e6441f7ecb7) Thanks [@constLiakos](https://github.com/constLiakos)! - chat surface hosts (plan 11 L6): `ChatPanel` — the composed host behind
+  the family's three chat shapes (`page` / `sidebar` / `bubble` variants,
+  header/banner/transcript/composer/footer slots); `ChatDrawer` — the
+  resizable sidepanel on Radix Dialog (focus trap, Escape, drag +
+  keyboard resize on a `role="separator"` handle, full-screen below the
+  breakpoint); `ChatLauncher` — the floating bubble (aria-expanded
+  launcher, anchored non-modal panel, unread badge). One assembly, three
+  surfaces — completing the shared chat layer's module set.
+
+### Patch Changes
+
+- [`6503f87`](https://github.com/neuronection/assistant-ui/commit/6503f8734ca9c21441eb7ffc2e7bbcaaabffa56e) Thanks [@constLiakos](https://github.com/constLiakos)! - SettingsShell: the responsive two-pane columns now live in component CSS
+  (`[data-as='settings-shell']`, one column → four at `64rem`) instead of
+  `grid-cols-1 lg:grid-cols-4` utilities. Host apps compile their own Tailwind
+  utilities after the library stylesheet, so any app that generates an
+  unconditional `.grid-cols-1` overrode the media-query rule and forced the
+  section nav to stack on top of the content at every viewport width. The shell
+  no longer carries collidable grid utilities, so the side-by-side layout holds
+  regardless of app CSS; intentional `className` column overrides still win.
+
 ## 0.23.0
 
 ### Minor Changes
