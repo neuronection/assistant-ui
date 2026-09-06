@@ -372,3 +372,9 @@ export {
   type ChatToolCardProps,
   type ChatToolCardLabels,
 } from './components/chat-tool-card'
+export {
+  ChatComposer,
+  type ChatComposerProps,
+  type ChatComposerLabels,
+  type ChatComposerIcons,
+} from './components/chat-composer'

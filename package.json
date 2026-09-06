@@ -55,6 +55,10 @@
       "types": "./dist/chat-core.d.ts",
       "import": "./dist/chat-core.js"
     },
+    "./chat-composer": {
+      "types": "./dist/chat-composer.d.ts",
+      "import": "./dist/chat-composer.js"
+    },
     "./chat-message": {
       "types": "./dist/chat-message.d.ts",
       "import": "./dist/chat-message.js"

@@ -33,6 +33,7 @@ const LIBRARY_COMPONENTS = [
   'ChatMessageEditor',
   'ChatReasoning',
   'ChatToolCard',
+  'ChatComposer',
   'MarkdownCodeBlock',
   'MermaidDiagram',
   'CheckIndicator',

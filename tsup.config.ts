@@ -13,6 +13,7 @@ export default defineConfig({
     button: 'src/components/button/index.ts',
     card: 'src/components/card/index.ts',
     'chat-core': 'src/components/chat-core/index.ts',
+    'chat-composer': 'src/components/chat-composer/index.ts',
     'chat-markdown': 'src/components/chat-markdown/index.ts',
     'chat-message': 'src/components/chat-message/index.ts',
     'chat-reasoning': 'src/components/chat-reasoning/index.ts',
