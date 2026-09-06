@@ -55,9 +55,21 @@
       "types": "./dist/chat-core.d.ts",
       "import": "./dist/chat-core.js"
     },
+    "./chat-message": {
+      "types": "./dist/chat-message.d.ts",
+      "import": "./dist/chat-message.js"
+    },
     "./chat-markdown": {
       "types": "./dist/chat-markdown.d.ts",
       "import": "./dist/chat-markdown.js"
+    },
+    "./chat-reasoning": {
+      "types": "./dist/chat-reasoning.d.ts",
+      "import": "./dist/chat-reasoning.js"
+    },
+    "./chat-tool-card": {
+      "types": "./dist/chat-tool-card.d.ts",
+      "import": "./dist/chat-tool-card.js"
     },
     "./connection-test-row": {
       "types": "./dist/connection-test-row.d.ts",

@@ -349,3 +349,26 @@ export {
   type MarkdownCodeBlockLabels,
   type MermaidDiagramProps,
 } from './components/chat-markdown'
+export {
+  ChatMessage,
+  MessageVariantSwitcher,
+  ChatMessageEditor,
+  type ChatMessageProps,
+  type ChatMessageActions,
+  type ChatMessageAction,
+  type ChatMessageLabels,
+  type MessageVariantSwitcherProps,
+  type MessageVariantSwitcherLabels,
+  type ChatMessageEditorProps,
+  type ChatMessageEditorLabels,
+} from './components/chat-message'
+export {
+  ChatReasoning,
+  type ChatReasoningProps,
+  type ChatReasoningLabels,
+} from './components/chat-reasoning'
+export {
+  ChatToolCard,
+  type ChatToolCardProps,
+  type ChatToolCardLabels,
+} from './components/chat-tool-card'
