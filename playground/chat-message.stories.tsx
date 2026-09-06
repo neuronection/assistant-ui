@@ -92,3 +92,41 @@ export const SwitcherStandalone = () => (
     <ChatMessageEditor value="edited prompt" onValueChange={() => {}} onSubmit={() => {}} onCancel={() => {}} />
   </div>
 )
+
+export const ToolResultViews = () => (
+  <div style={{ display: 'flex', flexDirection: 'column', gap: 10, maxWidth: 520 }}>
+    <ChatToolCard
+      name="QUIZ"
+      title="Quiz me"
+      status="done"
+      args={'{"question": "What is the derivative of x²?"}'}
+      result="correct"
+      durationMs={210}
+      defaultOpen
+      renderResult={() => (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+          <div style={{ fontWeight: 600 }}>What is the derivative of x²?</div>
+          <div
+            style={{
+              border: '1px solid var(--as-border)',
+              borderRadius: 'var(--as-radius-sm)',
+              padding: '4px 8px',
+              color: 'var(--as-success)',
+            }}
+          >
+            ✓ 2x — correct
+          </div>
+        </div>
+      )}
+    />
+    <ChatToolCard
+      name="STATE"
+      title="Preferences"
+      status="done"
+      durationMs={12}
+      defaultOpen
+      renderResult={() => <div>Notepad preference saved: “compact mode”.</div>}
+    />
+    <ChatToolCard name="search" status="done" args="{}" result="12 hits" durationMs={1400} defaultOpen />
+  </div>
+)

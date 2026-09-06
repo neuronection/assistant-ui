@@ -69,6 +69,56 @@ describe('ChatToolCard', () => {
     expect(screen.getByText('Failed')).toHaveClass('sr-only')
   })
 
+  it('renders the default serialized result in a pre pane', () => {
+    render(<ChatToolCard name="search" status="done" result="12 hits" defaultOpen />)
+    expect(screen.getByText('12 hits').closest('pre')).not.toBeNull()
+  })
+
+  it('renders a custom view through the renderResult slot', () => {
+    render(
+      <ChatToolCard
+        name="QUIZ"
+        status="done"
+        result="2+2"
+        defaultOpen
+        renderResult={(result) => <div data-testid="custom-view">{`view: ${result}`}</div>}
+      />,
+    )
+    expect(screen.getByTestId('custom-view')).toHaveTextContent('view: 2+2')
+    expect(screen.queryByText('view: 2+2')?.closest('pre')).toBeNull()
+  })
+
+  it('calls renderResult with an empty string when the tool has no result', () => {
+    const renderResult = vi.fn(() => <div>state view</div>)
+    render(<ChatToolCard name="STATE" status="done" renderResult={renderResult} defaultOpen />)
+    expect(renderResult).toHaveBeenCalledWith('')
+    expect(screen.getByText('state view')).toBeInTheDocument()
+  })
+
+  it('stays expandable when only renderResult is provided', async () => {
+    const user = userEvent.setup()
+    const { container } = render(
+      <ChatToolCard name="STATE" status="done" renderResult={() => <div>state view</div>} />,
+    )
+    expect(container.querySelector('[data-as="chat-tool-card"]')).not.toBeNull()
+    expect(screen.getByRole('button')).toHaveAttribute('aria-expanded', 'false')
+    await user.click(screen.getByRole('button'))
+    expect(screen.getByText('state view')).toBeInTheDocument()
+  })
+
+  it('passes axe with a renderResult view expanded', async () => {
+    const { container } = render(
+      <ChatToolCard
+        name="QUIZ"
+        status="done"
+        result="2+2"
+        defaultOpen
+        renderResult={(result) => <div>{`view: ${result}`}</div>}
+      />,
+    )
+    expect(await axe(container)).toHaveNoViolations()
+  })
+
   it('passes axe while running and expanded', async () => {
     const { container } = render(
       <ChatToolCard name="search_jobs" status="done" args="{}" result="ok" defaultOpen />,

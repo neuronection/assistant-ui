@@ -23,6 +23,12 @@ export interface ChatToolCardProps {
   args?: string
   /** Serialized result. */
   result?: string
+  /**
+   * Custom result view (study's per-tool views, family plan 12 L2).
+   * Called with the result string (possibly empty when the tool has no
+   * serialized output); when absent the default `<pre>` pane renders.
+   */
+  renderResult?: (result: string) => React.ReactNode
   durationMs?: number
   open?: boolean
   defaultOpen?: boolean
@@ -53,6 +59,7 @@ export const ChatToolCard = React.forwardRef<HTMLDivElement, ChatToolCardProps>(
       status,
       args,
       result,
+      renderResult,
       durationMs,
       open: openProp,
       defaultOpen = false,
@@ -67,7 +74,7 @@ export const ChatToolCard = React.forwardRef<HTMLDivElement, ChatToolCardProps>(
     const isControlled = openProp !== undefined
     const open = isControlled ? openProp : uncontrolledOpen
     const regionId = React.useId()
-    const expandable = Boolean(args || result)
+    const expandable = Boolean(args || result || renderResult)
 
     const toggle = () => {
       if (!expandable) {
@@ -155,12 +162,16 @@ export const ChatToolCard = React.forwardRef<HTMLDivElement, ChatToolCardProps>(
                 </pre>
               </div>
             ) : null}
-            {result ? (
+            {result || renderResult ? (
               <div>
                 <p className="mb-1 font-medium uppercase tracking-wide text-[var(--as-muted-fg)]">{labels?.result ?? 'Result'}</p>
-                <pre className="max-h-40 overflow-auto whitespace-pre-wrap break-words rounded-[var(--as-radius-sm)] bg-[var(--as-surface-raised)] p-2 font-mono text-[11px] leading-relaxed">
-                  {result}
-                </pre>
+                {renderResult ? (
+                  renderResult(result ?? '')
+                ) : (
+                  <pre className="max-h-40 overflow-auto whitespace-pre-wrap break-words rounded-[var(--as-radius-sm)] bg-[var(--as-surface-raised)] p-2 font-mono text-[11px] leading-relaxed">
+                    {result}
+                  </pre>
+                )}
               </div>
             ) : null}
           </div>

@@ -19,6 +19,7 @@ import { ChatToolCard } from '@neuronection/assistant-ui/chat-tool-card'
 | `title` | `string` | Human title. |
 | `status` | `'running' \| 'done' \| 'failed'` | |
 | `args` / `result` | `string` | Serialized payloads (preformatted, scrollable). |
+| `renderResult` | `(result: string) => ReactNode` | Custom result view; called even when `result` is empty (state-only tools). Absent → default `<pre>` pane. |
 | `durationMs` | `number` | Formatted as ms / s. |
 | `open` / `defaultOpen` / `onOpenChange` | | Expand state, controlled-first. |
 | `labels` | `Partial<ChatToolCardLabels>` | running/done/failed/args/result. |
@@ -29,7 +30,10 @@ import { ChatToolCard } from '@neuronection/assistant-ui/chat-tool-card'
 Expandable header is a real button (`aria-expanded` + `aria-controls`);
 status carries `role="status"` while running and an `sr-only` label
 otherwise; Enter/Space expand tested; static rows expose no dead controls.
+`renderResult` content is app markup — keep it text-legible and avoid
+nested interactive elements inside the collapsible region.
 
 ## related
 
-[`chat-message`](./chat-message.md), [`FlowStatusCard`](./flow-status.md).
+[`chat-message`](./chat-message.md), [`chat-turn-status`](./chat-turn-status.md),
+[`FlowStatusCard`](./flow-status.md).
