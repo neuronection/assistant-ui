@@ -128,7 +128,14 @@ export function liveTurnReducer(state: LiveTurnState, action: LiveTurnAction): L
       }
       switch (event.event) {
         case 'flow_started':
-          return { ...state, runId: event.run_id ?? state.runId }
+          return {
+            ...state,
+            runId: event.run_id ?? state.runId,
+            nodes:
+              event.steps !== undefined && event.steps.length > 0
+                ? event.steps.map((step): LiveNodeState => ({ id: step.id, label: step.label, status: 'pending' }))
+                : state.nodes,
+          }
         case 'node_started':
           return { ...state, nodes: upsertNode(state.nodes, event.node, event.label, 'running') }
         case 'node_finished':

@@ -95,6 +95,17 @@ describe('liveTurnReducer', () => {
     expect(ignored).toBe(state)
   })
 
+  it('seeds planned steps from flow_started and activates them on node_started', () => {
+    const state = reduce([
+      { event: 'flow_started', flow: 'chat', run_id: 'r1', steps: [{ id: 'search', label: 'Searching the catalog' }, { id: 'write', label: 'Writing the reply' }] },
+      { event: 'node_started', node: 'search', label: 'Searching the catalog' },
+    ])
+    expect(state.nodes).toEqual([
+      { id: 'search', label: 'Searching the catalog', status: 'running' },
+      { id: 'write', label: 'Writing the reply', status: 'pending' },
+    ])
+  })
+
   it('node_finished upserts labels and outcomes without duplicating rows', () => {
     const state = reduce([
       { event: 'node_started', node: 'tools', label: 'Using tools' },
