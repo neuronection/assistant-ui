@@ -12,6 +12,7 @@ export default defineConfig({
     breadcrumbs: 'src/components/breadcrumbs/index.ts',
     button: 'src/components/button/index.ts',
     card: 'src/components/card/index.ts',
+    'chat-core': 'src/components/chat-core/index.ts',
     'connection-test-row': 'src/components/connection-test-row/index.ts',
     'check-indicator': 'src/components/check-indicator/index.ts',
     'chip-input': 'src/components/chip-input/index.ts',

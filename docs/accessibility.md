@@ -126,7 +126,7 @@ behavior and focus restoration are listed **only where asserted**.
 
 ## Utilities (no ARIA contract)
 
-`useDictation` / `useAiTextTransform` (with `AiTextTransformTransport`) are transport-injected state-machine hooks (no rendered contract of their own); their UI companions above / `FlowStatusCard` carry the ARIA contract and the tests.
+`useDictation` / `useAiTextTransform` (with `AiTextTransformTransport`) / `useChatStream` (with `ChatStreamTransport`, `ChatMessageView`, `liveTurnReducer`) are transport-injected state-machine hooks (no rendered contract of their own); their UI companions above / `FlowStatusCard` / the chat components carry the ARIA contract and the tests.
 
 - `Portal`, `ThemeScope`, `cn` — rendering/theming primitives (`ThemeScope`
   is axe-checked).

@@ -51,6 +51,10 @@
       "types": "./dist/card.d.ts",
       "import": "./dist/card.js"
     },
+    "./chat-core": {
+      "types": "./dist/chat-core.d.ts",
+      "import": "./dist/chat-core.js"
+    },
     "./connection-test-row": {
       "types": "./dist/connection-test-row.d.ts",
       "import": "./dist/connection-test-row.js"
