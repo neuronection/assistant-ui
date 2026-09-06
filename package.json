@@ -55,6 +55,10 @@
       "types": "./dist/chat-core.d.ts",
       "import": "./dist/chat-core.js"
     },
+    "./chat-markdown": {
+      "types": "./dist/chat-markdown.d.ts",
+      "import": "./dist/chat-markdown.js"
+    },
     "./connection-test-row": {
       "types": "./dist/connection-test-row.d.ts",
       "import": "./dist/connection-test-row.js"
@@ -285,7 +289,7 @@
     "playground:build": "ladle build",
     "build": "NODE_OPTIONS=--max-old-space-size=8192 pnpm build:ts && pnpm build:css",
     "build:ts": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\" && tsup",
-    "build:css": "tailwindcss -i src/tokens/tokens.css -o dist/styles.css --minify && node scripts/unwrap-layers.mjs",
+    "build:css": "tailwindcss -i src/tokens/tokens.css -o dist/styles.css --minify && node scripts/unwrap-layers.mjs && node scripts/copy-katex-fonts.mjs",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:visual": "playwright test",
@@ -315,6 +319,12 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "date-fns": "^4.4.0",
+    "katex": "^0.16.47",
+    "mermaid": "^11.17.2",
+    "react-markdown": "^10.1.0",
+    "rehype-katex": "^7.0.1",
+    "remark-gfm": "^4.0.1",
+    "remark-math": "^6.0.0",
     "tailwind-merge": "^3.6.0",
     "tiptap-markdown": "^0.9.0"
   },

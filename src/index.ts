@@ -339,3 +339,13 @@ export {
   type UseChatStreamOptions,
   type UseChatStreamResult,
 } from './components/chat-core'
+export {
+  MarkdownSurface,
+  MarkdownCodeBlock,
+  MermaidDiagram,
+  type MarkdownSurfaceProps,
+  type MarkdownComponents,
+  type MarkdownCodeBlockProps,
+  type MarkdownCodeBlockLabels,
+  type MermaidDiagramProps,
+} from './components/chat-markdown'
