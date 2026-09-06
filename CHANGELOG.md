@@ -1,5 +1,22 @@
 # @neuronection/assistant-ui
 
+## 0.25.0
+
+### Minor Changes
+
+- [`102ef81`](https://github.com/neuronection/assistant-ui/commit/102ef81e08eb2f85bffcfed78195dd3143eeff8e) Thanks [@constLiakos](https://github.com/constLiakos)! - `ChatToolCard` gains a `renderResult?: (result: string) => ReactNode`
+  slot (family plan 12 L2): apps can render per-tool result views (quiz
+  previews, state confirmations, domain links) in place of the default
+  serialized `<pre>` pane. The card is expandable when only the slot is
+  provided (tools with no serialized output); default behavior is
+  unchanged when the slot is absent.
+
+- [`4952849`](https://github.com/neuronection/assistant-ui/commit/4952849151e8e0d922fc95204da0042229fb9abe) Thanks [@constLiakos](https://github.com/constLiakos)! - New `chat-turn-status` module: live pre-text turn status generalizing
+  study's `TurnTraceStatus` + `ThinkingDots` (family plan 12 L1). Animated
+  dots + phase label in a labelled `role="status"` region, optional elapsed
+  timer (`startedAt`, 100 ms tick, tabular-nums), `row`/`card` variants,
+  dots disabled under `prefers-reduced-motion`.
+
 ## 0.24.0
 
 ### Minor Changes
