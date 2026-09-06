@@ -6,7 +6,7 @@ export type LiveTurnStatus = 'idle' | 'pending' | 'streaming' | 'interrupted' | 
 export interface LiveNodeState {
   id: string
   label?: string
-  status: 'running' | 'done' | 'failed' | 'interrupted'
+  status: 'pending' | 'running' | 'done' | 'failed' | 'interrupted'
 }
 
 export interface LiveToolCall {
