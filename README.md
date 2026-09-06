@@ -122,6 +122,9 @@ Guides (`docs/guides/`):
 - [AI settings surfaces](./docs/guides/ai-settings.md) — the providers →
   models → tasks recipe (`ProviderForm`, `ConnectionTestRow`,
   `ModelRegistry`, `TaskAssignmentPicker`) with real app call-sites
+- [Chat surfaces](./docs/guides/chat-surfaces.md) — the bubble/sidepanel/
+  page assembly from the chat modules: transport adapters, the live tail,
+  branching (versioning) contract, composer slots
 
 Per-component reference (`docs/components/<module>.md`): purpose, import
 line, props table, controlled contract, i18n contract, snippets,
