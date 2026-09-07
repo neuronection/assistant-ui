@@ -1,5 +1,17 @@
 # @neuronection/assistant-ui
 
+## 0.28.0
+
+### Minor Changes
+
+- [`a4ca11f`](https://github.com/neuronection/assistant-ui/commit/a4ca11f4789cb49d11b42598fe001e55ab03f8b9) Thanks [@constLiakos](https://github.com/constLiakos)! - New `chat-trace-timeline` module: `ChatTraceTimeline` — a collapsible
+  per-turn trace attached to assistant replies (study's `TraceTimeline`,
+  generalized). Collapsed: total duration · tool count · model. Expanded:
+  duration-proportional bars for flow phases and tool calls, total/token
+  row, and a raw-reasoning disclosure. Pure presentational — trace data
+  is mapped to `entries` app-side (study adopts it directly; career feeds
+  it from persisted `metadata_json`).
+
 ## 0.27.0
 
 ### Minor Changes
