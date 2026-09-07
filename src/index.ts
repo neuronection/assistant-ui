@@ -426,6 +426,13 @@ export {
   type ChatTraceMetaProps,
 } from './components/chat-trace-meta'
 export {
+  ChatTraceTimeline,
+  type ChatTraceTimelineProps,
+  type ChatTraceTimelineLabels,
+  type ChatTraceTimelineTrace,
+  type ChatTraceTimelineEntry,
+} from './components/chat-trace-timeline'
+export {
   ChatPanel,
   type ChatPanelProps,
   type ChatPanelVariant,

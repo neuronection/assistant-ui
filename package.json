@@ -115,6 +115,10 @@
       "types": "./dist/chat-trace-meta.d.ts",
       "import": "./dist/chat-trace-meta.js"
     },
+    "./chat-trace-timeline": {
+      "types": "./dist/chat-trace-timeline.d.ts",
+      "import": "./dist/chat-trace-timeline.js"
+    },
     "./chat-turn-status": {
       "types": "./dist/chat-turn-status.d.ts",
       "import": "./dist/chat-turn-status.js"

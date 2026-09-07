@@ -28,6 +28,7 @@ export default defineConfig({
     'chat-export': 'src/components/chat-export/index.ts',
     'chat-history-button': 'src/components/chat-history-button/index.ts',
     'chat-trace-meta': 'src/components/chat-trace-meta/index.ts',
+    'chat-trace-timeline': 'src/components/chat-trace-timeline/index.ts',
     'chat-tools-catalog': 'src/components/chat-tools-catalog/index.ts',
     'connection-test-row': 'src/components/connection-test-row/index.ts',
     'check-indicator': 'src/components/check-indicator/index.ts',

@@ -44,6 +44,7 @@ const LIBRARY_COMPONENTS = [
   'ChatToolsCatalog',
   'ChatHistoryButton',
   'ChatTraceMeta',
+  'ChatTraceTimeline',
   'ChatPanel',
   'ChatDrawer',
   'ChatLauncher',
