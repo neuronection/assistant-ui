@@ -109,7 +109,7 @@ behavior and focus restoration are listed **only where asserted**.
 | `ChatHistoryButton` | labelled popover trigger (Radix popover semantics); content is app markup | Escape closes, focus returns to trigger | clean (open, closed) |
 | `ChatTraceMeta` | static decorative text row; nothing focusable | n/a | clean (full trace) |
 | `ChatTraceTimeline` | toggle + reasoning disclosure are labelled buttons with `aria-expanded`; bars decorative; summary composed from data | Enter/Space toggles | clean (collapsed, expanded) |
-| `ChatPanel` | layout host — inherits slot semantics; nothing focusable of its own | n/a | clean (page/sidebar/bubble) |
+| `ChatPanel` | layout host — inherits slot semantics; header row is landmark-free (`div[data-as="chat-panel-header"]`), so the panel embeds cleanly inside app landmarks; nothing focusable of its own | n/a | clean (page/sidebar/bubble, incl. nested in `role="main"`) |
 | `ChatDrawer` | Radix Dialog semantics (labelled `role="dialog"`, focus trap, Escape); resize handle is a focusable `role="separator"` | arrows resize (±16, Shift ±48); Escape closes | clean (open) |
 | `ChatLauncher` | launcher `aria-expanded` with swapped label; panel is labelled `role="complementary"` + close button; Escape closes while focus is inside | toggle + close buttons keyboard-reachable | clean (open, closed, badge) |
 | `FlowStatusCard` | step `<ol>` with per-step status icons; running step `aria-current="step"`; header summary `role="status"`; failure block `role="alert"` (code + message); derived action buttons (*Cancel* while running, *Resume* when interrupted, *Retry* on retryable failure) | Tab reaches the visible action(s) in DOM order; Enter fires `onCancel`/`onResume`/`onRetry` | clean (running, failed, interrupted) |

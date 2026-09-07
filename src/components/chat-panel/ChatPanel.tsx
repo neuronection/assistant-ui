@@ -41,10 +41,13 @@ export const ChatPanel = React.forwardRef<HTMLDivElement, ChatPanelProps>(
         )}
       >
         {title !== undefined || actions !== undefined ? (
-          <header className="flex shrink-0 items-center gap-2 border-b border-[var(--as-border)] px-3 py-2">
+          <div
+            data-as="chat-panel-header"
+            className="flex shrink-0 items-center gap-2 border-b border-[var(--as-border)] px-3 py-2"
+          >
             <div className="min-w-0 flex-1 truncate text-sm font-semibold">{title}</div>
             {actions ? <div className="flex shrink-0 items-center gap-0.5">{actions}</div> : null}
-          </header>
+          </div>
         ) : null}
         {banner ? (
           <div data-as="chat-panel-banner" className="shrink-0 px-3 py-1.5 text-xs text-[var(--as-muted-fg)]">

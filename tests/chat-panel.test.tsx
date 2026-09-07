@@ -40,6 +40,22 @@ describe('ChatPanel', () => {
     expect(container.querySelector('[data-as="chat-panel"]')?.getAttribute('data-variant')).toBe('sidebar')
   })
 
+  it('keeps the header row landmark-free so panels embed cleanly inside app landmarks', async () => {
+    const { container } = render(
+      <div role="main" aria-label="App main">
+        <ChatPanel
+          variant="bubble"
+          title="Assistant"
+          actions={<button type="button">expand</button>}
+          transcript={transcript}
+        />
+      </div>,
+    )
+    expect(container.querySelector('header')).toBeNull()
+    expect(container.querySelector('[data-as="chat-panel-header"]')).not.toBeNull()
+    expect(await axe(container)).toHaveNoViolations()
+  })
+
   it('keeps the page shell full-bleed while centering transcript and composer columns', () => {
     const { container } = render(
       <ChatPanel

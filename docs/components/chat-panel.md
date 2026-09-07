@@ -32,8 +32,12 @@ import { ChatPanel } from '@neuronection/assistant-ui/chat-panel'
 
 ## accessibility
 
-Layout host — inherits the semantics of its slots; header is a plain
-landmark-free row; nothing focusable of its own.
+Layout host — inherits the semantics of its slots; nothing focusable of
+its own. The header row is landmark-free: it renders as
+`div[data-as="chat-panel-header"]`, never a `<header>` (banner), so the
+panel embeds cleanly inside an app-level `main`/region landmark without
+triggering axe's `landmark-banner-is-top-level`. Apps own the page
+landmark structure; style the row via the `data-as` hook.
 
 ## related
 
