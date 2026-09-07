@@ -148,11 +148,17 @@ describe('ChatBranchTree', () => {
   })
 })
 
-const now = Date.now()
+const now = new Date()
+const atLocalNoon = (daysAgo: number) => {
+  const date = new Date(now)
+  date.setDate(date.getDate() - daysAgo)
+  date.setHours(12, 0, 0, 0)
+  return date
+}
 const sessions = [
-  { id: 's1', title: 'Limits tutoring', updatedAt: new Date(now) },
-  { id: 's2', title: 'Derivatives practice', updatedAt: new Date(now - 26 * 3600_000) },
-  { id: 's3', title: 'Old integrals chat', updatedAt: new Date(now - 8 * 24 * 3600_000) },
+  { id: 's1', title: 'Limits tutoring', updatedAt: now },
+  { id: 's2', title: 'Derivatives practice', updatedAt: atLocalNoon(1) },
+  { id: 's3', title: 'Old integrals chat', updatedAt: atLocalNoon(8) },
 ]
 
 describe('ChatSessionList', () => {
