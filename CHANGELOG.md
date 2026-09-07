@@ -1,5 +1,30 @@
 # @neuronection/assistant-ui
 
+## 0.26.0
+
+### Minor Changes
+
+- [`e2279ae`](https://github.com/neuronection/assistant-ui/commit/e2279ae29c73565770cc09decf830d6b725b9101) Thanks [@constLiakos](https://github.com/constLiakos)! - ChatPanel `page` variant is now a full-bleed shell: the host no longer centers
+  itself with `mx-auto max-w-3xl` — header, banner and composer bar span the
+  whole page and only the transcript region and the composer body sit in a
+  centered `max-w-3xl` column. App pages hosting the page variant integrate with
+  the surrounding route chrome (full-width header/dividers) instead of floating
+  as a narrow centered card. Sidebar and bubble variants are unchanged.
+
+### Patch Changes
+
+- [`a1b3277`](https://github.com/neuronection/assistant-ui/commit/a1b3277c1902a76909fa3c9235de9fc20a57dfa6) Thanks [@constLiakos](https://github.com/constLiakos)! - `ChatDrawer` now forwards its `ref` to the drawer content element
+  (`[data-as="chat-drawer"]`). The render function previously accepted no
+  `ref` parameter, which triggered React's "forwardRef render functions
+  accept exactly two parameters" development warning in every app using
+  the drawer.
+
+- [`f761728`](https://github.com/neuronection/assistant-ui/commit/f7617289a65ab829b7e7bed01411663bf82f0593) Thanks [@constLiakos](https://github.com/constLiakos)! - ChatMessage assistant bubbles use the `--as-muted` fill and drop the border
+  (the user bubble keeps the `--as-primary` fill). The white bordered
+  `--as-surface-raised` bubble read as a detached card against the family's
+  soft-surface look — study's original style-source design was a borderless
+  muted bubble, and that is now again what the family renders.
+
 ## 0.25.0
 
 ### Minor Changes
