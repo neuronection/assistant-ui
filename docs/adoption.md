@@ -21,13 +21,28 @@ Library CSS goes **before** the app's own CSS. Both ship unlayered, so on a
 Tailwind 3 app the cascade is decided by order at equal specificity — if the
 app loads last, its variant utilities (e.g. `lg:relative` on a layout column)
 can beat the library's base utilities (`.fixed`), and vice versa. App-last
-keeps layout utilities app-owned; the library's own components are unaffected
-because app utilities with the same name define the same properties.
-(Tailwind 4 apps are layered, so order doesn't matter there.)
+keeps layout utilities app-owned. (Tailwind 4 apps are layered, so order
+doesn't matter there.)
 
-Start `theme.css` from `themes/<app>.css` in the library repo. Do **not**
-add the package to the app's Tailwind `content`/`@source` — the CSS is
-precompiled.
+**Tailwind 3 apps must also add the package to their Tailwind `content`.**
+The precompiled `styles.css` loads first, so its media-wrapped variants
+(e.g. a component's `sm:flex-row`) lose the cascade to the app's
+*unconditioned* utilities on the same property (`.flex-col`) even when the
+names differ — the component then renders in its mobile layout at every
+viewport (career-assistant Tasks tab, 2026-09-07). Emitting the same
+classes from the app's build orders the variants after the base utilities
+in one stylesheet:
+
+```js
+// tailwind.config.js (TW3 apps)
+content: [
+  "./index.html",
+  "./src/**/*.{ts,tsx}",
+  "./node_modules/@neuronection/assistant-ui/dist/**/*.js",
+],
+```
+
+Start `theme.css` from `themes/<app>.css` in the library repo.
 
 ## 3. Vite config (one line, committable)
 
