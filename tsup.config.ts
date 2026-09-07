@@ -44,6 +44,7 @@ export default defineConfig({
     'expandable-search': 'src/components/expandable-search/index.ts',
     'file-card': 'src/components/file-card/index.ts',
     'file-queue': 'src/components/file-queue/index.ts',
+    'upload-dropzone': 'src/components/upload-dropzone/index.ts',
     'flow-status': 'src/components/flow-status/index.ts',
     'field-label': 'src/components/field-label/index.ts',
     'form-modal': 'src/components/form-modal/index.ts',
