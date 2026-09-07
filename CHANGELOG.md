@@ -1,5 +1,35 @@
 # @neuronection/assistant-ui
 
+## 0.27.0
+
+### Minor Changes
+
+- [`8d707aa`](https://github.com/neuronection/assistant-ui/commit/8d707aa237863fc578eb323b79bce9c1818aae6c) Thanks [@constLiakos](https://github.com/constLiakos)! - New `chat-export` module: `buildChatMarkdown` (conversation → Markdown
+  with bold or heading role styles and app-supplied blockquote
+  annotations), `chatExportFileName` (slugged `.md` name) and
+  `downloadChatMarkdown` (blob download). Career's and study's local
+  export builders, generalized as a pure utility.
+
+- [`8d707aa`](https://github.com/neuronection/assistant-ui/commit/8d707aa237863fc578eb323b79bce9c1818aae6c) Thanks [@constLiakos](https://github.com/constLiakos)! - New `chat-history-button` module: `ChatHistoryButton` — a labelled
+  history popover for chat headers (career's `HistoryButton` + study's
+  ChatPanel history popover, generalized). Owns the panel sizing, an
+  `onOpen` refresh hook and the close-on-pick wiring via a `close`
+  render-prop; the session list itself stays app-side
+  `ChatSessionList` glue.
+
+- [`8d707aa`](https://github.com/neuronection/assistant-ui/commit/8d707aa237863fc578eb323b79bce9c1818aae6c) Thanks [@constLiakos](https://github.com/constLiakos)! - New `chat-tools-catalog` module: `ChatToolsCatalog` renders the catalog of
+  tools an assistant can use — searchable disclosure cards with tool name,
+  human title, scope chip, description, argument list (name/type/required/
+  description), example payload and response shape. Presentational and
+  controlled-external: data in via `tools`, fetching and the modal shell
+  stay app-side (study's `ToolsDialog` body and career's `/ai/tools`
+  surface, generalized).
+
+- [`8d707aa`](https://github.com/neuronection/assistant-ui/commit/8d707aa237863fc578eb323b79bce9c1818aae6c) Thanks [@constLiakos](https://github.com/constLiakos)! - New `chat-trace-meta` module: `ChatTraceMeta` — compact
+  `model · duration · N tools` turn-trace badges under an assistant reply
+  (career's `TraceMeta`, generalized). Renders nothing without data;
+  parsing `metadata_json` stays app-side.
+
 ## 0.26.0
 
 ### Minor Changes
