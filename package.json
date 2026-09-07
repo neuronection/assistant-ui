@@ -99,6 +99,22 @@
       "types": "./dist/chat-tool-card.d.ts",
       "import": "./dist/chat-tool-card.js"
     },
+  "./chat-tools-catalog": {
+      "types": "./dist/chat-tools-catalog.d.ts",
+      "import": "./dist/chat-tools-catalog.js"
+    },
+  "./chat-export": {
+      "types": "./dist/chat-export.d.ts",
+      "import": "./dist/chat-export.js"
+    },
+  "./chat-history-button": {
+      "types": "./dist/chat-history-button.d.ts",
+      "import": "./dist/chat-history-button.js"
+    },
+  "./chat-trace-meta": {
+      "types": "./dist/chat-trace-meta.d.ts",
+      "import": "./dist/chat-trace-meta.js"
+    },
     "./chat-turn-status": {
       "types": "./dist/chat-turn-status.d.ts",
       "import": "./dist/chat-turn-status.js"

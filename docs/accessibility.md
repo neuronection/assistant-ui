@@ -105,6 +105,9 @@ behavior and focus restoration are listed **only where asserted**.
 | `ChatTranscript` | `role="log"` with label; `aria-busy` while streaming; turn completion via visually-hidden `aria-live="polite"` region; labelled jump pill | scroll follows the user; jump pill keyboard-reachable | clean (items+live) |
 | `ChatBranchTree` | `role="tree"` / `treeitem` (`aria-selected` on active path, `aria-level` nesting) / `group`; roving tabindex | ArrowUp/Down/Home/End navigate; Enter/Space selects | clean (branched tree) |
 | `ChatSessionList` | `role="list"`/`listitem`, `aria-current` on active; labelled searchbox; row actions a labelled `role="group"` revealed on hover AND focus-within | Enter/Space selects; actions keyboard-reachable | clean (grouped, actions) |
+| `ChatToolsCatalog` | labelled `role="list"` of entries; each header a real button with `aria-expanded` + `aria-controls`; labelled searchbox; asserted empty/no-results text | Enter/Space toggles an entry; Tab reaches search then headers | clean (collapsed, expanded, filtering) |
+| `ChatHistoryButton` | labelled popover trigger (Radix popover semantics); content is app markup | Escape closes, focus returns to trigger | clean (open, closed) |
+| `ChatTraceMeta` | static decorative text row; nothing focusable | n/a | clean (full trace) |
 | `ChatPanel` | layout host — inherits slot semantics; nothing focusable of its own | n/a | clean (page/sidebar/bubble) |
 | `ChatDrawer` | Radix Dialog semantics (labelled `role="dialog"`, focus trap, Escape); resize handle is a focusable `role="separator"` | arrows resize (±16, Shift ±48); Escape closes | clean (open) |
 | `ChatLauncher` | launcher `aria-expanded` with swapped label; panel is labelled `role="complementary"` + close button; Escape closes while focus is inside | toggle + close buttons keyboard-reachable | clean (open, closed, badge) |
@@ -138,7 +141,7 @@ behavior and focus restoration are listed **only where asserted**.
 
 ## Utilities (no ARIA contract)
 
-`useDictation` / `useAiTextTransform` (with `AiTextTransformTransport`) / `useChatStream` (with `ChatStreamTransport`, `ChatMessageView`, `liveTurnReducer`) are transport-injected state-machine hooks (no rendered contract of their own); their UI companions above / `FlowStatusCard` / the chat components carry the ARIA contract and the tests.
+`useDictation` / `useAiTextTransform` (with `AiTextTransformTransport`) / `useChatStream` (with `ChatStreamTransport`, `ChatMessageView`, `liveTurnReducer`) are transport-injected state-machine hooks (no rendered contract of their own); their UI companions above / `FlowStatusCard` / the chat components carry the ARIA contract and the tests. `chat-export` (pure string/DOM-download utility over `ChatExportMessage` / `ChatExportOptions`) has no rendered contract.
 
 - `Portal`, `ThemeScope`, `cn` — rendering/theming primitives (`ThemeScope`
   is axe-checked).

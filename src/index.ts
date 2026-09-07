@@ -403,6 +403,29 @@ export {
   type ChatSessionView,
 } from './components/chat-session-list'
 export {
+  ChatToolsCatalog,
+  type ChatToolsCatalogProps,
+  type ChatToolsCatalogLabels,
+  type ChatToolCatalogEntry,
+  type ChatToolCatalogArgument,
+} from './components/chat-tools-catalog'
+export {
+  buildChatMarkdown,
+  chatExportFileName,
+  downloadChatMarkdown,
+  type ChatExportMessage,
+  type ChatExportOptions,
+} from './components/chat-export'
+export {
+  ChatHistoryButton,
+  type ChatHistoryButtonProps,
+  type ChatHistoryButtonLabels,
+} from './components/chat-history-button'
+export {
+  ChatTraceMeta,
+  type ChatTraceMetaProps,
+} from './components/chat-trace-meta'
+export {
   ChatPanel,
   type ChatPanelProps,
   type ChatPanelVariant,
