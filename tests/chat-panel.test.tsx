@@ -1,3 +1,4 @@
+import * as React from 'react'
 import { describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
@@ -116,6 +117,13 @@ describe('ChatDrawer', () => {
     fireEvent.pointerMove(handle, { pointerId: 1, clientX: 600 })
     fireEvent.pointerUp(handle, { pointerId: 1 })
     expect(onWidthChange).toHaveBeenCalled()
+  })
+
+  it('forwards the ref to the drawer content element', () => {
+    const ref = React.createRef<HTMLDivElement>()
+    render(<ChatDrawer ref={ref} open onOpenChange={() => {}} panel={<div>body</div>} />)
+    expect(ref.current).not.toBeNull()
+    expect(ref.current?.getAttribute('data-as')).toBe('chat-drawer')
   })
 
   it('passes axe while open', async () => {

@@ -27,6 +27,8 @@ import { ChatDrawer } from '@neuronection/assistant-ui/chat-drawer'
 
 Keyboard resize: arrows ±16 px (Shift ±48) on the separator handle.
 
+A `ref` forwards to the drawer content element (`[data-as="chat-drawer"]`).
+
 ## accessibility
 
 Radix Dialog semantics (focus trap, Escape, labelled `role="dialog"`);

@@ -52,7 +52,8 @@ function useIsNarrow(breakpointPx: number): boolean {
  * Escape), drag + keyboard resize, full-screen below the breakpoint.
  */
 export const ChatDrawer = React.forwardRef<HTMLDivElement, ChatDrawerProps>(
-  function ChatDrawer({
+  function ChatDrawer(
+    {
       open,
       onOpenChange,
       panel,
@@ -69,7 +70,9 @@ export const ChatDrawer = React.forwardRef<HTMLDivElement, ChatDrawerProps>(
       container,
       overlayClassName,
       className,
-    }) {
+    },
+    ref,
+  ) {
     const narrow = useIsNarrow(fullScreenBreakpointPx)
     const draggingRef = React.useRef(false)
 
@@ -124,6 +127,7 @@ export const ChatDrawer = React.forwardRef<HTMLDivElement, ChatDrawerProps>(
             className={cn('as-anim-fade fixed inset-0 z-[var(--as-z-modal)] bg-[var(--as-overlay)]', overlayClassName)}
           />
           <DialogPrimitive.Content
+            ref={ref}
             data-as="chat-drawer"
             data-side={side}
             data-full-screen={narrow || undefined}
