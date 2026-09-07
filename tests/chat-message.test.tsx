@@ -160,6 +160,19 @@ describe('ChatMessage', () => {
     expect(container.firstElementChild).toHaveClass('items-end')
   })
 
+  it('styles the assistant bubble with the muted fill and no border', () => {
+    const { container } = render(<ChatMessage role="assistant" content="answer" />)
+    const bubble = container.querySelector('[data-as="chat-message"] > div')
+    expect(bubble).toHaveClass('bg-[var(--as-muted)]')
+    expect(bubble?.className).not.toContain('border')
+  })
+
+  it('styles the user bubble with the primary fill', () => {
+    const { container } = render(<ChatMessage role="user" content="hello" />)
+    const bubble = container.querySelector('[data-as="chat-message"] > div')
+    expect(bubble).toHaveClass('bg-[var(--as-primary)]')
+  })
+
   it('fires copy/edit/regenerate actions from the hover row', async () => {
     const user = userEvent.setup()
     const onCopy = vi.fn()

@@ -128,7 +128,7 @@ export const ChatMessage = React.forwardRef<HTMLDivElement, ChatMessageProps>(
             compact && 'px-2.5 py-1.5',
             isUser
               ? 'rounded-br-[var(--as-radius-sm)] bg-[var(--as-primary)] text-[var(--as-primary-fg)]'
-              : 'rounded-bl-[var(--as-radius-sm)] border border-[var(--as-border)] bg-[var(--as-surface-raised)] text-[var(--as-fg)]',
+              : 'rounded-bl-[var(--as-radius-sm)] bg-[var(--as-muted)] text-[var(--as-fg)]',
           )}
         >
           {reasoning ? <div className="not-prose">{reasoning}</div> : null}
