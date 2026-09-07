@@ -51,7 +51,15 @@ optimizeDeps: { exclude: ["@neuronection/assistant-ui"] }
 ```
 
 Prevents Vite from pre-bundling a stale snapshot (matters for local linked
-development; harmless for registry installs).
+development).
+
+> **Registry installs: do not add the exclude unconditionally.** The
+> library is ESM, and excluding it makes Vite serve its CJS transitive
+> dependencies (`style-to-js`, `debug`, …) raw — the browser then throws
+> "does not provide an export" and the whole app fails to mount. Either
+> omit the exclude (registry installs; desktop-assistant pattern), or pair
+> it with `optimizeDeps.include` entries for every CJS transitive dep.
+> Found the hard way in desktop-assistant (2026-09-07).
 
 ## 4. Swap components (same-commit delete rule)
 
