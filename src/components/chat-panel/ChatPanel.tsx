@@ -5,7 +5,7 @@ import { cn } from '../../lib/utils'
 export type ChatPanelVariant = 'page' | 'sidebar' | 'bubble'
 
 export interface ChatPanelProps {
-  /** Layout tier: full page (centered, wide), sidebar (dense column), bubble (compact widget body). */
+  /** Layout tier: full page (full-bleed shell, centered conversation column), sidebar (dense column), bubble (compact widget body). */
   variant: ChatPanelVariant
   /** Header row: title node + action nodes (session list, branch tree, expand, close). */
   title?: React.ReactNode
@@ -36,7 +36,6 @@ export const ChatPanel = React.forwardRef<HTMLDivElement, ChatPanelProps>(
         data-variant={variant}
         className={cn(
           'flex h-full min-h-0 w-full flex-col bg-[var(--as-surface)] text-[var(--as-fg)]',
-          variant === 'page' && 'mx-auto w-full max-w-3xl',
           variant === 'bubble' && 'overflow-hidden',
           className,
         )}
@@ -52,8 +51,21 @@ export const ChatPanel = React.forwardRef<HTMLDivElement, ChatPanelProps>(
             {banner}
           </div>
         ) : null}
-        <div className="flex min-h-0 flex-1 flex-col">{transcript}</div>
-        {composer ? <div className="shrink-0 border-t border-[var(--as-border)] p-2">{composer}</div> : null}
+        <div className="flex min-h-0 flex-1 flex-col">
+          <div
+            className={cn(
+              'flex min-h-0 w-full flex-1 flex-col',
+              variant === 'page' && 'mx-auto max-w-3xl',
+            )}
+          >
+            {transcript}
+          </div>
+        </div>
+        {composer ? (
+          <div className="shrink-0 border-t border-[var(--as-border)] p-2">
+            <div className={cn(variant === 'page' && 'mx-auto w-full max-w-3xl')}>{composer}</div>
+          </div>
+        ) : null}
         {footer ? (
           <div className="shrink-0 px-3 pb-2 pt-1 text-center text-[10px] text-[var(--as-muted-fg)]">{footer}</div>
         ) : null}

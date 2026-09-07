@@ -15,7 +15,7 @@ import { ChatPanel } from '@neuronection/assistant-ui/chat-panel'
 
 | Prop | Type | Description |
 | --- | --- | --- |
-| `variant` | `'page' \| 'sidebar' \| 'bubble'` | page centers wide, sidebar is a dense column, bubble is the compact widget body. |
+| `variant` | `'page' \| 'sidebar' \| 'bubble'` | page is a full-bleed shell with a centered conversation column (`max-w-3xl`) for the transcript and composer; sidebar is a dense column; bubble is the compact widget body. |
 | `title` / `actions` | `ReactNode` | Header row (actions: session list, branch tree, expand, close). |
 | `banner` | `ReactNode` | Status strip under the header. |
 | `transcript` | `ReactNode` | Usually `<ChatTranscript …/>` — owns the flex area. |

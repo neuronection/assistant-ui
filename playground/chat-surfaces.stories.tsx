@@ -157,3 +157,27 @@ export function DrawerSurface() {
     </div>
   )
 }
+
+export function PageSurface() {
+  return (
+    <div style={{ height: 520, display: 'flex', border: '1px solid var(--as-border)', borderRadius: 'var(--as-radius-lg)', overflow: 'hidden' }}>
+      <div style={{ width: 240, borderRight: '1px solid var(--as-border)', padding: 12, fontSize: 12, color: 'var(--as-muted-fg)' }}>
+        app session-list aside…
+      </div>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <ChatPanel
+          variant="page"
+          title="Tutor"
+          transcript={<ChatTranscript items={messages} renderItem={(message) => (
+            <ChatMessage
+              key={message.id}
+              role={message.role}
+              content={<MarkdownSurface value={message.content} />}
+            />
+          )} />}
+          composer={<ChatComposer value="" onValueChange={() => {}} onSubmit={() => {}} />}
+        />
+      </div>
+    </div>
+  )
+}

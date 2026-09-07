@@ -39,6 +39,34 @@ describe('ChatPanel', () => {
     rerender(<ChatPanel variant="sidebar" transcript={transcript} />)
     expect(container.querySelector('[data-as="chat-panel"]')?.getAttribute('data-variant')).toBe('sidebar')
   })
+
+  it('keeps the page shell full-bleed while centering transcript and composer columns', () => {
+    const { container } = render(
+      <ChatPanel
+        variant="page"
+        transcript={transcript}
+        composer={<ChatComposer value="" onValueChange={() => {}} onSubmit={() => {}} />}
+      />,
+    )
+    const host = container.querySelector('[data-as="chat-panel"]')
+    expect(host?.className).not.toContain('max-w-3xl')
+    const columns = container.querySelectorAll('.max-w-3xl')
+    expect(columns).toHaveLength(2)
+    expect(columns[0]).toContainElement(screen.getByRole('log'))
+    expect(columns[1]).toContainElement(screen.getByRole('textbox', { name: 'Message' }))
+  })
+
+  it('leaves sidebar and bubble transcripts and composers full width', () => {
+    const { container } = render(
+      <ChatPanel
+        variant="sidebar"
+        transcript={transcript}
+        composer={<ChatComposer value="" onValueChange={() => {}} onSubmit={() => {}} />}
+      />,
+    )
+    expect(container.querySelector('[data-as="chat-panel"]')?.className).not.toContain('max-w-3xl')
+    expect(container.querySelectorAll('.max-w-3xl')).toHaveLength(0)
+  })
 })
 
 describe('ChatDrawer', () => {
