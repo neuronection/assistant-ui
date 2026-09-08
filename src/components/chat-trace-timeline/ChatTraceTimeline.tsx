@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Brain, ChevronDown, Timer } from 'lucide-react'
+import { Brain, ChevronDown, ChevronRight, Timer } from 'lucide-react'
 
 import { cn } from '../../lib/utils'
 
@@ -12,6 +12,12 @@ export interface ChatTraceTimelineEntry {
   detail?: string | null
   startMs?: number | null
   durationMs?: number | null
+  /** Outcome of a tool execution (`tool` rows); renders a status dot. */
+  status?: 'ok' | 'error' | null
+  /** Pretty-printed call arguments (expandable block on `tool` rows). */
+  args?: string | null
+  /** Tool response text (expandable block on `tool` rows). */
+  response?: string | null
 }
 
 export interface ChatTraceTimelineTrace {
@@ -34,6 +40,12 @@ export interface ChatTraceTimelineLabels {
   /** Suffix of the token count, e.g. `tokens`. */
   tokens: string
   reasoning: string
+  /** Header of the expandable arguments block. */
+  arguments: string
+  /** Header of the expandable response block. */
+  response: string
+  /** Accessible name of a tool row's detail disclosure. */
+  details: string
 }
 
 export interface ChatTraceTimelineProps {
@@ -108,40 +120,9 @@ export const ChatTraceTimeline = React.forwardRef<HTMLDivElement, ChatTraceTimel
                 {`${trace.outputTokens ?? 0} ${labels?.tokens ?? 'tokens'}`}
               </span>
             </div>
-            {items.map((item, index) => {
-              const width = Math.max(
-                2,
-                Math.min(100, ((item.durationMs ?? 0) / totalMs) * 100),
-              )
-              return (
-                <div
-                  key={`${item.kind}-${index}`}
-                  data-kind={item.kind}
-                  className="flex items-center gap-2 text-[11px]"
-                >
-                  <span
-                    className="w-16 shrink-0 truncate text-[var(--as-muted-fg)]"
-                    title={item.detail ?? undefined}
-                  >
-                    {item.label}
-                  </span>
-                  <div className="h-1.5 min-w-0 flex-1 overflow-hidden rounded-full bg-[var(--as-surface-raised)]">
-                    <div
-                      className={cn(
-                        'h-full rounded-full',
-                        item.kind === 'phase'
-                          ? 'bg-[var(--as-primary)]'
-                          : 'bg-[var(--as-warning)]',
-                      )}
-                      style={{ width: `${width}%` }}
-                    />
-                  </div>
-                  <span className="w-12 shrink-0 text-right font-mono text-[10px] text-[var(--as-muted-fg)]">
-                    {formatDuration(item.durationMs ?? 0)}
-                  </span>
-                </div>
-              )
-            })}
+            {items.map((item, index) => (
+              <TraceRow key={`${item.kind}-${index}`} item={item} totalMs={totalMs} labels={labels} />
+            ))}
             {trace.thinking ? (
               <ThinkingDisclosure
                 thinking={trace.thinking}
@@ -154,6 +135,114 @@ export const ChatTraceTimeline = React.forwardRef<HTMLDivElement, ChatTraceTimel
     )
   },
 )
+
+function TraceRow({
+  item,
+  totalMs,
+  labels,
+}: {
+  item: ChatTraceTimelineEntry
+  totalMs: number
+  labels?: Partial<ChatTraceTimelineLabels>
+}) {
+  const [open, setOpen] = React.useState(false)
+  const regionId = React.useId()
+  const expandable = Boolean(item.args || item.response)
+  const width = Math.max(2, Math.min(100, ((item.durationMs ?? 0) / totalMs) * 100))
+  return (
+    <div data-kind={item.kind} data-status={item.status ?? undefined}>
+      <div className="flex items-center gap-2 text-[11px]">
+        <span
+          className="w-16 shrink-0 truncate text-[var(--as-muted-fg)]"
+          title={item.detail ?? undefined}
+        >
+          {item.label}
+        </span>
+        <div className="h-1.5 min-w-0 flex-1 overflow-hidden rounded-full bg-[var(--as-surface-raised)]">
+          <div
+            className={cn(
+              'h-full rounded-full',
+              item.kind === 'phase'
+                ? 'bg-[var(--as-primary)]'
+                : 'bg-[var(--as-warning)]',
+            )}
+            style={{ width: `${width}%` }}
+          />
+        </div>
+        <span className="w-12 shrink-0 text-right font-mono text-[10px] text-[var(--as-muted-fg)]">
+          {formatDuration(item.durationMs ?? 0)}
+        </span>
+        {item.status ? (
+          <span
+            data-as="chat-trace-status"
+            title={item.status}
+            className={cn(
+              'size-2 shrink-0 rounded-full',
+              item.status === 'error'
+                ? 'bg-[var(--as-danger)]'
+                : 'bg-[var(--as-success)]',
+            )}
+          />
+        ) : (
+          <span className="size-2 shrink-0" />
+        )}
+        {expandable ? (
+          <button
+            type="button"
+            data-as="chat-trace-detail-toggle"
+            aria-expanded={open}
+            aria-controls={regionId}
+            aria-label={`${item.label} ${labels?.details ?? 'details'}`}
+            onClick={() => setOpen((value) => !value)}
+            className="flex size-5 shrink-0 items-center justify-center rounded text-[var(--as-muted-fg)] transition-colors hover:bg-[var(--as-muted)] hover:text-[var(--as-fg)] focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[var(--as-focus-ring)]"
+          >
+            {open ? (
+              <ChevronDown className="size-3" aria-hidden />
+            ) : (
+              <ChevronRight className="size-3" aria-hidden />
+            )}
+          </button>
+        ) : (
+          <span className="w-5 shrink-0" />
+        )}
+      </div>
+      {expandable && open ? (
+        <div
+          id={regionId}
+          data-as="chat-trace-detail"
+          data-open="true"
+          className="mb-1.5 ml-[4.5rem] border-l border-[var(--as-border)] pl-2"
+        >
+          {item.args ? (
+            <DetailBlock label={labels?.arguments ?? 'Arguments'} text={item.args} />
+          ) : null}
+          {item.response ? (
+            <DetailBlock label={labels?.response ?? 'Response'} text={item.response} />
+          ) : null}
+        </div>
+      ) : null}
+    </div>
+  )
+}
+
+function DetailBlock({
+  label,
+  text,
+}: {
+  label: string
+  text: string
+}) {
+  return (
+    <div className="pt-1">
+      <p className="text-[10px] font-semibold uppercase tracking-wide text-[var(--as-muted-fg)]">
+        {label}
+      </p>
+      <pre className="mt-0.5 max-h-32 overflow-auto whitespace-pre-wrap break-words font-mono text-[10px] text-[var(--as-muted-fg)]">
+        {text}
+      </pre>
+    </div>
+  )
+}
 
 function ThinkingDisclosure({
   thinking,

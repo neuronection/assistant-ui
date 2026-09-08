@@ -34,3 +34,35 @@ export const Bare = () => (
     <ChatTraceTimeline trace={{ latencyMs: 640 }} entries={[]} />
   </div>
 )
+
+const observableEntries: ChatTraceTimelineEntry[] = [
+  { kind: 'phase', label: 'thinking', startMs: 0, durationMs: 9000 },
+  {
+    kind: 'tool',
+    label: 'notify',
+    detail: '{"message": "ping"}',
+    args: '{\n  "message": "ping",\n  "title": "Turn complete"\n}',
+    response: 'Notification delivered to the system tray.',
+    status: 'ok',
+    startMs: 9000,
+    durationMs: 45,
+  },
+  {
+    kind: 'tool',
+    label: 'failing_tool',
+    response: 'Permission denied: root not granted for this session.',
+    status: 'error',
+    startMs: 9100,
+    durationMs: 12,
+  },
+]
+
+export const ToolObservability = () => (
+  <div style={{ maxWidth: 520 }}>
+    <ChatTraceTimeline
+      trace={{ model: 'gpt-5.6', latencyMs: 9600, outputTokens: 180 }}
+      entries={observableEntries}
+      defaultOpen
+    />
+  </div>
+)

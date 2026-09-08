@@ -110,3 +110,76 @@ describe('ChatTraceTimeline', () => {
     expect(await axe(expanded.container)).toHaveNoViolations()
   })
 })
+
+describe('ChatTraceTimeline tool observability', () => {
+  const observableEntries: ChatTraceTimelineEntry[] = [
+    { kind: 'phase', label: 'thinking', startMs: 0, durationMs: 500 },
+    {
+      kind: 'tool',
+      label: 'notify',
+      detail: '{"message": "ping"}',
+      args: '{\n  "message": "ping"\n}',
+      response: 'Notification sent.',
+      status: 'ok',
+      startMs: 500,
+      durationMs: 45,
+    },
+    {
+      kind: 'tool',
+      label: 'failing_tool',
+      status: 'error',
+      response: 'Permission denied.',
+      startMs: 600,
+      durationMs: 12,
+    },
+  ]
+
+  it('renders status dots with an accessible title', () => {
+    render(
+      <ChatTraceTimeline trace={{ latencyMs: 600 }} entries={observableEntries} defaultOpen />,
+    )
+    expect(screen.getByTitle('ok')).toBeInTheDocument()
+    expect(screen.getByTitle('error')).toBeInTheDocument()
+  })
+
+  it('expands arguments and response blocks from the row disclosure', async () => {
+    const user = userEvent.setup()
+    const { container } = render(
+      <ChatTraceTimeline trace={{ latencyMs: 600 }} entries={observableEntries} defaultOpen />,
+    )
+    const chevrons = container.querySelectorAll('[data-as="chat-trace-detail-toggle"]')
+    expect(chevrons.length).toBe(2)
+    expect(screen.queryByText('Arguments')).not.toBeInTheDocument()
+
+    await user.click(chevrons[0] as Element)
+    console.log('DBG expanded=' + container.querySelectorAll('[aria-expanded="true"]').length
+      + ' details=' + container.querySelectorAll('[data-as="chat-trace-detail"]').length
+      + ' html=' + container.innerHTML.slice(0, 400))
+    const regions = container.querySelectorAll('[data-as="chat-trace-detail"]')
+    expect(regions).toHaveLength(1)
+    expect(regions[0]!).toHaveAttribute('data-open', 'true')
+    expect(regions[0]!.textContent).toContain('"message": "ping"')
+    expect(regions[0]!.textContent).toContain('Notification sent.')
+
+    await user.click(chevrons[1] as Element)
+    expect(container.querySelectorAll('[data-as="chat-trace-detail"]')).toHaveLength(2)
+    expect(container.textContent).toContain('Permission denied.')
+  })
+
+  it('rows without observability data keep the spacer layout', () => {
+    const { container } = render(
+      <ChatTraceTimeline trace={{ latencyMs: 2000 }} entries={entries} defaultOpen />,
+    )
+    expect(screen.queryByText('Arguments')).not.toBeInTheDocument()
+    expect(container.querySelectorAll('[data-as="chat-trace-status"]')).toHaveLength(0)
+    expect(container.querySelectorAll('[data-as="chat-trace-detail-toggle"]')).toHaveLength(0)
+  })
+
+  it('stays axe-clean with observability data', async () => {
+    const { axe } = await import('jest-axe')
+    const { container } = render(
+      <ChatTraceTimeline trace={{ latencyMs: 600 }} entries={observableEntries} defaultOpen />,
+    )
+    expect(await axe(container)).toHaveNoViolations()
+  })
+})

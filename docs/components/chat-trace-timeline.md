@@ -18,9 +18,9 @@ import { ChatTraceTimeline } from '@neuronection/assistant-ui/chat-trace-timelin
 | Prop | Type | Description |
 | --- | --- | --- |
 | `trace` | `ChatTraceTimelineTrace` | `model?`, `latencyMs?` (bar scale), `inputTokens?`, `outputTokens?`, `thinking?` (reasoning disclosure). |
-| `entries` | `ChatTraceTimelineEntry[]` | `{ kind: 'phase' \| 'tool', label, detail?, startMs?, durationMs? }` — sorted by `startMs` for rendering. |
+| `entries` | `ChatTraceTimelineEntry[]` | `{ kind: 'phase' \| 'tool', label, detail?, startMs?, durationMs?, status?, args?, response? }` — sorted by `startMs` for rendering. `status` (`'ok' \| 'error'`) renders a status dot on the row; `args`/`response` (pretty-printed strings) feed the row's expandable detail blocks. |
 | `defaultOpen` | `boolean` | Expand initially (default `false`). |
-| `labels` | `Partial<ChatTraceTimelineLabels>` | toggle/tools/total/tokens/reasoning (English defaults). |
+| `labels` | `Partial<ChatTraceTimelineLabels>` | toggle/tools/total/tokens/reasoning/arguments/response/details (English defaults). |
 | `className` | `string` | Extra classes. |
 
 ## controlled contract
@@ -33,9 +33,19 @@ the timeline row pattern instead.
 ## label / i18n contract
 
 `labels` covers the static words (`toggle`, `tools`, `total`, `tokens`,
-`reasoning`); the numeric summary (`2.0 s · 3 tools`) is composed from
-data. Entry labels and details are data — translate phases when
-building `entries`.
+`reasoning`, `arguments`, `response`, `details`); the numeric summary
+(`2.0 s · 3 tools`) is composed from data. Entry labels, argument and
+response payloads are data — translate phases when building `entries`.
+
+## tool observability
+
+`tool` rows carry execution evidence: `status` renders a success/error
+dot after the duration, and `args`/`response` (pretty-printed strings —
+`JSON.stringify(args, null, 2)` app-side) enable a per-row disclosure
+(`chat-trace-detail-toggle` button, `chat-trace-detail` region) with
+labeled `Arguments`/`Response` blocks. Rows without any of those fields
+keep the plain layout. The disclosure button's accessible name is
+`"<tool label> <labels.details>"`.
 
 ## snippets
 
