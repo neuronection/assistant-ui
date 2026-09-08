@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { axe } from 'jest-axe'
 
@@ -151,15 +151,16 @@ describe('ChatTraceTimeline tool observability', () => {
     expect(chevrons.length).toBe(2)
     expect(screen.queryByText('Arguments')).not.toBeInTheDocument()
 
-    await user.click(chevrons[0] as Element)
-    console.log('DBG expanded=' + container.querySelectorAll('[aria-expanded="true"]').length
-      + ' details=' + container.querySelectorAll('[data-as="chat-trace-detail"]').length
-      + ' html=' + container.innerHTML.slice(0, 400))
+    await user.click(screen.getByText('notify'))
     const regions = container.querySelectorAll('[data-as="chat-trace-detail"]')
     expect(regions).toHaveLength(1)
     expect(regions[0]!).toHaveAttribute('data-open', 'true')
-    expect(regions[0]!.textContent).toContain('"message": "ping"')
-    expect(regions[0]!.textContent).toContain('Notification sent.')
+    expect(within(regions[0] as HTMLElement).getByText('Arguments')).toBeInTheDocument()
+    expect(within(regions[0] as HTMLElement).getByText('message')).toBeInTheDocument()
+    expect(within(regions[0] as HTMLElement).getByText('ping')).toBeInTheDocument()
+    expect(within(regions[0] as HTMLElement).getByText('Response')).toBeInTheDocument()
+    expect(within(regions[0] as HTMLElement).getByText('Notification sent.')).toBeInTheDocument()
+    expect(regions[0]!.textContent).not.toContain('"message"')
 
     await user.click(chevrons[1] as Element)
     expect(container.querySelectorAll('[data-as="chat-trace-detail"]')).toHaveLength(2)

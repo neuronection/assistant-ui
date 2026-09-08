@@ -152,12 +152,25 @@ function TraceRow({
   return (
     <div data-kind={item.kind} data-status={item.status ?? undefined}>
       <div className="flex items-center gap-2 text-[11px]">
-        <span
-          className="w-16 shrink-0 truncate text-[var(--as-muted-fg)]"
-          title={item.detail ?? undefined}
-        >
-          {item.label}
-        </span>
+        {expandable ? (
+          <button
+            type="button"
+            aria-expanded={open}
+            aria-controls={regionId}
+            title={item.detail ?? undefined}
+            className="w-16 shrink-0 truncate text-left text-[11px] text-[var(--as-fg)] transition-colors hover:text-[var(--as-primary)] focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[var(--as-focus-ring)]"
+            onClick={() => setOpen((value) => !value)}
+          >
+            {item.label}
+          </button>
+        ) : (
+          <span
+            className="w-16 shrink-0 truncate text-[var(--as-muted-fg)]"
+            title={item.detail ?? undefined}
+          >
+            {item.label}
+          </span>
+        )}
         <div className="h-1.5 min-w-0 flex-1 overflow-hidden rounded-full bg-[var(--as-surface-raised)]">
           <div
             className={cn(
@@ -225,6 +238,22 @@ function TraceRow({
   )
 }
 
+function detailEntries(text: string): Array<{ key: string; value: string }> | null {
+  try {
+    const parsed = JSON.parse(text) as unknown
+    if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+      const entries = Object.entries(parsed as Record<string, unknown>).map(([key, value]) => ({
+        key,
+        value: typeof value === 'string' ? value : JSON.stringify(value),
+      }))
+      return entries.length > 0 ? entries : null
+    }
+    return null
+  } catch {
+    return null
+  }
+}
+
 function DetailBlock({
   label,
   text,
@@ -232,14 +261,33 @@ function DetailBlock({
   label: string
   text: string
 }) {
+  const entries = detailEntries(text)
   return (
     <div className="pt-1">
       <p className="text-[10px] font-semibold uppercase tracking-wide text-[var(--as-muted-fg)]">
         {label}
       </p>
-      <pre className="mt-0.5 max-h-32 overflow-auto whitespace-pre-wrap break-words font-mono text-[10px] text-[var(--as-muted-fg)]">
-        {text}
-      </pre>
+      {entries ? (
+        <dl className="mt-0.5 space-y-0.5">
+          {entries.map((entry) => (
+            <div
+              key={entry.key}
+              className="flex items-baseline justify-between gap-2 rounded-md bg-[var(--as-muted)] px-2 py-1"
+            >
+              <dt className="text-[10px] uppercase tracking-wide text-[var(--as-muted-fg)]">
+                {entry.key}
+              </dt>
+              <dd className="min-w-0 break-words text-right text-[11px] font-medium text-[var(--as-fg)]">
+                {entry.value}
+              </dd>
+            </div>
+          ))}
+        </dl>
+      ) : (
+        <p className="mt-0.5 whitespace-pre-wrap break-words text-[11px] text-[var(--as-fg)]">
+          {text}
+        </p>
+      )}
     </div>
   )
 }
