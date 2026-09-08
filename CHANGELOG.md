@@ -1,5 +1,26 @@
 # @neuronection/assistant-ui
 
+## 0.29.0
+
+### Minor Changes
+
+- [`e73579a`](https://github.com/neuronection/assistant-ui/commit/e73579ad0ab9795e7111a309d852b6042f2f5c2f) Thanks [@constLiakos](https://github.com/constLiakos)! - ChatTraceTimeline: full tool-call observability. `ChatTraceTimelineEntry`
+  gains optional `status` (`'ok' | 'error'` — renders a status dot after
+  the duration), `args` and `response` (pretty-printed strings) — `tool`
+  rows with `args`/`response` render a labelled, expandable detail region
+  (`Arguments` / `Response` blocks, `chat-trace-detail-toggle` button +
+  `chat-trace-detail` region, accessible name `"<tool> details"`). Labels
+  gain `arguments`, `response`, `details`. All fields optional — existing
+  usage renders unchanged.
+
+### Patch Changes
+
+- [`5f06c3e`](https://github.com/neuronection/assistant-ui/commit/5f06c3e7fd9ca2cf419ad7dc5b79148edff4022d) Thanks [@constLiakos](https://github.com/constLiakos)! - fix(chat-tools-catalog): sentence-length scope values can no longer break the header row — the scope chip is capped at 40% of the row width with an ellipsis and exposes the full text via a native `title` tooltip, and the name/title slot wraps (`break-words`) instead of painting over the chip and chevron. Docs page, accessibility row, LongScopeAndName story, and a regression test added.
+
+- [`732f29e`](https://github.com/neuronection/assistant-ui/commit/732f29e91edad217b7aa47edcdbd20ead7af75cc) Thanks [@constLiakos](https://github.com/constLiakos)! - fix(build): un-block the release gate — `pnpm build` no longer dies with `ERR_WORKER_OUT_OF_MEMORY` in tsup's dts worker (CI's 7 GB runner and memory-capped machines both hit it once the entry count reached ~80). Declaration emission now runs as sequential `dts: { only: true }` shards (`build:dts`, one tsup invocation + one dts worker each, `DTS_SHARD=0..N` over `tsup.dts.config.ts`, ~10 entries per shard) instead of one worker accumulating all 80 entries; JS output still builds as a single config, so chunk sharing is unchanged. tsup is `pnpm patch`ed to give the dts worker an explicit 3 GB heap (`resourceLimits.maxOldGenerationSizeMb`, overridable via `TSUP_DTS_WORKER_HEAP_MB`) because tsup spawns it without limits and Node sizes the default from total RAM, not cgroup/runner limits. Verified end-to-end under a 7 GB memory cap.
+
+- [`487a853`](https://github.com/neuronection/assistant-ui/commit/487a853ded7d93440851392d00acafcba157da31) Thanks [@constLiakos](https://github.com/constLiakos)! - Fix the `./upload-dropzone` subpath export: the module shipped in the main barrel and was listed in the package `exports` map, but had no tsup entry, so `dist/upload-dropzone.*` was never built and subpath imports failed to resolve in consumer apps. Career-assistant imports it from the main barrel until the next release.
+
 ## 0.28.1
 
 ### Patch Changes
