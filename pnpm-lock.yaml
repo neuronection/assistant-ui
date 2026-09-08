@@ -4,6 +4,9 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+patchedDependencies:
+  tsup@8.5.1: 80edd4b8f8124f31af33610eb035ac62b9b054052a7ae35f2f5c31febd5bbf76
+
 importers:
 
   .:
@@ -146,7 +149,7 @@ importers:
         version: 4.3.3
       tsup:
         specifier: ^8.4.0
-        version: 8.5.1(@swc/core@1.16.1)(jiti@2.7.0)(postcss@8.5.26)(supports-color@8.1.1)(typescript@5.9.3)
+        version: 8.5.1(patch_hash=80edd4b8f8124f31af33610eb035ac62b9b054052a7ae35f2f5c31febd5bbf76)(@swc/core@1.16.1)(jiti@2.7.0)(postcss@8.5.26)(supports-color@8.1.1)(typescript@5.9.3)
       typescript:
         specifier: ^5.9.3
         version: 5.9.3
@@ -9934,7 +9937,7 @@ snapshots:
 
   tsscmp@1.0.6: {}
 
-  tsup@8.5.1(@swc/core@1.16.1)(jiti@2.7.0)(postcss@8.5.26)(supports-color@8.1.1)(typescript@5.9.3):
+  tsup@8.5.1(patch_hash=80edd4b8f8124f31af33610eb035ac62b9b054052a7ae35f2f5c31febd5bbf76)(@swc/core@1.16.1)(jiti@2.7.0)(postcss@8.5.26)(supports-color@8.1.1)(typescript@5.9.3):
     dependencies:
       bundle-require: 5.1.0(esbuild@0.27.7)
       cac: 6.7.14

@@ -3,3 +3,5 @@ allowBuilds:
   '@swc/core': true
   esbuild: true
   msw: true
+patchedDependencies:
+  tsup@8.5.1: patches/tsup@8.5.1.patch

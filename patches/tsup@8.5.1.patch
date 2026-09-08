@@ -1,0 +1,13 @@
+diff --git a/dist/index.js b/dist/index.js
+index eff27819d14d659a39c50e6cf51516e11648d20b..5573dc2ac19afb108af23740e9a306a3cad57be4 100644
+--- a/dist/index.js
++++ b/dist/index.js
+@@ -1518,7 +1518,7 @@ async function build(_options) {
+           await experimentalDtsTask();
+           if (options.dts) {
+             await new Promise((resolve, reject) => {
+-              const worker = new (0, _worker_threads.Worker)(_path2.default.join(__dirname, "./rollup.js"));
++              const worker = new (0, _worker_threads.Worker)(_path2.default.join(__dirname, "./rollup.js"), { resourceLimits: { maxOldGenerationSizeMb: Number(process.env.TSUP_DTS_WORKER_HEAP_MB) || 3072 } });
+               const terminateWorker = () => {
+                 if (options.watch) return;
+                 worker.terminate();
