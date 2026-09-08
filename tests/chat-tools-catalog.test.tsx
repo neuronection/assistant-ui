@@ -26,6 +26,9 @@ const tools: ChatToolCatalogEntry[] = [
   },
 ]
 
+const LONG_SCOPE =
+  'Read-only — lists the learner’s courses and node resources; also served to external agents via the MCP resource server.'
+
 describe('ChatToolsCatalog', () => {
   it('renders the catalog entries collapsed with name, title and scope', () => {
     render(<ChatToolsCatalog tools={tools} />)
@@ -91,6 +94,27 @@ describe('ChatToolsCatalog', () => {
   it('shows the empty state without tools', () => {
     render(<ChatToolsCatalog tools={[]} />)
     expect(screen.getByText('No tools available')).toBeInTheDocument()
+  })
+
+  it('caps long scope values with a native tooltip instead of overflowing the header', () => {
+    render(
+      <ChatToolsCatalog
+        tools={[
+          {
+            name: 'a_very_long_tool_identifier_without_separators_that_must_wrap_not_crop',
+            scope: LONG_SCOPE,
+          },
+        ]}
+      />,
+    )
+    const chip = screen.getByTitle(LONG_SCOPE)
+    expect(chip).toHaveTextContent(LONG_SCOPE)
+    expect(chip).toHaveClass('truncate')
+    expect(chip).toHaveClass('max-w-[40%]')
+    const header = screen.getByRole('button', {
+      name: /a_very_long_tool_identifier/,
+    })
+    expect(header).toContainElement(chip)
   })
 
   it('applies label and icon overrides', async () => {

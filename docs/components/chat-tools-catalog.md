@@ -24,7 +24,7 @@ import { ChatToolsCatalog } from '@neuronection/assistant-ui/chat-tools-catalog'
 | `tools[].description` | `string` | Shown in the expanded body. |
 | `tools[].arguments` | `ChatToolCatalogArgument[]` | `{ name, type?, required?, description? }` rows. |
 | `tools[].example` / `.response` | `string` | Example payload (`pre`) and response description. |
-| `tools[].scope` | `string` | Rendered as an uppercase chip in the header. |
+| `tools[].scope` | `string` | Rendered as an uppercase chip in the header; capped at 40% of the row (ellipsis + native `title` tooltip), so sentence-length values never push the name or chevron out — prefer short labels and keep sentences in `description`. |
 | `searchable` | `boolean` | Fuzzy search over name/title/description (default `true`). |
 | `defaultOpen` | `boolean` | Expand every entry initially (default `false`). |
 | `labels` | `Partial<ChatToolsCatalogLabels>` | tools/search/searchPlaceholder/arguments/response/required/optional/empty/noResults. |
@@ -75,8 +75,11 @@ function ToolsDialog({ open, onOpenChange }) {
 Search input is a labelled `role="searchbox"`; entries form a labelled
 `role="list"`; each header is a real button with `aria-expanded` +
 `aria-controls` (Enter/Space toggles natively); the expanded region is
-plain text content. Empty and no-results states are asserted text.
-Clean under jest-axe collapsed, expanded and filtering.
+plain text content. Long names/titles wrap within the header instead of
+cropping; a capped scope chip exposes its full text via the native
+`title` tooltip (supplementary, not the only access to meaning — put
+sentences in `description`). Empty and no-results states are asserted
+text. Clean under jest-axe collapsed, expanded and filtering.
 
 ## related
 

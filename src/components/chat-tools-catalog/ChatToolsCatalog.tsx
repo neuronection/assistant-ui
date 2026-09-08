@@ -142,14 +142,17 @@ export const ChatToolsCatalog = React.forwardRef<HTMLDivElement, ChatToolsCatalo
                     className="flex w-full items-center gap-2 px-2.5 py-1.5 text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--as-focus-ring)]"
                   >
                     <Icon className="size-3.5 shrink-0 text-[var(--as-muted-fg)]" aria-hidden />
-                    <span className="min-w-0 flex-1">
+                    <span className="min-w-0 flex-1 break-words">
                       <span className="font-mono font-medium text-[var(--as-fg)]">{tool.name}</span>
                       {tool.title ? (
                         <span className="ml-1.5 text-[var(--as-muted-fg)]">{tool.title}</span>
                       ) : null}
                     </span>
                     {tool.scope ? (
-                      <span className="shrink-0 rounded-full bg-[var(--as-surface-raised)] px-1.5 py-0.5 text-[10px] uppercase tracking-wide text-[var(--as-muted-fg)]">
+                      <span
+                        title={tool.scope}
+                        className="max-w-[40%] shrink-0 truncate rounded-full bg-[var(--as-surface-raised)] px-1.5 py-0.5 text-[10px] uppercase tracking-wide text-[var(--as-muted-fg)]"
+                      >
                         {tool.scope}
                       </span>
                     ) : null}

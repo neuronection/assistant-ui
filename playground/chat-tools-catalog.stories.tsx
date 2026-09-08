@@ -28,6 +28,24 @@ export const Default = () => (
   </div>
 )
 
+export const LongScopeAndName = () => (
+  <div style={{ width: 420 }}>
+    <ChatToolsCatalog
+      tools={[
+        {
+          name: 'a_very_long_tool_identifier_without_separators_that_must_wrap_not_crop',
+          title: 'A human title that is also quite long and keeps reading',
+          description:
+            'Header stays one visual row: the name wraps within its slot and a sentence-length scope value is capped with an ellipsis (full text on hover).',
+          scope:
+            'Read-only — lists the learner’s courses and node resources; also served to external agents via the MCP resource server.',
+        },
+        ...tools,
+      ]}
+    />
+  </div>
+)
+
 export const OpenAndFiltered = () => (
   <div style={{ width: 420 }}>
     <ChatToolsCatalog tools={tools} defaultOpen labels={{ searchPlaceholder: 'Filter tools…' }} />
