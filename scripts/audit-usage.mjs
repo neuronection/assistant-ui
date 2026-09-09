@@ -59,6 +59,7 @@ const LIBRARY_COMPONENTS = [
   'DictationButton',
   'DictationStrip',
   'TextDiffView',
+  'MarkdownDiffView',
   'ComboboxMulti',
   'ConfirmationModal',
   'ContextMenu',

@@ -207,6 +207,10 @@
       "types": "./dist/marquee.d.ts",
       "import": "./dist/marquee.js"
     },
+    "./markdown-diff-view": {
+      "types": "./dist/markdown-diff-view.d.ts",
+      "import": "./dist/markdown-diff-view.js"
+    },
     "./menu": {
       "types": "./dist/menu.d.ts",
       "import": "./dist/menu.js"

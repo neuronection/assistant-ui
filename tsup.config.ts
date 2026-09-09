@@ -56,6 +56,7 @@ export const entry: Record<string, string> = {
   'ai-text-transform': 'src/components/ai-text-transform/index.ts',
   'text-diff-view': 'src/components/text-diff-view/index.ts',
   'marquee': 'src/components/marquee/index.ts',
+  'markdown-diff-view': 'src/components/markdown-diff-view/index.ts',
   'menu': 'src/components/menu/index.ts',
   'model-picker': 'src/components/model-picker/index.ts',
   'modal': 'src/components/modal/index.ts',

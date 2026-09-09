@@ -18,6 +18,10 @@ export interface LineDiffOptions {
   contextLines?: number
 }
 
+export interface UnitDiffOptions {
+  contextUnits?: number
+}
+
 export interface LineDiffResult {
   rows: DiffRow[]
   added: number
@@ -270,16 +274,16 @@ function foldRows(rows: DiffRow[], contextLines: number): DiffRow[] {
   return folded
 }
 
-export function computeLineDiff(
-  original: string,
-  suggested: string,
-  options: LineDiffOptions = {},
+export function computeUnitDiff(
+  a: string[],
+  b: string[],
+  options: UnitDiffOptions = {},
 ): LineDiffResult {
-  const contextLines = options.contextLines ?? 2
-  const ops = diffOps(splitLines(original), splitLines(suggested))
+  const contextUnits = options.contextUnits ?? 2
+  const ops = diffOps(a, b)
   const flatRows = pairRows(ops)
   numberRows(flatRows)
-  const rows = foldRows(flatRows, contextLines)
+  const rows = foldRows(flatRows, contextUnits)
   let added = 0
   let removed = 0
   for (const row of flatRows) {
@@ -294,4 +298,14 @@ export function computeLineDiff(
     }
   }
   return { rows, added, removed }
+}
+
+export function computeLineDiff(
+  original: string,
+  suggested: string,
+  options: LineDiffOptions = {},
+): LineDiffResult {
+  return computeUnitDiff(splitLines(original), splitLines(suggested), {
+    contextUnits: options.contextLines,
+  })
 }

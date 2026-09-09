@@ -308,13 +308,21 @@ export {
   type TextDiffViewProps,
   type TextDiffViewLabels,
   computeLineDiff,
+  computeUnitDiff,
   wordSegments,
   type DiffCell,
   type DiffSegment,
   type DiffRow,
   type LineDiffOptions,
   type LineDiffResult,
+  type UnitDiffOptions,
 } from './components/text-diff-view'
+export {
+  MarkdownDiffView,
+  type MarkdownDiffViewProps,
+  type MarkdownDiffViewLabels,
+  splitMarkdownBlocks,
+} from './components/markdown-diff-view'
 export {
   useChatStream,
   liveTurnReducer,
