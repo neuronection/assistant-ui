@@ -1,5 +1,17 @@
 # @neuronection/assistant-ui
 
+## 0.31.0
+
+### Minor Changes
+
+- [`f25f3ef`](https://github.com/neuronection/assistant-ui/commit/f25f3ef0d22d72fb09918af1e050ffe28d53e71a) Thanks [@constLiakos](https://github.com/constLiakos)! - ProviderForm gains a controlled preset-catalog select (`presets`,
+  `presetKey`, `onPresetChange`, `presetLabel`, `customPresetLabel` +
+  `ProviderPresetOption` and `CUSTOM_PRESET_KEY` exports) so both family apps
+  render the same provider catalog picker; the catalog data itself stays
+  app-side (ADR-006). New `@neuronection/assistant-ui/countries` subpath
+  exports the shared ISO country list (`COUNTRIES`, `CountryOption`,
+  `getCountryFlag`) for data-residency pickers.
+
 ## 0.30.0
 
 ### Minor Changes
