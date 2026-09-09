@@ -1,5 +1,11 @@
 # @neuronection/assistant-ui
 
+## 0.29.1
+
+### Patch Changes
+
+- [`6c8882c`](https://github.com/neuronection/assistant-ui/commit/6c8882cfc951a167b728b3977b5e1cffdda87a0b) Thanks [@constLiakos](https://github.com/constLiakos)! - fix(a11y): ChatSessionList and ChatToolsCatalog no longer render their empty/no-matches `<p>` states as children of `role="list"` (aria-required-children, critical — a list expects listitem children). The `role="list"` container now renders only when there are items to show; empty and no-results states render standalone with unchanged copy and styling. Found by desktop-assistant's new exclusion-free axe scans of the chat desktop window; regression axe tests for both components and a SessionListEmpty Ladle story added.
+
 ## 0.29.0
 
 ### Minor Changes
