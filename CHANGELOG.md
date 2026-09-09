@@ -1,5 +1,18 @@
 # @neuronection/assistant-ui
 
+## 0.32.0
+
+### Minor Changes
+
+- [`2cd79f9`](https://github.com/neuronection/assistant-ui/commit/2cd79f9167f931a8af75ef3c7b069e78235c15c2) Thanks [@constLiakos](https://github.com/constLiakos)! - New `@neuronection/assistant-ui/markdown-diff-view` subpath: `MarkdownDiffView`
+  renders a side-by-side **formatted** markdown diff — blocks are compared at the
+  markdown-block level (fenced code and `$$` display-math spans stay intact) and
+  render through the `chat-markdown` surface, so headings, KaTeX math, tables and
+  diagrams appear rendered instead of as source; unchanged blocks render once
+  full-width, changed blocks pair side-by-side with add/del tints, plus change
+  navigation and unchanged-block folds. `computeUnitDiff` (unit-array diff over
+  the existing engine) and `splitMarkdownBlocks` are exported alongside.
+
 ## 0.31.0
 
 ### Minor Changes
