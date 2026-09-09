@@ -205,4 +205,20 @@ describe('ChatSessionList', () => {
     )
     expect(await axe(container)).toHaveNoViolations()
   })
+
+  it('keeps the empty state outside the list role and passes axe', async () => {
+    const { container } = render(<ChatSessionList sessions={[]} onSelect={() => {}} />)
+    expect(screen.getByText('No conversations yet')).toBeInTheDocument()
+    expect(container.querySelector('[role="list"]')).toBeNull()
+    expect(await axe(container)).toHaveNoViolations()
+  })
+
+  it('keeps the no-matches state outside the list role and passes axe', async () => {
+    const user = userEvent.setup()
+    const { container } = render(<ChatSessionList sessions={sessions} onSelect={() => {}} />)
+    await user.type(screen.getByRole('searchbox'), 'zzzz')
+    expect(screen.getByText('No matches')).toBeInTheDocument()
+    expect(container.querySelector('[role="list"]')).toBeNull()
+    expect(await axe(container)).toHaveNoViolations()
+  })
 })

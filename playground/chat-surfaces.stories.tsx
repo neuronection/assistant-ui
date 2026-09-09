@@ -106,6 +106,14 @@ export function SessionList() {
   )
 }
 
+export function SessionListEmpty() {
+  return (
+    <div style={{ width: 300, height: 420 }}>
+      <ChatSessionList sessions={[]} onSelect={() => {}} onNew={() => {}} />
+    </div>
+  )
+}
+
 export function BubbleSurface() {
   return (
     <div style={{ position: 'relative', height: 480, border: '1px dashed var(--as-border)', borderRadius: 'var(--as-radius-lg)', overflow: 'hidden' }}>

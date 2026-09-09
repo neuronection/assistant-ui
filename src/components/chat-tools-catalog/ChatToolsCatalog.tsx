@@ -111,17 +111,17 @@ export const ChatToolsCatalog = React.forwardRef<HTMLDivElement, ChatToolsCatalo
             />
           </div>
         ) : null}
-        <div role="list" aria-label={labels?.tools ?? 'Tools'} className="flex flex-col gap-2">
-          {tools.length === 0 ? (
-            <p className="px-1 py-3 text-xs text-[var(--as-muted-fg)]">
-              {labels?.empty ?? 'No tools available'}
-            </p>
-          ) : filtered.length === 0 ? (
-            <p className="px-1 py-3 text-xs text-[var(--as-muted-fg)]">
-              {labels?.noResults ?? 'No matching tools'}
-            </p>
-          ) : (
-            filtered.map((tool) => {
+        {tools.length === 0 ? (
+          <p className="px-1 py-3 text-xs text-[var(--as-muted-fg)]">
+            {labels?.empty ?? 'No tools available'}
+          </p>
+        ) : filtered.length === 0 ? (
+          <p className="px-1 py-3 text-xs text-[var(--as-muted-fg)]">
+            {labels?.noResults ?? 'No matching tools'}
+          </p>
+        ) : (
+          <div role="list" aria-label={labels?.tools ?? 'Tools'} className="flex flex-col gap-2">
+            {filtered.map((tool) => {
               const open = openOverrides[tool.name] ?? defaultOpen
               const regionId = `${uid}-${tool.name}`
               const toggle = () =>
@@ -229,9 +229,9 @@ export const ChatToolsCatalog = React.forwardRef<HTMLDivElement, ChatToolsCatalo
                   ) : null}
                 </div>
               )
-            })
-          )}
-        </div>
+            })}
+          </div>
+        )}
       </div>
     )
   },

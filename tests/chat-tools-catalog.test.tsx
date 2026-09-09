@@ -96,6 +96,13 @@ describe('ChatToolsCatalog', () => {
     expect(screen.getByText('No tools available')).toBeInTheDocument()
   })
 
+  it('keeps the empty state outside the list role and passes axe', async () => {
+    const { container } = render(<ChatToolsCatalog tools={[]} />)
+    expect(screen.getByText('No tools available')).toBeInTheDocument()
+    expect(container.querySelector('[role="list"]')).toBeNull()
+    expect(await axe(container)).toHaveNoViolations()
+  })
+
   it('caps long scope values with a native tooltip instead of overflowing the header', () => {
     render(
       <ChatToolsCatalog

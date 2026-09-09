@@ -182,13 +182,13 @@ export const ChatSessionList = React.forwardRef<HTMLDivElement, ChatSessionListP
             </button>
           ) : null}
         </div>
-        <div role="list" aria-label={labels?.search ?? 'Conversations'} className="min-h-0 flex-1 overflow-y-auto">
-          {sessions.length === 0 ? (
-            <p className="px-2 py-3 text-xs text-[var(--as-muted-fg)]">{labels?.empty ?? 'No conversations yet'}</p>
-          ) : filtered.length === 0 ? (
-            <p className="px-2 py-3 text-xs text-[var(--as-muted-fg)]">{labels?.noResults ?? 'No matches'}</p>
-          ) : (
-            groups.map((group) => (
+        {sessions.length === 0 ? (
+          <p className="px-2 py-3 text-xs text-[var(--as-muted-fg)]">{labels?.empty ?? 'No conversations yet'}</p>
+        ) : filtered.length === 0 ? (
+          <p className="px-2 py-3 text-xs text-[var(--as-muted-fg)]">{labels?.noResults ?? 'No matches'}</p>
+        ) : (
+          <div role="list" aria-label={labels?.search ?? 'Conversations'} className="min-h-0 flex-1 overflow-y-auto">
+            {groups.map((group) => (
               <div key={group.key} className="mb-2">
                 {group.label ? (
                   <p className="px-2 pb-1 pt-2 text-[10px] font-semibold uppercase tracking-wide text-[var(--as-muted-fg)]">
@@ -278,13 +278,14 @@ export const ChatSessionList = React.forwardRef<HTMLDivElement, ChatSessionListP
                           ))}
                         </span>
                       ) : null}
-                    </div>
-                  )
-                })}
-              </div>
-            ))
-          )}
-        </div>
+                     </div>
+                   )
+                 })}
+                </div>
+              ))
+            }
+          </div>
+        )}
       </div>
     )
   },
