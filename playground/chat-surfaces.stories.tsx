@@ -134,6 +134,41 @@ export function BubbleSurface() {
   )
 }
 
+export function BubbleSurfaceHeaderClose() {
+  const [open, setOpen] = useState(true)
+  return (
+    <div style={{ position: 'relative', height: 480, border: '1px dashed var(--as-border)', borderRadius: 'var(--as-radius-lg)', overflow: 'hidden' }}>
+      <p style={{ padding: 12, fontSize: 12, color: 'var(--as-muted-fg)' }}>
+        panel header owns the close — no overlaid button
+      </p>
+      <ChatLauncher
+        open={open}
+        onOpenChange={setOpen}
+        showClose={false}
+        panel={
+          <ChatPanel
+            variant="bubble"
+            title="Assistant"
+            actions={
+              <button
+                type="button"
+                aria-label="Close panel"
+                onClick={() => setOpen(false)}
+                style={{ font: 'inherit', padding: '2px 6px', cursor: 'pointer' }}
+              >
+                ✕
+              </button>
+            }
+            transcript={<ChatTranscript items={messages.slice(0, 2)} />}
+            composer={<ChatComposer value="" onValueChange={() => {}} onSubmit={() => {}} />}
+            footer="AI can make mistakes"
+          />
+        }
+      />
+    </div>
+  )
+}
+
 
 export function DrawerSurface() {
   const [open, setOpen] = useState(true)

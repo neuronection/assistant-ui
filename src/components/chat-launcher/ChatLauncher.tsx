@@ -18,6 +18,14 @@ export interface ChatLauncherProps {
   closeIcon?: LucideIcon
   /** Unread / activity badge. */
   badge?: number | string
+  /**
+   * Render the floating close button pinned to the panel's top-right
+   * corner (default). Turn this off when the panel body renders its own
+   * header actions — an overlaid close intercepts clicks meant for
+   * top-right header buttons; compose the close into those actions
+   * (calling `onOpenChange(false)`) instead.
+   */
+  showClose?: boolean
   container?: HTMLElement | null
   panelClassName?: string
   className?: string
@@ -41,6 +49,7 @@ export const ChatLauncher = React.forwardRef<HTMLButtonElement, ChatLauncherProp
       icon: Icon = MessageCircle,
       closeIcon: CloseIcon = X,
       badge,
+      showClose = true,
       container,
       panelClassName,
       className,
@@ -90,14 +99,16 @@ export const ChatLauncher = React.forwardRef<HTMLButtonElement, ChatLauncherProp
               aria-label={label}
             >
               {panel}
-              <button
-                type="button"
-                aria-label={closeLabel}
-                onClick={() => setOpen(false)}
-                className="absolute right-2 top-2 z-10 rounded-[var(--as-radius-sm)] p-1 text-[var(--as-muted-fg)] transition-colors hover:bg-[var(--as-secondary)] hover:text-[var(--as-fg)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--as-focus-ring)]"
-              >
-                <CloseIcon aria-hidden className="size-4" />
-              </button>
+              {showClose ? (
+                <button
+                  type="button"
+                  aria-label={closeLabel}
+                  onClick={() => setOpen(false)}
+                  className="absolute right-2 top-2 z-10 rounded-[var(--as-radius-sm)] p-1 text-[var(--as-muted-fg)] transition-colors hover:bg-[var(--as-secondary)] hover:text-[var(--as-fg)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--as-focus-ring)]"
+                >
+                  <CloseIcon aria-hidden className="size-4" />
+                </button>
+              ) : null}
             </div>
           </Portal>
         ) : null}

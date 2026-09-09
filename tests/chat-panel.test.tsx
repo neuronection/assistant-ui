@@ -204,10 +204,40 @@ describe('ChatLauncher', () => {
     expect(screen.getByText('3')).toBeInTheDocument()
   })
 
+  it('omits the overlaid close when showClose is false (header-owned close)', async () => {
+    const user = userEvent.setup()
+    const onOpenChange = vi.fn()
+    render(
+      <ChatLauncher
+        panel={
+          <ChatPanel
+            variant="bubble"
+            title="Assistant"
+            actions={
+              <button type="button" onClick={() => onOpenChange(false)}>
+                Close panel
+              </button>
+            }
+            transcript={transcript}
+          />
+        }
+        showClose={false}
+        onOpenChange={onOpenChange}
+        defaultOpen
+      />,
+    )
+    const panel = screen.getByRole('complementary', { name: 'Chat' })
+    expect(within(panel).queryByRole('button', { name: 'Close chat' })).not.toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Close panel' }))
+    expect(onOpenChange).toHaveBeenCalledWith(false)
+  })
+
   it('passes axe open and closed', async () => {
     const { container, rerender } = render(<ChatLauncher panel={<div>body</div>} />)
     expect(await axe(container)).toHaveNoViolations()
     rerender(<ChatLauncher panel={<div>body</div>} defaultOpen />)
+    expect(await axe(container)).toHaveNoViolations()
+    rerender(<ChatLauncher panel={<div>body</div>} defaultOpen showClose={false} />)
     expect(await axe(container)).toHaveNoViolations()
   })
 })
