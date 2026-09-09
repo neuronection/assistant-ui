@@ -1,5 +1,24 @@
 # @neuronection/assistant-ui
 
+## 0.30.0
+
+### Minor Changes
+
+- [`815aecb`](https://github.com/neuronection/assistant-ui/commit/815aecbbbde173d2b569a2552d1773d7eaca84c2) Thanks [@constLiakos](https://github.com/constLiakos)! - ChatComposer: the input row now exposes styling hooks —
+  `data-as="chat-composer-row"` plus a `data-multiline` attribute that is
+  present whenever the auto-growing textarea renders more than one line
+  (measured in the same layout pass as the auto-grow height). Layout stays
+  unchanged by default; apps opt in via the hook (first consumer:
+  desktop-assistant wraps the toolbars into a footer row under the
+  full-width textarea once a draft is multiline).
+
+- [`068b817`](https://github.com/neuronection/assistant-ui/commit/068b8174e2701a20d9b4beae411127cbaf0f826c) Thanks [@constLiakos](https://github.com/constLiakos)! - ChatLauncher: new `showClose` prop (default `true`). Set it to `false`
+  when the panel body renders its own header actions — the overlaid
+  close button pinned to the panel's top-right corner intercepted clicks
+  meant for top-right header buttons (career's bubble panel: the
+  "New chat" action was unclickable with a mouse). Compose the close
+  into the header actions via `onOpenChange(false)` instead.
+
 ## 0.29.1
 
 ### Patch Changes
