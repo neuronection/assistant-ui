@@ -81,6 +81,7 @@ export const ChatComposer = React.forwardRef<HTMLFormElement, ChatComposerProps>
   ) {
     const internalTextareaRef = React.useRef<HTMLTextAreaElement | null>(null)
     const [dragging, setDragging] = React.useState(false)
+    const [multiline, setMultiline] = React.useState(false)
     const dragDepth = React.useRef(0)
 
     const setTextarea = (element: HTMLTextAreaElement | null) => {
@@ -101,6 +102,11 @@ export const ChatComposer = React.forwardRef<HTMLFormElement, ChatComposerProps>
       const cap = maxRows * 22
       element.style.height = element.scrollHeight > 0 ? `${Math.min(element.scrollHeight, cap)}px` : 'auto'
       element.style.overflowY = element.scrollHeight > cap ? 'auto' : 'hidden'
+      const style = window.getComputedStyle(element)
+      const lineHeight = Number.parseFloat(style.lineHeight) || 22
+      const verticalPadding =
+        (Number.parseFloat(style.paddingTop) || 0) + (Number.parseFloat(style.paddingBottom) || 0)
+      setMultiline(element.scrollHeight > lineHeight + verticalPadding + 1)
     }, [value, maxRows])
 
     const submit = () => {
@@ -181,6 +187,8 @@ export const ChatComposer = React.forwardRef<HTMLFormElement, ChatComposerProps>
         {suggestions ? <div className="flex flex-wrap gap-1.5">{suggestions}</div> : null}
         {attachments ? <div className="flex flex-wrap gap-1.5">{attachments}</div> : null}
         <div
+          data-as="chat-composer-row"
+          data-multiline={multiline || undefined}
           data-dragging={dragging || undefined}
           className={cn(
             'flex items-end gap-1.5 rounded-[var(--as-radius-lg)] border border-[var(--as-border)] bg-[var(--as-surface)] px-2 py-1.5 transition-colors focus-within:border-[var(--as-primary)]',

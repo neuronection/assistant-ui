@@ -29,6 +29,14 @@ import { ChatComposer } from '@neuronection/assistant-ui/chat-composer'
 | `labels` / `icons` | | send/stop strings; `LucideIcon` overrides (defaults ArrowUp/Square). |
 | `textareaRef` | `Ref<HTMLTextAreaElement>` | Focus management app-side. |
 
+## styling hooks
+
+| Hook | Meaning |
+| --- | --- |
+| `form[data-as="chat-composer"]` | The composer root (also carries `data-sending`). |
+| `[data-as="chat-composer-row"]` | The input row (toolbar slots + textarea + send/stop). |
+| `[data-as="chat-composer-row"][data-multiline]` | Present whenever the auto-growing textarea renders more than one line (same layout pass as the auto-grow height; absent in jsdom-style environments without layout). Apps use it to restructure the row — e.g. wrap the toolbars into a footer under a full-width textarea. |
+
 ## example (realistic)
 
 ```tsx

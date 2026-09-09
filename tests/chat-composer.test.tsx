@@ -96,6 +96,22 @@ describe('ChatComposer', () => {
     expect(screen.getByText('suggestion chips')).toBeInTheDocument()
   })
 
+  it('exposes the data-multiline row hook once content exceeds one row', () => {
+    const scrollHeight = vi.spyOn(Element.prototype, 'scrollHeight', 'get').mockReturnValue(60)
+    try {
+      const { container, rerender } = render(
+        <ChatComposer value={'one\ntwo'} onValueChange={() => {}} onSubmit={() => {}} />,
+      )
+      const row = container.querySelector('[data-as="chat-composer-row"]')
+      expect(row).toHaveAttribute('data-multiline')
+      scrollHeight.mockReturnValue(10)
+      rerender(<ChatComposer value="" onValueChange={() => {}} onSubmit={() => {}} />)
+      expect(row).not.toHaveAttribute('data-multiline')
+    } finally {
+      scrollHeight.mockRestore()
+    }
+  })
+
   it('passes axe idle and sending', async () => {
     const { container, rerender } = render(
       <ChatComposer value="hi" onValueChange={() => {}} onSubmit={() => {}} />,

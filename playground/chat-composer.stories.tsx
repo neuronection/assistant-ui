@@ -4,8 +4,16 @@ import { Plus } from 'lucide-react'
 import { ChatComposer } from '../src/components/chat-composer/ChatComposer'
 import { Button } from '../src/components/button/Button'
 
-function ComposerStory({ sending, onStop }: { sending?: boolean; onStop?: () => void }) {
-  const [value, setValue] = useState('Explain the limit definition, with a diagram')
+function ComposerStory({
+  sending,
+  onStop,
+  initialValue = 'Explain the limit definition, with a diagram',
+}: {
+  sending?: boolean
+  onStop?: () => void
+  initialValue?: string
+}) {
+  const [value, setValue] = useState(initialValue)
   return (
     <div style={{ maxWidth: 520 }}>
       <ChatComposer
@@ -44,3 +52,6 @@ function ComposerStory({ sending, onStop }: { sending?: boolean; onStop?: () => 
 
 export const Default = () => <ComposerStory />
 export const Sending = () => <ComposerStory sending onStop={() => {}} />
+export const Multiline = () => (
+  <ComposerStory initialValue={'Paste a long text here —\nthe row exposes data-multiline\nonce the textarea grows past one line.'} />
+)
