@@ -96,7 +96,12 @@ export {
   type ConnectionTestStatus,
   type ConnectionTestRowProps,
 } from './components/connection-test-row'
-export { ProviderForm, type ProviderFormProps } from './components/provider-form'
+export {
+  ProviderForm,
+  CUSTOM_PRESET_KEY,
+  type ProviderFormProps,
+  type ProviderPresetOption,
+} from './components/provider-form'
 export {
   SettingsShell,
   type SettingsNavItem,

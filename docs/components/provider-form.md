@@ -1,9 +1,11 @@
 # ProviderForm
 
-Standard provider-credential fields: name, optional base URL and a
-**write-only** API key, plus optional Local/Cloud hosting toggle and country
-select. The library never renders a stored key — keyring/storage is the
-app's business (ADR-006).
+Standard provider-credential fields: an optional preset-catalog picker,
+name, optional base URL and a **write-only** API key, plus optional
+Local/Cloud hosting toggle and country select. The library never renders a
+stored key — keyring/storage is the app's business (ADR-006). The preset
+catalog itself is app data (each backend ships its own); the form only
+renders the picker and reports the selected key.
 
 ## import
 
@@ -24,6 +26,11 @@ Extends `React.ComponentProps<'div'>` (spread onto the root).
 | `apiKey` | `string` | — | controlled; **write-only** field |
 | `onApiKeyChange` | `(value: string) => void` | — | |
 | `hideBaseUrl` | `boolean` | `false` | for provider types with a fixed endpoint |
+| `presets` | `ProviderPresetOption[]` | — | render gate for the catalog select (`{ key, name, local? }`) |
+| `presetKey` | `string` | `''` | controlled; `'custom'` (the `CUSTOM_PRESET_KEY` constant) is the built-in custom entry |
+| `onPresetChange` | `(key: string) => void` | — | required with `presets`; autofill (name/base URL/hosting) stays app-side |
+| `presetLabel` | `string` | `'Provider'` | |
+| `customPresetLabel` | `string` | `'Custom…'` | |
 | `namePlaceholder` | `string` | `'Provider name'` | |
 | `baseUrlPlaceholder` | `string` | `'https://api.example.com/v1'` | |
 | `nameLabel` | `string` | `'Name'` | |
@@ -70,6 +77,41 @@ minimal:
   onBaseUrlChange={setBaseUrl}
   apiKey={apiKey}
   onApiKeyChange={setApiKey}
+/>
+```
+
+preset catalog + hosting + country (country options come from the shared
+data export):
+
+```ts
+import { COUNTRIES, getCountryFlag } from '@neuronection/assistant-ui/countries'
+import { CUSTOM_PRESET_KEY } from '@neuronection/assistant-ui/provider-form'
+```
+
+```tsx
+<ProviderForm
+  presets={[
+    { key: 'openai', name: 'OpenAI' },
+    { key: 'ollama', name: 'Ollama (local)', local: true },
+  ]}
+  presetKey={presetKey}
+  onPresetChange={applyPreset}
+  name={name}
+  onNameChange={setName}
+  baseUrl={baseUrl}
+  onBaseUrlChange={setBaseUrl}
+  apiKey={apiKey}
+  onApiKeyChange={setApiKey}
+  showLocationKind
+  locationKind={isLocal ? 'local' : 'cloud'}
+  onLocationKindChange={setHosting}
+  showCountry
+  country={country}
+  onCountryChange={setCountry}
+  countryOptions={COUNTRIES.map((entry) => ({
+    value: entry.code,
+    label: `${entry.flag} ${entry.name}`,
+  }))}
 />
 ```
 

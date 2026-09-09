@@ -191,6 +191,49 @@ describe('ProviderForm', () => {
     expect(screen.getByRole('alert')).toHaveTextContent('URL must be https')
   })
 
+  it('renders the preset catalog select behind presets prop', async () => {
+    const user = userEvent.setup()
+    const onPresetChange = vi.fn()
+    const { container } = render(
+      <ProviderForm
+        name="x"
+        onNameChange={vi.fn()}
+        baseUrl=""
+        onBaseUrlChange={vi.fn()}
+        apiKey=""
+        onApiKeyChange={vi.fn()}
+        presets={[
+          { key: 'openai', name: 'OpenAI' },
+          { key: 'ollama', name: 'Ollama (local)', local: true },
+        ]}
+        presetKey="openai"
+        onPresetChange={onPresetChange}
+        presetLabel="Provider"
+        customPresetLabel="Custom…"
+      />,
+    )
+    const select = screen.getByLabelText('Provider')
+    expect(select).toHaveValue('openai')
+    expect(screen.getByRole('option', { name: 'Ollama (local)' })).toBeInTheDocument()
+    expect(screen.getByRole('option', { name: 'Custom…' })).toBeInTheDocument()
+    await user.selectOptions(select, 'custom')
+    expect(onPresetChange).toHaveBeenCalledWith('custom')
+
+    cleanup()
+    render(
+      <ProviderForm
+        name="x"
+        onNameChange={vi.fn()}
+        baseUrl=""
+        onBaseUrlChange={vi.fn()}
+        apiKey=""
+        onApiKeyChange={vi.fn()}
+      />,
+    )
+    expect(screen.queryByLabelText('Provider')).not.toBeInTheDocument()
+    expect(await axe(container)).toHaveNoViolations()
+  })
+
   it('has no axe violations', async () => {
     const { container } = render(
       <ProviderForm

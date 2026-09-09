@@ -50,6 +50,54 @@ export const ProviderFormStory = () => {
   )
 }
 
+export const ProviderFormPresetsStory = () => {
+  const [presetKey, setPresetKey] = useState('openai')
+  const [name, setName] = useState('OpenAI')
+  const [baseUrl, setBaseUrl] = useState('https://api.openai.com/v1')
+  const [apiKey, setApiKey] = useState('')
+  const [local, setLocal] = useState(false)
+  const [country, setCountry] = useState('')
+  const presets = [
+    { key: 'openai', name: 'OpenAI' },
+    { key: 'openrouter', name: 'OpenRouter' },
+    { key: 'ollama', name: 'Ollama (local)', local: true },
+    { key: 'lm_studio', name: 'LM Studio (local)', local: true },
+  ]
+  return (
+    <div style={{ maxWidth: 420 }}>
+      <ProviderForm
+        presets={presets}
+        presetKey={presetKey}
+        onPresetChange={(key) => {
+          setPresetKey(key)
+          const preset = presets.find((entry) => entry.key === key)
+          setName(preset ? preset.name : '')
+          setBaseUrl(preset ? (key === 'openai' ? 'https://api.openai.com/v1' : key === 'openrouter' ? 'https://openrouter.ai/v1' : key === 'ollama' ? 'http://localhost:11434/v1' : 'http://localhost:1234/v1') : '')
+          setLocal(preset?.local ?? false)
+        }}
+        name={name}
+        onNameChange={setName}
+        baseUrl={baseUrl}
+        onBaseUrlChange={setBaseUrl}
+        apiKey={apiKey}
+        onApiKeyChange={setApiKey}
+        showLocationKind
+        locationKind={local ? 'local' : 'cloud'}
+        onLocationKindChange={(kind) => setLocal(kind === 'local')}
+        showCountry
+        country={country}
+        onCountryChange={setCountry}
+        countryOptions={[
+          { value: 'AT', label: '🇦🇹 Austria' },
+          { value: 'DE', label: '🇩🇪 Germany' },
+          { value: 'US', label: '🇺🇸 United States' },
+        ]}
+        apiKeyHelp="Stored in the system keyring — never rendered back"
+      />
+    </div>
+  )
+}
+
 export const ConnectionTestRowStory = () => {
   const [status, setStatus] = useState<ConnectionTestStatus>('idle')
   const test = () => {

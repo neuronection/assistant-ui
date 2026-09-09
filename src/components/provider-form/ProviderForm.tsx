@@ -3,6 +3,18 @@ import { Building2, House, KeyRound } from 'lucide-react'
 import { cn } from '../../lib/utils'
 import { Input } from '../input/Input'
 
+/** One entry of the app's provider catalog (ADR-006: the catalog lives in
+ * the app/backend — the form only renders the picker and reports the key). */
+export interface ProviderPresetOption {
+  key: string
+  name: string
+  /** Local/on-premise preset — apps may default the hosting toggle from it. */
+  local?: boolean
+}
+
+/** Reserved key of the built-in "custom" preset entry (never a catalog key). */
+export const CUSTOM_PRESET_KEY = 'custom'
+
 export interface ProviderFormProps extends React.ComponentProps<'div'> {
   name: string
   onNameChange: (value: string) => void
@@ -17,6 +29,12 @@ export interface ProviderFormProps extends React.ComponentProps<'div'> {
   /** Hide the base URL field for provider types that have a fixed endpoint. */
   hideBaseUrl?: boolean
   apiKeyLabel?: string
+  /** Optional preset catalog select — render only when `presets` is non-empty. */
+  presets?: ProviderPresetOption[]
+  presetKey?: string
+  onPresetChange?: (key: string) => void
+  presetLabel?: string
+  customPresetLabel?: string
   /** Optional Local/Cloud toggle — render only when `showLocationKind`. */
   showLocationKind?: boolean
   locationKind?: 'local' | 'cloud'
@@ -63,6 +81,11 @@ export const ProviderForm = React.forwardRef<HTMLDivElement, ProviderFormProps>(
       apiKeyLabel = 'API key',
       apiKeyHelp,
       hasStoredKey = false,
+      presets,
+      presetKey = '',
+      onPresetChange,
+      presetLabel = 'Provider',
+      customPresetLabel = 'Custom…',
       showLocationKind = false,
       locationKind = 'cloud',
       onLocationKindChange,
@@ -91,6 +114,23 @@ export const ProviderForm = React.forwardRef<HTMLDivElement, ProviderFormProps>(
         className={cn('flex w-full flex-col gap-4', className)}
         {...props}
       >
+        {presets && presets.length > 0 && onPresetChange ? (
+          <label className="block space-y-1 text-sm">
+            <span className="text-sm font-medium text-[var(--as-fg)]">{presetLabel}</span>
+            <select
+              value={presetKey}
+              onChange={(event) => onPresetChange(event.target.value)}
+              className="w-full rounded-[var(--as-radius)] border border-[var(--as-border)] bg-[var(--as-surface)] px-3 py-2 text-sm text-[var(--as-fg)]"
+            >
+              {presets.map((preset) => (
+                <option key={preset.key} value={preset.key}>
+                  {preset.name}
+                </option>
+              ))}
+              <option value={CUSTOM_PRESET_KEY}>{customPresetLabel}</option>
+            </select>
+          </label>
+        ) : null}
         <Input
           label={nameLabel}
           value={name}

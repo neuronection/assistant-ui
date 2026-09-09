@@ -342,6 +342,10 @@
     "./fuzzy": {
       "types": "./dist/fuzzy.d.ts",
       "import": "./dist/fuzzy.js"
+    },
+    "./countries": {
+      "types": "./dist/countries.d.ts",
+      "import": "./dist/countries.js"
     }
   },
   "scripts": {

@@ -66,6 +66,7 @@ export const entry: Record<string, string> = {
   'range-bar': 'src/components/range-bar/index.ts',
   'scale-slider': 'src/components/scale-slider/index.ts',
   'fuzzy': 'src/lib/fuzzy.ts',
+  'countries': 'src/lib/countries.ts',
   'search-input': 'src/components/search-input/index.ts',
   'capability-chips': 'src/components/capability-chips/index.ts',
   'model-registry': 'src/components/model-registry/index.ts',
