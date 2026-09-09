@@ -3,6 +3,7 @@ dist/
 dev/
 *.local
 .DS_Store
+__pycache__/
 *.tsbuildinfo
 .ladle/cache/
 build/
