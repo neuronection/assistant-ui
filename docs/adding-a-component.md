@@ -57,11 +57,17 @@ Then wire it up:
 - **Ladle story** (`playground/<name>.stories.tsx`): the gallery is the
   review surface for design — and CI screenshots it. Visual baselines are
   **CI-shot**: local `--update-snapshots` output may differ from CI
-  rendering (font/antialiasing). If the CI visual job fails on stories
-  your PR didn't intentionally change — or after merging an intentional
-  visual change — trigger **Actions → CI → Run workflow**: the
-  `visual-rebaseline` job regenerates baselines on the CI runner,
-  commits them and re-runs CI. Never fix CI visual failures by
+  rendering (font/antialiasing). Baselines come from the `visual` job —
+  zero local baselines are committed, ever (the `tests/visual/__screenshots__`
+  dir is CI-authoritative). If the CI `visual` job fails on stories your
+  PR didn't intentionally change — or after merging an intentional
+  visual change — trigger **Actions → CI → Run workflow** (branch
+  `main`): the run re-executes `visual` and, **only when it fails**, the
+  sequenced `visual-rebaseline` job regenerates baselines on the CI
+  runner, commits them, and fires a cheap `visual_only` CI dispatch for
+  verification (non-visual jobs are skipped for that run). If the
+  dispatched run's `visual` job passed instead, the baselines were still
+  canonical — nothing to do. Never fix CI visual failures by
   hand-committing locally-shot baselines.
 - **Docs page** (`docs/components/<name>.md`): purpose, import line, props
   table (derive it from the component's Props interface — never invent),
