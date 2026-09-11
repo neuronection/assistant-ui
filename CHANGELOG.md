@@ -1,5 +1,14 @@
 # @neuronection/assistant-ui
 
+## 0.33.1
+
+### Patch Changes
+
+- [`0aafada`](https://github.com/neuronection/assistant-ui/commit/0aafada8a581d396e1c953d7804bcca1aeff9081) Thanks [@constLiakos](https://github.com/constLiakos)! - Fix React ref warning in `Combobox`/`ComboboxMulti`: `ComboboxPanel` is now a
+  forwardRef component (ref forwarded to the Radix `Popover.Content`), so the
+  `Popover.Portal` slot can attach refs without the
+  "Function components cannot be given refs" console warning.
+
 ## 0.33.0
 
 ### Minor Changes
