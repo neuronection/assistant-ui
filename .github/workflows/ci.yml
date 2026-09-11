@@ -182,7 +182,10 @@ jobs:
           if-no-files-found: ignore
 
   visual-rebaseline:
-    if: github.event_name == 'workflow_dispatch'
+    needs: visual
+    if: >-
+      always() && github.event_name == 'workflow_dispatch' &&
+      needs.visual.result == 'failure'
     runs-on: ubuntu-latest
     permissions:
       contents: write
