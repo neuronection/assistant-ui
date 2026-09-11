@@ -167,6 +167,34 @@ describe('ChatTraceTimeline tool observability', () => {
     expect(container.textContent).toContain('Permission denied.')
   })
 
+  it('pretty-prints JSON-array responses across lines in the detail block', async () => {
+    const user = userEvent.setup()
+    const { container } = render(
+      <ChatTraceTimeline
+        trace={{ latencyMs: 600 }}
+        entries={[
+          {
+            kind: 'tool',
+            label: 'search_jobs',
+            startMs: 0,
+            durationMs: 5,
+            args: '{"query": "hi"}',
+            response: '["ml-engineer", "game-developer", "graphic-designer"]',
+          },
+        ]}
+        defaultOpen
+      />,
+    )
+    await user.click(screen.getByText('search_jobs'))
+    const region = container.querySelector('[data-as="chat-trace-detail"]') as HTMLElement
+    expect(region).not.toBeNull()
+    const pre = region.querySelector('pre')
+    expect(pre).not.toBeNull()
+    expect(pre!.textContent).toBe(
+      '[\n  "ml-engineer",\n  "game-developer",\n  "graphic-designer"\n]',
+    )
+  })
+
   it('rows without observability data keep the spacer layout', () => {
     const { container } = render(
       <ChatTraceTimeline trace={{ latencyMs: 2000 }} entries={entries} defaultOpen />,

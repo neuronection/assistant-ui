@@ -74,6 +74,28 @@ describe('ChatToolCard', () => {
     expect(screen.getByText('12 hits').closest('pre')).not.toBeNull()
   })
 
+  it('pretty-prints JSON args and results across lines in the pre pane', () => {
+    render(
+      <ChatToolCard
+        name="search_jobs"
+        status="done"
+        args={'{"query": "hi", "limit": 5}'}
+        result='["ml-engineer", "game-developer"]'
+        defaultOpen
+      />,
+    )
+    expect(
+      screen.getByText((_, element) => element?.textContent === '{\n  "query": "hi",\n  "limit": 5\n}'),
+    ).toBeInTheDocument()
+    expect(
+      screen.getByText(
+        (_, element) =>
+          element?.textContent ===
+          '[\n  "ml-engineer",\n  "game-developer"\n]',
+      ),
+    ).toBeInTheDocument()
+  })
+
   it('renders a custom view through the renderResult slot', () => {
     render(
       <ChatToolCard

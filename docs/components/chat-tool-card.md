@@ -18,7 +18,7 @@ import { ChatToolCard } from '@neuronection/assistant-ui/chat-tool-card'
 | `name` | `string` | Tool identifier (rendered mono beside the title). |
 | `title` | `string` | Human title. |
 | `status` | `'running' \| 'done' \| 'failed'` | |
-| `args` / `result` | `string` | Serialized payloads (preformatted, scrollable). |
+| `args` / `result` | `string` | Serialized payloads (preformatted, scrollable; JSON is pretty-printed 2-space across lines — see `prettyJson`). |
 | `renderResult` | `(result: string) => ReactNode` | Custom result view; called even when `result` is empty (state-only tools). Absent → default `<pre>` pane. |
 | `durationMs` | `number` | Formatted as ms / s. |
 | `open` / `defaultOpen` / `onOpenChange` | | Expand state, controlled-first. |

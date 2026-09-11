@@ -43,8 +43,9 @@ response payloads are data — translate phases when building `entries`.
 dot after the duration, and `args`/`response` (JSON strings —
 `JSON.stringify(args, null, 2)` app-side) enable a per-row detail
 region (`chat-trace-detail` with `data-open`) rendering modern
-key-value rows — JSON objects are parsed into `key: value` pairs, other
-content renders as plain text. The region opens by clicking **the tool
+key-value rows — JSON objects are parsed into `key: value` pairs, JSON
+arrays render as a pretty-printed 2-space indent block (`prettyJson`),
+other content renders as plain text. The region opens by clicking **the tool
 name** (the label becomes a labelled button) or the row chevron
 (`chat-trace-detail-toggle`), accessible name
 `"<tool label> <labels.details>"`. Rows without any of those fields

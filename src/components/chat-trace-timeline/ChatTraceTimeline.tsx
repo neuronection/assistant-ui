@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { Brain, ChevronDown, ChevronRight, Timer } from 'lucide-react'
 
-import { cn } from '../../lib/utils'
+import { cn, prettyJson } from '../../lib/utils'
 
 export interface ChatTraceTimelineEntry {
   /** `phase` = model/flow round (primary bar); `tool` = tool call (warning bar). */
@@ -262,6 +262,7 @@ function DetailBlock({
   text: string
 }) {
   const entries = detailEntries(text)
+  const isArray = parseIsArray(text)
   return (
     <div className="pt-1">
       <p className="text-[10px] font-semibold uppercase tracking-wide text-[var(--as-muted-fg)]">
@@ -283,6 +284,10 @@ function DetailBlock({
             </div>
           ))}
         </dl>
+      ) : isArray ? (
+        <pre className="mt-0.5 max-h-40 overflow-auto whitespace-pre-wrap break-words rounded-[var(--as-radius)] bg-[var(--as-muted)] p-2 font-mono text-[11px] leading-relaxed text-[var(--as-fg)]">
+          {prettyJson(text)}
+        </pre>
       ) : (
         <p className="mt-0.5 whitespace-pre-wrap break-words text-[11px] text-[var(--as-fg)]">
           {text}
@@ -290,6 +295,14 @@ function DetailBlock({
       )}
     </div>
   )
+}
+
+function parseIsArray(text: string): boolean {
+  try {
+    return Array.isArray(JSON.parse(text))
+  } catch {
+    return false
+  }
 }
 
 function ThinkingDisclosure({

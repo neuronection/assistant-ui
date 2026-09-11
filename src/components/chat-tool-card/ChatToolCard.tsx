@@ -2,7 +2,7 @@ import * as React from 'react'
 import { Check, ChevronDown, TriangleAlert, Wrench } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 
-import { cn } from '../../lib/utils'
+import { cn, prettyJson } from '../../lib/utils'
 import { Spinner } from '../spinner/Spinner'
 
 export interface ChatToolCardLabels {
@@ -158,7 +158,7 @@ export const ChatToolCard = React.forwardRef<HTMLDivElement, ChatToolCardProps>(
               <div>
                 <p className="mb-1 font-medium uppercase tracking-wide text-[var(--as-muted-fg)]">{labels?.args ?? 'Arguments'}</p>
                 <pre className="max-h-40 overflow-auto whitespace-pre-wrap break-words rounded-[var(--as-radius-sm)] bg-[var(--as-surface-raised)] p-2 font-mono text-[11px] leading-relaxed">
-                  {args}
+                  {prettyJson(args)}
                 </pre>
               </div>
             ) : null}
@@ -169,7 +169,7 @@ export const ChatToolCard = React.forwardRef<HTMLDivElement, ChatToolCardProps>(
                   renderResult(result ?? '')
                 ) : (
                   <pre className="max-h-40 overflow-auto whitespace-pre-wrap break-words rounded-[var(--as-radius-sm)] bg-[var(--as-surface-raised)] p-2 font-mono text-[11px] leading-relaxed">
-                    {result}
+                    {prettyJson(result ?? '')}
                   </pre>
                 )}
               </div>
