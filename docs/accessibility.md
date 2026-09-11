@@ -114,6 +114,8 @@ behavior and focus restoration are listed **only where asserted**.
 | `ChatDrawer` | Radix Dialog semantics (labelled `role="dialog"`, focus trap, Escape); resize handle is a focusable `role="separator"` | arrows resize (±16, Shift ±48); Escape closes | clean (open) |
 | `ChatLauncher` | launcher `aria-expanded` with swapped label; panel is labelled `role="complementary"` + close button; Escape closes while focus is inside. `showClose={false}` moves the close into the app's header actions (keep one there) | toggle + close buttons keyboard-reachable | clean (open, closed, badge, showClose=false) |
 | `FlowStatusCard` | step `<ol>` with per-step status icons; running step `aria-current="step"`; header summary `role="status"`; failure block `role="alert"` (code + message); derived action buttons (*Cancel* while running, *Resume* when interrupted, *Retry* on retryable failure) | Tab reaches the visible action(s) in DOM order; Enter fires `onCancel`/`onResume`/`onRetry` | clean (running, failed, interrupted) |
+| `FlowTraceCard` | informational run ledger: stage `<ol>` + ops `<ul>` with visible ✓/✗ markers (decorative, `aria-hidden`) and detail tooltips (`title`, `aria-label` on the truncated detail); `<table>` per-call rows with scoped column headers (`task`/`model`/tokens/latency/status) and status dots with `title`; outcome + simulated badges are text | n/a — no interactive widgets (asserted: zero `button`s in the card) | clean (stages+calls+ops, simulated) |
+| `FlowTelemetryStrip` | informational digit row (`data-as="flow-telemetry-strip"`), plain text counters with tabular numerals; simulated badge carries a `title` explaining "no real spend" | n/a — informational | clean (counters, simulated) |
 
 ## File surface
 

@@ -45,6 +45,7 @@ export const entry: Record<string, string> = {
   'file-queue': 'src/components/file-queue/index.ts',
   'upload-dropzone': 'src/components/upload-dropzone/index.ts',
   'flow-status': 'src/components/flow-status/index.ts',
+  'flow-trace': 'src/components/flow-trace/index.ts',
   'field-label': 'src/components/field-label/index.ts',
   'form-modal': 'src/components/form-modal/index.ts',
   'info-button': 'src/components/info-button/index.ts',

@@ -83,6 +83,18 @@ export {
   type FlowStep,
   type FlowStepStatus,
 } from './components/flow-status'
+export {
+  FlowTraceCard,
+  FlowTelemetryStrip,
+  formatFlowLatency,
+  type FlowTrace,
+  type FlowTraceCall,
+  type FlowTraceCardLabels,
+  type FlowTraceCardProps,
+  type FlowTraceStage,
+  type FlowTelemetryStripProps,
+  type FlowTraceToolOp,
+} from './components/flow-trace'
 export { Badge, badgeVariants, type BadgeProps } from './components/badge'
 export {
   Breadcrumbs,

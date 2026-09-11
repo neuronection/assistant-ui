@@ -179,6 +179,10 @@
       "types": "./dist/flow-status.d.ts",
       "import": "./dist/flow-status.js"
     },
+    "./flow-trace": {
+      "types": "./dist/flow-trace.d.ts",
+      "import": "./dist/flow-trace.js"
+    },
     "./expandable-search": {
       "types": "./dist/expandable-search.d.ts",
       "import": "./dist/expandable-search.js"
