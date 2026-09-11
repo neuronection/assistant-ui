@@ -19,7 +19,9 @@ test('gallery ships at least the floor number of stories', () => {
 for (const id of ids) {
   test(`story ${id}`, async ({ page }) => {
     await page.goto(`/?story=${id}`)
-    await page.waitForSelector('main.ladle-main > *')
+    // Renders-nothing stories (presentational nulls, e.g. empty variants)
+    // mount with zero children — attached, not visible, is the honest bar.
+    await page.waitForSelector('main.ladle-main > *', { state: 'attached' })
     await page.evaluate(() => document.fonts.ready)
     await expect(page).toHaveScreenshot(`${id}.png`, {
       animations: 'disabled',
