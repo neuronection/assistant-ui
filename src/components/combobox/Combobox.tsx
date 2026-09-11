@@ -179,7 +179,8 @@ interface ComboboxPanelProps {
   panelClassName?: string
 }
 
-function ComboboxPanel(props: ComboboxPanelProps) {
+const ComboboxPanel = React.forwardRef<HTMLDivElement, ComboboxPanelProps>(
+  function ComboboxPanel(props, ref) {
   const {
     listId,
     options,
@@ -244,6 +245,7 @@ function ComboboxPanel(props: ComboboxPanelProps) {
 
   return (
     <PopoverPrimitive.Content
+      ref={ref}
       align="start"
       collisionPadding={8}
       onOpenAutoFocus={(event) => {
@@ -297,7 +299,7 @@ function ComboboxPanel(props: ComboboxPanelProps) {
       ) : null}
     </PopoverPrimitive.Content>
   )
-}
+})
 
 export interface ComboboxProps {
   options: ComboboxOption[]
