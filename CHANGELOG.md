@@ -1,5 +1,27 @@
 # @neuronection/assistant-ui
 
+## 0.33.0
+
+### Minor Changes
+
+- [`15755b0`](https://github.com/neuronection/assistant-ui/commit/15755b0fa23ba00727e25b6e120e9cf16047efcb) Thanks [@constLiakos](https://github.com/constLiakos)! - New `@neuronection/assistant-ui/flow-trace` subpath: `FlowTraceCard` renders a
+  run ledger over the library-owned `FlowTrace` schema — outcome badge + simulated
+  badge for mock-provider rows, the stage timeline, a per-call LLM ledger table
+  (task, stage, provider+model, tokens in/out, latency, prompt version, status)
+  and the applied/rejected ops list — while `FlowTelemetryStrip` renders the
+  compact `calls · tokens in/out · edits` live telemetry counters for the polling
+  progress card. Purely presentational (ADR-006): apps map their run data onto
+  the schema.
+
+### Patch Changes
+
+- [`7f180ea`](https://github.com/neuronection/assistant-ui/commit/7f180ea0c3baaa8d6ac209047e322c3cf14408a5) Thanks [@constLiakos](https://github.com/constLiakos)! - `ChatToolCard` and `ChatTraceTimeline` detail blocks render JSON
+  arguments/results as a **parsed, structured pane** instead of raw JSON text —
+  new shared `DetailValue`: objects render as `key: value` rows, arrays as value
+  chips, non-JSON payloads stay preformatted text. Also widens the trace-timeline
+  row label column (`w-16` → `w-24`) so tool names are not cropped, with the
+  detail region indent following the bar alignment.
+
 ## 0.32.0
 
 ### Minor Changes
