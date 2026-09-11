@@ -14,11 +14,11 @@ Works in React 18 & 19 and alongside Tailwind 3 or 4 — the library ships
 | [**study-assistant**](https://github.com/neuronection/study-assistant) | Study workspace: notes, materials, chat with math & code rendering |
 | [**health-assistant**](https://health-assistant.io) | Universal health data platform — self-hosted, privacy-first, [open source](https://github.com/health-assistant-io/health-assistant) |
 
-The family shares its UI DNA here: **40+ modules, 260+ tests** (keyboard-nav
+The family shares its UI DNA here: **80+ modules, 690+ tests** (keyboard-nav
 + axe per component), built on Radix, token-themed so every app looks like a
 sibling without sharing a stack. Patterns the apps actually use — provider &
 model settings blocks, AI affordances (ask/fill/act), date & clock pickers,
-async comboboxes, file attachment surfaces — live in the package, not
+async comboboxes, file attachment surfaces, chat surfaces & trace panes — live in the package, not
 copy-pasted in three repos.
 
 ## Install
