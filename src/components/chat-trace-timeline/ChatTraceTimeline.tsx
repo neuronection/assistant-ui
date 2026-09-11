@@ -1,7 +1,8 @@
 import * as React from 'react'
 import { Brain, ChevronDown, ChevronRight, Timer } from 'lucide-react'
 
-import { cn, prettyJson } from '../../lib/utils'
+import { cn } from '../../lib/utils'
+import { DetailValue } from '../detail-value/DetailValue'
 
 export interface ChatTraceTimelineEntry {
   /** `phase` = model/flow round (primary bar); `tool` = tool call (warning bar). */
@@ -158,14 +159,14 @@ function TraceRow({
             aria-expanded={open}
             aria-controls={regionId}
             title={item.detail ?? undefined}
-            className="w-16 shrink-0 truncate text-left text-[11px] text-[var(--as-fg)] transition-colors hover:text-[var(--as-primary)] focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[var(--as-focus-ring)]"
+            className="w-24 shrink-0 truncate text-left text-[11px] text-[var(--as-fg)] transition-colors hover:text-[var(--as-primary)] focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[var(--as-focus-ring)]"
             onClick={() => setOpen((value) => !value)}
           >
             {item.label}
           </button>
         ) : (
           <span
-            className="w-16 shrink-0 truncate text-[var(--as-muted-fg)]"
+            className="w-24 shrink-0 truncate text-[var(--as-muted-fg)]"
             title={item.detail ?? undefined}
           >
             {item.label}
@@ -224,7 +225,7 @@ function TraceRow({
           id={regionId}
           data-as="chat-trace-detail"
           data-open="true"
-          className="mb-1.5 ml-[4.5rem] border-l border-[var(--as-border)] pl-2"
+          className="mb-1.5 ml-[6.5rem] border-l border-[var(--as-border)] pl-2"
         >
           {item.args ? (
             <DetailBlock label={labels?.arguments ?? 'Arguments'} text={item.args} />
@@ -238,22 +239,6 @@ function TraceRow({
   )
 }
 
-function detailEntries(text: string): Array<{ key: string; value: string }> | null {
-  try {
-    const parsed = JSON.parse(text) as unknown
-    if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
-      const entries = Object.entries(parsed as Record<string, unknown>).map(([key, value]) => ({
-        key,
-        value: typeof value === 'string' ? value : JSON.stringify(value),
-      }))
-      return entries.length > 0 ? entries : null
-    }
-    return null
-  } catch {
-    return null
-  }
-}
-
 function DetailBlock({
   label,
   text,
@@ -261,48 +246,14 @@ function DetailBlock({
   label: string
   text: string
 }) {
-  const entries = detailEntries(text)
-  const isArray = parseIsArray(text)
   return (
     <div className="pt-1">
       <p className="text-[10px] font-semibold uppercase tracking-wide text-[var(--as-muted-fg)]">
         {label}
       </p>
-      {entries ? (
-        <dl className="mt-0.5 space-y-0.5">
-          {entries.map((entry) => (
-            <div
-              key={entry.key}
-              className="flex items-baseline justify-between gap-2 rounded-md bg-[var(--as-muted)] px-2 py-1"
-            >
-              <dt className="text-[10px] uppercase tracking-wide text-[var(--as-muted-fg)]">
-                {entry.key}
-              </dt>
-              <dd className="min-w-0 break-words text-right text-[11px] font-medium text-[var(--as-fg)]">
-                {entry.value}
-              </dd>
-            </div>
-          ))}
-        </dl>
-      ) : isArray ? (
-        <pre className="mt-0.5 max-h-40 overflow-auto whitespace-pre-wrap break-words rounded-[var(--as-radius)] bg-[var(--as-muted)] p-2 font-mono text-[11px] leading-relaxed text-[var(--as-fg)]">
-          {prettyJson(text)}
-        </pre>
-      ) : (
-        <p className="mt-0.5 whitespace-pre-wrap break-words text-[11px] text-[var(--as-fg)]">
-          {text}
-        </p>
-      )}
+      <DetailValue text={text} />
     </div>
   )
-}
-
-function parseIsArray(text: string): boolean {
-  try {
-    return Array.isArray(JSON.parse(text))
-  } catch {
-    return false
-  }
 }
 
 function ThinkingDisclosure({

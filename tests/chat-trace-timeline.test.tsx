@@ -167,7 +167,7 @@ describe('ChatTraceTimeline tool observability', () => {
     expect(container.textContent).toContain('Permission denied.')
   })
 
-  it('pretty-prints JSON-array responses across lines in the detail block', async () => {
+  it('renders array responses as value chips in the detail block', async () => {
     const user = userEvent.setup()
     const { container } = render(
       <ChatTraceTimeline
@@ -188,11 +188,21 @@ describe('ChatTraceTimeline tool observability', () => {
     await user.click(screen.getByText('search_jobs'))
     const region = container.querySelector('[data-as="chat-trace-detail"]') as HTMLElement
     expect(region).not.toBeNull()
-    const pre = region.querySelector('pre')
-    expect(pre).not.toBeNull()
-    expect(pre!.textContent).toBe(
-      '[\n  "ml-engineer",\n  "game-developer",\n  "graphic-designer"\n]',
+    expect(within(region).getByText('ml-engineer')).toBeInTheDocument()
+    expect(within(region).getByText('game-developer')).toBeInTheDocument()
+    expect(within(region).getByText('graphic-designer')).toBeInTheDocument()
+    expect(within(region).getByText('query')).toBeInTheDocument()
+    expect(within(region).getByText('hi')).toBeInTheDocument()
+    expect(region.querySelector('pre')).toBeNull()
+  })
+
+  it('tool-row labels are not cropped by the duration bar (wide label column)', () => {
+    render(
+      <ChatTraceTimeline trace={{ latencyMs: 2000 }} entries={entries} defaultOpen />,
     )
+    const label = screen.getByText('search_jobs')
+    expect(label.className).toContain('w-24')
+    expect(label.getAttribute('title')).not.toBeNull()
   })
 
   it('rows without observability data keep the spacer layout', () => {

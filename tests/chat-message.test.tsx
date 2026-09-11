@@ -58,7 +58,8 @@ describe('ChatToolCard', () => {
     )
     expect(screen.getByText('1.4 s')).toBeInTheDocument()
     await user.click(screen.getByRole('button'))
-    expect(screen.getByText(/"q": "nurse"/)).toBeInTheDocument()
+    expect(screen.getByText('q')).toBeInTheDocument()
+    expect(screen.getByText('nurse')).toBeInTheDocument()
     expect(screen.getByText('12 jobs')).toBeInTheDocument()
     expect(screen.getByRole('button')).toHaveAttribute('aria-expanded', 'true')
   })
@@ -69,12 +70,7 @@ describe('ChatToolCard', () => {
     expect(screen.getByText('Failed')).toHaveClass('sr-only')
   })
 
-  it('renders the default serialized result in a pre pane', () => {
-    render(<ChatToolCard name="search" status="done" result="12 hits" defaultOpen />)
-    expect(screen.getByText('12 hits').closest('pre')).not.toBeNull()
-  })
-
-  it('pretty-prints JSON args and results across lines in the pre pane', () => {
+  it('renders JSON args and results as structured rows and chips', () => {
     render(
       <ChatToolCard
         name="search_jobs"
@@ -84,16 +80,21 @@ describe('ChatToolCard', () => {
         defaultOpen
       />,
     )
-    expect(
-      screen.getByText((_, element) => element?.textContent === '{\n  "query": "hi",\n  "limit": 5\n}'),
-    ).toBeInTheDocument()
-    expect(
-      screen.getByText(
-        (_, element) =>
-          element?.textContent ===
-          '[\n  "ml-engineer",\n  "game-developer"\n]',
-      ),
-    ).toBeInTheDocument()
+    expect(screen.getByText('query')).toBeInTheDocument()
+    expect(screen.getByText('hi')).toBeInTheDocument()
+    expect(screen.getByText('limit')).toBeInTheDocument()
+    expect(screen.getByText('5')).toBeInTheDocument()
+    expect(screen.queryByText(/"\{?query/)).not.toBeInTheDocument()
+    expect(screen.getByText('ml-engineer')).toBeInTheDocument()
+    expect(screen.getByText('game-developer')).toBeInTheDocument()
+    const chip = screen.getByText('ml-engineer').closest('li')
+    expect(chip).not.toBeNull()
+  })
+
+  it('renders plain-text payloads as preformatted text', () => {
+    render(<ChatToolCard name="search" status="done" result="12 hits" defaultOpen />)
+    expect(screen.getByText('12 hits')).toBeInTheDocument()
+    expect(screen.getByText('12 hits')?.closest('pre')).not.toBeNull()
   })
 
   it('renders a custom view through the renderResult slot', () => {

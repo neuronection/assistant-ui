@@ -2,8 +2,9 @@ import * as React from 'react'
 import { Check, ChevronDown, TriangleAlert, Wrench } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 
-import { cn, prettyJson } from '../../lib/utils'
+import { cn } from '../../lib/utils'
 import { Spinner } from '../spinner/Spinner'
+import { DetailValue } from '../detail-value/DetailValue'
 
 export interface ChatToolCardLabels {
   running: string
@@ -157,9 +158,7 @@ export const ChatToolCard = React.forwardRef<HTMLDivElement, ChatToolCardProps>(
             {args ? (
               <div>
                 <p className="mb-1 font-medium uppercase tracking-wide text-[var(--as-muted-fg)]">{labels?.args ?? 'Arguments'}</p>
-                <pre className="max-h-40 overflow-auto whitespace-pre-wrap break-words rounded-[var(--as-radius-sm)] bg-[var(--as-surface-raised)] p-2 font-mono text-[11px] leading-relaxed">
-                  {prettyJson(args)}
-                </pre>
+                <DetailValue text={args} />
               </div>
             ) : null}
             {result || renderResult ? (
@@ -168,9 +167,7 @@ export const ChatToolCard = React.forwardRef<HTMLDivElement, ChatToolCardProps>(
                 {renderResult ? (
                   renderResult(result ?? '')
                 ) : (
-                  <pre className="max-h-40 overflow-auto whitespace-pre-wrap break-words rounded-[var(--as-radius-sm)] bg-[var(--as-surface-raised)] p-2 font-mono text-[11px] leading-relaxed">
-                    {prettyJson(result ?? '')}
-                  </pre>
+                  <DetailValue text={result ?? ''} />
                 )}
               </div>
             ) : null}
