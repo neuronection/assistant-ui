@@ -365,7 +365,7 @@
     "playground:build": "ladle build",
     "build": "NODE_OPTIONS=--max-old-space-size=8192 pnpm build:ts && pnpm build:dts && pnpm build:css",
     "build:ts": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\" && tsup",
-    "build:dts": "DTS_SHARD=0 tsup --config tsup.dts.config.ts && DTS_SHARD=1 tsup --config tsup.dts.config.ts && DTS_SHARD=2 tsup --config tsup.dts.config.ts && DTS_SHARD=3 tsup --config tsup.dts.config.ts && DTS_SHARD=4 tsup --config tsup.dts.config.ts",
+    "build:dts": "DTS_SHARD=0 tsup --config tsup.dts.config.ts && DTS_SHARD=1 tsup --config tsup.dts.config.ts && DTS_SHARD=2 tsup --config tsup.dts.config.ts && DTS_SHARD=3 tsup --config tsup.dts.config.ts && DTS_SHARD=4 tsup --config tsup.dts.config.ts && DTS_SHARD=5 tsup --config tsup.dts.config.ts",
     "build:css": "tailwindcss -i src/tokens/tokens.css -o dist/styles.css --minify && node scripts/unwrap-layers.mjs && node scripts/copy-katex-fonts.mjs",
     "test": "vitest run",
     "test:watch": "vitest",
