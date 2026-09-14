@@ -1,5 +1,18 @@
 # @neuronection/assistant-ui
 
+## 0.34.0
+
+### Minor Changes
+
+- [`6031a24`](https://github.com/neuronection/assistant-ui/commit/6031a24becf50833f9453ebba5e4c31bb841049f) Thanks [@constLiakos](https://github.com/constLiakos)! - feat(chat-hitl): human-in-the-loop proposal card module —
+  `HitlProposalCard` renders a persisted mutation the user resolves:
+  field-level before/after diffs (`FieldDiff`, long text through
+  `TextDiffView`), Approve/Reject actions with an armed two-step confirm
+  for destructive ops, and pending/approved/rejected/conflict/expired
+  states. Presentational + controlled (status is a prop, resolve is an
+  event) so proposing surfaces keep transport app-side. First consumer:
+  career-assistant plan 77 (chatbot profile editing).
+
 ## 0.33.2
 
 ### Patch Changes
