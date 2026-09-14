@@ -22,6 +22,7 @@ export const entry: Record<string, string> = {
   'chat-drawer': 'src/components/chat-drawer/index.ts',
   'chat-reasoning': 'src/components/chat-reasoning/index.ts',
   'chat-session-list': 'src/components/chat-session-list/index.ts',
+  'chat-hitl': 'src/components/chat-hitl/index.ts',
   'chat-tool-card': 'src/components/chat-tool-card/index.ts',
   'chat-turn-status': 'src/components/chat-turn-status/index.ts',
   'chat-export': 'src/components/chat-export/index.ts',

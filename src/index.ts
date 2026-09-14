@@ -403,6 +403,16 @@ export {
   type ChatTurnStatusLabels,
 } from './components/chat-turn-status'
 export {
+  HitlProposalCard,
+  type HitlProposalCardProps,
+  type HitlProposalCardLabels,
+  type HitlProposalStatus,
+  FieldDiff,
+  type FieldDiffProps,
+  type FieldDiffValue,
+  type FieldDiffLabels,
+} from './components/chat-hitl'
+export {
   ChatComposer,
   type ChatComposerProps,
   type ChatComposerLabels,

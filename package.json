@@ -107,6 +107,10 @@
       "types": "./dist/chat-export.d.ts",
       "import": "./dist/chat-export.js"
     },
+    "./chat-hitl": {
+      "types": "./dist/chat-hitl.d.ts",
+      "import": "./dist/chat-hitl.js"
+    },
     "./chat-history-button": {
       "types": "./dist/chat-history-button.d.ts",
       "import": "./dist/chat-history-button.js"
