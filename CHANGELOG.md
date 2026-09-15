@@ -1,5 +1,18 @@
 # @neuronection/assistant-ui
 
+## 0.35.0
+
+### Minor Changes
+
+- [`f7ca5a3`](https://github.com/neuronection/assistant-ui/commit/f7ca5a311d30988b92d19ffa1022ec4d8aefa67d) Thanks [@constLiakos](https://github.com/constLiakos)! - feat(chat-hitl): create-mode summaries on `HitlProposalCard` — a new
+  optional `action` prop (`create | update | delete`) swaps the before→after
+  diff for a clean item summary (`FieldSummary`) on create proposals:
+  empty fields are skipped, fields render as label/value rows and long
+  text as a plain prose block (no red/green TextDiffView — there is no
+  before-state to diff against). Update/delete cards keep the classic
+  diff; the prop defaults to undefined for full backwards compatibility.
+  First consumer: career-assistant chat HITL cards.
+
 ## 0.34.0
 
 ### Minor Changes
