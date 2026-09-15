@@ -5,6 +5,7 @@ import { axe } from 'jest-axe'
 
 import { HitlProposalCard } from '../src/components/chat-hitl'
 import { FieldDiff } from '../src/components/chat-hitl/FieldDiff'
+import { FieldSummary } from '../src/components/chat-hitl/FieldSummary'
 
 const DIFF = [
   { field: 'end', label: 'End date', before: null, after: '2026-06-30' },
@@ -169,5 +170,122 @@ describe('FieldDiff', () => {
       />,
     )
     expect(screen.getByText('[{"url":"https://x"}]')).toBeInTheDocument()
+  })
+})
+
+describe('HitlProposalCard create summary', () => {
+  it('renders create ops as field summaries without the diff grid', () => {
+    const { container } = render(
+      <HitlProposalCard
+        title="Add experience · Desktop Assistant"
+        status="pending"
+        action="create"
+        diff={[
+          { field: 'title', label: 'Title', after: 'Desktop Assistant' },
+          { field: 'kind', label: 'Type', after: 'project' },
+          { field: 'org_name', label: 'Organization', after: '' },
+          { field: 'end', label: 'End date', after: null },
+          { field: 'open_ended', label: 'Open-ended', after: true },
+        ]}
+        onApprove={() => {}}
+      />,
+    )
+    expect(
+      container.querySelectorAll('[data-as="hitl-field-summary"]').length,
+    ).toBeGreaterThan(0)
+    expect(screen.getByText('Title')).toBeInTheDocument()
+    expect(screen.getByText('Desktop Assistant')).toBeInTheDocument()
+    expect(screen.getByText('project')).toBeInTheDocument()
+    expect(screen.getByText('true')).toBeInTheDocument()
+    expect(screen.queryByText('—')).not.toBeInTheDocument()
+    expect(screen.queryByText('Organization')).not.toBeInTheDocument()
+    expect(screen.queryByText('End date')).not.toBeInTheDocument()
+    expect(document.querySelectorAll('[data-as="text-diff-view"]')).toHaveLength(0)
+  })
+
+  it('keeps the classic diff grid for update and delete ops', () => {
+    for (const action of ['update', 'delete', undefined] as const) {
+      const { container, unmount } = render(
+        <HitlProposalCard
+          title="Update experience · X"
+          status="pending"
+          action={action}
+          diff={DIFF}
+        />,
+      )
+      expect(
+        screen.getByText('—'),
+        `action ${String(action)} should stay a diff`,
+      ).toBeInTheDocument()
+      expect(
+        container.querySelectorAll('[data-as="hitl-field-summary"]'),
+      ).toHaveLength(0)
+      unmount()
+    }
+  })
+
+  it('runs axe on a create card', async () => {
+    const { container } = render(
+      <HitlProposalCard
+        title="Add experience · Desktop Assistant"
+        status="pending"
+        action="create"
+        diff={[{ field: 'title', label: 'Title', after: 'X' }]}
+        onApprove={() => {}}
+        onReject={() => {}}
+      />,
+    )
+    expect(await axe(container)).toHaveNoViolations()
+  })
+})
+
+describe('FieldSummary', () => {
+  it('renders long text as a prose block without diff colors', () => {
+    const { container } = render(
+      <FieldSummary
+        rows={[
+          {
+            field: 'description',
+            label: 'Description',
+            after: 'a'.repeat(120),
+          },
+        ]}
+      />,
+    )
+    expect(
+      container.querySelector('[data-as="hitl-field-summary"][data-field="description"]'),
+    ).not.toBeNull()
+    expect(container.querySelector('[data-as="text-diff-view"]')).toBeNull()
+    expect(screen.getByText('a'.repeat(120))).toBeInTheDocument()
+  })
+
+  it('renders collections as parsed chips, not raw JSON', () => {
+    const { container } = render(
+      <FieldSummary
+        rows={[
+          { field: 'skills', label: 'Skills', after: ['python', 'timescaledb'] },
+          {
+            field: 'links',
+            label: 'Links',
+            after: '["https://neuronection.com"]',
+          },
+        ]}
+      />,
+    )
+    const chips = container.querySelectorAll('ul li')
+    expect(chips.length).toBe(3)
+    expect(screen.getByText('python')).toBeInTheDocument()
+    expect(screen.getByText('timescaledb')).toBeInTheDocument()
+    expect(screen.getByText('https://neuronection.com')).toBeInTheDocument()
+    expect(screen.queryByText(/skill_key/)).not.toBeInTheDocument()
+  })
+
+  it('renders nothing when every row is empty', () => {
+    const { container } = render(
+      <FieldSummary
+        rows={[{ field: 'org_name', label: 'Organization', after: '' }]}
+      />,
+    )
+    expect(container).toBeEmptyDOMElement()
   })
 })

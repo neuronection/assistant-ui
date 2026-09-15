@@ -407,10 +407,13 @@ export {
   type HitlProposalCardProps,
   type HitlProposalCardLabels,
   type HitlProposalStatus,
+  type HitlProposalAction,
   FieldDiff,
   type FieldDiffProps,
   type FieldDiffValue,
   type FieldDiffLabels,
+  FieldSummary,
+  type FieldSummaryProps,
 } from './components/chat-hitl'
 export {
   ChatComposer,

@@ -11,6 +11,7 @@ import type { LucideIcon } from 'lucide-react'
 import { cn } from '../../lib/utils'
 import { Spinner } from '../spinner/Spinner'
 import { FieldDiff, type FieldDiffValue } from './FieldDiff'
+import { FieldSummary } from './FieldSummary'
 
 export type HitlProposalStatus =
   | 'pending'
@@ -18,6 +19,9 @@ export type HitlProposalStatus =
   | 'rejected'
   | 'conflict'
   | 'expired'
+
+/** Mutation kind of the proposal — selects create-summary vs diff body. */
+export type HitlProposalAction = 'create' | 'update' | 'delete'
 
 export interface HitlProposalCardLabels {
   approve: string
@@ -54,6 +58,9 @@ export interface HitlProposalCardProps {
   status: HitlProposalStatus
   /** Field-level before/after rows. */
   diff?: FieldDiffValue[]
+  /** Proposal mutation kind — `create` renders an item summary instead
+   * of a before→after diff (no before-state exists to diff against). */
+  action?: HitlProposalAction
   /** Destructive ops arm a two-step confirm before `onApprove` fires. */
   destructive?: boolean
   onApprove?: () => void
@@ -77,6 +84,7 @@ export function HitlProposalCard({
   title,
   status,
   diff = [],
+  action,
   destructive = false,
   onApprove,
   onReject,
@@ -155,7 +163,12 @@ export function HitlProposalCard({
         </div>
       </div>
 
-      {diff.length > 0 ? (
+      {action === 'create' && diff.length > 0 ? (
+        <div className="border-t border-[var(--as-border)] px-2.5 py-2">
+          <FieldSummary rows={diff} />
+        </div>
+      ) : null}
+      {action !== 'create' && diff.length > 0 ? (
         <div className="flex flex-col gap-1.5 border-t border-[var(--as-border)] px-2.5 py-2">
           {diff.map((row) => (
             <FieldDiff key={row.field} row={row} />

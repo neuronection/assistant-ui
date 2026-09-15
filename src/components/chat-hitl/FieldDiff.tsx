@@ -17,7 +17,7 @@ export interface FieldDiffLabels {
 }
 
 /** Value rendering: null reads as em-dash, everything else as text. */
-function valueText(value: unknown): string {
+export function valueText(value: unknown): string {
   if (value === null || value === undefined) {
     return '—'
   }

@@ -21,6 +21,7 @@ import { HitlProposalCard } from '@neuronection/assistant-ui'
 | `title` | `string` | Card headline, e.g. `Update experience · Siemens internship`. |
 | `status` | `'pending' \| 'approved' \| 'rejected' \| 'conflict' \| 'expired'` | Only `pending` renders actions. |
 | `diff` | `FieldDiffValue[]` | Field rows `{ field, label?, before?, after? }`; long text (either side > 80 chars) renders through `TextDiffView`. |
+| `action` | `'create' \| 'update' \| 'delete'` | Proposal mutation kind. `create` renders the rows through `FieldSummary` instead of a before→after diff — empty values are skipped, fields render as label/value rows and long text as a plain prose block (a create has no before-state to diff against). Update/delete keep the classic diff; omitted → legacy diff behavior. |
 | `destructive` | `boolean` | Destructive ops arm a two-step confirm (Approve → Confirm delete / Cancel) before `onApprove` fires. |
 | `onApprove` / `onReject` | `() => void` | Resolve events. `onReject` absent → no reject button (e.g. read-only history). |
 | `busy` | `boolean` | Resolve in flight — disables actions, shows a spinner on the primary. |
@@ -28,7 +29,9 @@ import { HitlProposalCard } from '@neuronection/assistant-ui'
 | `labels` | `Partial<HitlProposalCardLabels>` | approve/reject/confirm/cancel + the five status words + `conflictHint`. |
 | `icon` | `LucideIcon` | Default `ClipboardCheck`. |
 
-`FieldDiff` is exported separately for one-off diff rows outside a card.
+`FieldDiff` is exported separately for one-off diff rows outside a card;
+`FieldSummary` for non-diff item summaries (empty fields skipped, long
+text as prose).
 
 ## accessibility
 
