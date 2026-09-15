@@ -1,5 +1,18 @@
 # @neuronection/assistant-ui
 
+## 0.36.0
+
+### Minor Changes
+
+- [`ac43245`](https://github.com/neuronection/assistant-ui/commit/ac43245ab6adb09d4269ef98425bbc5a92a64542) Thanks [@constLiakos](https://github.com/constLiakos)! - feat(segmented-tabs): new `SegmentedTabs` component — a pill-style
+  segmented control with a raised sliding thumb for compact tab switching
+  (inspector panels, view/filter switches). Full ARIA tabs semantics:
+  roving `tabIndex`, automatic activation on Arrow/Home/End (wrap-around,
+  skips disabled items), `aria-selected`, decorative thumb. Tokens-only
+  styling with `data-as="segmented-tabs"`; thumb motion respects
+  `prefers-reduced-motion`. First consumer: career-assistant CV builder
+  inspector.
+
 ## 0.35.0
 
 ### Minor Changes
