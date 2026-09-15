@@ -249,6 +249,11 @@ export {
 } from './components/model-registry'
 export { SelectionBar, type SelectionBarProps } from './components/selection-bar'
 export {
+  SegmentedTabs,
+  type SegmentedTabsProps,
+  type SegmentedTabsItem,
+} from './components/segmented-tabs'
+export {
   SidebarNav,
   type NavChild,
   type NavItem,

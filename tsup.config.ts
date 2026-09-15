@@ -73,6 +73,7 @@ export const entry: Record<string, string> = {
   'search-input': 'src/components/search-input/index.ts',
   'capability-chips': 'src/components/capability-chips/index.ts',
   'model-registry': 'src/components/model-registry/index.ts',
+  'segmented-tabs': 'src/components/segmented-tabs/index.ts',
   'selection-bar': 'src/components/selection-bar/index.ts',
   'spinner': 'src/components/spinner/index.ts',
   'table': 'src/components/table/index.ts',

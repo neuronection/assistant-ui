@@ -113,6 +113,7 @@ const LIBRARY_COMPONENTS = [
   'ScaleSlider',
   'scaleColorForValue',
   'SearchInput',
+  'SegmentedTabs',
   'SelectionBar',
   'SettingsShell',
   'SidebarNav',

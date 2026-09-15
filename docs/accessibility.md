@@ -26,6 +26,7 @@ test where noted.
 | `UndoNotice` | `role="status"` live region | Enter on *Undo* fires `onUndo`; auto-dismiss via `duration` | clean |
 | `SelectionBar` | bar with *Clear selection* button | Enter clears; renders nothing at `count={0}` | clean |
 | `CheckIndicator` | `role="checkbox"`, `aria-checked` incl. `mixed` | Enter and Space toggle | clean |
+| `SegmentedTabs` | `role="tablist"`+`tab`, `aria-selected`, roving tabIndex, thumb `aria-hidden` | Arrow/Home/End move selection (wrap, skips disabled), selection follows focus | clean |
 | `ViewToggle` | buttons with `aria-pressed` | Enter switches views | clean |
 
 ## Overlays
