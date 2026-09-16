@@ -1,5 +1,20 @@
 # @neuronection/assistant-ui
 
+## 0.39.0
+
+### Minor Changes
+
+- [`43789ef`](https://github.com/neuronection/assistant-ui/commit/43789ef2dd13a1a24d4f1b749d3a4c20c9e4aaf4) Thanks [@constLiakos](https://github.com/constLiakos)! - Add the `hover-card` module: `HoverCard` (Radix root wrapper with 150/100 ms
+  open/close grace defaults and the controlled-first `open`/`onOpenChange`
+  contract), `HoverCardTrigger` (focusable — the card opens from keyboard focus
+  alone), `HoverCardContent` (`data-as="hover-card"`, tokened surface, `w-72`
+  default width) and `HoverCardPortal`. Escape/blur close; styling rides
+  `--as-*` tokens only.
+
+### Patch Changes
+
+- [`5b7da2d`](https://github.com/neuronection/assistant-ui/commit/5b7da2dfc273b9cd6663757f447cda55e323dd19) Thanks [@constLiakos](https://github.com/constLiakos)! - ChatComposer: make the `data-multiline` row hook hysteretic — once set it stays until the draft clears. Apps that restructure the row off the flag (e.g. desktop-assistant's footer wrap) change the textarea's width between states, and a flag re-measured at the new width fed back into itself, flipping the layout on every keystroke near the wrap threshold.
+
 ## 0.38.0
 
 ### Minor Changes
