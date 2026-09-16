@@ -82,6 +82,7 @@ export const ChatComposer = React.forwardRef<HTMLFormElement, ChatComposerProps>
     const internalTextareaRef = React.useRef<HTMLTextAreaElement | null>(null)
     const [dragging, setDragging] = React.useState(false)
     const [multiline, setMultiline] = React.useState(false)
+    const multilineRef = React.useRef(false)
     const dragDepth = React.useRef(0)
 
     const setTextarea = (element: HTMLTextAreaElement | null) => {
@@ -121,7 +122,16 @@ export const ChatComposer = React.forwardRef<HTMLFormElement, ChatComposerProps>
       if (!overflowing && element.scrollTop !== 0) {
         element.scrollTop = 0
       }
-      setMultiline(element.scrollHeight > lineHeight + verticalPadding + 1)
+      // Hysteresis: apps restyle this row off [data-multiline] (e.g.
+      // footer-wrapping the toolbars under a full-width textarea), which
+      // changes the textarea's width between the two states. A flag
+      // re-measured at whichever width the previous decision produced
+      // feeds back into itself and oscillates near the wrap threshold —
+      // one keystroke wide, the next squeezed. Once multiline, stay
+      // multiline until the draft clears.
+      const grew = element.scrollHeight > lineHeight + verticalPadding + 1
+      multilineRef.current = value === '' ? false : multilineRef.current || grew
+      setMultiline(multilineRef.current)
     }, [value, maxRows])
 
     const submit = () => {

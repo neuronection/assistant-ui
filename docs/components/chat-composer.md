@@ -35,7 +35,7 @@ import { ChatComposer } from '@neuronection/assistant-ui/chat-composer'
 | --- | --- |
 | `form[data-as="chat-composer"]` | The composer root (also carries `data-sending`). |
 | `[data-as="chat-composer-row"]` | The input row (toolbar slots + textarea + send/stop). |
-| `[data-as="chat-composer-row"][data-multiline]` | Present whenever the auto-growing textarea renders more than one line (same layout pass as the auto-grow height; absent in jsdom-style environments without layout). Apps use it to restructure the row — e.g. wrap the toolbars into a footer under a full-width textarea. |
+| `[data-as="chat-composer-row"][data-multiline]` | Present while the auto-growing textarea renders more than one line (same layout pass as the auto-grow height; absent in jsdom-style environments without layout). Apps use it to restructure the row — e.g. wrap the toolbars into a footer under a full-width textarea. Hysteretic by contract: once set it stays until the draft clears, because restructuring the row changes the textarea's width and a flag re-measured at the new width would flip itself every keystroke near the wrap threshold. |
 
 ## example (realistic)
 
