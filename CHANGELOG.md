@@ -1,5 +1,27 @@
 # @neuronection/assistant-ui
 
+## 0.38.0
+
+### Minor Changes
+
+- [`4e0edfe`](https://github.com/neuronection/assistant-ui/commit/4e0edfe645bcde037c9070cfbc2f4218b8b86c09) Thanks [@constLiakos](https://github.com/constLiakos)! - Add the `skeleton` module: `Skeleton` (one block) and `SkeletonText` (a stack
+  of text lines) loading placeholders with a `--as-*` token shimmer that sweeps
+  via CSS `background-position` (no transforms, radius/circle safe) and disables
+  to static muted blocks under `prefers-reduced-motion`. Both primitives are
+  `aria-hidden` decorations; the docs pin the container pattern — the app-owned
+  loading region carries `aria-busy` while placeholders show.
+
+### Patch Changes
+
+- [`6541949`](https://github.com/neuronection/assistant-ui/commit/65419493f8175f3c8ca0e060ab21ae3bb68faa08) Thanks [@constLiakos](https://github.com/constLiakos)! - ChatComposer: fix multiline auto-grow clipping the first line. The grow
+  height now adds a 1px slack over the (browser-rounded-down) scrollHeight
+  so fractional line-heights (e.g. `text-sm leading-relaxed` = 22.75px)
+  no longer leave the box short and let the caret scroll the first line
+  out of a hidden-overflow textarea; an under-cap box also pins
+  `scrollTop` to 0. The JS cap now mirrors the CSS box — a `max-h-*`
+  class on the textarea wins over `maxRows * 22`, so the two could never
+  disagree and hide lines silently.
+
 ## 0.37.0
 
 ### Minor Changes
