@@ -247,7 +247,7 @@ export const ChatSessionList = React.forwardRef<HTMLDivElement, ChatSessionListP
                       }}
                       tabIndex={0}
                     >
-                      <span className="min-w-0 flex-1 truncate text-[var(--as-fg)]">{session.title}</span>
+                      <span className="line-clamp-2 min-w-0 flex-1 text-[var(--as-fg)]">{session.title}</span>
                       {date ? (
                         <span className="shrink-0 text-[10px] text-[var(--as-muted-fg)]">
                           {formatDistanceToNow(date, { addSuffix: true })}

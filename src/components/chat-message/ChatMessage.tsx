@@ -124,7 +124,7 @@ export const ChatMessage = React.forwardRef<HTMLDivElement, ChatMessageProps>(
         {attachments ? <div className="mb-1.5 flex w-full flex-wrap justify-end gap-1.5">{attachments}</div> : null}
         <div
           className={cn(
-            'relative flex max-w-[92%] flex-col gap-1.5 rounded-[var(--as-radius-lg)] px-3 py-2 text-sm',
+            'relative flex max-w-[92%] flex-col gap-1.5 rounded-[var(--as-radius)] px-3 py-2 text-sm',
             compact && 'px-2.5 py-1.5',
             isUser
               ? 'rounded-br-[var(--as-radius-sm)] bg-[var(--as-primary)] text-[var(--as-primary-fg)]'
