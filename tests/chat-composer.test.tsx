@@ -112,6 +112,44 @@ describe('ChatComposer', () => {
     }
   })
 
+  it('keeps a fitting draft fully visible despite fractional line-height rounding', () => {
+    const scrollHeight = vi.spyOn(Element.prototype, 'scrollHeight', 'get').mockReturnValue(54)
+    const clientHeight = vi.spyOn(Element.prototype, 'clientHeight', 'get').mockReturnValue(60)
+    try {
+      const { rerender } = render(
+        <ChatComposer value={'one\ntwo'} onValueChange={() => {}} onSubmit={() => {}} />,
+      )
+      const textarea = screen.getByRole('textbox') as HTMLTextAreaElement
+      // +1 slack over the rounded-down scrollHeight: fractional
+      // line-heights (text-sm/leading-relaxed = 22.75px) otherwise leave
+      // the box short and the caret scrolls the first line out.
+      expect(textarea).toHaveStyle({ height: '55px' })
+      expect(textarea).toHaveStyle({ overflowY: 'hidden' })
+      ;(textarea as unknown as { scrollTop: number }).scrollTop = 12
+      rerender(<ChatComposer value={'one\ntwo '} onValueChange={() => {}} onSubmit={() => {}} />)
+      expect(textarea.scrollTop).toBe(0)
+    } finally {
+      scrollHeight.mockRestore()
+      clientHeight.mockRestore()
+    }
+  })
+
+  it('makes a draft past the cap scrollable and stops pinning the top', () => {
+    const scrollHeight = vi.spyOn(Element.prototype, 'scrollHeight', 'get').mockReturnValue(200)
+    const clientHeight = vi.spyOn(Element.prototype, 'clientHeight', 'get').mockReturnValue(60)
+    try {
+      render(<ChatComposer value={'line\n'.repeat(20)} onValueChange={() => {}} onSubmit={() => {}} />)
+      const textarea = screen.getByRole('textbox') as HTMLTextAreaElement
+      expect(textarea).toHaveStyle({ height: '176px' }) // maxRows * 22 fallback cap
+      expect(textarea).toHaveStyle({ overflowY: 'auto' })
+      ;(textarea as unknown as { scrollTop: number }).scrollTop = 7
+      expect(textarea.scrollTop).toBe(7)
+    } finally {
+      scrollHeight.mockRestore()
+      clientHeight.mockRestore()
+    }
+  })
+
   it('passes axe idle and sending', async () => {
     const { container, rerender } = render(
       <ChatComposer value="hi" onValueChange={() => {}} onSubmit={() => {}} />,

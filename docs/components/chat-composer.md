@@ -20,7 +20,7 @@ import { ChatComposer } from '@neuronection/assistant-ui/chat-composer'
 | `sending` | `boolean` | Turn in flight — swaps Send for Stop, blocks Enter. |
 | `onStop` | `() => void` | Stop control while `sending` (family stop endpoint). |
 | `disabled` | `boolean` | Dims and blocks everything. |
-| `maxRows` | `number` | Auto-grow cap before scrolling. Default `8`. |
+| `maxRows` | `number` | Auto-grow cap fallback (rows of 22px) when the textarea carries no CSS `max-h-*`; a `max-h-*` class always wins. Default `8`. |
 | `toolbarStart` / `toolbarEnd` | `ReactNode` | Inside the input row — attach menu, equation, draw, dictation… |
 | `attachments` | `ReactNode` | Rail above the input (`FileQueue`, image chips). |
 | `suggestions` | `ReactNode` | Chips / context strip above everything. |

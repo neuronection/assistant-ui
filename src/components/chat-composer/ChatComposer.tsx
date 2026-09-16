@@ -98,14 +98,29 @@ export const ChatComposer = React.forwardRef<HTMLFormElement, ChatComposerProps>
       if (element === null) {
         return
       }
-      element.style.height = 'auto'
-      const cap = maxRows * 22
-      element.style.height = element.scrollHeight > 0 ? `${Math.min(element.scrollHeight, cap)}px` : 'auto'
-      element.style.overflowY = element.scrollHeight > cap ? 'auto' : 'hidden'
       const style = window.getComputedStyle(element)
       const lineHeight = Number.parseFloat(style.lineHeight) || 22
       const verticalPadding =
         (Number.parseFloat(style.paddingTop) || 0) + (Number.parseFloat(style.paddingBottom) || 0)
+      // The JS cap must mirror the CSS box: a `max-h-*` class wins over
+      // the maxRows fallback, otherwise overflowY and the real visible
+      // cap disagree and lines clip silently.
+      const cap = Number.parseFloat(style.maxHeight) || maxRows * 22
+      element.style.height = 'auto'
+      // scrollHeight rounds fractional line-heights down (22.75px at
+      // text-sm/leading-relaxed), leaving the box ~1px short — the
+      // caret then scrolls the hidden-overflow textarea and clips the
+      // first line at the box top. The +1 absorbs the rounding; the
+      // scrollTop reset guarantees the first line stays visible
+      // whenever the whole content fits.
+      const next =
+        element.scrollHeight > 0 ? Math.min(Math.ceil(element.scrollHeight) + 1, cap) : 0
+      element.style.height = next > 0 ? `${next}px` : 'auto'
+      const overflowing = element.scrollHeight > element.clientHeight + 1
+      element.style.overflowY = overflowing ? 'auto' : 'hidden'
+      if (!overflowing && element.scrollTop !== 0) {
+        element.scrollTop = 0
+      }
       setMultiline(element.scrollHeight > lineHeight + verticalPadding + 1)
     }, [value, maxRows])
 
