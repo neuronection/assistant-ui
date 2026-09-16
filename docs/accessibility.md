@@ -143,6 +143,7 @@ behavior and focus restoration are listed **only where asserted**.
 | Module | ARIA pattern | Notes | axe |
 | --- | --- | --- | --- |
 | `Spinner` | `aria-hidden` without a label; `role="status"` + `aria-live="polite"` with one | announces loading by label | — |
+| `Skeleton` / `SkeletonText` | `aria-hidden` decorative blocks; the loading region carries `aria-busy` (app-owned pattern, see docs page) | none — content replaces them | clean (reduced-motion disables the sweep via CSS) |
 | `ErrorBanner` | `role="alert"` | renders nothing without a message; action slot app-owned | clean |
 | `UndoNotice` | `role="status"` | see Actions | clean |
 

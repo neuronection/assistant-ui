@@ -75,6 +75,7 @@ export const entry: Record<string, string> = {
   'model-registry': 'src/components/model-registry/index.ts',
   'segmented-tabs': 'src/components/segmented-tabs/index.ts',
   'selection-bar': 'src/components/selection-bar/index.ts',
+  'skeleton': 'src/components/skeleton/index.ts',
   'spinner': 'src/components/spinner/index.ts',
   'table': 'src/components/table/index.ts',
   'task-assignment-picker': 'src/components/task-assignment-picker/index.ts',

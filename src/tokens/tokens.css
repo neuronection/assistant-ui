@@ -110,6 +110,33 @@
   animation: as-drawer-in 0.2s ease-out;
 }
 
+@keyframes as-skeleton-sweep {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}
+
+[data-as='skeleton'] {
+  background-image: linear-gradient(
+    100deg,
+    transparent 30%,
+    var(--as-surface-raised) 50%,
+    transparent 70%
+  );
+  background-size: 200% 100%;
+  background-repeat: no-repeat;
+  animation: as-skeleton-sweep 1.8s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-as='skeleton'] {
+    animation: none;
+  }
+}
+
 /*
  * SettingsShell owns its responsive layout here instead of via
  * `grid-cols-1 lg:grid-cols-4` utilities: apps load their own compiled

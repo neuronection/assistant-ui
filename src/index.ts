@@ -260,6 +260,12 @@ export {
   type SidebarNavLabels,
   type SidebarNavProps,
 } from './components/sidebar-nav'
+export {
+  Skeleton,
+  SkeletonText,
+  type SkeletonProps,
+  type SkeletonTextProps,
+} from './components/skeleton'
 export { Spinner, type SpinnerProps } from './components/spinner'
 export {
   TaskAssignmentPicker,

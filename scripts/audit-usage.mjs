@@ -117,6 +117,8 @@ const LIBRARY_COMPONENTS = [
   'SelectionBar',
   'SettingsShell',
   'SidebarNav',
+  'Skeleton',
+  'SkeletonText',
   'Spinner',
   'Stepper',
   'Table',
