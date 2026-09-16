@@ -48,12 +48,19 @@ describe('Tooltip', () => {
 
 describe('InfoTooltip', () => {
   it('renders an accessible trigger with default label', () => {
-    render(
-      <TooltipProvider>
-        <InfoTooltip content="Details" />
-      </TooltipProvider>,
-    )
+    render(<InfoTooltip content="Details" />)
     expect(screen.getByRole('button', { name: 'Information' })).toBeInTheDocument()
+  })
+
+  it('shows content on focus without an app-level TooltipProvider (self-providing)', async () => {
+    const user = userEvent.setup()
+    render(<InfoTooltip content="Standalone help" />)
+    await user.tab()
+    expect(screen.getByRole('button', { name: 'Information' })).toHaveFocus()
+    await waitFor(() => {
+      expect(screen.getByRole('tooltip')).toBeInTheDocument()
+    })
+    expect(screen.getByText('Standalone help')).toBeInTheDocument()
   })
 
   it('click mode opens a popover with content', async () => {

@@ -2,7 +2,7 @@ import * as React from 'react'
 import { Info } from 'lucide-react'
 import { cn } from '../../lib/utils'
 import { Popover, PopoverContent, PopoverTrigger } from '../popover/Popover'
-import { Tooltip, TooltipContent, TooltipTrigger } from './Tooltip'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './Tooltip'
 
 type IconType = React.ComponentType<{ className?: string }>
 
@@ -49,16 +49,18 @@ export function InfoTooltip({
   }
 
   return (
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <button type="button" aria-label={label} className={iconButtonClassName}>
-          <Icon className="size-4" />
-        </button>
-      </TooltipTrigger>
-      <TooltipContent side={side}>
-        {title ? <p className="mb-0.5 font-semibold">{title}</p> : null}
-        {content}
-      </TooltipContent>
-    </Tooltip>
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <button type="button" aria-label={label} className={iconButtonClassName}>
+            <Icon className="size-4" />
+          </button>
+        </TooltipTrigger>
+        <TooltipContent side={side}>
+          {title ? <p className="mb-0.5 font-semibold">{title}</p> : null}
+          {content}
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   )
 }

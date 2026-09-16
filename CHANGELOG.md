@@ -1,5 +1,15 @@
 # @neuronection/assistant-ui
 
+## 0.36.2
+
+### Patch Changes
+
+- [`c945e00`](https://github.com/neuronection/assistant-ui/commit/c945e00cd9f897936135040a0c36e28fbfcbee67) Thanks [@constLiakos](https://github.com/constLiakos)! - fix(tooltip): `InfoTooltip` hover mode renders its own `TooltipProvider`,
+  so it works standalone — previously it threw
+  "`Tooltip` must be used within `TooltipProvider`" in any tree without an
+  app-level provider (hit in health-assistant's biomarker detail page).
+  The tooltip.md minimal example now includes the provider too.
+
 ## 0.36.1
 
 ### Patch Changes

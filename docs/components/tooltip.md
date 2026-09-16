@@ -34,6 +34,10 @@ Radix Content props; `sideOffset` defaults to `6`.
 | `label` | `string` | `'Information'` | trigger accessible name |
 | `className` | `string` | — | on the trigger button |
 
+`InfoTooltip` ships its own `TooltipProvider` in hover mode — it works
+standalone, no app-level provider required (nested providers are fine
+when the app has one).
+
 ## controlled contract
 
 Radix semantics: tooltip opens on focus **and** hover, closes on blur/leave;
@@ -50,12 +54,14 @@ name).
 minimal:
 
 ```tsx
-<Tooltip>
-  <TooltipTrigger asChild>
-    <Button variant="ghost" size="icon" aria-label={t('common.details')}><Info /></Button>
-  </TooltipTrigger>
-  <TooltipContent>{t('common.detailsHint')}</TooltipContent>
-</Tooltip>
+<TooltipProvider>
+  <Tooltip>
+    <TooltipTrigger asChild>
+      <Button variant="ghost" size="icon" aria-label={t('common.details')}><Info /></Button>
+    </TooltipTrigger>
+    <TooltipContent>{t('common.detailsHint')}</TooltipContent>
+  </Tooltip>
+</TooltipProvider>
 ```
 
 realistic (`InfoTooltip` next to a label):
