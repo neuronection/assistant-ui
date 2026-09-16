@@ -1,5 +1,14 @@
 # @neuronection/assistant-ui
 
+## 0.36.1
+
+### Patch Changes
+
+- [`84a2648`](https://github.com/neuronection/assistant-ui/commit/84a2648d1f96e9d17996da2b98b2517f015489b3) Thanks [@constLiakos](https://github.com/constLiakos)! - feat(chat): session-list titles wrap to two lines before ellipsising
+  (`ChatSessionList`), and chat bubbles use `--as-radius` (soft rounded
+  rectangle with the small tail corner) instead of `--as-radius-lg`, which
+  turned one-line messages into capsules.
+
 ## 0.36.0
 
 ### Minor Changes
