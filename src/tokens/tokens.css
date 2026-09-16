@@ -111,20 +111,116 @@
 }
 
 /*
- * SettingsShell owns its responsive columns here instead of via
+ * SettingsShell owns its responsive layout here instead of via
  * `grid-cols-1 lg:grid-cols-4` utilities: apps load their own compiled
  * utilities AFTER this stylesheet, so an unconditional app-side
  * `.grid-cols-1` (matched because the shell carried the class) would
- * override the media-query rule and force the nav on top at every
- * viewport. Class selectors never match here, so no collision.
+ * override a class-matched rule. Attribute selectors never collide with
+ * app utilities — BUT any property a mode rule below owns must not also
+ * appear as a utility class on the same element, or the later-loaded
+ * utility wins at equal specificity.
+ *
+ * The columns key off the shell's OWN inline size (container query),
+ * not the viewport: beside a docked side panel the page column is narrow
+ * on wide screens, and viewport media queries cannot see it. Below 48rem
+ * of shell width the rail collapses to a wrapping chip row; at or above
+ * it the classic 1+3 rail grid renders. Browsers without container
+ * query support get the narrow (chips) layout — usable everywhere.
  */
 [data-as='settings-shell'] {
+  container-type: inline-size;
+}
+
+[data-as='settings-shell-body'] {
+  display: grid;
+  gap: 2rem;
   grid-template-columns: repeat(1, minmax(0, 1fr));
 }
 
-@media (min-width: 64rem) {
-  [data-as='settings-shell'] {
+[data-as='settings-shell-nav'],
+[data-as='settings-shell-content'] {
+  min-width: 0;
+}
+
+[data-as='settings-shell-navbox'] {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0.625rem;
+  border: 1px solid var(--as-border);
+  border-radius: var(--as-radius-lg);
+  background: var(--as-surface-raised);
+}
+
+[data-as='settings-shell-navheader'] {
+  display: none;
+}
+
+[data-as='settings-shell-navitem'] {
+  display: inline-flex;
+  width: auto;
+  max-width: 100%;
+  align-items: center;
+  border-radius: var(--as-radius);
+}
+
+[data-as='settings-shell-navdesc'] {
+  display: none;
+}
+
+[data-as='settings-shell-navicon'] {
+  margin-right: 0.375rem;
+}
+
+[data-as='settings-shell-navtrailing'] {
+  margin-left: 0.375rem;
+}
+
+@container (min-width: 48rem) {
+  [data-as='settings-shell-body'] {
     grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  [data-as='settings-shell-content'] {
+    grid-column: span 3;
+  }
+
+  [data-as='settings-shell-navbox'] {
+    display: block;
+    padding: 0.75rem;
+  }
+
+  [data-as='settings-shell-navheader'] {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    margin-bottom: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    border-bottom: 1px solid var(--as-border);
+  }
+
+  [data-as='settings-shell-navitem'] {
+    display: flex;
+    width: 100%;
+    align-items: flex-start;
+  }
+
+  [data-as='settings-shell-navitem'] + [data-as='settings-shell-navitem'] {
+    margin-top: 0.25rem;
+  }
+
+  [data-as='settings-shell-navicon'] {
+    margin-right: 0.75rem;
+    margin-top: 0.125rem;
+  }
+
+  [data-as='settings-shell-navdesc'] {
+    display: block;
+  }
+
+  [data-as='settings-shell-navtrailing'] {
+    margin-left: auto;
+    padding-left: 0.5rem;
   }
 }
 

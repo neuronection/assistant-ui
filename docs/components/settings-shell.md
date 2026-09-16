@@ -2,7 +2,9 @@
 
 Two-pane settings layout: sticky section nav (icon, label, description per
 entry) + content pane. Fully controlled navigation; the router/page state
-stays app-side.
+stays app-side. The layout responds to the shell's **own width** (container
+query), not the viewport — beside a docked side panel the page column can be
+narrow on a wide screen, and the shell adapts to what it actually gets.
 
 ## import
 
@@ -17,24 +19,37 @@ import { SettingsShell, type SettingsNavItem } from '@neuronection/assistant-ui/
 | `nav` | `SettingsNavItem[]` | — | `{ id, label, description?, icon?, trailing? }` |
 | `active` | `string` | — | active nav id |
 | `onNavigate` | `(id: string) => void` | — | |
-| `header` | `{ icon?: LucideIcon; title: string }` | — | small header above the nav |
-| `children` | `ReactNode` | — | content pane (`lg:col-span-3`) |
-| `className` | `string` | — | on the outer grid (`grid gap-8` default; columns come from component CSS) |
+| `header` | `{ icon?: LucideIcon; title: string }` | — | small header above the nav (rail mode only) |
+| `children` | `ReactNode` | — | content pane (3 of 4 columns in rail mode) |
+| `className` | `string` | — | on the outer shell (the size container; the grid lives in component CSS) |
 | `navClassName` | `string` | — | on the nav card (e.g. sticky offset) |
 
-`trailing` is a ReactNode rendered at the row's trailing edge (`ml-auto`,
-vertically centered) — use it for status dots, counts or badges that belong
-to the nav entry itself rather than its description.
+`trailing` is a ReactNode rendered at the entry's trailing edge — use it for
+status dots, counts or badges that belong to the nav entry itself rather
+than its description. In chip mode the trailing node sits right after the
+label; in rail mode it is pushed to the row edge.
 
 ## layout & theming
 
-The responsive columns are owned by component CSS
-(`[data-as='settings-shell']`: one column, four at `64rem`) instead of
-`grid-cols-*` utilities. Host apps compile their own utilities **after** the
-library stylesheet, so an app-side `.grid-cols-1` would silently override a
-utility-based media-query rule and stack the nav on top — component CSS
-removes that collision. Override via `className` utilities still works (they
-win by source order), e.g. `className="lg:grid-cols-[1fr_3fr]"`.
+All layout is owned by component CSS on `[data-as]` hooks (root
+`settings-shell`, body grid `settings-shell-body`, nav `settings-shell-nav`,
+nav card `settings-shell-navbox`, entries `settings-shell-navitem`, content
+`settings-shell-content`). Host apps compile their own utilities **after**
+the library stylesheet, so utility-based column rules would silently
+collide — component CSS removes that.
+
+Two modes, switched by a container query on the root:
+
+- **Narrow** (shell < `48rem` wide — small windows, phones, or a docked
+  side panel squeezing the page): the nav renders as a **wrapping chip row**
+  (icons + labels, descriptions and header hidden) above the full-width
+  content pane.
+- **Rail** (shell ≥ `48rem`): the classic 1+3 grid — sticky vertical nav
+  card with descriptions on the left, content pane on the right.
+
+Browsers without container-query support render the narrow layout (usable
+everywhere). Apps should not restyle the grid; the mode hooks exist for
+tests and exceptional overrides via app CSS targeting `[data-as]`.
 
 ## controlled contract
 
