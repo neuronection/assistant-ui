@@ -112,6 +112,33 @@ describe('ChatComposer', () => {
     }
   })
 
+  it('stays multiline until the draft clears even when the widened row fits one line', () => {
+    let scrollHeightValue = 60
+    const scrollHeight = vi
+      .spyOn(Element.prototype, 'scrollHeight', 'get')
+      .mockImplementation(() => scrollHeightValue)
+    try {
+      const { container, rerender } = render(
+        <ChatComposer value={'squeezed pill wraps this'} onValueChange={() => {}} onSubmit={() => {}} />,
+      )
+      const row = container.querySelector('[data-as="chat-composer-row"]')
+      expect(row).toHaveAttribute('data-multiline')
+      scrollHeightValue = 10
+      rerender(
+        <ChatComposer value={'squeezed pill wraps this!'} onValueChange={() => {}} onSubmit={() => {}} />,
+      )
+      expect(row).toHaveAttribute('data-multiline')
+      rerender(
+        <ChatComposer value={'squeezed pill wraps this?'} onValueChange={() => {}} onSubmit={() => {}} />,
+      )
+      expect(row).toHaveAttribute('data-multiline')
+      rerender(<ChatComposer value="" onValueChange={() => {}} onSubmit={() => {}} />)
+      expect(row).not.toHaveAttribute('data-multiline')
+    } finally {
+      scrollHeight.mockRestore()
+    }
+  })
+
   it('keeps a fitting draft fully visible despite fractional line-height rounding', () => {
     const scrollHeight = vi.spyOn(Element.prototype, 'scrollHeight', 'get').mockReturnValue(54)
     const clientHeight = vi.spyOn(Element.prototype, 'clientHeight', 'get').mockReturnValue(60)

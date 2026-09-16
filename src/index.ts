@@ -266,6 +266,13 @@ export {
   type SkeletonProps,
   type SkeletonTextProps,
 } from './components/skeleton'
+export {
+  HoverCard,
+  HoverCardTrigger,
+  HoverCardContent,
+  HoverCardPortal,
+  type HoverCardProps,
+} from './components/hover-card'
 export { Spinner, type SpinnerProps } from './components/spinner'
 export {
   TaskAssignmentPicker,
