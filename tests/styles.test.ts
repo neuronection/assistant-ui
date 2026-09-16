@@ -42,4 +42,12 @@ describe.skipIf(!hasStyles)('dist/styles.css contract', () => {
     expect(css).toContain('as-anim-fade')
     expect(css).toContain('as-anim-pop')
   })
+
+  it('settings-shell keys its modes off its own width (container query), not the viewport', () => {
+    expect(css).toMatch(/data-as=.?settings-shell.?\]\{container-type:inline-size/)
+    expect(css).toMatch(/@container\s*\(min-width:\s*48rem\)/)
+    expect(css).not.toMatch(
+      new RegExp('@media \\(min-width: 64rem\\)\\s*\\{\\s*\\[data-as=.?settings-shell'),
+    )
+  })
 })

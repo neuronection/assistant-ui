@@ -30,6 +30,22 @@ export const SettingsShellStory = () => {
   )
 }
 
+export const SettingsShellNarrowStory = () => {
+  const [active, setActive] = useState('providers')
+  return (
+    <div style={{ width: 420 }}>
+      <SettingsShell
+        nav={nav}
+        active={active}
+        onNavigate={setActive}
+        header={{ icon: KeyRound, title: 'Settings' }}
+      >
+        <p style={{ fontSize: 14 }}>Section: {active}</p>
+      </SettingsShell>
+    </div>
+  )
+}
+
 export const ProviderFormStory = () => {
   const [name, setName] = useState('OpenRouter')
   const [baseUrl, setBaseUrl] = useState('https://openrouter.ai/v1')

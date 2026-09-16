@@ -64,10 +64,40 @@ describe('SettingsShell', () => {
     const root = container.firstElementChild as HTMLElement
     expect(root).toHaveAttribute('data-as', 'settings-shell')
     // App builds ship `.grid-cols-1` AFTER the library stylesheet; if the
-    // shell carried that class it would override `lg:grid-cols-4` (same
-    // specificity, later source order) and stack the nav on top.
+    // shell carried that class it would override the component CSS rule
+    // (same specificity, later source order) and stack the nav on top.
     expect(root.className).not.toContain('grid-cols-1')
     expect(root.className).not.toContain('lg:grid-cols-4')
+  })
+
+  it('exposes the container-query layout hooks (chip row narrow, rail wide)', () => {
+    const { container } = render(<ShellDemo />)
+    const root = container.firstElementChild as HTMLElement
+    expect(root.querySelector('[data-as="settings-shell-body"]')).not.toBeNull()
+    expect(root.querySelector('[data-as="settings-shell-nav"]')).not.toBeNull()
+    expect(root.querySelector('[data-as="settings-shell-navbox"]')).not.toBeNull()
+    expect(root.querySelector('[data-as="settings-shell-navheader"]')).not.toBeNull()
+    expect(root.querySelector('[data-as="settings-shell-content"]')).not.toBeNull()
+    const item = screen.getByRole('button', { name: /Providers/ })
+    expect(item).toHaveAttribute('data-as', 'settings-shell-navitem')
+    expect(item.querySelector('[data-as="settings-shell-navdesc"]')).not.toBeNull()
+  })
+
+  it('trailing nodes ride the layout hooks too', () => {
+    const { container } = render(
+      <SettingsShell
+        nav={[{ id: 'a', label: 'A', trailing: <span data-testid="dot" /> }]}
+        active="a"
+        onNavigate={vi.fn()}
+      >
+        <p>x</p>
+      </SettingsShell>,
+    )
+    const trailing = container.querySelector(
+      '[data-as="settings-shell-navtrailing"]',
+    )
+    expect(trailing).not.toBeNull()
+    expect(trailing?.firstElementChild).toHaveAttribute('data-testid', 'dot')
   })
 })
 
