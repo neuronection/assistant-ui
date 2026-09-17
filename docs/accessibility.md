@@ -36,7 +36,7 @@ behavior and focus restoration are listed **only where asserted**.
 
 | Module | ARIA pattern | Keyboard (asserted) | axe |
 | --- | --- | --- | --- |
-| `Modal` | `role="dialog"`, labelled title/description | Escape closes **and restores focus to the trigger**; built-in close button | clean (open) |
+| `Modal` | `role="dialog"`, labelled title/description; `ModalBody` is a plain padded `div` (no controls) | Escape closes **and restores focus to the trigger**; built-in close button | clean (open) |
 | `PanelModal` | `role="dialog"` side panel | Escape reports `onOpenChange(false)` | clean (open) |
 | `ConfirmationModal` | `Modal` + confirm/cancel buttons | Enter on confirm fires `onConfirm`; Escape reports `onOpenChange(false)`; busy disables both actions | clean (open) |
 | `FormModal` | `Modal` + form | Enter inside a field submits; `disabled` submit blocks submission | clean (open) |

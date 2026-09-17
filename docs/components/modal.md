@@ -1,7 +1,7 @@
 # Modal
 
 Radix dialog compound — `Modal` (Root), `ModalTrigger`, `ModalContent`,
-`ModalHeader`, `ModalTitle`, `ModalDescription`, `ModalFooter`,
+`ModalHeader`, `ModalBody`, `ModalTitle`, `ModalDescription`, `ModalFooter`,
 `ModalClose` — plus `PanelModal`, a header/body/footer dialog shell
 (full-screen on mobile, centered card on desktop).
 
@@ -12,6 +12,7 @@ import {
   Modal,
   ModalContent,
   ModalHeader,
+  ModalBody,
   ModalTitle,
   ModalDescription,
   ModalFooter,
@@ -32,6 +33,13 @@ import {
 
 `Modal` (Root) takes Radix Root props: `open` + `onOpenChange` (controlled)
 or `ModalTrigger` for uncontrolled use. Other parts forward native props.
+
+## props — ModalBody
+
+| prop | type | default | notes |
+|---|---|---|---|
+| `className` | `string` | — | merges; default padding `px-6 pb-6` matches Header/Footer |
+| …div props | — | — | `ModalHeader` uses `pb-4`, `ModalFooter` uses `p-6 pt-0` — the layout owns spacing; consumers don't add per-modal padding wrappers |
 
 ## props — PanelModal
 
@@ -70,7 +78,7 @@ minimal:
       <ModalTitle>Settings</ModalTitle>
       <ModalDescription>Provider configuration.</ModalDescription>
     </ModalHeader>
-    <div className="p-4">…</div>
+    <ModalBody>…</ModalBody>
     <ModalFooter>
       <Button variant="ghost" onClick={() => setOpen(false)}>Close</Button>
     </ModalFooter>

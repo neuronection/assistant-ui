@@ -203,6 +203,7 @@ export {
   type PanelModalProps,
   ModalClose,
   ModalContent,
+  ModalBody,
   ModalDescription,
   ModalFooter,
   ModalHeader,

@@ -1,5 +1,6 @@
 export {
   Modal,
+  ModalBody,
   ModalClose,
   ModalContent,
   ModalDescription,

@@ -101,6 +101,19 @@ export const ModalDescription = React.forwardRef<
   )
 })
 
+export const ModalBody = React.forwardRef<HTMLDivElement, React.ComponentProps<'div'>>(
+  function ModalBody({ className, ...props }, ref) {
+    return (
+      <div
+        ref={ref}
+        data-as="modal-body"
+        className={cn('px-6 pb-6', className)}
+        {...props}
+      />
+    )
+  },
+)
+
 export const ModalFooter = React.forwardRef<HTMLDivElement, React.ComponentProps<'div'>>(
   function ModalFooter({ className, ...props }, ref) {
     return (

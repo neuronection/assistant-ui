@@ -3,6 +3,7 @@ import { Button } from '../src/components/button/Button'
 import { ConfirmationModal } from '../src/components/confirmation-modal/ConfirmationModal'
 import {
   Modal,
+  ModalBody,
   ModalContent,
   ModalDescription,
   ModalFooter,
@@ -24,9 +25,9 @@ export const Sizes = () => (
             <ModalTitle>Size: {size}</ModalTitle>
             <ModalDescription>Radii, surfaces and shadows come from tokens.</ModalDescription>
           </ModalHeader>
-          <div style={{ padding: '0 24px' }}>
+          <ModalBody>
             <Input label="Project name" hint="Shown in exports" />
-          </div>
+          </ModalBody>
           <ModalFooter>
             <Button variant="outline">Cancel</Button>
             <Button>Save</Button>

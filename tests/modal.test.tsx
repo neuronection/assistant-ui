@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event'
 import { axe } from 'jest-axe'
 import {
   Modal,
+  ModalBody,
   ModalClose,
   ModalContent,
   ModalDescription,
@@ -73,6 +74,28 @@ describe('Modal', () => {
     await user.click(screen.getByRole('button', { name: 'Open' }))
     await screen.findByRole('dialog')
     expect(await axe(container)).toHaveNoViolations()
+  })
+
+  it('ModalBody renders a padded body region and merges className', async () => {
+    render(
+      <Modal open onOpenChange={() => {}}>
+        <ModalContent>
+          <ModalHeader>
+            <ModalTitle>T</ModalTitle>
+          </ModalHeader>
+          <ModalBody data-testid="body" className="grid gap-2">
+            <p>Body content</p>
+          </ModalBody>
+        </ModalContent>
+      </Modal>,
+    )
+    await screen.findByRole('dialog')
+    const body = screen.getByTestId('body')
+    expect(body).toHaveAttribute('data-as', 'modal-body')
+    expect(body).toHaveClass('px-6')
+    expect(body).toHaveClass('pb-6')
+    expect(body).toHaveClass('grid')
+    expect(screen.getByText('Body content')).toBeInTheDocument()
   })
 })
 
