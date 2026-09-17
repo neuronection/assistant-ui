@@ -1,5 +1,11 @@
 # @neuronection/assistant-ui
 
+## 0.40.0
+
+### Minor Changes
+
+- [`e6f84bd`](https://github.com/neuronection/assistant-ui/commit/e6f84bd1923274c96e719c2cef7338aec686afe7) Thanks [@constLiakos](https://github.com/constLiakos)! - ChatToolsCatalog: optional `badge` chip on catalog entries (`{ label, tone?: 'info' | 'warning' }`) rendered beside the tool name — lets apps mark non-callable HITL capability rows distinctly from callable tools (family ADR-0015; warning tone mirrors the HitlProposalCard accent tokens).
+
 ## 0.39.0
 
 ### Minor Changes
