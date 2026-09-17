@@ -76,6 +76,9 @@ export interface HitlProposalCardProps {
   /** Preview slot (plan 99, ADR-006 tier 3): renders a preview button —
    * the app owns what a preview IS (the modal, highlighting, revert). */
   onPreview?: () => void
+  /** Testid override for the preview button (app convention
+   * `hitl-preview-{id}`). */
+  previewTestId?: string
   /** Resolve in flight — disables the action buttons. */
   busy?: boolean
   /** Resolve error text (e.g. a failed apply). */
@@ -100,6 +103,7 @@ export function HitlProposalCard({
   onApprove,
   onReject,
   onPreview,
+  previewTestId = 'hitl-preview-button',
   busy = false,
   error,
   labels,
@@ -205,6 +209,7 @@ export function HitlProposalCard({
               onClick={() => onPreview()}
               disabled={!actionable}
               data-hitl-action="preview"
+              data-testid={previewTestId}
               className="inline-flex items-center gap-1 rounded-[var(--as-radius)] border border-[var(--as-border)] px-2.5 py-1 font-medium text-[var(--as-fg)] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--as-focus-ring)]"
             >
               <Eye className="size-3" aria-hidden />
@@ -258,6 +263,7 @@ export function HitlProposalCard({
             type="button"
             onClick={() => onPreview()}
             data-hitl-action="preview"
+            data-testid={previewTestId}
             className="inline-flex items-center gap-1 rounded-[var(--as-radius)] border border-[var(--as-border)] px-2.5 py-1 font-medium text-[var(--as-fg)] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--as-focus-ring)]"
           >
             <Eye className="size-3" aria-hidden />

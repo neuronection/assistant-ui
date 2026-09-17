@@ -28,6 +28,7 @@ import { HitlProposalCard } from '@neuronection/assistant-ui'
 | `error` | `string` | Resolve error text (`role="alert"`). |
 | `labels` | `Partial<HitlProposalCardLabels>` | approve/reject/confirm/cancel/preview + the six status words + `conflictHint`. |
 | `icon` | `LucideIcon` | Default `ClipboardCheck`. |
+| `previewTestId` | `string` | Preview button `data-testid` (default `hitl-preview-button`; pass `hitl-preview-{id}` for per-card targeting). |
 
 `FieldDiff` is exported separately for one-off diff rows outside a card;
 `FieldSummary` for non-diff item summaries (empty fields skipped, long
