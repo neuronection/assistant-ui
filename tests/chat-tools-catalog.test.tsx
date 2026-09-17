@@ -79,6 +79,29 @@ describe('ChatToolsCatalog', () => {
     expect(screen.getByText('Fit-scored matches for the caller.')).toBeInTheDocument()
   })
 
+  it('renders the badge chip when an entry carries one', () => {
+    render(
+      <ChatToolsCatalog
+        tools={[{ name: 'screen_watch', description: 'Watch the screen.', badge: { label: 'hitl', tone: 'warning' } }]}
+      />,
+    )
+    const badge = screen.getByText('hitl')
+    expect(badge).toHaveAttribute('data-tone', 'warning')
+    expect(badge).toHaveAttribute('data-as', 'chat-tools-catalog-badge')
+  })
+
+  it('renders no badge element without one', () => {
+    render(<ChatToolsCatalog tools={[{ name: 'search_jobs', description: 'Full-text search.' }]} />)
+    expect(document.querySelector('[data-as="chat-tools-catalog-badge"]')).toBeNull()
+  })
+
+  it('falls back to the info tone', () => {
+    render(
+      <ChatToolsCatalog tools={[{ name: 'list_apps', description: 'List apps.', badge: { label: 'read-only' } }]} />,
+    )
+    expect(screen.getByText('read-only')).toHaveAttribute('data-tone', 'info')
+  })
+
   it('filters by fuzzy search over name, title and description', async () => {
     const user = userEvent.setup()
     render(<ChatToolsCatalog tools={tools} />)
@@ -142,7 +165,11 @@ describe('ChatToolsCatalog', () => {
 
   it('passes axe collapsed, expanded and while filtering', async () => {
     const user = userEvent.setup()
-    const { container } = render(<ChatToolsCatalog tools={tools} />)
+    const badged = [
+      ...tools,
+      { name: 'screen_watch', description: 'Watch the screen.', badge: { label: 'hitl', tone: 'warning' as const } },
+    ]
+    const { container } = render(<ChatToolsCatalog tools={badged} />)
     expect(await axe(container)).toHaveNoViolations()
     await user.click(screen.getByRole('button', { name: /search_jobs/ }))
     expect(await axe(container)).toHaveNoViolations()

@@ -25,6 +25,7 @@ import { ChatToolsCatalog } from '@neuronection/assistant-ui/chat-tools-catalog'
 | `tools[].arguments` | `ChatToolCatalogArgument[]` | `{ name, type?, required?, description? }` rows. |
 | `tools[].example` / `.response` | `string` | Example payload (`pre`) and response description. |
 | `tools[].scope` | `string` | Rendered as an uppercase chip in the header; capped at 40% of the row (ellipsis + native `title` tooltip), so sentence-length values never push the name or chevron out — prefer short labels and keep sentences in `description`. |
+| `tools[].badge` | `{ label: string; tone?: 'info' \| 'warning' }` | Optional accent chip beside the name (`data-as="chat-tools-catalog-badge"`, tone in `data-tone`). `warning` uses the `--as-warning` accent (same tokens as the HITL card) — apps use it to mark non-callable HITL capability rows distinctly from callable tools (family ADR-0015). |
 | `searchable` | `boolean` | Fuzzy search over name/title/description (default `true`). |
 | `defaultOpen` | `boolean` | Expand every entry initially (default `false`). |
 | `labels` | `Partial<ChatToolsCatalogLabels>` | tools/search/searchPlaceholder/arguments/response/required/optional/empty/noResults. |

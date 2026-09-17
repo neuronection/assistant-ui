@@ -22,6 +22,8 @@ export interface ChatToolCatalogEntry {
   example?: string | null
   response?: string | null
   scope?: string | null
+  /** Accent chip beside the name — e.g. HITL capability rows (ADR-0015). */
+  badge?: { label: string; tone?: 'info' | 'warning' } | null
 }
 
 export interface ChatToolsCatalogLabels {
@@ -146,6 +148,20 @@ export const ChatToolsCatalog = React.forwardRef<HTMLDivElement, ChatToolsCatalo
                       <span className="font-mono font-medium text-[var(--as-fg)]">{tool.name}</span>
                       {tool.title ? (
                         <span className="ml-1.5 text-[var(--as-muted-fg)]">{tool.title}</span>
+                      ) : null}
+                      {tool.badge ? (
+                        <span
+                          data-as="chat-tools-catalog-badge"
+                          data-tone={tool.badge.tone ?? 'info'}
+                          className={cn(
+                            'ml-1.5 inline-block rounded-full border px-1.5 py-px align-middle text-[10px] font-medium uppercase tracking-wide',
+                            (tool.badge.tone ?? 'info') === 'warning'
+                              ? 'border-[var(--as-warning)] text-[var(--as-warning)]'
+                              : 'border-[var(--as-border)] text-[var(--as-muted-fg)]',
+                          )}
+                        >
+                          {tool.badge.label}
+                        </span>
                       ) : null}
                     </span>
                     {tool.scope ? (
