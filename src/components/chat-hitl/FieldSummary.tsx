@@ -2,7 +2,12 @@ import * as React from 'react'
 
 import { cn } from '../../lib/utils'
 import { DetailValue } from '../detail-value/DetailValue'
-import { valueText, type FieldDiffValue } from './FieldDiff'
+import {
+  FieldChips,
+  isStructuredList,
+  valueText,
+  type FieldDiffValue,
+} from './FieldDiff'
 
 /** Rows whose value is empty render nothing on a create card. */
 function isBlank(value: unknown): boolean {
@@ -53,6 +58,16 @@ export function FieldSummary({ rows, className }: FieldSummaryProps) {
     <div className={cn('flex flex-col gap-1.5', className)} data-field-count={filled.length}>
       {filled.map((row) => {
         const heading = row.label ?? row.field
+        if (isStructuredList(row.after)) {
+          return (
+            <div key={row.field} data-as="hitl-field-summary" data-field={row.field}>
+              <p className="font-medium uppercase tracking-wide text-[var(--as-muted-fg)]">
+                {heading}
+              </p>
+              <FieldChips value={row.after} />
+            </div>
+          )
+        }
         if (isArrayish(row.after)) {
           return (
             <div key={row.field} data-as="hitl-field-summary" data-field={row.field}>

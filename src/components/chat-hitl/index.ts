@@ -10,5 +10,9 @@ export {
   type FieldDiffProps,
   type FieldDiffValue,
   type FieldDiffLabels,
+  isStructuredList,
+  chipLabel,
+  valueText,
 } from './FieldDiff'
+export { FieldChips } from './FieldDiff'
 export { FieldSummary, type FieldSummaryProps } from './FieldSummary'

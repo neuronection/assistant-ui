@@ -73,3 +73,71 @@ export const Resolved = () => (
     <HitlProposalCard title="Update profile section · academics" status="expired" />
   </div>
 )
+
+const COLLECTION_DIFF = [
+  {
+    field: 'skills',
+    label: 'Skills',
+    before: [
+      {
+        id: 's1',
+        skill_key: 'python',
+        skill_label: 'Python',
+        role_in_item: 'primary',
+        level_claim: null,
+      },
+    ],
+    after: [
+      {
+        id: 's1',
+        skill_key: 'python',
+        skill_label: 'Python',
+        role_in_item: 'primary',
+        level_claim: null,
+      },
+      {
+        id: 's2',
+        skill_key: 'docker',
+        skill_label: 'Docker',
+        role_in_item: 'secondary',
+        level_claim: 4,
+      },
+    ],
+  },
+  {
+    field: 'edit',
+    label: 'Change',
+    before: null,
+    after: "adds skill: docker (secondary)",
+  },
+  { field: 'description', label: 'Description', before: 'Kept systems up.', after: 'Kept systems up.\nOptimized batch queries.' },
+]
+
+export const Reverted = () => (
+  <div style={{ maxWidth: 420 }}>
+    <HitlProposalCard
+      title="Update experience · Sample Logistics GmbH"
+      status="reverted"
+      diff={COLLECTION_DIFF}
+    />
+  </div>
+)
+
+export const PreviewSlot = () => (
+  <div style={{ maxWidth: 420, display: 'flex', flexDirection: 'column', gap: 12 }}>
+    <HitlProposalCard
+      title="Update experience · Sample Logistics GmbH"
+      status="pending"
+      diff={COLLECTION_DIFF}
+      onPreview={() => {}}
+      onApprove={() => {}}
+      onReject={() => {}}
+    />
+    <HitlProposalCard
+      title="Update experience · Sample Logistics GmbH"
+      status="approved"
+      diff={COLLECTION_DIFF.slice(0, 2)}
+      onPreview={() => {}}
+    />
+  </div>
+)

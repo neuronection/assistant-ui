@@ -19,15 +19,21 @@ import { HitlProposalCard } from '@neuronection/assistant-ui'
 | Prop | Type | Description |
 | --- | --- | --- |
 | `title` | `string` | Card headline, e.g. `Update experience · Siemens internship`. |
-| `status` | `'pending' \| 'approved' \| 'rejected' \| 'conflict' \| 'expired'` | Only `pending` renders actions. |
-| `diff` | `FieldDiffValue[]` | Field rows `{ field, label?, before?, after? }`; long text (either side > 80 chars) renders through `TextDiffView`. |
+| `status` | `'pending' \| 'approved' \| 'rejected' \| 'conflict' \| 'expired' \| 'reverted'` | Only `pending` renders resolve actions; `reverted` is the terminal state of an undone approved card (plan 99). |
+| `diff` | `FieldDiffValue[]` | Field rows `{ field, label?, before?, after? }`. Values render three ways: long text (either side > 80 chars) through `TextDiffView`, structured collections (`isStructuredList` — lists of plain objects, plan 99's skills/achievements/links rows) as chip rows with the entry's label + role/level suffix, scalars inline or as parsed chips for string arrays. |
 | `action` | `'create' \| 'update' \| 'delete'` | Proposal mutation kind. `create` renders the rows through `FieldSummary` instead of a before→after diff — empty values are skipped, fields render as label/value rows and long text as a plain prose block (a create has no before-state to diff against). Update/delete keep the classic diff; omitted → legacy diff behavior. |
 | `destructive` | `boolean` | Destructive ops arm a two-step confirm (Approve → Confirm delete / Cancel) before `onApprove` fires. |
-| `onApprove` / `onReject` | `() => void` | Resolve events. `onReject` absent → no reject button (e.g. read-only history). |
+| `onApprove` / `onReject` / `onPreview` | `() => void` | Resolve events. `onReject` absent → no reject button (e.g. read-only history). `onPreview` (plan 99) renders a Preview button on pending AND approved/reverted cards — a tier-3 slot: the library owns the button + a11y, the app owns what a preview is (before/after modal, highlighting). Omitted → no button. |
 | `busy` | `boolean` | Resolve in flight — disables actions, shows a spinner on the primary. |
 | `error` | `string` | Resolve error text (`role="alert"`). |
-| `labels` | `Partial<HitlProposalCardLabels>` | approve/reject/confirm/cancel + the five status words + `conflictHint`. |
+| `labels` | `Partial<HitlProposalCardLabels>` | approve/reject/confirm/cancel/preview + the six status words + `conflictHint`. |
 | `icon` | `LucideIcon` | Default `ClipboardCheck`. |
+
+`FieldDiff` is exported separately for one-off diff rows outside a card;
+`FieldSummary` for non-diff item summaries (empty fields skipped, long
+text as prose). `isStructuredList`, `chipLabel`, `FieldChips` and
+`valueText` are exported for apps composing custom value rows — the
+chips caption is `label (role · lvl N)`.
 
 `FieldDiff` is exported separately for one-off diff rows outside a card;
 `FieldSummary` for non-diff item summaries (empty fields skipped, long

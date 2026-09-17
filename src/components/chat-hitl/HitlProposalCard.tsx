@@ -3,7 +3,9 @@ import {
   Check,
   ClipboardCheck,
   Clock,
+  Eye,
   TriangleAlert,
+  Undo2,
   X,
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
@@ -19,6 +21,7 @@ export type HitlProposalStatus =
   | 'rejected'
   | 'conflict'
   | 'expired'
+  | 'reverted'
 
 /** Mutation kind of the proposal — selects create-summary vs diff body. */
 export type HitlProposalAction = 'create' | 'update' | 'delete'
@@ -29,12 +32,15 @@ export interface HitlProposalCardLabels {
   /** Armed (second-click) label for destructive confirms. */
   confirm: string
   cancel: string
+  /** Preview slot button (plan 99: the rendered before/after modal). */
+  preview: string
   /** Status words (chip + sr-only). */
   pending: string
   approved: string
   rejected: string
   conflict: string
   expired: string
+  reverted: string
   /** Hint under a conflict status. */
   conflictHint: string
 }
@@ -44,11 +50,13 @@ const DEFAULT_LABELS: HitlProposalCardLabels = {
   reject: 'Reject',
   confirm: 'Confirm delete',
   cancel: 'Cancel',
+  preview: 'Preview',
   pending: 'Pending review',
   approved: 'Approved',
   rejected: 'Rejected',
   conflict: 'Changed since proposed',
   expired: 'Expired',
+  reverted: 'Reverted',
   conflictHint: 'The data changed — review the diff and ask again if still wanted.',
 }
 
@@ -65,6 +73,9 @@ export interface HitlProposalCardProps {
   destructive?: boolean
   onApprove?: () => void
   onReject?: () => void
+  /** Preview slot (plan 99, ADR-006 tier 3): renders a preview button —
+   * the app owns what a preview IS (the modal, highlighting, revert). */
+  onPreview?: () => void
   /** Resolve in flight — disables the action buttons. */
   busy?: boolean
   /** Resolve error text (e.g. a failed apply). */
@@ -88,6 +99,7 @@ export function HitlProposalCard({
   destructive = false,
   onApprove,
   onReject,
+  onPreview,
   busy = false,
   error,
   labels,
@@ -122,6 +134,8 @@ export function HitlProposalCard({
       <TriangleAlert className="size-3.5" aria-hidden />
     ) : status === 'expired' ? (
       <Clock className="size-3.5" aria-hidden />
+    ) : status === 'reverted' ? (
+      <Undo2 className="size-3.5" aria-hidden />
     ) : null
 
   return (
@@ -148,6 +162,7 @@ export function HitlProposalCard({
               status === 'rejected' && 'text-[var(--as-muted-fg)]',
               (status === 'conflict' || destructive) && status === 'pending' && 'text-[var(--as-warning)]',
               status === 'expired' && 'text-[var(--as-muted-fg)]',
+              status === 'reverted' && 'text-[var(--as-muted-fg)]',
               status === 'pending' && !destructive && 'text-[var(--as-muted-fg)]',
             )}
           >
@@ -184,6 +199,18 @@ export function HitlProposalCard({
 
       {status === 'pending' ? (
         <div className="flex items-center gap-2 border-t border-[var(--as-border)] px-2.5 py-2">
+          {onPreview ? (
+            <button
+              type="button"
+              onClick={() => onPreview()}
+              disabled={!actionable}
+              data-hitl-action="preview"
+              className="inline-flex items-center gap-1 rounded-[var(--as-radius)] border border-[var(--as-border)] px-2.5 py-1 font-medium text-[var(--as-fg)] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--as-focus-ring)]"
+            >
+              <Eye className="size-3" aria-hidden />
+              {text.preview}
+            </button>
+          ) : null}
           <button
             type="button"
             onClick={handleApprove}
@@ -224,6 +251,18 @@ export function HitlProposalCard({
               {text.reject}
             </button>
           ) : null}
+        </div>
+      ) : onPreview ? (
+        <div className="flex items-center gap-2 border-t border-[var(--as-border)] px-2.5 py-2">
+          <button
+            type="button"
+            onClick={() => onPreview()}
+            data-hitl-action="preview"
+            className="inline-flex items-center gap-1 rounded-[var(--as-radius)] border border-[var(--as-border)] px-2.5 py-1 font-medium text-[var(--as-fg)] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--as-focus-ring)]"
+          >
+            <Eye className="size-3" aria-hidden />
+            {text.preview}
+          </button>
         </div>
       ) : null}
     </div>

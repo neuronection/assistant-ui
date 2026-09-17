@@ -136,6 +136,82 @@ describe('HitlProposalCard', () => {
     )
     expect(await axe(container)).toHaveNoViolations()
   })
+
+  it('renders the preview slot on pending and approved cards', async () => {
+    const onPreview = vi.fn()
+    const { unmount } = render(
+      <HitlProposalCard
+        title="Update experience · X"
+        status="pending"
+        diff={DIFF}
+        onApprove={() => {}}
+        onReject={() => {}}
+        onPreview={onPreview}
+      />,
+    )
+    const user = userEvent.setup()
+    await user.click(screen.getByRole('button', { name: 'Preview' }))
+    expect(onPreview).toHaveBeenCalledTimes(1)
+    unmount()
+
+    render(
+      <HitlProposalCard
+        title="Update experience · X"
+        status="approved"
+        diff={DIFF}
+        onPreview={onPreview}
+      />,
+    )
+    await user.click(screen.getByRole('button', { name: 'Preview' }))
+    expect(onPreview).toHaveBeenCalledTimes(2)
+  })
+
+  it('renders the reverted terminal status without actions', () => {
+    const { container } = render(
+      <HitlProposalCard
+        title="Update experience · X"
+        status="reverted"
+        diff={DIFF}
+      />,
+    )
+    expect(screen.getByText('Reverted')).toBeInTheDocument()
+    expect(screen.queryByRole('button')).not.toBeInTheDocument()
+    expect(container.querySelector('[data-status="reverted"]')).not.toBeNull()
+  })
+
+  it('hides the preview button when no slot is given', () => {
+    render(
+      <HitlProposalCard
+        title="Update experience · X"
+        status="approved"
+        diff={DIFF}
+      />,
+    )
+    expect(screen.queryByRole('button', { name: 'Preview' })).not.toBeInTheDocument()
+  })
+
+  it('runs axe with the preview slot and a reverted card', async () => {
+    const onPreview = vi.fn()
+    const { container } = render(
+      <div>
+        <HitlProposalCard
+          title="Update experience · X"
+          status="pending"
+          diff={DIFF}
+          onPreview={onPreview}
+          onApprove={() => {}}
+          onReject={() => {}}
+        />
+        <HitlProposalCard
+          title="Update experience · X"
+          status="reverted"
+          diff={DIFF}
+          onPreview={onPreview}
+        />
+      </div>,
+    )
+    expect(await axe(container)).toHaveNoViolations()
+  })
 })
 
 describe('FieldDiff', () => {
@@ -163,13 +239,63 @@ describe('FieldDiff', () => {
     expect(screen.getByText('7')).toBeInTheDocument()
   })
 
-  it('stringifies object values', () => {
-    render(
+  it('renders structured collection entries as chips, not raw JSON', () => {
+    const { container } = render(
       <FieldDiff
-        row={{ field: 'links', before: null, after: [{ url: 'https://x' }] }}
+        row={{
+          field: 'skills',
+          before: [
+            {
+              id: 's1',
+              skill_key: 'python',
+              skill_label: 'Python',
+              role_in_item: 'primary',
+              level_claim: null,
+            },
+          ],
+          after: [
+            {
+              id: 's1',
+              skill_key: 'python',
+              skill_label: 'Python',
+              role_in_item: 'primary',
+              level_claim: null,
+            },
+            {
+              id: 's2',
+              skill_key: 'docker',
+              skill_label: 'Docker',
+              role_in_item: 'secondary',
+              level_claim: 4,
+            },
+          ],
+        }}
       />,
     )
-    expect(screen.getByText('[{"url":"https://x"}]')).toBeInTheDocument()
+    expect(container.querySelectorAll('[data-as="hitl-field-chips"]').length).toBe(2)
+    expect(screen.getAllByText('Python (primary)')).toHaveLength(2)
+    expect(screen.getByText('Docker (secondary · lvl 4)')).toBeInTheDocument()
+    expect(screen.queryByText(/skill_key/)).not.toBeInTheDocument()
+  })
+
+  it('renders scalar string arrays as plain text (back-compat)', () => {
+    render(
+      <FieldDiff row={{ field: 'links', before: null, after: [{ url: 'https://x' }] }} />,
+    )
+    expect(screen.getByText('https://x')).toBeInTheDocument()
+    expect(screen.queryByText('[{"url":"https://x"}]')).not.toBeInTheDocument()
+    expect(
+      document.querySelector('[data-as="hitl-field-chips"]'),
+    ).not.toBeNull()
+  })
+
+  it('keeps stringifiying non-collection object values', () => {
+    render(
+      <FieldDiff
+        row={{ field: 'metric', before: null, after: { within: 'P90', value: 12 } }}
+      />,
+    )
+    expect(screen.getByText('{"within":"P90","value":12}')).toBeInTheDocument()
   })
 })
 
@@ -287,5 +413,41 @@ describe('FieldSummary', () => {
       />,
     )
     expect(container).toBeEmptyDOMElement()
+  })
+
+  it('renders structured collections as chips in the create summary', () => {
+    const { container } = render(
+      <FieldSummary
+        rows={[
+          {
+            field: 'skills',
+            label: 'Skills',
+            after: [
+              { skill_key: 'python', role_in_item: 'primary', level_claim: 5 },
+              { skill_key: 'docker', role_in_item: 'secondary' },
+            ],
+          },
+        ]}
+      />,
+    )
+    expect(container.querySelector('[data-as="hitl-field-chips"]')).not.toBeNull()
+    expect(screen.getByText('python (primary · lvl 5)')).toBeInTheDocument()
+    expect(screen.getByText('docker (secondary)')).toBeInTheDocument()
+    expect(screen.queryByText(/skill_key/)).not.toBeInTheDocument()
+  })
+
+  it('runs axe with structured chip rows', async () => {
+    const { container } = render(
+      <FieldSummary
+        rows={[
+          {
+            field: 'skills',
+            label: 'Skills',
+            after: [{ skill_key: 'python', role_in_item: 'primary' }],
+          },
+        ]}
+      />,
+    )
+    expect(await axe(container)).toHaveNoViolations()
   })
 })
