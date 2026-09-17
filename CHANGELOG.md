@@ -1,5 +1,28 @@
 # @neuronection/assistant-ui
 
+## 0.41.0
+
+### Minor Changes
+
+- [`4093020`](https://github.com/neuronection/assistant-ui/commit/409302063427554803dcc548034811f1c3e16bc9) Thanks [@constLiakos](https://github.com/constLiakos)! - Add `ModalBody` to the `Modal` compound: a padded body region (`px-6 pb-6`,
+  mergable via className, `data-as="modal-body"`) that sits between
+  `ModalHeader` (`p-6 pb-4`) and `ModalFooter` (`p-6 pt-0`). The modal layout
+  now owns its full spacing — consumers no longer hand-roll `px-6 pb-6`
+  wrappers on the content between header and footer (this was the de-facto
+  pattern in every family app, and `FormModal` already used it internally).
+  Story + docs + tests updated; no visual regression in existing usage.
+
+- [`cfcf89a`](https://github.com/neuronection/assistant-ui/commit/cfcf89a0b4e8aed583432ceec992bdeff7351b18) Thanks [@constLiakos](https://github.com/constLiakos)! - Refresh the default elevation tokens to softer two-layer ambient+key shadows
+  (`--as-shadow-1..3` — lower alpha, wider ambient spread: a calmer "floating
+  surface" feel) and deepen `--as-success` from oklch(0.62 0.15 152) to
+  oklch(0.55 0.15 152) so white `--as-success-fg` text meets WCAG AA (4.51:1,
+  was 3.41:1). A new automated contrast gate (`tests/tokens-contrast.test.ts`)
+  converts the light `:root` tokens OKLCH → sRGB → WCAG relative luminance and
+  asserts every fg/background text pair stays at 4.5:1 or better, so future
+  token edits cannot silently regress accessibility. Components consume the
+  tokens — no API changes; apps that re-map these tokens in their own
+  `theme.css` are unaffected until they adopt the new defaults.
+
 ## 0.40.0
 
 ### Minor Changes
