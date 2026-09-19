@@ -64,6 +64,8 @@ export const ChatTranscript = React.forwardRef<HTMLDivElement, ChatTranscriptPro
   ) {
     const scrollRef = React.useRef<HTMLDivElement | null>(null)
     const atBottomRef = React.useRef(true)
+    const lastScrollTopRef = React.useRef(0)
+    const lastTouchYRef = React.useRef<number | null>(null)
     const [showJump, setShowJump] = React.useState(false)
     const [announcement, setAnnouncement] = React.useState('')
     const previousCountRef = React.useRef(-1)
@@ -74,9 +76,60 @@ export const ChatTranscript = React.forwardRef<HTMLDivElement, ChatTranscriptPro
         return
       }
       const distance = element.scrollHeight - element.scrollTop - element.clientHeight
-      const atBottom = distance <= scrollThresholdPx
+      const goingUp = element.scrollTop < lastScrollTopRef.current
+      lastScrollTopRef.current = element.scrollTop
+      const atBottom = distance <= scrollThresholdPx && !(goingUp && distance > 0)
       atBottomRef.current = atBottom
       setShowJump(element.scrollHeight > element.clientHeight && !atBottom)
+    }
+
+    /**
+     * Fast streams re-pin the bottom on every render (rAF), which erases
+     * a partial upward scroll before it can cross `scrollThresholdPx` —
+     * so user scroll-up INTENT cancels stickiness synchronously here
+     * (wheel up, touch drag up, scroll-up keys), and any upward scroll
+     * event with distance left also breaks it. Scrolling back to the
+     * bottom (or the jump pill) re-arms the follow.
+     */
+    const cancelStick = () => {
+      const element = scrollRef.current
+      if (element === null) {
+        return
+      }
+      atBottomRef.current = false
+      setShowJump(element.scrollHeight > element.clientHeight)
+    }
+
+    const onWheel = (event: React.WheelEvent<HTMLDivElement>) => {
+      if (event.deltaY < 0) {
+        cancelStick()
+      }
+    }
+
+    const onTouchStart = (event: React.TouchEvent<HTMLDivElement>) => {
+      lastTouchYRef.current = event.touches[0]?.clientY ?? null
+    }
+
+    const onTouchMove = (event: React.TouchEvent<HTMLDivElement>) => {
+      const y = event.touches[0]?.clientY
+      if (y === undefined) {
+        return
+      }
+      if (lastTouchYRef.current !== null && y > lastTouchYRef.current) {
+        cancelStick()
+      }
+      lastTouchYRef.current = y
+    }
+
+    const onKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+      if (
+        event.key === 'ArrowUp' ||
+        event.key === 'PageUp' ||
+        event.key === 'Home' ||
+        (event.key === ' ' && event.shiftKey)
+      ) {
+        cancelStick()
+      }
     }
 
     React.useEffect(() => {
@@ -127,6 +180,10 @@ export const ChatTranscript = React.forwardRef<HTMLDivElement, ChatTranscriptPro
         <div
           ref={scrollRef}
           onScroll={onScroll}
+          onWheel={onWheel}
+          onTouchStart={onTouchStart}
+          onTouchMove={onTouchMove}
+          onKeyDown={onKeyDown}
           role="log"
           aria-label={labels?.log ?? 'Conversation'}
           aria-busy={live !== undefined}

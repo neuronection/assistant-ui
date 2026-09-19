@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { fireEvent, render, screen, within } from '@testing-library/react'
+import { act, fireEvent, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { axe } from 'jest-axe'
 import { vi } from 'vitest'
@@ -90,6 +90,108 @@ describe('ChatTranscript', () => {
       <ChatTranscript items={messages} live={<div>typing…</div>} />,
     )
     expect(await axe(container)).toHaveNoViolations()
+  })
+})
+
+type ScrollMock = {
+  writes: number[]
+  setScroll: (top: number) => void
+}
+
+function mockScroll(element: HTMLElement, scrollHeight: number, clientHeight: number): ScrollMock {
+  let scrollTop = 0
+  const writes: number[] = []
+  Object.defineProperty(element, 'scrollHeight', { configurable: true, get: () => scrollHeight })
+  Object.defineProperty(element, 'clientHeight', { configurable: true, get: () => clientHeight })
+  Object.defineProperty(element, 'scrollTop', {
+    configurable: true,
+    get: () => scrollTop,
+    set: (value: number) => {
+      scrollTop = Math.max(0, Math.min(value, scrollHeight - clientHeight))
+      writes.push(scrollTop)
+    },
+  })
+  element.scrollTo = vi.fn()
+  return { writes, setScroll: (top: number) => { scrollTop = top } }
+}
+
+describe('ChatTranscript stick-to-bottom', () => {
+  const overflow = { scrollHeight: 600, clientHeight: 400 }
+  const bottom = overflow.scrollHeight - overflow.clientHeight
+
+  function setupPinned() {
+    const utils = render(<ChatTranscript items={messages} live={<div>streaming</div>} />)
+    const log = screen.getByRole('log')
+    const mock = mockScroll(log, overflow.scrollHeight, overflow.clientHeight)
+    return { ...utils, ...mock, log }
+  }
+
+  it('follows the stream while pinned to the bottom', async () => {
+    const { writes, log } = setupPinned()
+    await vi.waitFor(() => expect(writes).toContain(bottom))
+    fireEvent.scroll(log)
+    expect(screen.queryByRole('button', { name: 'Scroll to latest' })).not.toBeInTheDocument()
+  })
+
+  it('stops following on a partial upward scroll even inside the threshold', async () => {
+    const { rerender, writes, log } = setupPinned()
+    await vi.waitFor(() => expect(writes).toContain(bottom))
+    fireEvent.scroll(log)
+
+    log.scrollTop = bottom - 30
+    fireEvent.scroll(log)
+    expect(screen.getByRole('button', { name: 'Scroll to latest' })).toBeInTheDocument()
+
+    const writesBefore = writes.length
+    rerender(
+      <ChatTranscript
+        items={[...messages, { id: 'a2', role: 'assistant', content: 'more streamed text', status: 'done' }]}
+        live={<div>streaming</div>}
+      />,
+    )
+    await act(async () => { await new Promise((resolve) => setTimeout(resolve, 30)) })
+    expect(writes.length).toBe(writesBefore)
+  })
+
+  it('cancels the follow on wheel-up before any scroll happens', async () => {
+    const { rerender, writes, log } = setupPinned()
+    await vi.waitFor(() => expect(writes).toContain(bottom))
+
+    fireEvent.wheel(log, { deltaY: -10 })
+    expect(screen.getByRole('button', { name: 'Scroll to latest' })).toBeInTheDocument()
+
+    const writesBefore = writes.length
+    rerender(<ChatTranscript items={messages} live={<div>streaming more</div>} />)
+    await act(async () => { await new Promise((resolve) => setTimeout(resolve, 30)) })
+    expect(writes.length).toBe(writesBefore)
+  })
+
+  it('cancels the follow on an upward touch drag', () => {
+    const { log } = setupPinned()
+    fireEvent.touchStart(log, { touches: [{ clientY: 120 }] })
+    fireEvent.touchMove(log, { touches: [{ clientY: 160 }] })
+    expect(screen.getByRole('button', { name: 'Scroll to latest' })).toBeInTheDocument()
+  })
+
+  it('cancels the follow on scroll-up keys', () => {
+    const { log } = setupPinned()
+    fireEvent.keyDown(log, { key: 'PageUp' })
+    expect(screen.getByRole('button', { name: 'Scroll to latest' })).toBeInTheDocument()
+  })
+
+  it('re-arms the follow when the user scrolls back to the bottom', async () => {
+    const { rerender, writes, log } = setupPinned()
+    await vi.waitFor(() => expect(writes).toContain(bottom))
+
+    fireEvent.wheel(log, { deltaY: -10 })
+    expect(screen.getByRole('button', { name: 'Scroll to latest' })).toBeInTheDocument()
+
+    log.scrollTop = bottom
+    fireEvent.scroll(log)
+    expect(screen.queryByRole('button', { name: 'Scroll to latest' })).not.toBeInTheDocument()
+
+    rerender(<ChatTranscript items={messages} live={<div>streaming more</div>} />)
+    await vi.waitFor(() => expect(writes.filter((top) => top === bottom).length).toBeGreaterThan(1))
   })
 })
 
