@@ -1,5 +1,16 @@
 # @neuronection/assistant-ui
 
+## 0.43.0
+
+### Minor Changes
+
+- [`7ab64aa`](https://github.com/neuronection/assistant-ui/commit/7ab64aab3596488684a489eab109ed1b56041552) Thanks [@constLiakos](https://github.com/constLiakos)! - Add the fourth family member everywhere: new `DesktopMark` logo (exported
+  from the root and `@neuronection/assistant-ui/logo`), `FamilyApp` widened
+  with `'desktop'` (usable as `AboutPanel`'s `familyCurrent` and
+  `FamilyBadge`'s `current`), and the default `FamilyBadge` member grid now
+  lists Desktop Assistant — four cards in a 2×2 responsive grid
+  (`sm:grid-cols-2`, was `sm:grid-cols-3`).
+
 ## 0.42.0
 
 ### Minor Changes
