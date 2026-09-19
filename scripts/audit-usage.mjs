@@ -81,6 +81,7 @@ const LIBRARY_COMPONENTS = [
   'InfoButton',
   'Input',
   'CareerMark',
+  'DesktopMark',
   'HealthMark',
   'NeuronectionMark',
   'NeuronectionWordmark',

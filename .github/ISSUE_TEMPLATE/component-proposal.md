@@ -11,6 +11,7 @@ assignees: ''
 - [ ] career-assistant
 - [ ] study-assistant
 - [ ] health-assistant
+- [ ] desktop-assistant
 
 **Where does it exist today?** (paths in the app repos, and how the implementations differ)
 

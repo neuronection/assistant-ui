@@ -2,8 +2,8 @@
 
 Family brand marks and wordmarks as inline SVGs: `NeuronectionMark`,
 `NeuronectionWordmark` (+ `mono`), and per-app marks `CareerMark`,
-`StudyMark`, `HealthMark`. `useLogoId` is exported for building unique SVG
-ids in app-drawn marks.
+`StudyMark`, `HealthMark`, `DesktopMark`. `useLogoId` is exported for
+building unique SVG ids in app-drawn marks.
 
 ## import
 
@@ -14,6 +14,7 @@ import {
   CareerMark,
   StudyMark,
   HealthMark,
+  DesktopMark,
   useLogoId,
   type LogoProps,
 } from '@neuronection/assistant-ui/logo'

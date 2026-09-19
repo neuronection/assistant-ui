@@ -1,6 +1,7 @@
 # Contributing to assistant-ui
 
-Internal library for the Assistant family (career-, study-, health-assistant).
+Internal library for the Assistant family (career-, study-, health-,
+desktop-assistant).
 External contributions are welcome but scoped to the family's needs — this is
 not a general-purpose design system.
 
@@ -42,7 +43,7 @@ not a general-purpose design system.
 6. Merging to `main` triggers the Changesets version PR; merging that
    publishes to npm with provenance. Nobody publishes from a laptop.
 
-## App adoption rules (for the three apps)
+## App adoption rules (for the four apps)
 
 When the library covers a local component: **delete the local copy and import
 the library version in the same commit.** No `// TODO migrate`, no thin local

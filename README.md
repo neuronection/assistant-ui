@@ -1,8 +1,9 @@
 # assistant-ui
 
-Shared React component library for the **Assistant family** — three sibling
-apps that AI-help people with career, study, and health. One package, three
-apps: family look by default, app flavor via CSS-variable design tokens.
+Shared React component library for the **Assistant family** — four sibling
+apps that AI-help people with career, study, health, and their desktop. One
+package, four apps: family look by default, app flavor via CSS-variable
+design tokens.
 Works in React 18 & 19 and alongside Tailwind 3 or 4 — the library ships
 **precompiled CSS**, so your app's Tailwind never compiles library classes.
 
@@ -13,13 +14,14 @@ Works in React 18 & 19 and alongside Tailwind 3 or 4 — the library ships
 | [**career-assistant**](https://github.com/neuronection/career-assistant) | Job discovery, AI matching and university pathways for students |
 | [**study-assistant**](https://github.com/neuronection/study-assistant) | Study workspace: notes, materials, chat with math & code rendering |
 | [**health-assistant**](https://health-assistant.io) | Universal health data platform — self-hosted, privacy-first, [open source](https://github.com/health-assistant-io/health-assistant) |
+| [**desktop-assistant**](https://github.com/neuronection/desktop-assistant) | System-tray AI launcher — global hotkey, streaming chat, voice input, local-only history |
 
 The family shares its UI DNA here: **80+ modules, 690+ tests** (keyboard-nav
 + axe per component), built on Radix, token-themed so every app looks like a
 sibling without sharing a stack. Patterns the apps actually use — provider &
 model settings blocks, AI affordances (ask/fill/act), date & clock pickers,
 async comboboxes, file attachment surfaces, chat surfaces & trace panes — live in the package, not
-copy-pasted in three repos.
+copy-pasted in four repos.
 
 ## Install
 
@@ -114,7 +116,7 @@ Visual reference: [gallery](https://neuronection.github.io/assistant-ui/).
 | [`upload-dropzone`](./docs/components/upload-dropzone.md) / [`file-card`](./docs/components/file-card.md) / [`file-queue`](./docs/components/file-queue.md) | file attachment surface: dropzone (block/row) · card (status, include toggle) · queue (summary + reorder) | [stories](https://neuronection.github.io/assistant-ui/?story=file-surface--dropzones) |
 | [`marquee`](./docs/components/marquee.md) | `useMarquee`, `MarqueeSurface`, `MarqueeBand` (rubber-band selection) | [stories](https://neuronection.github.io/assistant-ui/?story=marquee--default) |
 | [`portal`](./docs/components/portal.md) / [`theme-scope`](./docs/components/theme-scope.md) / tokens | `Portal` · `ThemeScope` · [token name lists + types](./docs/guides/utilities.md#tokens-entry-point) | [stories](https://neuronection.github.io/assistant-ui/?story=tokens--semantic-tokens) |
-| [`logo`](./docs/components/logo.md) / [`about`](./docs/components/about.md) | `NeuronectionMark`, `NeuronectionWordmark`, `Career/Study/HealthMark` · `AboutPanel` + about-page building blocks (`AboutCard`, `AboutLinkList`, `FamilyBadge`, `SponsorCard`, …) | [stories](https://neuronection.github.io/assistant-ui/?story=about--health-about-page) |
+| [`logo`](./docs/components/logo.md) / [`about`](./docs/components/about.md) | `NeuronectionMark`, `NeuronectionWordmark`, `Career/Study/Health/DesktopMark` · `AboutPanel` + about-page building blocks (`AboutCard`, `AboutLinkList`, `FamilyBadge`, `SponsorCard`, …) | [stories](https://neuronection.github.io/assistant-ui/?story=about--health-about-page) |
 
 API rules: controlled-first, `className` merges (never replaces), `asChild`
 where it makes sense, refs forwarded everywhere, English label props with

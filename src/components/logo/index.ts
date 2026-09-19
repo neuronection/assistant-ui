@@ -7,3 +7,4 @@ export {
 export { CareerMark } from './CareerMark'
 export { StudyMark } from './StudyMark'
 export { HealthMark } from './HealthMark'
+export { DesktopMark } from './DesktopMark'

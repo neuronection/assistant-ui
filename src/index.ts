@@ -29,6 +29,7 @@ export {
 export { ThemeScope, type ThemeScopeProps } from './components/theme-scope'
 export {
   CareerMark,
+  DesktopMark,
   HealthMark,
   NeuronectionMark,
   NeuronectionWordmark,

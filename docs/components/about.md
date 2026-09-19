@@ -31,7 +31,7 @@ Extends `React.ComponentProps<'div'>`.
 | prop | type | default | notes |
 |---|---|---|---|
 | `appName` | `string` | — | h1 (required) |
-| `familyCurrent` | `FamilyApp` (`'health' \| 'career' \| 'study'`) | — | picks the default mark + renders the family badge |
+| `familyCurrent` | `FamilyApp` (`'health' \| 'career' \| 'study' \| 'desktop'`) | — | picks the default mark + renders the family badge |
 | `logo` | `ReactNode` | — | overrides the default app mark |
 | `tagline` / `description` | `ReactNode` | — | hero copy |
 | `version` | `string` | — | outline badge + footer line |

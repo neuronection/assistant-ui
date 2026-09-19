@@ -21,7 +21,7 @@ Checklist for landing a new component in the library.
 5. Semantic `--as-*` tokens only — no raw colors in component code.
 6. `data-as="<component>"` attribute on the root element.
 7. Label/button strings via props with English defaults (apps translate at
-   call sites; all three apps use i18next).
+   call sites; career, study and health use i18next).
 8. Icons via props (`icon?: LucideIcon`) with conservative defaults.
 9. **No `-translate-x/y-*` utilities for overlay positioning.** On Tailwind 3
    apps those class names also resolve through the app stylesheet

@@ -28,7 +28,7 @@ What it does per package manager:
 | App | Manager | Mechanism |
 |---|---|---|
 | study-assistant | pnpm | `overrides:` entry in the workspace `pnpm-workspace.yaml` → `link:` symlink |
-| career-assistant, health-assistant | npm | **not supported — use the tarball flow** (see below) |
+| career-assistant, health-assistant, desktop-assistant | npm | **not supported — use the tarball flow** (see below) |
 
 **npm apps: `file:` linking is broken for this library — use tarballs.**
 Verified 2026-09-02 (nav primitives program): npm's `file:` symlink makes

@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { axe } from 'jest-axe'
 import { CareerMark } from '../src/components/logo/CareerMark'
+import { DesktopMark } from '../src/components/logo/DesktopMark'
 import { HealthMark } from '../src/components/logo/HealthMark'
 import { StudyMark } from '../src/components/logo/StudyMark'
 import { NeuronectionMark } from '../src/components/logo/NeuronectionMark'
@@ -9,6 +10,7 @@ import { NeuronectionWordmark } from '../src/components/logo/NeuronectionWordmar
 
 const marks = [
   ['career', CareerMark],
+  ['desktop', DesktopMark],
   ['health', HealthMark],
   ['study', StudyMark],
   ['neuronection', NeuronectionMark],
@@ -73,6 +75,7 @@ describe('logo marks', () => {
         <CareerMark />
         <StudyMark />
         <HealthMark />
+        <DesktopMark />
         <NeuronectionWordmark />
       </>,
     )

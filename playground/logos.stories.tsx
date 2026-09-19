@@ -1,4 +1,5 @@
 import { CareerMark } from '../src/components/logo/CareerMark'
+import { DesktopMark } from '../src/components/logo/DesktopMark'
 import { HealthMark } from '../src/components/logo/HealthMark'
 import { StudyMark } from '../src/components/logo/StudyMark'
 import { NeuronectionMark } from '../src/components/logo/NeuronectionMark'
@@ -31,11 +32,13 @@ export const AppMarks = () => (
       <CareerMark size={52} theme="light" />
       <HealthMark size={52} theme="light" />
       <StudyMark size={52} theme="light" />
+      <DesktopMark size={52} theme="light" />
     </Surface>
     <Surface dark>
       <CareerMark size={52} theme="dark" />
       <HealthMark size={52} theme="dark" />
       <StudyMark size={52} theme="dark" />
+      <DesktopMark size={52} theme="dark" />
     </Surface>
   </div>
 )
@@ -70,5 +73,6 @@ export const LabeledAndSized = () => (
     <CareerMark size={40} title="Career Assistant" />
     <StudyMark size={56} title="Study Assistant" />
     <HealthMark size={72} title="Health Assistant" />
+    <DesktopMark size={64} title="Desktop Assistant" />
   </Surface>
 )

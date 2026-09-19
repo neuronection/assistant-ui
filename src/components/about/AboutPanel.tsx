@@ -2,6 +2,7 @@ import * as React from 'react'
 import { cn } from '../../lib/utils'
 import { Badge } from '../badge/Badge'
 import { CareerMark } from '../logo/CareerMark'
+import { DesktopMark } from '../logo/DesktopMark'
 import { HealthMark } from '../logo/HealthMark'
 import { StudyMark } from '../logo/StudyMark'
 import type { LogoTheme } from '../logo/Logo'
@@ -74,6 +75,7 @@ const marks = {
   health: HealthMark,
   career: CareerMark,
   study: StudyMark,
+  desktop: DesktopMark,
 } as const
 
 export const AboutPanel = React.forwardRef<HTMLDivElement, AboutPanelProps>(

@@ -5,6 +5,7 @@ import type { LogoTheme } from '../logo/Logo'
 import { NeuronectionMark } from '../logo/NeuronectionMark'
 import { NeuronectionWordmark } from '../logo/NeuronectionWordmark'
 import { CareerMark } from '../logo/CareerMark'
+import { DesktopMark } from '../logo/DesktopMark'
 import { HealthMark } from '../logo/HealthMark'
 import { StudyMark } from '../logo/StudyMark'
 
@@ -14,7 +15,7 @@ const GitHubGlyph = ({ className }: { className?: string }) => (
   </svg>
 )
 
-export type FamilyApp = 'health' | 'career' | 'study'
+export type FamilyApp = 'health' | 'career' | 'study' | 'desktop'
 
 export interface FamilyMember {
   app: FamilyApp
@@ -50,6 +51,7 @@ const marks = {
   health: HealthMark,
   career: CareerMark,
   study: StudyMark,
+  desktop: DesktopMark,
 } as const
 
 const defaultMembers: Record<FamilyApp, { name: string; tagline: string; href: string; github: string; website?: string }> = {
@@ -72,9 +74,15 @@ const defaultMembers: Record<FamilyApp, { name: string; tagline: string; href: s
     href: 'https://neuronection.com/en/study/',
     github: 'https://github.com/neuronection/study-assistant',
   },
+  desktop: {
+    name: 'Desktop Assistant',
+    tagline: 'System-tray AI launcher with global-hotkey chat and local-only history',
+    href: 'https://neuronection.com/en/desktop/',
+    github: 'https://github.com/neuronection/desktop-assistant',
+  },
 }
 
-const defaultOrder: FamilyApp[] = ['health', 'career', 'study']
+const defaultOrder: FamilyApp[] = ['health', 'career', 'study', 'desktop']
 
 const defaultBlurb =
   'Neuronection is a family of open-source, self-hosted AI assistants — one connected ecosystem for life\u2019s important choices. Every assistant in the family shares the same principles: deeply structured data instead of text dumps, AI that explains its reasoning, and you in control of your information.'
@@ -145,12 +153,12 @@ export const FamilyBadge = React.forwardRef<HTMLDivElement, FamilyBadgeProps>(
           </p>
         ) : null}
 
-        <ul className="grid grid-cols-1 gap-x-3 gap-y-4 sm:grid-cols-3">
+        <ul className="grid grid-cols-1 gap-x-3 gap-y-4 sm:grid-cols-2">
           {list.map((member) => {
             const Mark = marks[member.app]
             const isCurrent = member.app === current
             const card = cn(
-              'group flex h-full flex-col rounded-[var(--as-radius)] border p-5 pt-6 text-center transition-[color,box-shadow] hover:shadow-[var(--as-shadow-2)]',
+              'group flex h-full flex-col rounded-[var(--as-radius)] border p-4 pt-5 text-center transition-[color,box-shadow] hover:shadow-[var(--as-shadow-2)]',
               isCurrent
                 ? 'border-[var(--as-primary)] bg-[color-mix(in_srgb,var(--as-primary)_7%,transparent)] ring-2 ring-[var(--as-primary)]'
                 : 'border-[var(--as-border)] bg-[var(--as-muted)] hover:border-[var(--as-primary)]',
@@ -197,7 +205,7 @@ export const FamilyBadge = React.forwardRef<HTMLDivElement, FamilyBadgeProps>(
                     <div className="flex flex-1 flex-col items-center gap-2.5">{header}</div>
                   )}
                   {member.github || member.website ? (
-                    <div className="mt-5 flex items-center justify-center gap-2 border-t border-[var(--as-border)] pt-4">
+                    <div className="mt-4 flex items-center justify-center gap-2 border-t border-[var(--as-border)] pt-3">
                       {member.github ? (
                         <a
                           href={member.github}

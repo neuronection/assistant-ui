@@ -130,6 +130,9 @@ describe('FamilyBadge', () => {
       screen.getByRole('link', { name: 'Study Assistant on GitHub' }),
     ).toHaveAttribute('href', 'https://github.com/neuronection/study-assistant')
     expect(
+      screen.getByRole('link', { name: 'Desktop Assistant on GitHub' }),
+    ).toHaveAttribute('href', 'https://github.com/neuronection/desktop-assistant')
+    expect(
       screen.getByRole('link', { name: 'Health Assistant website' }),
     ).toHaveAttribute('href', 'https://health-assistant.io')
     expect(screen.getByRole('link', { name: 'Part of the Neuronection family' })).toHaveAttribute(
@@ -148,6 +151,22 @@ describe('FamilyBadge', () => {
       .find((a) => a.getAttribute('href') === 'https://neuronection.com/en/career/')
     expect(link).toBeTruthy()
     expect(link).toHaveAttribute('target', '_blank')
+  })
+
+  it('marks the desktop app current like any sibling', () => {
+    render(<FamilyBadge current="desktop" />)
+    expect(
+      screen.getByText('Desktop Assistant').closest('li[data-current]'),
+    ).toBeTruthy()
+  })
+
+  it('lays the four family cards out in a responsive 2×2 grid', () => {
+    render(<FamilyBadge current="health" />)
+    const list = screen.getAllByRole('list')[0]
+    expect(list).toHaveClass('grid')
+    expect(list).toHaveClass('grid-cols-1')
+    expect(list).toHaveClass('sm:grid-cols-2')
+    expect(list).not.toHaveClass('lg:grid-cols-4')
   })
 
   it('renders the family blurb and prominent site CTA', () => {
@@ -188,6 +207,8 @@ describe('FamilyBadge', () => {
       'Career Assistant on GitHub',
       /Study Assistant/,
       'Study Assistant on GitHub',
+      /Desktop Assistant/,
+      'Desktop Assistant on GitHub',
     ]
     for (const name of expected) {
       await user.tab()

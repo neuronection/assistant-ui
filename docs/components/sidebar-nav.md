@@ -47,8 +47,8 @@ import { SidebarNav, type NavItem, type NavChild } from '@neuronection/assistant
 ## labels & i18n
 
 Labels are plain strings — build the item array at render time so
-`t(labelKey)` flows through (all three apps use i18next). Aria strings
-come from `labels` with English defaults.
+`t(labelKey)` flows through (career, study and health use i18next). Aria
+strings come from `labels` with English defaults.
 
 ## examples
 
