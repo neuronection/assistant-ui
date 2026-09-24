@@ -10,9 +10,11 @@ export {
   type FieldDiffProps,
   type FieldDiffValue,
   type FieldDiffLabels,
+  type HitlDensity,
   isStructuredList,
   chipLabel,
   valueText,
 } from './FieldDiff'
 export { FieldChips } from './FieldDiff'
 export { FieldSummary, type FieldSummaryProps } from './FieldSummary'
+export { CappedRows, type CappedRowsLabels } from './CappedRows'

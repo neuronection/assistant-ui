@@ -16,6 +16,11 @@ export interface FieldDiffLabels {
   to?: string
 }
 
+/** Presentation density for HITL surfaces: `compact` truncates the body
+ * (bubble/docked chat), `full` renders everything (page + preview modal).
+ * Defaults to `full` so existing consumers never shift. */
+export type HitlDensity = 'compact' | 'full'
+
 /** Value rendering: null reads as em-dash, everything else as text. */
 export function valueText(value: unknown): string {
   if (value === null || value === undefined) {
@@ -95,6 +100,7 @@ function isLongText(...values: unknown[]): boolean {
 export interface FieldDiffProps {
   row: FieldDiffValue
   labels?: Partial<FieldDiffLabels>
+  density?: HitlDensity
   className?: string
 }
 
@@ -103,7 +109,12 @@ export interface FieldDiffProps {
  * pairs (either side > 80 chars) render through `TextDiffView` instead of
  * the inline row.
  */
-export function FieldDiff({ row, labels, className }: FieldDiffProps) {
+export function FieldDiff({
+  row,
+  labels,
+  density = 'full',
+  className,
+}: FieldDiffProps) {
   const heading = row.label ?? row.field
   const structured =
     isStructuredList(row.before) || isStructuredList(row.after)
@@ -156,7 +167,7 @@ export function FieldDiff({ row, labels, className }: FieldDiffProps) {
           original={valueText(row.before)}
           suggested={valueText(row.after)}
           showHeader={false}
-          bodyClassName="max-h-48"
+          bodyClassName={density === 'compact' ? 'max-h-24' : 'max-h-48'}
         />
       </div>
     )

@@ -12,7 +12,8 @@ import type { LucideIcon } from 'lucide-react'
 
 import { cn } from '../../lib/utils'
 import { Spinner } from '../spinner/Spinner'
-import { FieldDiff, type FieldDiffValue } from './FieldDiff'
+import { CappedRows } from './CappedRows'
+import { FieldDiff, type FieldDiffValue, type HitlDensity } from './FieldDiff'
 import { FieldSummary } from './FieldSummary'
 
 export type HitlProposalStatus =
@@ -43,6 +44,10 @@ export interface HitlProposalCardLabels {
   reverted: string
   /** Hint under a conflict status. */
   conflictHint: string
+  /** Compact-density expander, `{count}` replaced with the row total. */
+  showAll: string
+  /** Compact-density collapse label. */
+  showFewer: string
 }
 
 const DEFAULT_LABELS: HitlProposalCardLabels = {
@@ -58,6 +63,8 @@ const DEFAULT_LABELS: HitlProposalCardLabels = {
   expired: 'Expired',
   reverted: 'Reverted',
   conflictHint: 'The data changed — review the diff and ask again if still wanted.',
+  showAll: 'Show all {count} fields',
+  showFewer: 'Show fewer',
 }
 
 export interface HitlProposalCardProps {
@@ -84,6 +91,9 @@ export interface HitlProposalCardProps {
   /** Resolve error text (e.g. a failed apply). */
   error?: string
   labels?: Partial<HitlProposalCardLabels>
+  /** Presentation density (default `full`): `compact` caps the diff rows
+   * behind a "Show all" expander and shrinks long-text bodies. */
+  density?: HitlDensity
   icon?: LucideIcon
   className?: string
 }
@@ -107,6 +117,7 @@ export function HitlProposalCard({
   busy = false,
   error,
   labels,
+  density = 'full',
   icon: Icon = ClipboardCheck,
   className,
 }: HitlProposalCardProps) {
@@ -184,14 +195,22 @@ export function HitlProposalCard({
 
       {action === 'create' && diff.length > 0 ? (
         <div className="border-t border-[var(--as-border)] px-2.5 py-2">
-          <FieldSummary rows={diff} />
+          <FieldSummary
+            rows={diff}
+            density={density}
+            labels={{ showAll: text.showAll, showFewer: text.showFewer }}
+          />
         </div>
       ) : null}
       {action !== 'create' && diff.length > 0 ? (
         <div className="flex flex-col gap-1.5 border-t border-[var(--as-border)] px-2.5 py-2">
-          {diff.map((row) => (
-            <FieldDiff key={row.field} row={row} />
-          ))}
+          <CappedRows
+            density={density}
+            labels={{ showAll: text.showAll, showFewer: text.showFewer }}
+            rows={diff.map((row) => (
+              <FieldDiff key={row.field} row={row} density={density} />
+            ))}
+          />
         </div>
       ) : null}
 

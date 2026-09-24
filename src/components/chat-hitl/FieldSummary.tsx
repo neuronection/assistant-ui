@@ -2,11 +2,13 @@ import * as React from 'react'
 
 import { cn } from '../../lib/utils'
 import { DetailValue } from '../detail-value/DetailValue'
+import { CappedRows, type CappedRowsLabels } from './CappedRows'
 import {
   FieldChips,
   isStructuredList,
   valueText,
   type FieldDiffValue,
+  type HitlDensity,
 } from './FieldDiff'
 
 /** Rows whose value is empty render nothing on a create card. */
@@ -40,6 +42,8 @@ function isArrayish(value: unknown): boolean {
 
 export interface FieldSummaryProps {
   rows: FieldDiffValue[]
+  density?: HitlDensity
+  labels?: CappedRowsLabels
   className?: string
 }
 
@@ -49,14 +53,22 @@ export interface FieldSummaryProps {
  * before-state — the classic diff grid renders every unset field as
  * `— → value` noise, empty rows are skipped entirely here.
  */
-export function FieldSummary({ rows, className }: FieldSummaryProps) {
+export function FieldSummary({
+  rows,
+  density = 'full',
+  labels,
+  className,
+}: FieldSummaryProps) {
   const filled = rows.filter((row) => !isBlank(row.after))
   if (filled.length === 0) {
     return null
   }
   return (
     <div className={cn('flex flex-col gap-1.5', className)} data-field-count={filled.length}>
-      {filled.map((row) => {
+      <CappedRows
+        density={density}
+        labels={labels}
+        rows={filled.map((row) => {
         const heading = row.label ?? row.field
         if (isStructuredList(row.after)) {
           return (
@@ -91,7 +103,12 @@ export function FieldSummary({ rows, className }: FieldSummaryProps) {
               <p className="font-medium uppercase tracking-wide text-[var(--as-muted-fg)]">
                 {heading}
               </p>
-              <p className="mt-1 max-h-48 overflow-y-auto whitespace-pre-wrap break-words text-[var(--as-fg)]">
+              <p
+                className={cn(
+                  'mt-1 overflow-y-auto whitespace-pre-wrap break-words text-[var(--as-fg)]',
+                  density === 'compact' ? 'max-h-24' : 'max-h-48',
+                )}
+              >
                 {valueText(row.after)}
               </p>
             </div>
@@ -112,7 +129,8 @@ export function FieldSummary({ rows, className }: FieldSummaryProps) {
             </span>
           </div>
         )
-      })}
+        })}
+      />
     </div>
   )
 }

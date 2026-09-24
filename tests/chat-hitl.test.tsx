@@ -214,6 +214,101 @@ describe('HitlProposalCard', () => {
   })
 })
 
+const MANY_ROWS = [
+  { field: 'title', label: 'Title', before: 'A', after: 'B' },
+  { field: 'org_name', label: 'Organization', before: 'X', after: 'Y' },
+  { field: 'start', label: 'Start date', before: '2025-01-01', after: '2025-02-01' },
+  { field: 'end', label: 'End date', before: '2025-06-01', after: '2025-07-01' },
+  { field: 'hours_per_week', label: 'Hours per week', before: 35, after: 20 },
+]
+
+describe('HitlProposalCard density', () => {
+  it('compact caps the diff rows behind a Show all expander', async () => {
+    render(
+      <HitlProposalCard
+        title="Update experience · X"
+        status="pending"
+        diff={MANY_ROWS}
+        density="compact"
+      />,
+    )
+    expect(screen.queryByText('End date')).not.toBeInTheDocument()
+    const toggle = screen.getByRole('button', { name: 'Show all 5 fields' })
+    expect(toggle).toHaveAttribute('aria-expanded', 'false')
+
+    const user = userEvent.setup()
+    await user.click(toggle)
+    expect(screen.getByText('End date')).toBeInTheDocument()
+    expect(screen.getByText('Hours per week')).toBeInTheDocument()
+    const collapse = screen.getByRole('button', { name: 'Show fewer' })
+    expect(collapse).toHaveAttribute('aria-expanded', 'true')
+
+    await user.click(collapse)
+    expect(screen.queryByText('End date')).not.toBeInTheDocument()
+  })
+
+  it('full density (the default) renders every row without an expander', () => {
+    render(
+      <HitlProposalCard title="Update experience · X" status="pending" diff={MANY_ROWS} />,
+    )
+    expect(screen.getByText('End date')).toBeInTheDocument()
+    expect(screen.getByText('Hours per week')).toBeInTheDocument()
+    expect(
+      screen.queryByRole('button', { name: /show all/i }),
+    ).not.toBeInTheDocument()
+  })
+
+  it('compact leaves short diffs uncapped', () => {
+    render(
+      <HitlProposalCard
+        title="Update experience · X"
+        status="pending"
+        diff={DIFF}
+        density="compact"
+      />,
+    )
+    expect(screen.getByText('End date')).toBeInTheDocument()
+    expect(
+      screen.queryByRole('button', { name: /show all/i }),
+    ).not.toBeInTheDocument()
+  })
+
+  it('runs axe with a compact expanded card', async () => {
+    const { container } = render(
+      <HitlProposalCard
+        title="Update experience · X"
+        status="pending"
+        diff={MANY_ROWS}
+        density="compact"
+        onApprove={() => {}}
+        onReject={() => {}}
+      />,
+    )
+    const user = userEvent.setup()
+    await user.click(screen.getByRole('button', { name: 'Show all 5 fields' }))
+    expect(await axe(container)).toHaveNoViolations()
+  })
+})
+
+describe('FieldSummary density', () => {
+  it('compact caps the filled rows behind a Show all expander', async () => {
+    render(
+      <FieldSummary
+        density="compact"
+        rows={[
+          ...MANY_ROWS,
+          { field: 'org_name_blank', label: 'Blank', after: '' },
+        ]}
+      />,
+    )
+    expect(screen.queryByText('End date')).not.toBeInTheDocument()
+    const toggle = screen.getByRole('button', { name: 'Show all 5 fields' })
+    const user = userEvent.setup()
+    await user.click(toggle)
+    expect(screen.getByText('End date')).toBeInTheDocument()
+  })
+})
+
 describe('FieldDiff', () => {
   it('renders long text pairs through TextDiffView', () => {
     const { container } = render(
@@ -227,6 +322,22 @@ describe('FieldDiff', () => {
       />,
     )
     expect(container.querySelector('[data-as="text-diff-view"]')).not.toBeNull()
+  })
+
+  it('compact shrinks the long-text body cap', () => {
+    const { container } = render(
+      <FieldDiff
+        density="compact"
+        row={{
+          field: 'description',
+          label: 'Description',
+          before: 'a'.repeat(120),
+          after: 'b'.repeat(120),
+        }}
+      />,
+    )
+    expect(container.querySelector('[data-as="text-diff-view"] .max-h-24')).not.toBeNull()
+    expect(container.querySelector('[data-as="text-diff-view"] .max-h-48')).toBeNull()
   })
 
   it('renders inline for scalars', () => {
