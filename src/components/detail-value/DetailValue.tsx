@@ -6,12 +6,16 @@ import { detailValueView } from '../../lib/utils'
  * Structured detail payload (parsed, never raw JSON): objects render as
  * `key: value` rows, arrays as value chips, anything else as preformatted
  * text. Display-only; the JSON string stays view-only (no app joins).
+ *
+ * Panes grow with content up to a generous max (2026-09 follow-up:
+ * `max-h-40` cropped tool responses mid-value; users inspect traces to
+ * audit what the assistant saw, not to peek at a stub).
  */
 export function DetailValue({ text }: { text: string }) {
   const view = detailValueView(text)
   if (view.kind === 'pairs') {
     return (
-      <dl className="mt-0.5 max-h-40 space-y-0.5 overflow-auto">
+      <dl className="mt-0.5 max-h-96 space-y-0.5 overflow-auto">
         {view.entries.map((entry) => (
           <div
             key={entry.key}
@@ -30,7 +34,7 @@ export function DetailValue({ text }: { text: string }) {
   }
   if (view.kind === 'items') {
     return (
-      <ul className="mt-0.5 flex max-h-40 flex-wrap gap-1 overflow-auto">
+      <ul className="mt-0.5 flex max-h-96 flex-wrap gap-1 overflow-auto">
         {view.items.map((item, index) => (
           <li
             key={`${item}-${index}`}
@@ -43,7 +47,7 @@ export function DetailValue({ text }: { text: string }) {
     )
   }
   return (
-    <pre className="mt-0 max-h-40 overflow-auto whitespace-pre-wrap break-words rounded-[var(--as-radius)] bg-[var(--as-surface-raised)] p-2 font-mono text-[11px] leading-relaxed text-[var(--as-fg)]">
+    <pre className="mt-0 max-h-96 overflow-auto whitespace-pre-wrap break-words rounded-[var(--as-radius)] bg-[var(--as-surface-raised)] p-2 font-mono text-[11px] leading-relaxed text-[var(--as-fg)]">
       {text}
     </pre>
   )
