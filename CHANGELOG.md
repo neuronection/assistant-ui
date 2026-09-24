@@ -1,5 +1,17 @@
 # @neuronection/assistant-ui
 
+## 0.44.0
+
+### Minor Changes
+
+- [`46be477`](https://github.com/neuronection/assistant-ui/commit/46be477fe8657eeffd156bcf332272ffc4f98901) Thanks [@constLiakos](https://github.com/constLiakos)! - `chat-hitl` gains a presentational `density: 'compact' | 'full'` prop on `HitlProposalCard`, `FieldDiff` and `FieldSummary` (default `full`, so existing consumers are unchanged). Compact density caps the visible rows behind a "Show all N fields" expander (`CappedRows`, never a silent truncation) and shrinks long-text diff/summary bodies; full density renders everything. Lets space-constrained chat surfaces (bubble/docked) stay scannable while wide surfaces and preview modals show the complete proposal.
+
+### Patch Changes
+
+- [`8ea6dbd`](https://github.com/neuronection/assistant-ui/commit/8ea6dbd155d10b4a745b965c4f677363175df485) Thanks [@constLiakos](https://github.com/constLiakos)! - Fix chat-transcript stick-to-bottom fighting the reader on fast streams: upward scroll intent (wheel-up, touch drag up, scroll-up keys) now cancels the follow synchronously and any upward scroll event breaks it, so a partial scroll-up inside `scrollThresholdPx` no longer gets re-pinned to the bottom before the user finished reading; scrolling back to the bottom (or the jump pill) re-arms the follow
+
+- [`c582841`](https://github.com/neuronection/assistant-ui/commit/c582841d73df90ff41948185cc0524857398b2aa) Thanks [@constLiakos](https://github.com/constLiakos)! - `DetailValue` panes grow with content instead of cropping: the pairs rows, value chips and the preformatted fallback moved from `max-h-40` to `max-h-96`, so a tool response or trace payload is readable in full without scrolling past a cut-off stub.
+
 ## 0.43.0
 
 ### Minor Changes
