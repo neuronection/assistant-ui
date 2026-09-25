@@ -27,6 +27,10 @@
       "types": "./dist/about.d.ts",
       "import": "./dist/about.js"
     },
+    "./admin-user-table": {
+      "types": "./dist/admin-user-table.d.ts",
+      "import": "./dist/admin-user-table.js"
+    },
     "./ai-actions-dropdown": {
       "types": "./dist/ai-actions-dropdown.d.ts",
       "import": "./dist/ai-actions-dropdown.js"

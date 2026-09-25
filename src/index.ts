@@ -480,6 +480,15 @@ export {
   type ChatHistoryButtonLabels,
 } from './components/chat-history-button'
 export {
+  AdminUserTable,
+  describeAdminUserError,
+  type AdminUser,
+  type AdminUserPatch,
+  type AdminUserTableIcons,
+  type AdminUserTableLabels,
+  type AdminUserTableProps,
+} from './components/admin-user-table'
+export {
   ChatTraceMeta,
   type ChatTraceMetaProps,
 } from './components/chat-trace-meta'

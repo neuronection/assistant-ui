@@ -137,6 +137,7 @@ behavior and focus restoration are listed **only where asserted**.
 | `CapabilityChips` | `role="group"` of `aria-pressed` toggle buttons (badge variant renders non-interactive spans) | chips are buttons; below `minSelected` the last chip disables instead of silently refusing | clean |
 | `ModelRegistry` | provider headers are disclosure buttons (`aria-expanded`); rows carry labelled icon-only controls (`Add/Edit/Remove — <id>`, `Enabled — <id>`); modal inputs are labelled | header Enter toggles the provider; row enable checkbox is a native input (`Enabled — <id>`); modal inputs are labelled | clean |
 | `ConnectionTestRow` | status text (`role="status"` while testing); error message; `variant="inline"` drops the card chrome | Enter on *Test* fires `onTest` | clean |
+| `AdminUserTable` | native `<table>` with sr-only caption + `scope="col"` headers; per-row action buttons in a labelled `role="group"`; inline reset panel is a form labelled by its title; transient note `role="status"`, errors `role="alert"` | Tab reaches row actions in DOM order; Enter/Space fires promote/demote, activate/deactivate and force logout; Enter on *Reset password* opens the panel and focuses the password input; Enter submits when the draft passes the minimum length; Escape closes the panel and returns focus to its *Reset password* trigger | clean (default, loading, reset panel) |
 
 ## Status & feedback
 
