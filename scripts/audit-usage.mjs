@@ -110,6 +110,7 @@ const LIBRARY_COMPONENTS = [
   'Portal',
   'Popover',
   'PopoverButton',
+  'ProfileSwitcher',
   'ProviderForm',
   'RangeBar',
   'ScaleSlider',

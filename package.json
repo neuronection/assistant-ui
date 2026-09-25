@@ -255,6 +255,10 @@
       "types": "./dist/popover-button.d.ts",
       "import": "./dist/popover-button.js"
     },
+    "./profile-switcher": {
+      "types": "./dist/profile-switcher.d.ts",
+      "import": "./dist/profile-switcher.js"
+    },
     "./provider-form": {
       "types": "./dist/provider-form.d.ts",
       "import": "./dist/provider-form.js"

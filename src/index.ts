@@ -221,6 +221,13 @@ export {
   PopoverTrigger,
 } from './components/popover'
 export { PopoverButton, type PopoverButtonProps } from './components/popover-button'
+export {
+  ProfileSwitcher,
+  type ProfileItem,
+  type ProfileSwitcherIcons,
+  type ProfileSwitcherLabels,
+  type ProfileSwitcherProps,
+} from './components/profile-switcher'
 export { RangeBar, type RangeBarProps } from './components/range-bar'
 export {
   ScaleSlider,

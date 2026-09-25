@@ -66,6 +66,7 @@ export const entry: Record<string, string> = {
   'popover': 'src/components/popover/index.ts',
   'popover-button': 'src/components/popover-button/index.ts',
   'portal': 'src/components/portal/index.ts',
+  'profile-switcher': 'src/components/profile-switcher/index.ts',
   'provider-form': 'src/components/provider-form/index.ts',
   'range-bar': 'src/components/range-bar/index.ts',
   'scale-slider': 'src/components/scale-slider/index.ts',
