@@ -6,6 +6,7 @@ export const entry: Record<string, string> = {
   'ai-actions-dropdown': 'src/components/ai-actions-dropdown/index.ts',
   'about': 'src/components/about/index.ts',
   'admin-user-table': 'src/components/admin-user-table/index.ts',
+  'auth-gate': 'src/components/auth-gate/index.ts',
   'ai-button': 'src/components/ai-button/index.ts',
   'ai-magic-fill': 'src/components/ai-magic-fill/index.ts',
   'badge': 'src/components/badge/index.ts',

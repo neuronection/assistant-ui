@@ -31,6 +31,10 @@
       "types": "./dist/admin-user-table.d.ts",
       "import": "./dist/admin-user-table.js"
     },
+    "./auth-gate": {
+      "types": "./dist/auth-gate.d.ts",
+      "import": "./dist/auth-gate.js"
+    },
     "./ai-actions-dropdown": {
       "types": "./dist/ai-actions-dropdown.d.ts",
       "import": "./dist/ai-actions-dropdown.js"

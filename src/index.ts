@@ -512,6 +512,12 @@ export {
   type AdminUserTableProps,
 } from './components/admin-user-table'
 export {
+  AuthGate,
+  type AuthGateLabels,
+  type AuthGateProps,
+  type AuthGateStatus,
+} from './components/auth-gate'
+export {
   ChatTraceMeta,
   type ChatTraceMetaProps,
 } from './components/chat-trace-meta'
