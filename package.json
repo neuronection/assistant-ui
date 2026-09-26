@@ -211,6 +211,14 @@
       "types": "./dist/input.d.ts",
       "import": "./dist/input.js"
     },
+    "./login-form": {
+      "types": "./dist/login-form.d.ts",
+      "import": "./dist/login-form.js"
+    },
+    "./register-form": {
+      "types": "./dist/register-form.d.ts",
+      "import": "./dist/register-form.js"
+    },
     "./logo": {
       "types": "./dist/logo.d.ts",
       "import": "./dist/logo.js"

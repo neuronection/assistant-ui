@@ -166,6 +166,22 @@ export { FormModal, type FormModalProps } from './components/form-modal'
 export { InfoButton, type InfoButtonProps } from './components/info-button'
 export { Input, type InputProps } from './components/input'
 export {
+  LoginForm,
+  type LoginFormFields,
+  type LoginFormIcons,
+  type LoginFormLabels,
+  type LoginFormProps,
+  type LoginFormFieldOverrides,
+} from './components/login-form'
+export {
+  RegisterForm,
+  type RegisterFormFields,
+  type RegisterFormIcons,
+  type RegisterFormLabels,
+  type RegisterFormProps,
+  type RegisterFormFieldOverrides,
+} from './components/register-form'
+export {
   MarqueeBand,
   MarqueeSurface,
   useMarquee,

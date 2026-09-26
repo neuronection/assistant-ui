@@ -52,6 +52,8 @@ export const entry: Record<string, string> = {
   'form-modal': 'src/components/form-modal/index.ts',
   'info-button': 'src/components/info-button/index.ts',
   'input': 'src/components/input/index.ts',
+  'login-form': 'src/components/login-form/index.ts',
+  'register-form': 'src/components/register-form/index.ts',
   'logo': 'src/components/logo/index.ts',
   'textarea': 'src/components/textarea/index.ts',
   'rich-text-editor': 'src/components/rich-text-editor/index.ts',

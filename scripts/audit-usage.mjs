@@ -81,6 +81,8 @@ const LIBRARY_COMPONENTS = [
   'FormModal',
   'InfoButton',
   'Input',
+  'LoginForm',
+  'RegisterForm',
   'CareerMark',
   'DesktopMark',
   'HealthMark',
