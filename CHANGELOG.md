@@ -1,5 +1,18 @@
 # @neuronection/assistant-ui
 
+## 0.46.0
+
+### Minor Changes
+
+- [`329e05e`](https://github.com/neuronection/assistant-ui/commit/329e05e7f32279ee139f290bb6c2bfd1c877bd2a) Thanks [@constLiakos](https://github.com/constLiakos)! - **Next-gen menu skin** (plan 16 UX polish): menu surfaces upgraded to rounded-xl with raised-surface background, `--as-shadow-pop` shadow and backdrop blur (`p-1.5`, `min-w-56`/`min-w-44`); items get `rounded-lg` hover/highlight states; `MenuSubContent` now renders the full overlay surface and `MenuSubTrigger` gains a trailing chevron; `MenuSub`/`MenuSubTrigger`/`MenuSubContent` exported from the family barrel; `UserMenu` languages moved into a **Languages submenu** with the active language on the sub-trigger, status pill as a full-width row and `w-60` panel; `as-anim-pop` refined (fade + slide + scale, spring-ish ease).
+
+- [`022886a`](https://github.com/neuronection/assistant-ui/commit/022886a674a043442c9bdd5a8b3afbff865e00a9) Thanks [@constLiakos](https://github.com/constLiakos)! - **UserMenu** upgraded to the full family identity-dropdown pattern: `user`
+  structured identity (+ `roleBadge`), `switcher` slot for app-composed
+  Profile/Tenant switchers, `status` pill, built-in appearance section
+  (`theme`/`onThemeChange`, `language`/`onLanguageChange` + `languages`) and a
+  dedicated danger `onLogout` row. Legacy flat `name`/`email`/`avatarUrl`
+  props and the `items`/`onItemSelect` contract are unchanged.
+
 ## 0.45.0
 
 ### Minor Changes
