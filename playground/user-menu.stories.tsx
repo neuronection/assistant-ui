@@ -1,5 +1,13 @@
 import { useState } from 'react'
-import { Globe, LogOut, Moon, Settings } from 'lucide-react'
+import {
+  Briefcase,
+  Globe,
+  Info,
+  LogOut,
+  Moon,
+  Settings,
+  UserRound,
+} from 'lucide-react'
 import { UserMenu, type UserMenuItem } from '../src/components/user-menu/UserMenu'
 
 export const WithInitialsStory = () => {
@@ -64,3 +72,42 @@ export const LongEmailStory = () => (
     onItemSelect={() => {}}
   />
 )
+
+export const IdentityDropdownStory = () => {
+  const [theme, setTheme] = useState<'light' | 'dark' | 'system'>('system')
+  const [lang, setLang] = useState('en')
+  return (
+    <UserMenu
+      user={{ name: 'Ilias Sdryom', email: 'ilias@neuronection.com', role: 'ADMIN' }}
+      roleBadge="Administrator"
+      switcher={
+        <button
+          type="button"
+          className="flex w-full items-center gap-2 rounded-[var(--as-radius-sm)] border border-[var(--as-border)] px-2 py-2 text-left text-sm"
+        >
+          <Briefcase aria-hidden className="size-4" />
+          Workspace: Neuronection
+        </button>
+      }
+      status={{ label: 'Synced', tone: 'success' }}
+      labels={{ openMenu: 'Open user menu', account: 'Account' }}
+      theme={theme}
+      onThemeChange={setTheme}
+      themeLabels={{ light: 'Light theme', dark: 'Dark theme', system: 'System theme' }}
+      language={lang}
+      onLanguageChange={setLang}
+      languages={[
+        { id: 'en', label: 'English' },
+        { id: 'el', label: 'Ελληνικά' },
+      ]}
+      items={[
+        { id: 'profile', label: 'My Profile', icon: UserRound },
+        { id: 'settings', label: 'Settings', icon: Settings },
+        { id: 'about', label: 'About', icon: Info },
+      ]}
+      onItemSelect={() => {}}
+      onLogout={() => {}}
+      logoutLabel="Log out"
+    />
+  )
+}

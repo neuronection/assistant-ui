@@ -212,7 +212,13 @@ export {
 export {
   UserMenu,
   type UserMenuItem,
+  type UserMenuIcons,
+  type UserMenuLanguage,
   type UserMenuProps,
+  type UserMenuStatus,
+  type UserMenuStatusTone,
+  type UserMenuTheme,
+  type UserMenuUser,
 } from './components/user-menu'
 export {
   Modal,

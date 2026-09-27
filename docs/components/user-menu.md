@@ -1,9 +1,10 @@
 # UserMenu
 
-Family-standard user menu: avatar/identity trigger + identity header +
-action list (including checkable items for theme/language toggles).
-Composed from the `Menu` primitives; Radix provides focus management,
-typeahead and collision handling.
+Family-standard identity dropdown: avatar/identity trigger + switcher slot +
+identity header (email + role badge) + status pill + appearance section
+(theme/language checkables) + app entries + logout. Composed from the `Menu`
+primitives; Radix provides focus management, typeahead and collision
+handling.
 
 ## import
 
@@ -15,26 +16,57 @@ import { UserMenu, type UserMenuItem } from '@neuronection/assistant-ui/user-men
 
 | prop | type | default | notes |
 |---|---|---|---|
-| `items` | `UserMenuItem[]` | — | `{ id, label, icon?, tone?, disabled?, pending?, checked? }` |
+| `user` | `{ name?, email?, role?, avatarUrl? }` | — | structured identity; wins per field over the legacy flat props |
+| `items` | `UserMenuItem[]` | `[]` | `{ id, label, icon?, tone?, disabled?, pending?, checked? }` |
 | `onItemSelect` | `(id: string) => void` | — | fires with the item id (checkable items included) |
-| `name` | `string` | — | shown in trigger + panel header |
-| `email` | `string` | — | shown in trigger + panel header, muted |
+| `name` | `string` | — | legacy flat identity (shown in trigger + panel header) |
+| `email` | `string` | — | legacy flat identity (shown in trigger + panel header, muted) |
 | `avatarUrl` | `string` | — | image disc; falls back to initials disc |
 | `initials` | `string` | from `name` | override disc text |
+| `roleBadge` | `string` | `user.role` | badge text (app-translated); renders when set |
+| `switcher` | `ReactNode` | — | app-composed switcher (ProfileSwitcher / TenantSwitcher) in a top section |
+| `status` | `{ label: string; tone?: 'success' \| 'info' \| 'warning' }` | — | status pill under the identity block |
+| `theme` | `'light' \| 'dark' \| 'system'` | — | controlled theme value for the appearance section |
+| `onThemeChange` | `(theme) => void` | — | fires with the picked theme id |
+| `themeLabels` | `{ light?, dark?, system? }` | — | one checkable row per label given; apps opt into exactly the options they support |
+| `language` | `string` | — | controlled language id |
+| `onLanguageChange` | `(id: string) => void` | — | fires with the picked language id |
+| `languages` | `{ id, label }[]` | — | rendered as checkable rows when `language`/`onLanguageChange` are set |
+| `onLogout` | `() => void` | — | renders the danger logout row when set |
+| `logoutLabel` | `string` | `'Log out'` | logout row text |
 | `align` | `'start' \| 'end'` | `'end'` | panel alignment |
-| `labels` | `{ openMenu?: string }` | `'Open user menu'` | trigger aria-label; apps translate |
+| `labels` | `{ openMenu?, account? }` | `'Open user menu'` | trigger aria-label; `account` is the identity section eyebrow |
+| `icons` | `{ logout?, language?, themeLight?, themeDark?, themeSystem? }` | `LogOut`/`Globe`/`Sun`/`Moon`/`Monitor` | Lucide icon overrides |
 | `className` | `string` | — | on the wrapper (`data-as="user-menu"`) |
+| `triggerClassName` | `string` | — | on the trigger button |
+| `contentClassName` | `string` | — | on the panel — e.g. `overflow-visible` when a switcher renders its own floating panel |
+
+## render order
+
+Fixed, top to bottom (each section renders only when its props are given;
+separators render between adjacent sections):
+
+1. `switcher` slot
+2. identity block — `labels.account` eyebrow, avatar/initials disc, name,
+   email, role badge
+3. `status` pill
+4. appearance — language rows, then theme rows
+5. `items`
+6. logout row
 
 ## controlled contract
 
-None — the menu is stateless beyond Radix's open state. All behavior is
-expressed through `items` + `onItemSelect` (e.g. a language toggle item is
-re-rendered with the new `checked` value after selection).
+`theme` + `onThemeChange`, `language` + `onLanguageChange` and `items` +
+`onItemSelect` are fully controlled — the component never owns state; apps
+re-render with the new values. With a single `themeLabels` entry (e.g. only
+`dark`), selecting the active row reports the opposite theme (toggle
+semantics); with multiple entries it reports the picked id.
 
 ## labels & i18n
 
-Item labels and identity strings are app strings (pass `t(...)` results);
-only `labels.openMenu` has an English default.
+Item labels, identity strings, status pill and role badge are app strings
+(pass `t(...)` results); only `labels.openMenu` and `logoutLabel` have
+English defaults.
 
 ## examples
 
@@ -43,28 +75,34 @@ minimal:
 ```tsx
 <UserMenu
   email={user.email}
-  items={[{ id: 'signout', label: 'Sign out', tone: 'danger', icon: LogOut }]}
-  onItemSelect={(id) => id === 'signout' && logout()}
+  onLogout={logout}
 />
 ```
 
-realistic (health-style header menu with toggles):
+realistic (full identity dropdown with switcher, status and appearance):
 
 ```tsx
 <UserMenu
-  name={user.fullName}
-  email={user.email}
-  items={[
-    { id: 'profile', label: t('nav.profile'), icon: UserRound },
-    { id: 'lang', label: 'Ελληνικά', icon: Globe, checked: lang === 'el' },
-    { id: 'theme', label: t('nav.darkMode'), icon: Moon, checked: dark },
-    { id: 'signout', label: t('nav.signOut'), icon: LogOut, tone: 'danger' },
+  user={{ name: user.fullName, email: user.email, role: user.role }}
+  roleBadge={t('roles.admin')}
+  switcher={<TenantSwitcher className="w-full" />}
+  status={{ label: t('sync.synced'), tone: 'success' }}
+  theme={theme}
+  onThemeChange={setTheme}
+  themeLabels={{ light: t('theme.light'), dark: t('theme.dark'), system: t('theme.system') }}
+  language={lang}
+  onLanguageChange={setLanguage}
+  languages={[
+    { id: 'en', label: t('common.english') },
+    { id: 'el', label: t('common.greek') },
   ]}
-  onItemSelect={(id) => {
-    if (id === 'signout') logout()
-    if (id === 'lang') toggleLanguage()
-    if (id === 'theme') toggleTheme()
-  }}
+  items={[
+    { id: 'profile', label: t('common.profile'), icon: UserRound },
+    { id: 'settings', label: t('common.settings'), icon: Settings },
+  ]}
+  onItemSelect={(id) => id === 'profile' && navigate('/profile')}
+  onLogout={() => void logout()}
+  labels={{ openMenu: t('common.account'), account: t('common.account') }}
 />
 ```
 
@@ -74,10 +112,14 @@ See [accessibility.md](../accessibility.md#navigation--structure): trigger
 has `aria-haspopup="menu"` + labelled name; checkable entries are
 `role="menuitemcheckbox"` with `aria-checked`; pending entries set
 `aria-busy` and cannot be selected. Radix keyboard semantics asserted
-(arrows, typeahead, Escape).
+(arrows, typeahead, Escape) and focus returns to the trigger on close.
+Keydowns originating from typing targets inside the `switcher` slot are
+excluded from menu typeahead, so embedded inputs keep normal text-entry
+behavior (Escape still closes).
 
 ## related
 
 [`Menu`](./menu.md) for custom menus, [`Popover`](./popover.md) for rich
-panels (e.g. tenant switchers), [`SidebarNav`](./sidebar-nav.md) for the
-navigation shell this usually sits in.
+panels (e.g. tenant switchers), [`ProfileSwitcher`](./profile-switcher.md)
+for the switcher slot, [`SidebarNav`](./sidebar-nav.md) for the navigation
+shell this usually sits in.
