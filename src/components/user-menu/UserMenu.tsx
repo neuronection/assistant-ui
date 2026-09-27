@@ -269,7 +269,7 @@ export const UserMenu = React.forwardRef<HTMLDivElement, UserMenuProps>(
           <MenuContent
             align={align}
             sideOffset={8}
-            className={cn('min-w-48', contentClassName)}
+            className={cn('w-60 min-w-48', contentClassName)}
           >
             <div className="contents" onKeyDown={handleNestedKeyDown}>
               {switcher !== undefined ? (
@@ -327,7 +327,7 @@ export const UserMenu = React.forwardRef<HTMLDivElement, UserMenuProps>(
                     <span
                       data-as="user-menu-status"
                       className={cn(
-                        'inline-flex max-w-full items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium',
+                        'flex w-full items-center gap-1.5 rounded-lg px-2 py-1.5 text-xs font-medium',
                         statusToneClass[status.tone ?? 'info'],
                       )}
                     >
@@ -344,6 +344,9 @@ export const UserMenu = React.forwardRef<HTMLDivElement, UserMenuProps>(
                 <MenuSub>
                   <MenuSubTrigger>
                     {labels?.language ?? 'Language'}
+                    <span className="ml-auto text-xs text-[var(--as-muted-fg)]">
+                      {languageRows.find((lang) => lang.id === language)?.label}
+                    </span>
                   </MenuSubTrigger>
                   <MenuSubContent>
                     {languageRows.map((lang) => (

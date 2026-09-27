@@ -51,6 +51,7 @@
     --as-shadow-1: 0 1px 2px 0 oklch(0 0 0 / 0.04), 0 1px 3px 0 oklch(0 0 0 / 0.03);
     --as-shadow-2: 0 2px 4px -1px oklch(0 0 0 / 0.05), 0 4px 12px -2px oklch(0 0 0 / 0.06);
     --as-shadow-3: 0 4px 8px -2px oklch(0 0 0 / 0.06), 0 12px 24px -4px oklch(0 0 0 / 0.08);
+    --as-shadow-pop: 0 0 0 1px oklch(0 0 0 / 0.04), 0 4px 12px -2px oklch(0 0 0 / 0.08), 0 16px 40px -8px oklch(0 0 0 / 0.14);
   }
 }
 
@@ -103,7 +104,19 @@
 }
 
 .as-anim-pop {
-  animation: as-pop-in 0.12s ease-out;
+  transform-origin: var(--as-origin-y, top) var(--as-origin-x, center);
+  animation: as-pop-in 0.16s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes as-pop-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 .as-anim-drawer {

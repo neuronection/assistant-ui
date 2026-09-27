@@ -179,8 +179,9 @@ describe('UserMenu', () => {
       />,
     )
     await openMenu()
-    // language rows live in a submenu off the "Language" trigger
-    await userEvent.setup().click(screen.getByRole('menuitem', { name: 'Language' }))
+    // language rows live in a submenu off the "Language" trigger (whose
+    // accessible name carries the active language label)
+    await userEvent.setup().click(screen.getByRole('menuitem', { name: /Language/ }))
     const english = screen.getByRole('menuitemcheckbox', { name: 'English' })
     expect(english).toHaveAttribute('aria-checked', 'true')
     await userEvent.setup().click(screen.getByRole('menuitemcheckbox', { name: 'Ελληνικά' }))

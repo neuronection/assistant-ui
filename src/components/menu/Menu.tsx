@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu'
-import { Loader2, type LucideIcon } from 'lucide-react'
+import { ChevronRight, Loader2, type LucideIcon } from 'lucide-react'
 import { cn } from '../../lib/utils'
 
 export const Menu = DropdownMenuPrimitive.Root
@@ -19,7 +19,7 @@ export const MenuContent = React.forwardRef<
         sideOffset={sideOffset}
         collisionPadding={8}
         className={cn(
-          'as-anim-pop z-[var(--as-z-popover)] min-w-40 overflow-hidden rounded-[var(--as-radius-lg)] border border-[var(--as-border)] bg-[var(--as-surface-raised)] p-1 text-[var(--as-fg)] shadow-[var(--as-shadow-3)]',
+          'as-anim-pop z-[var(--as-z-popover)] min-w-56 overflow-hidden rounded-xl border border-[var(--as-border)] bg-[var(--as-surface-raised)] p-1.5 text-[var(--as-fg)] shadow-[var(--as-shadow-pop)] backdrop-blur-xl',
           className,
         )}
         {...props}
@@ -67,17 +67,40 @@ export const MenuItem = React.forwardRef<
 export const MenuSub = DropdownMenuPrimitive.Sub
 export const MenuSubTrigger = React.forwardRef<
   React.ComponentRef<typeof DropdownMenuPrimitive.SubTrigger>,
-  React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.SubTrigger>
->(function MenuSubTrigger(props, ref) {
-  return <DropdownMenuPrimitive.SubTrigger ref={ref} {...props} />
+  React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.SubTrigger> & { icon?: LucideIcon }
+>(function MenuSubTrigger({ className, icon: Icon, children, ...props }, ref) {
+  return (
+    <DropdownMenuPrimitive.SubTrigger
+      ref={ref}
+      className={cn(
+        menuItemBaseClass,
+        'data-[state=open]:bg-[var(--as-secondary)]',
+        className,
+      )}
+      {...props}
+    >
+      {Icon ? <Icon aria-hidden /> : null}
+      {children}
+      <ChevronRight className="ml-auto size-4 opacity-50" aria-hidden />
+    </DropdownMenuPrimitive.SubTrigger>
+  )
 })
 export const MenuSubContent = React.forwardRef<
   React.ComponentRef<typeof DropdownMenuPrimitive.SubContent>,
   React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.SubContent>
->(function MenuSubContent(props, ref) {
+>(function MenuSubContent({ className, ...props }, ref) {
   return (
     <DropdownMenuPrimitive.Portal>
-      <DropdownMenuPrimitive.SubContent ref={ref} {...props} />
+      <DropdownMenuPrimitive.SubContent
+        ref={ref}
+        sideOffset={4}
+        collisionPadding={8}
+        className={cn(
+          'as-anim-pop z-[var(--as-z-popover)] min-w-44 overflow-hidden rounded-xl border border-[var(--as-border)] bg-[var(--as-surface-raised)] p-1.5 text-[var(--as-fg)] shadow-[var(--as-shadow-pop)] backdrop-blur-xl',
+          className,
+        )}
+        {...props}
+      />
     </DropdownMenuPrimitive.Portal>
   )
 })
@@ -96,7 +119,7 @@ export const MenuSeparator = React.forwardRef<
 })
 
 const menuItemBaseClass =
-  'flex w-full cursor-pointer select-none items-center gap-2 rounded-[calc(var(--as-radius-sm)-2px)] px-2 py-1.5 text-left text-sm outline-none transition-colors focus:bg-[var(--as-secondary)] data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg]:size-4 [&_svg]:shrink-0'
+  'flex w-full cursor-pointer select-none items-center gap-2.5 rounded-lg px-2 py-2 text-left text-sm outline-none transition-colors duration-100 hover:bg-[var(--as-secondary)] focus:bg-[var(--as-secondary)] data-[highlighted]:bg-[var(--as-secondary)] data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg]:size-4 [&_svg]:shrink-0'
 
 export interface MenuCheckboxItemProps
   extends React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.CheckboxItem> {
