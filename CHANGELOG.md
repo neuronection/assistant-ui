@@ -1,5 +1,11 @@
 # @neuronection/assistant-ui
 
+## 0.47.0
+
+### Minor Changes
+
+- [`71caea1`](https://github.com/neuronection/assistant-ui/commit/71caea12b7b97bee0d96ace0529b022b8e749bbe) Thanks [@constLiakos](https://github.com/constLiakos)! - **UserMenu**: a full theme set (`light`/`dark`/`system` labels) now renders as a checkable **Theme submenu** whose trigger shows the active theme — mirroring the Languages submenu, so the appearance section is two uniform rows instead of one row next to three. Fewer labels keep the previous inline rows (single `dark` label keeps toggle semantics). New `labels.theme` trigger label (English default `'Theme'`).
+
 ## 0.46.0
 
 ### Minor Changes
