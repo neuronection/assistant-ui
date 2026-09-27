@@ -1,5 +1,28 @@
 # @neuronection/assistant-ui
 
+## 0.45.0
+
+### Minor Changes
+
+- [`f0cadf3`](https://github.com/neuronection/assistant-ui/commit/f0cadf3679290713b041897c0cd2c342b5ccb699) Thanks [@constLiakos](https://github.com/constLiakos)! - `admin-user-table` gains `AdminUserTable`, a presentational + controlled admin user management table (identity-auth §12): email with `"(you)"` marker, activity count, role/status badges and per-row promote/demote, activate/deactivate, inline password reset (min-length gate) and force logout, with loading/empty/error states and guard-rail 403s surfaced through label-driven messages (`describeAdminUserError`). Strings and icons pass in as props with English defaults, tokens only. First consumer is study's admin Users tab (just-in-time exception); career adopts in Phase 3.
+
+- [`0487713`](https://github.com/neuronection/assistant-ui/commit/04877135cb9d9f9c8aef7ee586da47a695d6c2ac) Thanks [@constLiakos](https://github.com/constLiakos)! - `login-form` + `register-form` gain `LoginForm` and `RegisterForm`, the family-standard auth surfaces (identity-auth §12, plan 16 U1): presentational + controlled forms with labelled email/password fields, password visibility toggles, loading/error props (apps map API errors), HTML5 + min-length validation, link slots for the SPA mode switch (`onRegister`/`registerHref`, `forgotHref`, `onLogin`/`loginHref` — omitting them hides the action, covering career's registration-disabled P3c), plus confirm-password mismatch and an optional full-name field on `RegisterForm`. No remember-me: HttpOnly cookies make session lifetime server-owned. Strings and icons pass in as props with English defaults, tokens only. First consumers are study's `LoginOverlay` and career's `LoginScreen` (plan 16 Phase 5 closeout, same-commit deletes of their local form markup).
+
+- [`756e70b`](https://github.com/neuronection/assistant-ui/commit/756e70b117655b39bda7f8e323d7ef2217d8a108) Thanks [@constLiakos](https://github.com/constLiakos)! - `auth-gate` gains `AuthGate`, the shared session gate (identity-auth §4,
+  plan 16 Phase 5 closeout): the gate owns the `checking → authenticated |
+anonymous` boot machine and its rendering, the app owns the endpoints —
+  `boot` (cookie → refresh → desktop exchange) resolves the session,
+  `login`/`checking` come in as app-composed nodes, `resetKey` replays the
+  machine for mid-session 401s, post-login transitions and forced drops,
+  `onStatusChange` reports transitions out. A rejecting boot reads as
+  anonymous (never wedged on checking). First consumers are study's
+  `SessionGate` (local `AuthGate` state machine deleted) and career's
+  `SessionGate` (local `ProtectedRoute` gate deleted; `dropToLogin()` keeps
+  its zero-round-trip semantics by answering the replayed boot from the
+  store verdict).
+
+- [`51307ba`](https://github.com/neuronection/assistant-ui/commit/51307bae742e8e4b75dcd10faf8969cd9f39bfd5) Thanks [@constLiakos](https://github.com/constLiakos)! - `profile-switcher` gains `ProfileSwitcher`, a presentational + controlled profile switcher (identity-auth §6/§12): current-profile trigger and labelled panel listing the user's profiles with select, create, inline rename, optional set-Default and delete flows, plus loading/empty/error states. Strings and icons pass in as props with English defaults, tokens only. First consumer is career's app chrome (plan 16 P3b); study adopts its ProfileDialog parity later.
+
 ## 0.44.0
 
 ### Minor Changes
