@@ -166,7 +166,7 @@ describe('UserMenu', () => {
     expect(onThemeChange).toHaveBeenCalledWith('light')
   })
 
-  it('renders language rows as checkable items', async () => {
+  it('renders language rows as a checkable submenu', async () => {
     const onLanguageChange = vi.fn()
     render(
       <Demo
@@ -179,10 +179,10 @@ describe('UserMenu', () => {
       />,
     )
     await openMenu()
-    expect(screen.getByRole('menuitemcheckbox', { name: 'English' })).toHaveAttribute(
-      'aria-checked',
-      'true',
-    )
+    // language rows live in a submenu off the "Language" trigger
+    await userEvent.setup().click(screen.getByRole('menuitem', { name: 'Language' }))
+    const english = screen.getByRole('menuitemcheckbox', { name: 'English' })
+    expect(english).toHaveAttribute('aria-checked', 'true')
     await userEvent.setup().click(screen.getByRole('menuitemcheckbox', { name: 'Ελληνικά' }))
     expect(onLanguageChange).toHaveBeenCalledWith('el')
   })

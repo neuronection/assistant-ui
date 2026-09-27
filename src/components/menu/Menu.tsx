@@ -64,6 +64,24 @@ export const MenuItem = React.forwardRef<
   )
 })
 
+export const MenuSub = DropdownMenuPrimitive.Sub
+export const MenuSubTrigger = React.forwardRef<
+  React.ComponentRef<typeof DropdownMenuPrimitive.SubTrigger>,
+  React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.SubTrigger>
+>(function MenuSubTrigger(props, ref) {
+  return <DropdownMenuPrimitive.SubTrigger ref={ref} {...props} />
+})
+export const MenuSubContent = React.forwardRef<
+  React.ComponentRef<typeof DropdownMenuPrimitive.SubContent>,
+  React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.SubContent>
+>(function MenuSubContent(props, ref) {
+  return (
+    <DropdownMenuPrimitive.Portal>
+      <DropdownMenuPrimitive.SubContent ref={ref} {...props} />
+    </DropdownMenuPrimitive.Portal>
+  )
+})
+
 export const MenuSeparator = React.forwardRef<
   React.ComponentRef<typeof DropdownMenuPrimitive.Separator>,
   React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Separator>

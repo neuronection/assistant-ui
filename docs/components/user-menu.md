@@ -2,7 +2,7 @@
 
 Family-standard identity dropdown: avatar/identity trigger + switcher slot +
 identity header (email + role badge) + status pill + appearance section
-(theme/language checkables) + app entries + logout. Composed from the `Menu`
+(language submenu, theme checkables) + app entries + logout. Composed from the `Menu`
 primitives; Radix provides focus management, typeahead and collision
 handling.
 
@@ -31,7 +31,7 @@ import { UserMenu, type UserMenuItem } from '@neuronection/assistant-ui/user-men
 | `themeLabels` | `{ light?, dark?, system? }` | — | one checkable row per label given; apps opt into exactly the options they support |
 | `language` | `string` | — | controlled language id |
 | `onLanguageChange` | `(id: string) => void` | — | fires with the picked language id |
-| `languages` | `{ id, label }[]` | — | rendered as checkable rows when `language`/`onLanguageChange` are set |
+| `languages` | `{ id, label }[]` | — | rendered as checkable rows in a **Language submenu** (Languages ▸) when `language`/`onLanguageChange` are set |
 | `onLogout` | `() => void` | — | renders the danger logout row when set |
 | `logoutLabel` | `string` | `'Log out'` | logout row text |
 | `align` | `'start' \| 'end'` | `'end'` | panel alignment |

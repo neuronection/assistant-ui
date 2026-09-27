@@ -8,6 +8,9 @@ import {
   MenuLabel,
   MenuSeparator,
   MenuTrigger,
+  MenuSub,
+  MenuSubContent,
+  MenuSubTrigger,
 } from '../menu/Menu'
 import { cn } from '../../lib/utils'
 
@@ -94,7 +97,7 @@ export interface UserMenuProps {
   onLogout?: () => void
   logoutLabel?: string
   align?: 'start' | 'end'
-  labels?: { openMenu?: string; account?: string }
+  labels?: { openMenu?: string; account?: string; language?: string }
   icons?: UserMenuIcons
   className?: string
   triggerClassName?: string
@@ -337,16 +340,24 @@ export const UserMenu = React.forwardRef<HTMLDivElement, UserMenuProps>(
 
               {(languageRows.length > 0 || themeRows.length > 0) && <MenuSeparator />}
 
-              {languageRows.map((lang) => (
-                <MenuCheckboxItem
-                  key={`lang-${lang.id}`}
-                  icon={resolvedIcons.language}
-                  checked={language === lang.id}
-                  onSelect={() => onLanguageChange?.(lang.id)}
-                >
-                  {lang.label}
-                </MenuCheckboxItem>
-              ))}
+              {languageRows.length > 0 ? (
+                <MenuSub>
+                  <MenuSubTrigger>
+                    {labels?.language ?? 'Language'}
+                  </MenuSubTrigger>
+                  <MenuSubContent>
+                    {languageRows.map((lang) => (
+                      <MenuCheckboxItem
+                        key={`lang-${lang.id}`}
+                        checked={language === lang.id}
+                        onSelect={() => onLanguageChange?.(lang.id)}
+                      >
+                        {lang.label}
+                      </MenuCheckboxItem>
+                    ))}
+                  </MenuSubContent>
+                </MenuSub>
+              ) : null}
 
               {themeRows.map((id) => (
                 <MenuCheckboxItem
