@@ -133,7 +133,7 @@ describe('UserMenu', () => {
     expect(pill!.className).toContain('text-[var(--as-success)]')
   })
 
-  it('renders theme rows for the provided labels and reports the picked id', async () => {
+  it('renders full theme sets as a checkable submenu and reports the picked id', async () => {
     const onThemeChange = vi.fn()
     render(
       <Demo
@@ -143,6 +143,11 @@ describe('UserMenu', () => {
       />,
     )
     await openMenu()
+    // theme rows live in a submenu off the "Theme" trigger (whose accessible
+    // name carries the active theme label) — mirrors the Languages submenu
+    const themeTrigger = screen.getByRole('menuitem', { name: /Theme/ })
+    expect(themeTrigger).toHaveTextContent('Light theme')
+    await userEvent.setup().click(themeTrigger)
     expect(screen.getByRole('menuitemcheckbox', { name: 'Light theme' })).toHaveAttribute(
       'aria-checked',
       'true',

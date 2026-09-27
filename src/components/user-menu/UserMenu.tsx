@@ -75,14 +75,15 @@ export interface UserMenuProps {
   switcher?: React.ReactNode
   /** Status pill rendered under the identity block (e.g. "Synced"). */
   status?: UserMenuStatus
-  /** Controlled theme preference — checked state of the theme rows. */
+  /** Controlled theme preference — checked state of the theme items. */
   theme?: UserMenuTheme
   onThemeChange?: (theme: UserMenuTheme) => void
   /**
-   * Labels for the theme rows — one checkable row renders per label given,
-   * so apps opt into exactly the options they support (provide `dark` only
-   * for a single "Dark Mode" toggle row; `light`/`dark`/`system` for the
-   * full appearance section).
+   * Labels for the theme options — with all three (`light`/`dark`/`system`)
+   * they render as a checkable "Theme" submenu whose trigger shows the
+   * active theme (mirroring the Languages submenu); fewer labels render as
+   * inline checkable rows (provide `dark` only for a single "Dark Mode"
+   * toggle row).
    */
   themeLabels?: { light?: string; dark?: string; system?: string }
   /** Controlled language — checked state of the language rows. */
@@ -97,7 +98,7 @@ export interface UserMenuProps {
   onLogout?: () => void
   logoutLabel?: string
   align?: 'start' | 'end'
-  labels?: { openMenu?: string; account?: string; language?: string }
+  labels?: { openMenu?: string; account?: string; language?: string; theme?: string }
   icons?: UserMenuIcons
   className?: string
   triggerClassName?: string
@@ -362,16 +363,39 @@ export const UserMenu = React.forwardRef<HTMLDivElement, UserMenuProps>(
                 </MenuSub>
               ) : null}
 
-              {themeRows.map((id) => (
-                <MenuCheckboxItem
-                  key={`theme-${id}`}
-                  icon={themeIcon(id)}
-                  checked={theme === id}
-                  onSelect={() => selectTheme(id)}
-                >
-                  {themeLabels?.[id]}
-                </MenuCheckboxItem>
-              ))}
+              {themeRows.length >= 3 ? (
+                <MenuSub>
+                  <MenuSubTrigger>
+                    {labels?.theme ?? 'Theme'}
+                    <span className="ml-auto text-xs text-[var(--as-muted-fg)]">
+                      {theme !== undefined ? themeLabels?.[theme] : undefined}
+                    </span>
+                  </MenuSubTrigger>
+                  <MenuSubContent>
+                    {themeRows.map((id) => (
+                      <MenuCheckboxItem
+                        key={`theme-${id}`}
+                        icon={themeIcon(id)}
+                        checked={theme === id}
+                        onSelect={() => selectTheme(id)}
+                      >
+                        {themeLabels?.[id]}
+                      </MenuCheckboxItem>
+                    ))}
+                  </MenuSubContent>
+                </MenuSub>
+              ) : (
+                themeRows.map((id) => (
+                  <MenuCheckboxItem
+                    key={`theme-${id}`}
+                    icon={themeIcon(id)}
+                    checked={theme === id}
+                    onSelect={() => selectTheme(id)}
+                  >
+                    {themeLabels?.[id]}
+                  </MenuCheckboxItem>
+                ))
+              )}
 
               {menuItemList.length > 0 &&
               (switcher !== undefined || hasIdentity || status !== undefined || languageRows.length > 0 || themeRows.length > 0) ? (

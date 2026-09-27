@@ -28,14 +28,14 @@ import { UserMenu, type UserMenuItem } from '@neuronection/assistant-ui/user-men
 | `status` | `{ label: string; tone?: 'success' \| 'info' \| 'warning' }` | — | status pill under the identity block |
 | `theme` | `'light' \| 'dark' \| 'system'` | — | controlled theme value for the appearance section |
 | `onThemeChange` | `(theme) => void` | — | fires with the picked theme id |
-| `themeLabels` | `{ light?, dark?, system? }` | — | one checkable row per label given; apps opt into exactly the options they support |
+| `themeLabels` | `{ light?, dark?, system? }` | — | with all three: checkable **Theme submenu** (trigger shows the active theme); fewer labels: inline checkable rows — apps opt into exactly the options they support |
 | `language` | `string` | — | controlled language id |
 | `onLanguageChange` | `(id: string) => void` | — | fires with the picked language id |
 | `languages` | `{ id, label }[]` | — | rendered as checkable rows in a **Language submenu** (Languages ▸) when `language`/`onLanguageChange` are set |
 | `onLogout` | `() => void` | — | renders the danger logout row when set |
 | `logoutLabel` | `string` | `'Log out'` | logout row text |
 | `align` | `'start' \| 'end'` | `'end'` | panel alignment |
-| `labels` | `{ openMenu?, account? }` | `'Open user menu'` | trigger aria-label; `account` is the identity section eyebrow |
+| `labels` | `{ openMenu?, account?, language?, theme? }` | `'Open user menu'` | trigger aria-label; `account` is the identity section eyebrow; `language`/`theme` label the appearance submenu triggers (English defaults `'Language'`/`'Theme'`) |
 | `icons` | `{ logout?, language?, themeLight?, themeDark?, themeSystem? }` | `LogOut`/`Globe`/`Sun`/`Moon`/`Monitor` | Lucide icon overrides |
 | `className` | `string` | — | on the wrapper (`data-as="user-menu"`) |
 | `triggerClassName` | `string` | — | on the trigger button |
@@ -50,7 +50,8 @@ separators render between adjacent sections):
 2. identity block — `labels.account` eyebrow, avatar/initials disc, name,
    email, role badge
 3. `status` pill
-4. appearance — language rows, then theme rows
+4. appearance — Languages submenu row, then theme (Theme submenu when all
+   three `themeLabels` are given, else inline checkable rows)
 5. `items`
 6. logout row
 
@@ -65,7 +66,8 @@ semantics); with multiple entries it reports the picked id.
 ## labels & i18n
 
 Item labels, identity strings, status pill and role badge are app strings
-(pass `t(...)` results); only `labels.openMenu` and `logoutLabel` have
+(pass `t(...)` results); only `labels.openMenu`, `logoutLabel`, and the
+appearance submenu triggers (`labels.language` / `labels.theme`) have
 English defaults.
 
 ## examples
