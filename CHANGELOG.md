@@ -1,5 +1,25 @@
 # @neuronection/assistant-ui
 
+## 0.48.0
+
+### Minor Changes
+
+- [`e24b449`](https://github.com/neuronection/assistant-ui/commit/e24b4496037347ce369dd9e90ed568870f3ae32f) Thanks [@constLiakos](https://github.com/constLiakos)! - **ChatMessage**: new `actions.errorExtra` slot — an app-composed node rendered inside the error card (e.g. an "Open AI settings" link for not-configured failures). It sits next to the Retry button when the error is retryable and renders alone otherwise.
+
+- [`70797f0`](https://github.com/neuronection/assistant-ui/commit/70797f04ad71eea3fe803a0000c541e348dbde3f) Thanks [@constLiakos](https://github.com/constLiakos)! - **ProfileSwitcher redesign**: the trigger becomes an avatar chip (round
+  avatar + name + chevron, `UserMenu`-style) instead of an outline button;
+  the panel moves to the Menu aesthetic (`w-80`, `backdrop-blur-xl`,
+  `--as-shadow-pop`) with a titled header + profile count. Rows are roomier
+  (size-8 ringed avatars, `font-medium` names) with pill badges — the
+  accent-tinted `Current` pill replaces the bare check text, `Default` gets a
+  muted pill — and the row actions compact to `size-7` ghost icon buttons
+  (delete hovers to danger). The create row gains an inline `+` prefix icon,
+  `↓/↑`/`Home`/`End` now walk the rows, and loading gets `as-anim-fade` +
+  `role="status"`. No API changes: every label, icon and callback prop is
+  unchanged.
+
+- [`237dcc7`](https://github.com/neuronection/assistant-ui/commit/237dcc7b8afe729cd27f8415d4db36d53b5caa90) Thanks [@constLiakos](https://github.com/constLiakos)! - **UserMenu**: removed the legacy flat identity props (`name`, `email`, `avatarUrl`) — pass the structured `user` prop instead (every family app already does). New `themeLayout` prop (`'auto' | 'submenu' | 'inline'`, default `'auto'`) makes the appearance-section layout explicit instead of inferred from `themeLabels` cardinality. Single-option toggle rows now report `system → light` when toggled off (was `dark`).
+
 ## 0.47.0
 
 ### Minor Changes
