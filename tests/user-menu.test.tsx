@@ -18,8 +18,7 @@ function Demo(
 ) {
   return (
     <UserMenu
-      name="Ilias Sdryom"
-      email="ilias@neuronection.com"
+      user={{ name: 'Ilias Sdryom', email: 'ilias@neuronection.com' }}
       items={items}
       onItemSelect={vi.fn()}
       {...props}
@@ -51,23 +50,23 @@ describe('UserMenu', () => {
     expect(screen.getByRole('menuitem', { name: 'Profile' })).toBeInTheDocument()
   })
 
-  it('derives initials from the name when no avatar is given', () => {
-    render(<Demo email="x@y.z" />)
+  it('derives initials from the user name when no avatar is given', () => {
+    render(<Demo user={{ name: 'Ilias Sdryom', email: 'x@y.z' }} />)
     expect(screen.getByText('IS')).toBeInTheDocument()
   })
 
   it('uses provided initials verbatim', () => {
-    render(<Demo initials="XY" email={undefined} />)
+    render(<Demo initials="XY" user={{ email: 'x@y.z' }} />)
     expect(screen.getByText('XY')).toBeInTheDocument()
   })
 
   it('falls back to a glyph disc without name/initials', () => {
-    const { container } = render(<Demo name={undefined} email={undefined} />)
+    const { container } = render(<Demo user={undefined} />)
     expect(container.querySelector('svg')).not.toBeNull()
   })
 
-  it('uses the avatar image when avatarUrl is provided', () => {
-    render(<Demo avatarUrl="/avatar.png" />)
+  it('uses the avatar image when the user carries an avatarUrl', () => {
+    render(<Demo user={{ name: 'Maria Papadopoulou', avatarUrl: '/avatar.png' }} />)
     expect(screen.getByRole('button', { name: 'Open user menu' }).querySelector('img')).toHaveAttribute(
       'src',
       '/avatar.png',
@@ -81,15 +80,6 @@ describe('UserMenu', () => {
     await openMenu()
     expect(screen.getAllByText('Maria Papadopoulou')).toHaveLength(2)
     expect(screen.getAllByText('maria@health-assistant.io')).toHaveLength(2)
-  })
-
-  it('prefers `user` fields over the legacy flat props', async () => {
-    render(
-      <Demo user={{ name: 'Maria Papadopoulou', email: 'maria@health-assistant.io' }} />,
-    )
-    await openMenu()
-    expect(screen.queryByText('Ilias Sdryom')).toBeNull()
-    expect(screen.getAllByText('Maria Papadopoulou')).toHaveLength(2)
   })
 
   it('renders the role badge when a role is given', async () => {
@@ -171,6 +161,61 @@ describe('UserMenu', () => {
     expect(onThemeChange).toHaveBeenCalledWith('light')
   })
 
+  it('toggles a single System row to light, not dark', async () => {
+    const onThemeChange = vi.fn()
+    render(
+      <Demo
+        theme="system"
+        onThemeChange={onThemeChange}
+        themeLabels={{ system: 'Use system theme' }}
+      />,
+    )
+    await openMenu()
+    const system = screen.getByRole('menuitemcheckbox', { name: 'Use system theme' })
+    expect(system).toHaveAttribute('aria-checked', 'true')
+    await userEvent.setup().click(system)
+    expect(onThemeChange).toHaveBeenCalledWith('light')
+  })
+
+  it('themeLayout=inline forces inline rows for a full theme set', async () => {
+    const onThemeChange = vi.fn()
+    render(
+      <Demo
+        theme="light"
+        onThemeChange={onThemeChange}
+        themeLabels={{ light: 'Light theme', dark: 'Dark theme', system: 'System theme' }}
+        themeLayout="inline"
+      />,
+    )
+    await openMenu()
+    // no Theme submenu trigger — the rows render directly in the panel
+    expect(screen.queryByRole('menuitem', { name: /Theme/ })).toBeNull()
+    expect(screen.getByRole('menuitemcheckbox', { name: 'Light theme' })).toHaveAttribute(
+      'aria-checked',
+      'true',
+    )
+    await userEvent.setup().click(screen.getByRole('menuitemcheckbox', { name: 'System theme' }))
+    expect(onThemeChange).toHaveBeenCalledWith('system')
+  })
+
+  it('themeLayout=submenu forces the submenu for a partial theme set', async () => {
+    const onThemeChange = vi.fn()
+    render(
+      <Demo
+        theme="dark"
+        onThemeChange={onThemeChange}
+        themeLabels={{ light: 'Light theme', dark: 'Dark theme' }}
+        themeLayout="submenu"
+      />,
+    )
+    await openMenu()
+    const themeTrigger = screen.getByRole('menuitem', { name: /Theme/ })
+    expect(themeTrigger).toHaveTextContent('Dark theme')
+    await userEvent.setup().click(themeTrigger)
+    await userEvent.setup().click(screen.getByRole('menuitemcheckbox', { name: 'Light theme' }))
+    expect(onThemeChange).toHaveBeenCalledWith('light')
+  })
+
   it('renders language rows as a checkable submenu', async () => {
     const onLanguageChange = vi.fn()
     render(
@@ -210,13 +255,13 @@ describe('UserMenu', () => {
   })
 
   it('keeps the identity header when only a role is given', async () => {
-    render(<Demo name={undefined} email={undefined} user={{ role: 'ADMIN' }} />)
+    render(<Demo user={{ role: 'ADMIN' }} />)
     await openMenu()
     expect(screen.getByText('ADMIN')).toBeInTheDocument()
   })
 
-  it('omits the identity header when neither name nor email is given', async () => {
-    render(<Demo name={undefined} email={undefined} />)
+  it('omits the identity header when no identity is given', async () => {
+    render(<Demo user={undefined} />)
     await openMenu()
     expect(screen.queryByRole('separator')).toBeNull()
   })

@@ -15,8 +15,7 @@ export const WithInitialsStory = () => {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
       <UserMenu
-        name="Ilias Sdryom"
-        email="ilias@neuronection.com"
+        user={{ name: 'Ilias Sdryom', email: 'ilias@neuronection.com' }}
         items={[
           { id: 'profile', label: 'Profile', icon: Settings },
           { id: 'signout', label: 'Sign out', icon: LogOut, tone: 'danger' },
@@ -30,9 +29,11 @@ export const WithInitialsStory = () => {
 
 export const WithAvatarStory = () => (
   <UserMenu
-    name="Maria Papadopoulou"
-    email="maria@health-assistant.io"
-    avatarUrl="/icon-light.svg"
+    user={{
+      name: 'Maria Papadopoulou',
+      email: 'maria@health-assistant.io',
+      avatarUrl: '/icon-light.svg',
+    }}
     items={[{ id: 'signout', label: 'Sign out', icon: LogOut, tone: 'danger' }]}
     onItemSelect={() => {}}
   />
@@ -54,8 +55,7 @@ export const CheckableItemsStory = () => {
   ]
   return (
     <UserMenu
-      name="Ilias Sdryom"
-      email="ilias@neuronection.com"
+      user={{ name: 'Ilias Sdryom', email: 'ilias@neuronection.com' }}
       items={items}
       onItemSelect={(id) => {
         if (id === 'theme') setDark((d) => !d)
@@ -67,7 +67,7 @@ export const CheckableItemsStory = () => {
 
 export const LongEmailStory = () => (
   <UserMenu
-    email="very.long.account.name@subdomain.health-assistant-io.example.com"
+    user={{ email: 'very.long.account.name@subdomain.health-assistant-io.example.com' }}
     items={[{ id: 'signout', label: 'Sign out', icon: LogOut, tone: 'danger' }]}
     onItemSelect={() => {}}
   />
@@ -108,6 +108,21 @@ export const IdentityDropdownStory = () => {
       onItemSelect={() => {}}
       onLogout={() => {}}
       logoutLabel="Log out"
+    />
+  )
+}
+
+export const ThemeInlineStory = () => {
+  const [theme, setTheme] = useState<'light' | 'dark' | 'system'>('dark')
+  return (
+    <UserMenu
+      user={{ name: 'Ilias Sdryom', email: 'ilias@neuronection.com' }}
+      theme={theme}
+      onThemeChange={setTheme}
+      themeLabels={{ light: 'Light theme', dark: 'Dark theme', system: 'System theme' }}
+      themeLayout="inline"
+      items={[{ id: 'signout', label: 'Sign out', icon: LogOut, tone: 'danger' }]}
+      onItemSelect={() => {}}
     />
   )
 }

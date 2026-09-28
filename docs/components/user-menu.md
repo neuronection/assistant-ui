@@ -16,19 +16,17 @@ import { UserMenu, type UserMenuItem } from '@neuronection/assistant-ui/user-men
 
 | prop | type | default | notes |
 |---|---|---|---|
-| `user` | `{ name?, email?, role?, avatarUrl? }` | — | structured identity; wins per field over the legacy flat props |
+| `user` | `{ name?, email?, role?, avatarUrl? }` | — | structured identity (shown in trigger + panel header) |
 | `items` | `UserMenuItem[]` | `[]` | `{ id, label, icon?, tone?, disabled?, pending?, checked? }` |
 | `onItemSelect` | `(id: string) => void` | — | fires with the item id (checkable items included) |
-| `name` | `string` | — | legacy flat identity (shown in trigger + panel header) |
-| `email` | `string` | — | legacy flat identity (shown in trigger + panel header, muted) |
-| `avatarUrl` | `string` | — | image disc; falls back to initials disc |
-| `initials` | `string` | from `name` | override disc text |
+| `initials` | `string` | from `user.name` | override disc text |
 | `roleBadge` | `string` | `user.role` | badge text (app-translated); renders when set |
 | `switcher` | `ReactNode` | — | app-composed switcher (ProfileSwitcher / TenantSwitcher) in a top section |
 | `status` | `{ label: string; tone?: 'success' \| 'info' \| 'warning' }` | — | status pill under the identity block |
 | `theme` | `'light' \| 'dark' \| 'system'` | — | controlled theme value for the appearance section |
 | `onThemeChange` | `(theme) => void` | — | fires with the picked theme id |
-| `themeLabels` | `{ light?, dark?, system? }` | — | with all three: checkable **Theme submenu** (trigger shows the active theme); fewer labels: inline checkable rows — apps opt into exactly the options they support |
+| `themeLabels` | `{ light?, dark?, system? }` | — | theme options — apps opt into exactly the options they support |
+| `themeLayout` | `'auto' \| 'submenu' \| 'inline'` | `'auto'` | `auto`: checkable **Theme submenu** (trigger shows the active theme) when all three labels are present, inline checkable rows otherwise; `submenu`/`inline` force the layout regardless of label count |
 | `language` | `string` | — | controlled language id |
 | `onLanguageChange` | `(id: string) => void` | — | fires with the picked language id |
 | `languages` | `{ id, label }[]` | — | rendered as checkable rows in a **Language submenu** (Languages ▸) when `language`/`onLanguageChange` are set |
@@ -50,8 +48,8 @@ separators render between adjacent sections):
 2. identity block — `labels.account` eyebrow, avatar/initials disc, name,
    email, role badge
 3. `status` pill
-4. appearance — Languages submenu row, then theme (Theme submenu when all
-   three `themeLabels` are given, else inline checkable rows)
+4. appearance — Languages submenu row, then theme (per `themeLayout`:
+   Theme submenu or inline checkable rows)
 5. `items`
 6. logout row
 
@@ -60,8 +58,9 @@ separators render between adjacent sections):
 `theme` + `onThemeChange`, `language` + `onLanguageChange` and `items` +
 `onItemSelect` are fully controlled — the component never owns state; apps
 re-render with the new values. With a single `themeLabels` entry (e.g. only
-`dark`), selecting the active row reports the opposite theme (toggle
-semantics); with multiple entries it reports the picked id.
+`dark`), selecting the active row reports the counterpart theme (toggle
+semantics: `dark ↔ light`, `system → light`); with multiple entries it
+reports the picked id.
 
 ## labels & i18n
 
@@ -76,7 +75,7 @@ minimal:
 
 ```tsx
 <UserMenu
-  email={user.email}
+  user={{ email: user.email }}
   onLogout={logout}
 />
 ```

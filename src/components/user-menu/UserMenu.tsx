@@ -60,11 +60,7 @@ export interface UserMenuIcons {
 export interface UserMenuProps {
   /** Structured identity — rendered in the trigger and the panel header. */
   user?: UserMenuUser
-  /** Legacy flat identity fields (still supported; `user` wins per field). */
-  name?: string
-  email?: string
-  avatarUrl?: string
-  /** Fallback disc text when no avatarUrl; derived from `name` when omitted. */
+  /** Fallback disc text when no avatarUrl; derived from `user.name` when omitted. */
   initials?: string
   /** Badge text for the role (app-translated); falls back to `user.role`. */
   roleBadge?: string
@@ -86,6 +82,12 @@ export interface UserMenuProps {
    * toggle row).
    */
   themeLabels?: { light?: string; dark?: string; system?: string }
+  /**
+   * Layout of the theme section. `'auto'` (default) renders the submenu
+   * when all three labels are present and inline rows otherwise;
+   * `'submenu'` / `'inline'` force the layout regardless of label count.
+   */
+  themeLayout?: 'auto' | 'submenu' | 'inline'
   /** Controlled language — checked state of the language rows. */
   language?: string
   onLanguageChange?: (id: string) => void
@@ -156,9 +158,6 @@ export const UserMenu = React.forwardRef<HTMLDivElement, UserMenuProps>(
   function UserMenu(
     {
       user,
-      name,
-      email,
-      avatarUrl,
       initials,
       roleBadge,
       switcher,
@@ -166,6 +165,7 @@ export const UserMenu = React.forwardRef<HTMLDivElement, UserMenuProps>(
       theme,
       onThemeChange,
       themeLabels,
+      themeLayout = 'auto',
       language,
       onLanguageChange,
       languages,
@@ -182,9 +182,9 @@ export const UserMenu = React.forwardRef<HTMLDivElement, UserMenuProps>(
     },
     ref,
   ) {
-    const identityName = user?.name ?? name
-    const identityEmail = user?.email ?? email
-    const identityAvatarUrl = user?.avatarUrl ?? avatarUrl
+    const identityName = user?.name
+    const identityEmail = user?.email
+    const identityAvatarUrl = user?.avatarUrl
     const badge = roleBadge ?? user?.role
     const hasIdentity = Boolean(identityName || identityEmail || badge)
 
@@ -195,6 +195,8 @@ export const UserMenu = React.forwardRef<HTMLDivElement, UserMenuProps>(
       theme !== undefined && onThemeChange !== undefined
         ? THEME_ORDER.filter((id) => themeLabels?.[id] !== undefined)
         : []
+    const themeAsSubmenu =
+      themeLayout === 'submenu' || (themeLayout === 'auto' && themeRows.length >= 3)
 
     const resolvedIcons = {
       logout: icons?.logout ?? LogOut,
@@ -216,11 +218,18 @@ export const UserMenu = React.forwardRef<HTMLDivElement, UserMenuProps>(
     const themeIcon = (id: UserMenuTheme) =>
       id === 'light' ? resolvedIcons.themeLight : id === 'dark' ? resolvedIcons.themeDark : resolvedIcons.themeSystem
 
+    /** Counterpart reported when the active single-option row is toggled off. */
+    const toggleCounterpart: Record<UserMenuTheme, UserMenuTheme> = {
+      light: 'dark',
+      dark: 'light',
+      system: 'light',
+    }
+
     const selectTheme = (id: UserMenuTheme) => {
       if (themeRows.length === 1) {
         // Single toggle row ("Dark Mode"): selecting the active option
         // means turning it off.
-        onThemeChange?.(theme === id ? (id === 'dark' ? 'light' : 'dark') : id)
+        onThemeChange?.(theme === id ? toggleCounterpart[id] : id)
       } else {
         onThemeChange?.(id)
       }
@@ -363,7 +372,7 @@ export const UserMenu = React.forwardRef<HTMLDivElement, UserMenuProps>(
                 </MenuSub>
               ) : null}
 
-              {themeRows.length >= 3 ? (
+              {themeAsSubmenu ? (
                 <MenuSub>
                   <MenuSubTrigger>
                     {labels?.theme ?? 'Theme'}
