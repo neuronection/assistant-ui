@@ -23,6 +23,12 @@ export interface ChatMessageActions {
   onRetry?: () => void
   /** Extra icon actions (app-specific). */
   extras?: ChatMessageAction[]
+  /**
+   * Extra node rendered inside the error card next to the Retry button —
+   * e.g. an "Open AI settings" link when the error is a not-configured
+   * failure. Rendered only while the error card is visible.
+   */
+  errorExtra?: React.ReactNode
 }
 
 export interface ChatMessageLabels {
@@ -157,9 +163,14 @@ export const ChatMessage = React.forwardRef<HTMLDivElement, ChatMessageProps>(
               <span className="font-mono font-semibold uppercase tracking-wide">{error.code}</span>
               <span className="whitespace-pre-wrap break-words">{error.message}</span>
               {error.retryable && actions?.onRetry ? (
-                <Button variant="outline" size="sm" className="self-start" onClick={actions.onRetry}>
-                  {labels?.retry ?? 'Retry'}
-                </Button>
+                <div className="flex flex-wrap items-center gap-1.5">
+                  <Button variant="outline" size="sm" className="self-start" onClick={actions.onRetry}>
+                    {labels?.retry ?? 'Retry'}
+                  </Button>
+                  {actions?.errorExtra}
+                </div>
+              ) : actions?.errorExtra ? (
+                <div className="self-start">{actions.errorExtra}</div>
               ) : null}
             </div>
           ) : null}

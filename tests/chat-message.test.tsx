@@ -243,6 +243,34 @@ describe('ChatMessage', () => {
     expect(onRetry).toHaveBeenCalledTimes(1)
   })
 
+  it('renders errorExtra next to Retry and on non-retryable errors', () => {
+    const { rerender } = render(
+      <ChatMessage
+        role="assistant"
+        content="partial"
+        status="error"
+        error={{ code: 'rate_limit', message: 'slow down', retryable: true }}
+        actions={{
+          onRetry: () => {},
+          errorExtra: <a href="/settings">Open AI settings</a>,
+        }}
+      />,
+    )
+    expect(screen.getByRole('link', { name: 'Open AI settings' })).toBeInTheDocument()
+
+    rerender(
+      <ChatMessage
+        role="assistant"
+        content="partial"
+        status="error"
+        error={{ code: 'not_configured', message: 'no provider', retryable: false }}
+        actions={{ errorExtra: <a href="/settings">Open AI settings</a> }}
+      />,
+    )
+    expect(screen.getByRole('link', { name: 'Open AI settings' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Retry' })).not.toBeInTheDocument()
+  })
+
   it('marks interrupted turns', () => {
     render(<ChatMessage role="assistant" content="partial" status="interrupted" />)
     expect(screen.getByText('Stopped')).toBeInTheDocument()

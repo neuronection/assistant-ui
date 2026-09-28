@@ -22,7 +22,7 @@ import { ChatMessage, MessageVariantSwitcher, ChatMessageEditor } from '@neurone
 | `children` | `ReactNode` | Below-content slot — tool cards, HITL cards. |
 | `status` | `'streaming' \| 'done' \| 'error' \| 'interrupted'` | Default `done`. |
 | `error` | `ChatError` | Alert block with optional retry (when `retryable` + `actions.onRetry`). |
-| `actions` | `ChatMessageActions` | `onCopy` / `onEdit` / `onRegenerate` / `onRetry` / `extras: ChatMessageAction[]`. |
+| `actions` | `ChatMessageActions` | `onCopy` / `onEdit` / `onRegenerate` / `onRetry` / `extras: ChatMessageAction[]` / `errorExtra?: ReactNode` (rendered inside the error card — next to Retry when retryable, alone otherwise). |
 | `editing` | `false \| { value; onValueChange; onSubmit; onCancel; submitDisabled? }` | Renders `ChatMessageEditor` (save & resend branches the tree). |
 | `variants` | `ChatMessageVariants` | `{ index, count, siblingIds }` — shows `‹ n/N ›` when `count > 1`. |
 | `onSelectVariant` | `(id) => void` | Drives the family `select` endpoint. |
