@@ -390,6 +390,10 @@
     "./countries": {
       "types": "./dist/countries.d.ts",
       "import": "./dist/countries.js"
+    },
+    "./languages": {
+      "types": "./dist/languages.d.ts",
+      "import": "./dist/languages.js"
     }
   },
   "scripts": {
