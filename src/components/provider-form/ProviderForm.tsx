@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { Building2, House, KeyRound } from 'lucide-react'
 import { cn } from '../../lib/utils'
+import { Combobox } from '../combobox/Combobox'
 import { Input } from '../input/Input'
 
 /** One entry of the app's provider catalog (ADR-006: the catalog lives in
@@ -49,6 +50,13 @@ export interface ProviderFormProps extends React.ComponentProps<'div'> {
   countryLabel?: string
   countryOptions?: { value: string; label: string }[]
   countryPlaceholder?: string
+  /** Search-input placeholder for the country picker (searchable — the
+   * catalog is ~250 entries, ADR-0024). */
+  countrySearchPlaceholder?: string
+  /** Empty-search result label for the country picker. */
+  countryEmptyLabel?: string
+  /** Accessible name of the country picker's clear button. */
+  countryClearLabel?: string
   /** Hint under the key field; apps mention keyring storage here. */
   apiKeyHelp?: string
   /** The provider already stores a key (write-only field shows no value). */
@@ -98,6 +106,9 @@ export const ProviderForm = React.forwardRef<HTMLDivElement, ProviderFormProps>(
       countryLabel = 'Country',
       countryOptions = [],
       countryPlaceholder = 'Select a country…',
+      countrySearchPlaceholder = 'Search countries…',
+      countryEmptyLabel = 'No matching country',
+      countryClearLabel = 'Clear country',
       storedKeyLabel = 'Stored — leave empty to keep',
       keyPlaceholder = 'sk-…',
       error,
@@ -208,21 +219,18 @@ export const ProviderForm = React.forwardRef<HTMLDivElement, ProviderFormProps>(
           </div>
         ) : null}
         {showCountry && onCountryChange ? (
-          <label className="block space-y-1 text-sm">
-            <span className="text-sm font-medium text-[var(--as-fg)]">{countryLabel}</span>
-            <select
-              value={country ?? ''}
-              onChange={(event) => onCountryChange(event.target.value)}
-              className="w-full rounded-[var(--as-radius)] border border-[var(--as-border)] bg-[var(--as-surface)] px-3 py-2 text-sm text-[var(--as-fg)]"
-            >
-              <option value="">{countryPlaceholder}</option>
-              {countryOptions.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </label>
+          <Combobox
+            options={countryOptions}
+            value={country ?? ''}
+            onChange={onCountryChange}
+            label={countryLabel}
+            placeholder={countryPlaceholder}
+            searchPlaceholder={countrySearchPlaceholder}
+            searchLabel={countrySearchPlaceholder}
+            emptyLabel={countryEmptyLabel}
+            clearable
+            clearLabel={countryClearLabel}
+          />
         ) : null}
         {children}
         {error ? (
