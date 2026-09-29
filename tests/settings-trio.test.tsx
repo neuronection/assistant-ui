@@ -169,7 +169,8 @@ describe('ProviderForm', () => {
     expect(screen.getByText('Hosting')).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: /Cloud/ }))
     expect(onLocationKindChange).toHaveBeenCalledWith('cloud')
-    await user.selectOptions(screen.getByLabelText('Country'), 'DE')
+    await user.click(screen.getByRole('combobox', { name: 'Country' }))
+    await user.click(screen.getByRole('option', { name: 'Germany' }))
     expect(onCountryChange).toHaveBeenCalledWith('DE')
     expect(await axe(container)).toHaveNoViolations()
 

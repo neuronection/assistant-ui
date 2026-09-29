@@ -75,6 +75,7 @@ export const entry: Record<string, string> = {
   'scale-slider': 'src/components/scale-slider/index.ts',
   'fuzzy': 'src/lib/fuzzy.ts',
   'countries': 'src/lib/countries.ts',
+  'languages': 'src/lib/languages.ts',
   'search-input': 'src/components/search-input/index.ts',
   'capability-chips': 'src/components/capability-chips/index.ts',
   'model-registry': 'src/components/model-registry/index.ts',
