@@ -123,10 +123,12 @@ describe('Combobox (single)', () => {
 
   it('open state has no axe violations', async () => {
     const user = userEvent.setup()
-    const { container } = render(<SingleDemo />)
+    render(<SingleDemo />)
     await user.click(screen.getByRole('combobox'))
     await screen.findByRole('listbox')
-    expect(await axe(container)).toHaveNoViolations()
+    // The panel portals to document.body — scanning `container` would
+    // pass vacuously without ever seeing the open listbox.
+    expect(await axe(document.body)).toHaveNoViolations()
   })
 })
 
@@ -185,10 +187,13 @@ describe('ComboboxMulti', () => {
 
   it('open state has no axe violations', async () => {
     const user = userEvent.setup()
-    const { container } = render(<MultiDemo />)
+    render(<MultiDemo />)
     await user.click(screen.getByRole('combobox'))
     await screen.findByRole('listbox')
-    expect(await axe(container)).toHaveNoViolations()
+    // Portaled panel — scan document.body, not `container` (see SingleDemo).
+    // `region` is a page-level rule (landmarks are the app's chrome, not a
+    // portaled picker's) — disabled for this component-level scan.
+    expect(await axe(document.body, { rules: { region: { enabled: false } } })).toHaveNoViolations()
   })
 })
 

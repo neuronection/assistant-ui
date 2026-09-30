@@ -146,7 +146,7 @@ describe('ProviderForm', () => {
     const user = userEvent.setup()
     const onLocationKindChange = vi.fn()
     const onCountryChange = vi.fn()
-    const { container } = render(
+    render(
       <ProviderForm
         name="x"
         onNameChange={vi.fn()}
@@ -170,9 +170,19 @@ describe('ProviderForm', () => {
     await user.click(screen.getByRole('button', { name: /Cloud/ }))
     expect(onLocationKindChange).toHaveBeenCalledWith('cloud')
     await user.click(screen.getByRole('combobox', { name: 'Country' }))
+    // scan the OPEN picker: the listbox portals to document.body, so
+    // `container` never contains it — axe(document.body) or it is vacuous.
+    // `region` disabled: a page-level rule — landmarks are app chrome,
+    // not this portaled picker's responsibility.
+    await screen.findByRole('listbox')
+    expect(
+      await axe(document.body, { rules: { region: { enabled: false } } }),
+    ).toHaveNoViolations()
     await user.click(screen.getByRole('option', { name: 'Germany' }))
     expect(onCountryChange).toHaveBeenCalledWith('DE')
-    expect(await axe(container)).toHaveNoViolations()
+    expect(
+      await axe(document.body, { rules: { region: { enabled: false } } }),
+    ).toHaveNoViolations()
 
     cleanup()
     render(

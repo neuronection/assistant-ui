@@ -1,7 +1,56 @@
 # utilities
 
-Non-component exports: the fuzzy search scorer, `cn`, and the tokens module.
-All are re-exported from the root barrel; `fuzzy` has no dedicated subpath.
+Non-component exports: the fuzzy search scorer, `cn`, the tokens module,
+and the shared reference-data catalogs (countries, languages). The former
+are re-exported from the root barrel; `fuzzy` and the catalogs ship as
+dedicated subpaths (data-only — never rendered by the library).
+
+## countries (`@neuronection/assistant-ui/countries`)
+
+Source: `src/lib/countries.ts`. The complete officially assigned ISO
+3166-1 alpha-2 set (249 entries) as `CountryOption { code, name, flag }`
+— `GB` (never `UK`), CLDR English short names, flag = the code-derived
+regional-indicator emoji (test-asserted against derivation, so a typo
+cannot land). ADR-0024 is the decision record: one catalog, consumed
+everywhere; provider-style residency fields validate `^[A-Z]{2}$` on
+write.
+
+```ts
+import {
+  COUNTRIES, findCountry, pickCountries, getCountryFlag, countryDisplayName,
+} from '@neuronection/assistant-ui/countries'
+
+countryDisplayName('de', 'en-GB')          // 'Germany' via Intl.DisplayNames
+getCountryFlag('gr')                       // '🇬🇷' — derived from the code
+```
+
+`countryDisplayName` localizes via `Intl.DisplayNames` with the catalog's
+English `name` as fallback (`ZZ` → the raw input). Enablement is a
+per-usage slice (`pickCountries([...])`), never a catalog toggle; labels
+render app-side (ADR-0024 §3). Python backends consume the
+byte-identical JSON copies shipped in the family templates, not this
+package.
+
+## languages (`@neuronection/assistant-ui/languages`)
+
+Source: `src/lib/languages.ts`. An ISO 639-1 superset of every family
+list (43 entries) as `LanguageOption { code, name, nativeName, flag? }`
+— all three Norwegian codes (`nb`/`nn`/`no`), `el`/`he`/`id` (not the
+legacy `gr`/`iw`/`in`), `nativeName` is the endonym (picker label
+default; flags on languages are a UX choice, omitted where no country
+maps cleanly).
+
+```ts
+import {
+  LANGUAGES, findLanguage, pickLanguages, languageDisplayName,
+} from '@neuronection/assistant-ui/languages'
+
+findLanguage('pt-BR')?.nativeName          // 'português' (locale-tag aware)
+```
+
+`findLanguage` trims and collapses locale tags to their base language;
+`languageDisplayName` mirrors `countryDisplayName` (Intl first, catalog
+fallback). Same slice-and-app-side-labels rules as countries.
 
 ## fuzzy search (`searchScore`, `fuzzyScore`)
 

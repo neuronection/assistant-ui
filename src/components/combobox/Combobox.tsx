@@ -172,6 +172,7 @@ interface ComboboxPanelProps {
   onOpenChange: (open: boolean) => void
   searchPlaceholder: string
   searchLabel?: string
+  panelLabel: string
   emptyLabel?: string
   loading?: boolean
   loadingLabel?: string
@@ -193,6 +194,7 @@ const ComboboxPanel = React.forwardRef<HTMLDivElement, ComboboxPanelProps>(
     onOpenChange,
     searchPlaceholder,
     searchLabel = 'Search options',
+    panelLabel,
     emptyLabel,
     loading,
     loadingLabel,
@@ -248,6 +250,7 @@ const ComboboxPanel = React.forwardRef<HTMLDivElement, ComboboxPanelProps>(
       ref={ref}
       align="start"
       collisionPadding={8}
+      aria-label={panelLabel}
       onOpenAutoFocus={(event) => {
         event.preventDefault()
         const panel = event.currentTarget as HTMLElement | null
@@ -462,6 +465,7 @@ export const Combobox = React.forwardRef<HTMLButtonElement, ComboboxProps>(funct
               onOpenChange={handleOpenChange}
               searchPlaceholder={searchPlaceholder}
               searchLabel={searchLabel}
+              panelLabel={typeof label === 'string' ? label : placeholder || 'Options'}
               emptyLabel={emptyLabel}
               loading={loading}
               loadingLabel={loadingLabel}
@@ -628,6 +632,7 @@ export const ComboboxMulti = React.forwardRef<HTMLButtonElement, ComboboxMultiPr
                 onOpenChange={handleOpenChange}
                 searchPlaceholder={searchPlaceholder}
                 searchLabel={searchLabel}
+                panelLabel={typeof label === 'string' ? label : placeholder || 'Options'}
                 emptyLabel={emptyLabel}
                 loading={loading}
                 loadingLabel={loadingLabel}

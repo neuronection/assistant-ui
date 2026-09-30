@@ -2,7 +2,10 @@
 
 Standard provider-credential fields: an optional preset-catalog picker,
 name, optional base URL and a **write-only** API key, plus optional
-Local/Cloud hosting toggle and country select. The library never renders a
+Local/Cloud hosting toggle and country picker (the country field renders the
+library `Combobox` — searchable and clearable over the shared catalog, so
+full-ISO lists (~250 entries) stay usable; the `countryOptions` contract is
+unchanged and all call sites get search for free). The library never renders a
 stored key — keyring/storage is the app's business (ADR-006). The preset
 catalog itself is app data (each backend ships its own); the form only
 renders the picker and reports the selected key.
@@ -44,12 +47,15 @@ Extends `React.ComponentProps<'div'>` (spread onto the root).
 | `locationKind` | `'local' \| 'cloud'` | `'cloud'` | |
 | `onLocationKindChange` | `(kind: 'local' \| 'cloud') => void` | — | required with `showLocationKind` |
 | `locationLabel` / `localLabel` / `cloudLabel` | `string` | `'Hosting'` / `'Local / on-premise'` / `'Cloud'` | |
-| `showCountry` | `boolean` | `false` | render gate for the country select |
+| `showCountry` | `boolean` | `false` | render gate for the country picker |
 | `country` | `string` | — | |
 | `onCountryChange` | `(country: string) => void` | — | |
 | `countryLabel` | `string` | `'Country'` | |
-| `countryOptions` | `{ value: string; label: string }[]` | `[]` | |
-| `countryPlaceholder` | `string` | `'Select a country…'` | |
+| `countryOptions` | `{ value: string; label: string }[]` | `[]` | fed by `@neuronection/assistant-ui/countries` (`COUNTRIES` is already `{code, name, flag}`-shaped) |
+| `countryPlaceholder` | `string` | `'Select a country…'` | shown as the Combobox trigger's placeholder |
+| `countrySearchPlaceholder` | `string` | `'Search countries…'` | search-field placeholder (also its accessible name — pass a translated string at the call site) |
+| `countryEmptyLabel` | `string` | `'No countries found'` | empty-search-state message |
+| `countryClearLabel` | `string` | `'Clear country'` | accessible label for the clear (×) button |
 | `error` | `string` | — | `role="alert"` line at the bottom |
 | `children` | `ReactNode` | — | extra app-side content between fields and error |
 
