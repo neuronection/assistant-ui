@@ -1,5 +1,17 @@
 # @neuronection/assistant-ui
 
+## 0.50.0
+
+### Minor Changes
+
+- [`9923534`](https://github.com/neuronection/assistant-ui/commit/99235343c1359c576cde716217ddc66ffd03a1b7) Thanks [@constLiakos](https://github.com/constLiakos)! - **`InstanceModeControl`** — controlled §4.5 instance access-mode panel (identity-auth §4.5): current mode, the `open → authenticated` transition (owner credentials in the same call), the `authenticated → open` transition (password + explicit acknowledgement), blocked states (server entrypoint, other accounts) and an audit note. Exports `describeInstanceModeError` and the `InstanceAuthMode` type; subpath export `@neuronection/assistant-ui/instance-mode-control`.
+
+### Patch Changes
+
+- [`3fc526f`](https://github.com/neuronection/assistant-ui/commit/3fc526fd5d64c11db8e910ed9ddd87c90d4f0a02) Thanks [@constLiakos](https://github.com/constLiakos)! - Combobox: the portaled open panel now carries an accessible name (`aria-label` derived from the trigger's label/placeholder, overridable per call site via the existing label props). The open-state axe tests previously scanned `container` while Radix portals the panel to `document.body`, so the open picker was never actually asserted — and hid exactly this `aria-dialog-name` violation. Tests now scan `document.body` (the page-level `region` rule disabled for component-level scans, with rationale in the test).
+
+  Also documents the ADR-0024 additions the same-commit rule missed: the three country-picker label props on `ProviderForm` (`countrySearchPlaceholder`, `countryEmptyLabel`, `countryClearLabel`) and the `countries` / `languages` data subpaths in the utilities guide.
+
 ## 0.49.0
 
 ### Minor Changes
