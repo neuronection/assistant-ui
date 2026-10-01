@@ -4,6 +4,7 @@ import { join, basename } from 'node:path'
 const LIBRARY_COMPONENTS = [
   'AboutCard',
   'AdminUserTable',
+  'InstanceModeControl',
   'AuthGate',
   'AboutLinkList',
   'AboutNote',

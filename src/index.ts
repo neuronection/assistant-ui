@@ -521,6 +521,14 @@ export {
   type AdminUserTableProps,
 } from './components/admin-user-table'
 export {
+  InstanceModeControl,
+  describeInstanceModeError,
+  type InstanceAuthMode,
+  type InstanceModeControlIcons,
+  type InstanceModeControlLabels,
+  type InstanceModeControlProps,
+} from './components/instance-mode-control'
+export {
   AuthGate,
   type AuthGateLabels,
   type AuthGateProps,

@@ -31,6 +31,10 @@
       "types": "./dist/admin-user-table.d.ts",
       "import": "./dist/admin-user-table.js"
     },
+    "./instance-mode-control": {
+      "types": "./dist/instance-mode-control.d.ts",
+      "import": "./dist/instance-mode-control.js"
+    },
     "./auth-gate": {
       "types": "./dist/auth-gate.d.ts",
       "import": "./dist/auth-gate.js"
