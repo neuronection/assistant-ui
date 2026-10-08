@@ -77,6 +77,50 @@ describe('liveTurnReducer', () => {
     expect(state.status).toBe('interrupted')
   })
 
+  it('maps flow_interrupted onto the same terminal stop as the local stop action', () => {
+    const state = reduce([
+      { event: 'flow_started', flow: 'chat', run_id: 'run-1' },
+      { event: 'delta', text: 'partial answer' },
+      { event: 'flow_interrupted', reason: 'server', partial: true },
+    ])
+    expect(state.status).toBe('interrupted')
+    expect(state.stopped).toBe(true)
+    expect(state.finishedAt).toBe(at)
+    expect(state.text).toBe('partial answer')
+    expect(state.interruptPayload).toBeNull()
+    expect(liveTurnReducer(state, { type: 'event', event: { event: 'delta', text: ' LATE' }, at })).toBe(state)
+    expect(liveTurnReducer(state, { type: 'event', event: { event: 'flow_finished' }, at })).toBe(state)
+  })
+
+  it('syncs a server-broadcast stop onto a consumer that did not issue the stop', () => {
+    const shared: ChatStreamEvent[] = [
+      { event: 'flow_started', flow: 'chat', run_id: 'run-1' },
+      { event: 'delta', text: 'shared prefix' },
+    ]
+    const stoppingTab = liveTurnReducer(reduce(shared), { type: 'stop', at })
+    const observingTab = reduce([...shared, { event: 'flow_interrupted', reason: 'user' }])
+    expect(stoppingTab.status).toBe('interrupted')
+    expect(observingTab.status).toBe('interrupted')
+    expect(observingTab.stopped).toBe(true)
+    expect(observingTab.text).toBe(stoppingTab.text)
+    expect(observingTab.finishedAt).toBe(at)
+    expect(liveTurnReducer(observingTab, { type: 'event', event: { event: 'delta', text: ' LATE' }, at })).toBe(observingTab)
+  })
+
+  it('keeps the HITL pause resumable — a stop after it is what terminalizes', () => {
+    const paused = reduce([
+      { event: 'delta', text: 'need input ' },
+      { event: 'interrupt', payload: { question: 'Which drug?' } },
+    ])
+    expect(paused.status).toBe('interrupted')
+    expect(paused.stopped).toBe(false)
+    const stopped = liveTurnReducer(paused, { type: 'event', event: { event: 'flow_interrupted', reason: 'server' }, at })
+    expect(stopped.status).toBe('interrupted')
+    expect(stopped.stopped).toBe(true)
+    expect(stopped.interruptPayload).toEqual({ question: 'Which drug?' })
+    expect(liveTurnReducer(stopped, { type: 'event', event: { event: 'delta', text: 'after resume' }, at })).toBe(stopped)
+  })
+
   it('ignores events for a different run_id once one is known', () => {
     const state = reduce([
       { event: 'flow_started', flow: 'chat', run_id: 'run-1' },
@@ -334,6 +378,47 @@ describe('useChatStream', () => {
     await vi.advanceTimersByTimeAsync(33)
     await vi.advanceTimersByTimeAsync(0)
     expect(capture.current?.text).toBe('second turn')
+  })
+
+  it('a server-broadcast flow_interrupted terminalizes the turn and blocks late events', async () => {
+    vi.useFakeTimers()
+    const { transport, emit } = makeTransport()
+    const { capture, click } = setup(transport)
+    click('Send')
+    await vi.advanceTimersByTimeAsync(0)
+    expect(capture.current?.status).toBe('pending')
+    emit({ event: 'delta', text: 'partial ' })
+    await vi.advanceTimersByTimeAsync(33)
+    await vi.advanceTimersByTimeAsync(0)
+    expect(capture.current?.status).toBe('streaming')
+    emit({ event: 'flow_interrupted', reason: 'user', partial: true })
+    await vi.advanceTimersByTimeAsync(0)
+    expect(capture.current?.status).toBe('interrupted')
+    expect(capture.current?.stopped).toBe(true)
+    expect(capture.current?.text).toBe('partial ')
+    emit({ event: 'delta', text: 'LATE' })
+    await vi.advanceTimersByTimeAsync(90_000)
+    expect(capture.current?.status).toBe('interrupted')
+    expect(capture.current?.text).toBe('partial ')
+  })
+
+  it('reset re-arms after flow_interrupted and a fresh turn streams', async () => {
+    vi.useFakeTimers()
+    const { transport, emit } = makeTransport()
+    const { capture, click } = setup(transport)
+    click('Send')
+    await vi.advanceTimersByTimeAsync(0)
+    emit({ event: 'flow_interrupted', reason: 'server' })
+    await vi.advanceTimersByTimeAsync(0)
+    click('Reset')
+    expect(capture.current?.status).toBe('idle')
+    expect(capture.current?.live).toBeNull()
+    click('Send')
+    await vi.advanceTimersByTimeAsync(0)
+    emit({ event: 'delta', text: 'next turn' })
+    await vi.advanceTimersByTimeAsync(33)
+    await vi.advanceTimersByTimeAsync(0)
+    expect(capture.current?.text).toBe('next turn')
   })
 
   it('send/stop/reset closures stay stable across renders', () => {

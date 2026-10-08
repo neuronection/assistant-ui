@@ -116,6 +116,6 @@ export function ChatCoreStory() {
 
 const drainedScript: ChatStreamEvent[] = [
   { event: 'flow_started', flow: 'chat', run_id: 'r2' },
-  { event: 'delta', text: 'Second turn answer.' },
-  { event: 'flow_finished' },
+  { event: 'delta', text: 'Second turn answer, cut ' },
+  { event: 'flow_interrupted', reason: 'server', partial: true },
 ]

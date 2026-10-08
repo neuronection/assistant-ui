@@ -21,9 +21,14 @@ export interface LiveToolCall {
 
 /**
  * Ephemeral state of the in-flight assistant turn. `text`/`reasoning` are
- * `null` until the first delta (study's "not streaming yet" sentinel);
- * `interrupted` is a resumable pause (HITL) unless `stopped` marks a user
- * cancel; `stopped`/`done`/`error` are terminal for event intake.
+ * `null` until the first delta (study's "not streaming yet" sentinel).
+ * `status: 'interrupted'` has two distinct readings: the HITL `interrupt`
+ * event is a *resumable pause* — it carries `interruptPayload` and the
+ * next delta streams again — while a *stop* is terminal for event intake:
+ * the local `stop` action (the user cancel this consumer issued) or the
+ * server-broadcast `flow_interrupted` event (how a consumer that did NOT
+ * issue the stop learns the turn was cancelled, e.g. another tab). Both
+ * stop paths set `stopped: true`; `stopped`/`done`/`error` close intake.
  */
 export interface LiveTurnState {
   status: LiveTurnStatus
@@ -123,7 +128,8 @@ export function liveTurnReducer(state: LiveTurnState, action: LiveTurnAction): L
       if (state.status === 'idle' || isTerminal(state)) {
         return state
       }
-      if (event.run_id !== undefined && state.runId !== null && event.run_id !== state.runId) {
+      const eventRunId = 'run_id' in event ? event.run_id : undefined
+      if (eventRunId !== undefined && state.runId !== null && eventRunId !== state.runId) {
         return state
       }
       switch (event.event) {
@@ -160,6 +166,8 @@ export function liveTurnReducer(state: LiveTurnState, action: LiveTurnAction): L
             error: { code: event.code, message: event.message, retryable: event.retryable },
             finishedAt: at,
           }
+        case 'flow_interrupted':
+          return { ...state, status: 'interrupted', stopped: true, finishedAt: at }
         default:
           return state
       }

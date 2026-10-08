@@ -109,7 +109,7 @@ export function useChatStream(options: UseChatStreamOptions): UseChatStreamResul
           return
         }
         flush()
-        if (event.event === 'flow_finished' || event.event === 'flow_failed') {
+        if (event.event === 'flow_finished' || event.event === 'flow_failed' || event.event === 'flow_interrupted') {
           terminalRef.current = true
           clearTimeoutTimer()
         }
