@@ -20,6 +20,7 @@ import { ChatComposer } from '@neuronection/assistant-ui/chat-composer'
 | `sending` | `boolean` | Turn in flight — swaps Send for Stop, blocks Enter. |
 | `onStop` | `() => void` | Stop control while `sending` (family stop endpoint). |
 | `disabled` | `boolean` | Dims and blocks everything. |
+| `canSubmit` | `boolean` | Overrides the send button's blank-text guard — apps that allow attachment-only submits (health's image-only "what's this?" turn) pass `true` while ready attachments exist; `false` force-disables. Default: enabled only when `value.trim() !== ''`. Enter/form submit is unaffected — the app's `onSubmit` stays the guard. |
 | `maxRows` | `number` | Auto-grow cap fallback (rows of 22px) when the textarea carries no CSS `max-h-*`; a `max-h-*` class always wins. Default `8`. |
 | `toolbarStart` / `toolbarEnd` | `ReactNode` | Inside the input row — attach menu, equation, draw, dictation… |
 | `attachments` | `ReactNode` | Rail above the input (`FileQueue`, image chips). |
@@ -50,6 +51,7 @@ import { ChatComposer } from '@neuronection/assistant-ui/chat-composer'
   toolbarEnd={<DictationButton onText={setDraft} />}
   attachments={pending.length > 0 ? <FileQueue items={pending} /> : null}
   onAttachFiles={(files) => upload(files)}
+  canSubmit={draft.trim() !== '' || pending.some((file) => file.ready)}
 />
 ```
 

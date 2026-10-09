@@ -26,6 +26,14 @@ export interface ChatComposerProps {
   sending?: boolean
   onStop?: () => void
   disabled?: boolean
+  /**
+   * Overrides the send button's blank-text guard. Apps that allow
+   * attachment-only submits (health's image-only "what's this?" turn) pass
+   * `true` while ready attachments exist; pass `false` to force-disable.
+   * Default: the button enables only when `value.trim() !== ''`. The
+   * Enter/form path is unaffected — the app's `onSubmit` stays the guard.
+   */
+  canSubmit?: boolean
   placeholder?: string
   ariaLabel?: string
   /** Auto-grow cap before the textarea scrolls. Default 8. */
@@ -64,6 +72,7 @@ export const ChatComposer = React.forwardRef<HTMLFormElement, ChatComposerProps>
       sending = false,
       onStop,
       disabled = false,
+      canSubmit,
       placeholder,
       ariaLabel,
       maxRows = 8,
@@ -196,6 +205,8 @@ export const ChatComposer = React.forwardRef<HTMLFormElement, ChatComposerProps>
     const SendIcon = icons?.send ?? ArrowUp
     const StopIcon = icons?.stop ?? Square
     const showStop = sending && onStop !== undefined
+    const submitBlocked =
+      disabled || sending || (canSubmit === undefined ? value.trim() === '' : !canSubmit)
 
     return (
       <form
@@ -250,7 +261,7 @@ export const ChatComposer = React.forwardRef<HTMLFormElement, ChatComposerProps>
               type="submit"
               aria-label={labels?.send ?? 'Send message'}
               title={labels?.send ?? 'Send message'}
-              disabled={disabled || value.trim() === '' || sending}
+              disabled={submitBlocked}
               className="mb-0.5 flex size-7 shrink-0 items-center justify-center rounded-full bg-[var(--as-primary)] text-[var(--as-primary-fg)] transition-opacity hover:opacity-90 disabled:pointer-events-none disabled:opacity-30 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[var(--as-focus-ring)]"
             >
               <SendIcon className="size-4" aria-hidden />
