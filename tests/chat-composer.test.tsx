@@ -65,6 +65,20 @@ describe('ChatComposer', () => {
     expect(screen.getByRole('textbox')).toBeDisabled()
   })
 
+  it('enables send for blank values when canSubmit allows attachment-only turns', async () => {
+    const user = userEvent.setup()
+    const { onSubmit } = setup({ value: '', canSubmit: true })
+    const send = screen.getByRole('button', { name: 'Send message' })
+    expect(send).toBeEnabled()
+    await user.click(send)
+    expect(onSubmit).toHaveBeenCalledTimes(1)
+  })
+
+  it('force-disables send when canSubmit is false, even with text', () => {
+    setup({ value: 'hello', canSubmit: false })
+    expect(screen.getByRole('button', { name: 'Send message' })).toBeDisabled()
+  })
+
   it('routes dropped files to onAttachFiles', () => {
     const onAttachFiles = vi.fn()
     const file = new File(['x'], 'shot.png', { type: 'image/png' })
