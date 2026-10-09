@@ -1,5 +1,11 @@
 # @neuronection/assistant-ui
 
+## 0.52.0
+
+### Minor Changes
+
+- [#76](https://github.com/neuronection/assistant-ui/pull/76) [`2911feb`](https://github.com/neuronection/assistant-ui/commit/2911feb99688cf5bb349411aae5482d8763edab1) Thanks [@constLiakos](https://github.com/constLiakos)! - ChatComposer: add the `canSubmit` override for attachment-only submits. The send button's default guard (`value.trim() !== ''`) blocks turns that carry only attachments — health-assistant's image-only "what's this?" chat turn is the driving case. Apps pass `canSubmit={draft.trim() !== '' || hasReadyAttachments}` (or `false` to force-disable); the Enter/form path is unchanged, the app's `onSubmit` stays the single submit guard. Consumers: health wires it in its chat composer (plan 13 H1); career/study only if they add attachment-only sends.
+
 ## 0.51.0
 
 ### Minor Changes
