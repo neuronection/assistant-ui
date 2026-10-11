@@ -84,6 +84,17 @@ export const Failed = () => (
   </div>
 )
 
+export const Interrupted = () => (
+  <div style={{ maxWidth: 520 }}>
+    <ChatMessage
+      role="assistant"
+      content={<MarkdownSurface value="A derivative measures instantaneous change, which—" />}
+      status="interrupted"
+      actions={{ onCopy: () => {}, onRegenerate: () => {} }}
+    />
+  </div>
+)
+
 export const SwitcherStandalone = () => (
   <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
     <MessageVariantSwitcher variants={{ index: 1, count: 3, siblingIds: ['a', 'b', 'c'] }} onSelect={() => {}} />
@@ -128,5 +139,25 @@ export const ToolResultViews = () => (
       renderResult={() => <div>Notepad preference saved: “compact mode”.</div>}
     />
     <ChatToolCard name="search" status="done" args="{}" result="12 hits" durationMs={1400} defaultOpen />
+  </div>
+)
+
+export const LiveTurnStates = () => (
+  <div style={{ display: 'flex', flexDirection: 'column', gap: 12, maxWidth: 520 }}>
+    <ChatReasoning text="Streaming reasoning trace — the block carries the AI edge and collapses itself when the stream ends." streaming />
+    <ChatToolCard name="search_catalog" title="Searching the course catalog" status="running" />
+    <ChatToolCard
+      name="search_catalog"
+      title="Searching the course catalog"
+      status="done"
+      args={'{"q": "limits"}'}
+      result="4 courses"
+      durationMs={820}
+    />
+    <ChatMessage
+      role="assistant"
+      status="streaming"
+      content={<MarkdownSurface value="The limit of a function describes…" streaming />}
+    />
   </div>
 )

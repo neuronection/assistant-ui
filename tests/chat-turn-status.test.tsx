@@ -80,6 +80,12 @@ describe('ChatTurnStatus', () => {
     expect(container.querySelector('[data-variant="row"]')).toBeInTheDocument()
   })
 
+  it('crossfades the phase label when it changes', () => {
+    const { rerender } = render(<ChatTurnStatus label="thinking" />)
+    rerender(<ChatTurnStatus label="writing the reply" />)
+    expect(screen.getByText('writing the reply')).toHaveClass('as-anim-fade-swap')
+  })
+
   it('keeps the timer text out of the live announcement and offers an sr-only description', () => {
     render(
       <ChatTurnStatus

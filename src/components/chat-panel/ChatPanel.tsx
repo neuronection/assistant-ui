@@ -50,7 +50,10 @@ export const ChatPanel = React.forwardRef<HTMLDivElement, ChatPanelProps>(
           </div>
         ) : null}
         {banner ? (
-          <div data-as="chat-panel-banner" className="shrink-0 px-3 py-1.5 text-xs text-[var(--as-muted-fg)]">
+          <div
+            data-as="chat-panel-banner"
+            className="as-anim-slide-up shrink-0 px-3 py-1.5 text-xs text-[var(--as-muted-fg)]"
+          >
             {banner}
           </div>
         ) : null}

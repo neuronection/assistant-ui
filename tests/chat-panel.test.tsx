@@ -204,6 +204,22 @@ describe('ChatLauncher', () => {
     expect(screen.getByText('3')).toBeInTheDocument()
   })
 
+  it('pulses the badge on every unread change', () => {
+    const { rerender } = render(<ChatLauncher panel={<div>body</div>} badge={3} />)
+    expect(screen.getByText('3')).toHaveClass('as-anim-pulse-once')
+    rerender(<ChatLauncher panel={<div>body</div>} badge={5} />)
+    expect(screen.getByText('5')).toHaveClass('as-anim-pulse-once')
+  })
+
+  it('morphs the launcher icon on toggle, never on mount', async () => {
+    const user = userEvent.setup()
+    render(<ChatLauncher panel={<div>body</div>} />)
+    const trigger = screen.getByRole('button', { name: 'Chat' })
+    expect(trigger.querySelector('svg')?.getAttribute('class')).not.toContain('as-anim-morph-in')
+    await user.click(trigger)
+    expect(trigger.querySelector('svg')?.getAttribute('class')).toContain('as-anim-morph-in')
+  })
+
   it('omits the overlaid close when showClose is false (header-owned close)', async () => {
     const user = userEvent.setup()
     const onOpenChange = vi.fn()

@@ -1,0 +1,5 @@
+---
+'@neuronection/assistant-ui': minor
+---
+
+**Motion foundation (plan 100 S1 / ADR-012):** a CSS-first motion system in `tokens.css` — `--as-duration-fast/base/slow/spring` (120/180/280/420ms) and `--as-ease-out/standard/spring` tokens, plus guarded utilities `.as-anim-message-in`, `.as-anim-slide-up`, `.as-anim-fade-swap`, `.as-anim-check-draw`, `.as-anim-pulse-once`, `.as-anim-shimmer`, `.as-anim-breathe` and the `.as-collapse` grid height-reveal (collapsed content leaves the a11y tree + tab order after the transition). Every animation/transition rule in `tokens.css` — including the pre-existing `as-anim-fade/modal/pop/drawer`, which were previously unguarded — is now disabled under `prefers-reduced-motion: reduce`, enforced by a static CSS contract test. Existing entrance timings re-tuned onto the tokens (±30ms, no behavior change). Apps can re-pace the whole family by remapping the tokens in `theme.css` — documented in `docs/theming.md` § Motion tokens. No runtime animation dependency was added (deliberate — see ADR-012).
