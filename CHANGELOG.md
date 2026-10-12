@@ -1,5 +1,96 @@
 # @neuronection/assistant-ui
 
+## 0.53.0
+
+### Minor Changes
+
+- [#78](https://github.com/neuronection/assistant-ui/pull/78) [`7fb0f6e`](https://github.com/neuronection/assistant-ui/commit/7fb0f6ea2cb2fdec737a68e4379b917bf20ea79a) Thanks [@constLiakos](https://github.com/constLiakos)! - **Message states (plan 100 S3):** `ChatMessage` state changes now animate instead of snapping.
+
+  - **Entrance:** every message bubble rises 4px + fades in on mount (`--as-duration-base`, mount-only — stream re-renders never restart it).
+  - **Copy feedback:** new `actions.copied` prop (controlled) plus an uncontrolled default — the copy action morphs into a success check for 1.5 s after each copy click, with the `aria-label` following ("Copy" → "Copied", new `labels.copied`, default "Copied").
+  - **Interrupted:** the "Stopped" chip slides in with a single amber pulse (`--as-warning`); **error** cards slide up into place.
+  - **Action row:** the hover/focus reveal is now owned by `tokens.css` (`data-as="chat-message-actions"`, opacity + 2px rise, `--as-duration-fast`, reduced-motion safe) instead of Tailwind `group-hover` classes — TW3 app CSS can never collide with it. Keyboard reachability is unchanged.
+  - **Edit mode:** `ChatMessageEditor` reveals with a slide-up and autofocuses its textarea (previously no focus on mount).
+  - **Variant switch:** content crossfades (`--as-duration-fast`) when `variants.index` changes on a branched message — automatic, no new props.
+
+  Consumers: nothing to wire for entrance/error/interrupted/variant animations; copy feedback works uncontrolled out of the box.
+
+- [#78](https://github.com/neuronection/assistant-ui/pull/78) [`7fb0f6e`](https://github.com/neuronection/assistant-ui/commit/7fb0f6ea2cb2fdec737a68e4379b917bf20ea79a) Thanks [@constLiakos](https://github.com/constLiakos)! - **Surfaces (plan 100 S6):** the three surface hosts get their final motion pass, plus the chat welcome kit.
+
+  - **New `ChatWelcome`** (`@neuronection/assistant-ui/chat-welcome`) — the chat empty-state kit: a breathing `--as-ai` identity orb (default `Sparkles` icon, overridable node), greeting + subtitle, and a staggered suggestion container (children enter 40 ms apart). Densities `page | sidebar | bubble` via `data-variant`. Non-interactive by itself — suggestion controls are app markup. Intended as `ChatTranscript emptyState`.
+  - **`ChatLauncher`:** the panel now springs in from the launcher corner (`--as-ease-spring`, bottom transform-origin), the launcher icon ↔ close icon morph on toggle (never on first mount), and the unread badge pulses once on every value change.
+  - **`ChatDrawer`:** the slide-in re-curved onto the spring token (`--as-duration-spring` / `--as-ease-spring`).
+  - **`ChatPanel`:** the `banner` strip slides up in when it appears.
+  - **`as-anim-pulse-once` rework:** the one-shot attention pulse is now a box-shadow ripple (position-independent) instead of a `::after` overlay — safe on absolutely-positioned hosts like badges; visual behavior on existing consumers (interrupted chip) unchanged.
+
+  Everything is disabled under `prefers-reduced-motion: reduce` (motion contract test enforced).
+
+- [#78](https://github.com/neuronection/assistant-ui/pull/78) [`7fb0f6e`](https://github.com/neuronection/assistant-ui/commit/7fb0f6ea2cb2fdec737a68e4379b917bf20ea79a) Thanks [@constLiakos](https://github.com/constLiakos)! - **In-chat search (plan 101 P2):** find anything in the conversation without leaving the transcript.
+
+  - **`ChatTranscript search`** prop (`{ query, onQueryChange }`): renders the new **`ChatSearchField`** above the log — a labelled query input with an `n/N` match readout and prev/next controls. Enter jumps to the next match, Shift+Enter to the previous, Escape clears. The active match scrolls into view with a one-shot flash (`data-search-flash`, reduced-motion safe).
+  - **`MarkdownSurface query`** prop: case-insensitive matches wrap in `<mark data-as="chat-search-match">` (warning-tinted) via a hand-rolled hast walker — no new dependency, zero cost when no query is set.
+  - Custom `renderItem` receives the active query as its fourth argument; transcript rows now carry `data-message-id` for anchor queries.
+  - `ChatSearchField` is exported from the `chat-transcript` module (and the root) for standalone composition; new transcript labels: `search`, `searchPlaceholder`, `previousMatch`, `nextMatch`, `clearSearch`, `matches`.
+
+  Jump-scrolling requires a non-virtualized transcript (documented); virtualized transcripts highlight visible rows only.
+
+- [#78](https://github.com/neuronection/assistant-ui/pull/78) [`7fb0f6e`](https://github.com/neuronection/assistant-ui/commit/7fb0f6ea2cb2fdec737a68e4379b917bf20ea79a) Thanks [@constLiakos](https://github.com/constLiakos)! - **Motion foundation (plan 100 S1 / ADR-012):** a CSS-first motion system in `tokens.css` — `--as-duration-fast/base/slow/spring` (120/180/280/420ms) and `--as-ease-out/standard/spring` tokens, plus guarded utilities `.as-anim-message-in`, `.as-anim-slide-up`, `.as-anim-fade-swap`, `.as-anim-check-draw`, `.as-anim-pulse-once`, `.as-anim-shimmer`, `.as-anim-breathe` and the `.as-collapse` grid height-reveal (collapsed content leaves the a11y tree + tab order after the transition). Every animation/transition rule in `tokens.css` — including the pre-existing `as-anim-fade/modal/pop/drawer`, which were previously unguarded — is now disabled under `prefers-reduced-motion: reduce`, enforced by a static CSS contract test. Existing entrance timings re-tuned onto the tokens (±30ms, no behavior change). Apps can re-pace the whole family by remapping the tokens in `theme.css` — documented in `docs/theming.md` § Motion tokens. No runtime animation dependency was added (deliberate — see ADR-012).
+
+- [#78](https://github.com/neuronection/assistant-ui/pull/78) [`7fb0f6e`](https://github.com/neuronection/assistant-ui/commit/7fb0f6ea2cb2fdec737a68e4379b917bf20ea79a) Thanks [@constLiakos](https://github.com/constLiakos)! - **Streaming choreography (plan 100 S2):** the live turn now reads as one continuous animation instead of abrupt swaps.
+
+  - **New `ChatPending`** (`@neuronection/assistant-ui/chat-pending`) — the first-token latency placeholder: a narrated phase row (`ChatTurnStatus`: dots + elapsed timer) over an assistant-aligned shimmer bubble tinted with the `--as-ai` accent. Render it as the transcript's `live` tail between send and the first delta (`label`, `startedAt`, `lines`, `children` props).
+  - **`MarkdownSurface`:** `streaming` now renders a pulsing `--as-ai` caret at the tail of the last block (static but visible under reduced motion) — the "still generating" signal after the pending handoff.
+  - **`ChatReasoning`:** `--as-ai` edge while streaming; expand/collapse animates through the `.as-collapse` height reveal; new `autoCollapse` prop (default `true`, uncontrolled mode only) folds the block when `streaming` turns true → false — a controlled `open` is never auto-collapsed, and a block that never streamed never folds.
+  - **`ChatToolCard`:** `--as-ai` edge while running; the running → done transition crossfades into a stroke-drawn check; args/result panes reveal through the animated collapse (collapsed panes are `visibility: hidden` — out of the a11y tree and tab order, so screen-reader behavior matches the old conditional render).
+  - **`ChatTurnStatus`:** phase-label changes crossfade (`--as-duration-fast`).
+
+  All effects are compositor-only, mount-keyed (stream re-renders never restart them), and disabled under `prefers-reduced-motion: reduce` with state staying legible. Consumers: compose `ChatPending` into the `live` tail per `docs/guides/chat-surfaces.md`; everything else is automatic on the next dependency bump.
+
+- [#78](https://github.com/neuronection/assistant-ui/pull/78) [`7fb0f6e`](https://github.com/neuronection/assistant-ui/commit/7fb0f6ea2cb2fdec737a68e4379b917bf20ea79a) Thanks [@constLiakos](https://github.com/constLiakos)! - **Transcript modernization (plan 100 S5):** `ChatTranscript` + `ChatMessage` gain the modern layout option and navigation polish.
+
+  - **Flat design:** `design="flat"` on `ChatTranscript` (feeds the default renderer) or `ChatMessage` — assistant content renders as prose on the panel surface while the user keeps its bubble; `data-design` styling hook for apps. Default stays `bubbles` — opt-in, zero migration.
+  - **Consecutive-message grouping:** `groupConsecutive` tightens spacing between same-role runs and tags rows `data-group-pos` (`single | start | mid | end`, system rows always `single`); `renderItem` now receives the position as a third argument (render group-start avatars only).
+  - **Avatar slot:** optional `ChatMessage avatar` node — leading for assistants, trailing for users (`data-as="chat-message-avatar"`).
+  - **Unread jump pill:** assistant replies that land while the user is scrolled away are counted; the pill label reads "Scroll to latest — N new messages" (new `labels.newMessages`), shows a `9+` badge chip beyond nine, and resets on return-to-bottom or pill click. The pill slides up in instead of teleporting.
+  - **Depth + chrome:** top fade mask while scrolled into the thread (`data-fade-top`) and thin themed scrollbars (`--as-scrollbar-thumb`/`--as-scrollbar-track` tokens, progressive enhancement).
+  - **Fix:** the jump pill no longer positions with a translate utility (TW3 double-apply hazard) — margin-centering, identical geometry.
+
+  Consumers: everything is opt-in (`design`, `groupConsecutive`, `avatar`); the unread pill and scroll polish are automatic on the next dependency bump.
+
+- [#78](https://github.com/neuronection/assistant-ui/pull/78) [`7fb0f6e`](https://github.com/neuronection/assistant-ui/commit/7fb0f6ea2cb2fdec737a68e4379b917bf20ea79a) Thanks [@constLiakos](https://github.com/constLiakos)! - **Composer intelligence (plan 101 P1):** `ChatComposer` gains the three interaction features modern chat inputs have.
+
+  - **Slash commands / @-mentions:** new `commands` prop — `{ trigger? ('/' default), items, maxItems?, onSelect }`. The palette opens while the caret touches a trigger-started word (caret-aware, works mid-sentence), fuzzy-filters via `searchScore`, and is fully keyboard-driven: ArrowUp/Down move, Enter/Tab select — never submitting while open — Escape dismisses. `onSelect(id, token)` receives the draft span (`start/end/query`) so the app performs the insertion. A11y: `role="listbox"`/`option` + `aria-controls`, `aria-autocomplete="list"`, `aria-activedescendant` on the textarea.
+  - **Escape to stop:** pressing Escape while a turn is in flight now fires `onStop` (after the palette-dismiss Escape, when both apply).
+  - **Prompt recall:** new `history` prop — ArrowUp on an empty draft recalls the last sent prompt, ArrowUp/Down walk the stack, editing a recalled draft exits it.
+
+  New `labels.commands` (listbox name, default "Commands"). Existing behavior (IME guard, canSubmit, drag-drop, multiline hysteresis) unchanged — all 24 composer tests green incl. the new palette/history/keyboard cases.
+
+- [#78](https://github.com/neuronection/assistant-ui/pull/78) [`7fb0f6e`](https://github.com/neuronection/assistant-ui/commit/7fb0f6ea2cb2fdec737a68e4379b917bf20ea79a) Thanks [@constLiakos](https://github.com/constLiakos)! - **Media & list polish (plan 101 P4):**
+
+  - **Image lightbox:** `MarkdownSurface lightbox` — markdown images become labelled zoom buttons opening the library `Modal` (Escape closes, Radix focus handling). Aimed at health's medical images and study screenshots; inert images remain the default.
+  - **Inline session rename:** `ChatSessionList onRenameCommit(id, title)` — the rename action edits the title in place (autofocused input, Enter/blur commits, Escape cancels, keystrokes never select the row). Dialog-based `onRename` flows are unchanged.
+  - **Session rows stagger in** (30 ms steps, `as-slide-up`, reduced-motion safe) via the new `data-as="chat-session-rows"` hook.
+  - **New `ChatSuggestionCard`** (`@neuronection/assistant-ui/chat-suggestion-card`) — the standard suggestion chip for `ChatWelcome suggestions` and composer strips: icon + title + hint, real labelled button, hover lift via border/shadow (no transform utilities — TW3-safe).
+
+  New labels: `MarkdownSurface` `zoomImage`/`closeImage`, `ChatSessionList` `renameInput`.
+
+- [#78](https://github.com/neuronection/assistant-ui/pull/78) [`7fb0f6e`](https://github.com/neuronection/assistant-ui/commit/7fb0f6ea2cb2fdec737a68e4379b917bf20ea79a) Thanks [@constLiakos](https://github.com/constLiakos)! - **Transcript context (plan 101 P3):** orientation anchors inside long conversations.
+
+  - **Date separators:** `showDateSeparators` on `ChatTranscript` renders Today/Yesterday/date chips between day groups, read from `ChatMessageView.createdAt` (rows without one join the previous group). `formatDate` overrides the older-day format (default `MMM d, yyyy`); new labels `today` / `yesterday`.
+  - **Message anchoring:** `focusMessageId` scrolls the row into view and flashes it whenever it changes — wire branch-tree node clicks, citation links or deep links to it. Rows carry `data-message-id`.
+  - **Floating stop:** `onStop` on `ChatTranscript` renders a stop pill beside the jump pill while a live turn streams and the user has scrolled away (labelled, keyboard-reachable, `labels.stop`).
+
+  All opt-in; no behavior change for existing consumers.
+
+- [#78](https://github.com/neuronection/assistant-ui/pull/78) [`7fb0f6e`](https://github.com/neuronection/assistant-ui/commit/7fb0f6ea2cb2fdec737a68e4379b917bf20ea79a) Thanks [@constLiakos](https://github.com/constLiakos)! - **Composer micro-interactions (plan 100 S4):** `ChatComposer` state changes now animate.
+
+  - **Send ↔ Stop morph:** the swap rotates through (−90° + fade in, `--as-duration-fast`) — only on state change, never on first mount, so pages don't animate on load. Buttons, labels and focus behavior unchanged.
+  - **Focus glow:** the input row's `:focus-within` affordance is now CSS-owned and token-timed (accent border + 3px primary glow ring) instead of Tailwind `focus-within:` classes — TW3 app CSS can never collide.
+  - **Drag-over pulse:** while files drag over the composer (`data-dragging`), a 1.4s primary drop-zone pulse runs under the existing dashed border styling.
+  - **Rails slide in:** the `attachments` and `suggestions` slot wrappers rise + fade on mount (`as-anim-slide-up`).
+
+  All of it is disabled under `prefers-reduced-motion: reduce` (enforced by the motion contract test). No API changes.
+
 ## 0.52.0
 
 ### Minor Changes
