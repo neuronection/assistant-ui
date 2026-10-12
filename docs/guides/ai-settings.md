@@ -1,14 +1,21 @@
 # AI settings surfaces (providers → models → tasks)
 
-The settings trio the family uses to wire up AI: **providers** (credentials),
-**models** (registered models + remote catalog), **tasks** (task → model
-assignments). All four components are presentational (ADR-006): the catalog,
-the API calls and the persistence are app-side; data comes in via props and
-actions go out via events.
+The settings stack the family uses to wire up AI: **first-run setup**
+(one-click provider wizard), **providers** (credentials), **models**
+(registered models + remote catalog), **tasks** (task → model assignments,
+including the Decision models group). Every component is presentational
+(ADR-006): the catalog, the API calls and the persistence are app-side; data
+comes in via props and actions go out via events.
 
 | component | module | role |
 |---|---|---|
-| `ProviderForm` | `@neuronection/assistant-ui/provider-form` | name / base URL / write-only API key (+ hosting, country) |
+| `SetupFirstRunCard` | `@neuronection/assistant-ui/setup-first-run-card` | empty-state CTA when no provider is configured (local-probe status) |
+| `ProviderSetupTiles` | `@neuronection/assistant-ui/provider-setup-tiles` | neutral equal-weight preset grid (family order, no "recommended") |
+| `ProviderSetupForm` | `@neuronection/assistant-ui/provider-setup-form` | guided setup form: checklist + copy buttons, write-only key, Advanced disclosure, §15 error copy |
+| `SetupReview` | `@neuronection/assistant-ui/setup-review` | editable pre-flight review emitting the five-bind options body |
+| `SwitchRow` | `@neuronection/assistant-ui/switch-row` | labeled `role="switch"` row with `now:` sub-line |
+| `ProviderLogo` | `@neuronection/assistant-ui/provider-logo` | simple-icons provider mark, monogram fallback, `currentColor` |
+| `ProviderForm` | `@neuronection/assistant-ui/provider-form` | name / base URL / write-only API key (+ hosting, country) — manual create/edit |
 | `ConnectionTestRow` | `@neuronection/assistant-ui/connection-test-row` | idle/testing/ok/fail status line, app-side ping |
 | `ModelRegistry` | `@neuronection/assistant-ui/model-registry` | provider cards → registered model rows + remote-catalog add modal |
 | `TaskAssignmentPicker` | `@neuronection/assistant-ui/task-assignment-picker` | task → model mapping rows, capability-filtered, optional fallback |
@@ -18,6 +25,95 @@ The reference implementation is study-assistant
 (`frontend/src/features/settings/`): `ProvidersTab.tsx`,
 `ProviderFormDialog.tsx`, `ProviderCreateFields.tsx`, `ModelsTab.tsx`,
 `TasksTab.tsx`. The snippets below are copied from there.
+
+## 0. The family assembly (plan 26 §6)
+
+One experience across every app — **first-run card → setup wizard →
+defaults-first list → re-configure**. The app owns the wizard's phase
+machine, every fetch/IPC call and every secret; the library owns structure,
+a11y and visuals.
+
+### 1. First run — the empty settings state
+
+When no provider is configured, the AI-settings surface renders
+`SetupFirstRunCard`; chat empty states deep-link to it. The local-engine
+probe (Ollama) is app-side — the card renders its pending state and the app
+drops the detected banner in as children:
+
+```tsx
+<SetupFirstRunCard
+  title={TEXT.SETUP_CARD_TITLE}
+  body={TEXT.SETUP_CARD_SUBTITLE}
+  localProbing={probing}
+  onSetup={() => setWizardOpen(true)}
+>
+  {ollamaDetected && <OllamaDetectedBanner onConnect={() => openWizard('ollama')} />}
+</SetupFirstRunCard>
+```
+
+### 2. The setup wizard — tiles → guided form → editable review → success
+
+The app drives the phases (a modal or the library `Wizard`); each step is a
+promoted component:
+
+```tsx
+// step 1 — tiles: app data in family order, manual tile appended
+<ProviderSetupTiles
+  presets={PRESET_ORDER.map((key) => ({ key, name: PRESETS[key].name, local: PRESETS[key].local }))}
+  configured={configuredPresetKeys}
+  onSelect={openForm}
+  label={TEXT.SETUP_TILES_ARIA}
+>
+  <ProviderSetupManualTile onClick={openManual}>{TEXT.SETUP_MANUAL_CARD}</ProviderSetupManualTile>
+</ProviderSetupTiles>
+
+// step 2 — guided form: validation + secrets stay app-side
+<ProviderSetupForm
+  preset={presetSlice /* {name, keyUrl, steps, freeTierNote, fixedBase, baseUrl, local} */}
+  value={formValue /* {name, apiKey, baseUrl} */}
+  onChange={setFormValue}
+  testing={checking}
+  error={classified /* {code: 'invalid_key', suspectedVendor?: 'openrouter'} */}
+  errorLabels={translatedCopyPerCode}
+  onCopyStep={(step) => ipc.writeToClipboard(step)}   // Electron mirror
+  onOpenKeyUrl={(url) => ipc.openExternal(url)}       // Electron link
+  advancedExtra={<HostingToggle … />}                 // study/health hosting + country
+  submitLabel={preset.local ? connectLabel : validateLabel}
+  onSubmit={submit}
+  onCancel={backToTiles}
+/>
+
+// step 3 — editable review: every edit emits the full five-bind body
+<SetupReview
+  models={(preset.curatedModels ?? []).map((id) => ({ id, name: id, caps: inferCaps(id), selected: options.curatedIds.includes(id) }))}
+  slots={reviewSlots /* text/vision/stt for chat presets; decision-only presets show the decision slot only */}
+  onOptionsChange={setOptions /* {curatedIds, bindChat, bindVision, bindStt, bindDecision} */}
+  footnote={neverRemovesFootnote}
+/>
+```
+
+On submit the app sends its setup call with the options body — camelCase
+over desktop IPC, snake_case (`curated_ids`, `bind_chat`, `bind_vision`,
+`bind_stt`, `bind_decision`) in Python payloads; conversion is app-side.
+
+### 3. Success + ongoing — defaults-first assignment list
+
+The success panel rebinds the just-filled slots (per-slot `ModelPicker` or
+`Combobox` rows — app composition). Ongoing, the tasks surface is a
+defaults-first list — text, vision, transcription (stt), speech (tts), then
+the **Decision models group** (`decision:<cap>` slots, primary + fallback,
+transport-filtered) — then derived tasks; see §3 below for the
+`TaskAssignmentPicker` wiring and the Decision group contract.
+
+### 4. Re-configuration is first-class
+
+- **Change key:** edit the provider (`ProviderForm` `hasStoredKey` — stored
+  key note + write-only field).
+- **Revalidate:** `ConnectionTestRow` on the provider row.
+- **Re-run setup:** stored-key note + the same `SetupReview` modal — append
+  semantics, never removes (the footnote says so).
+- **Reassign:** the pickers; **reset-to-defaults** is the per-task clear
+  action re-running capability-aware gap-fill as an explicit user action.
 
 ## 1. providers
 
@@ -355,10 +451,22 @@ and surface the app's privacy notice at assignment time (cloud decision
 models are explicit opt-in; prompt + candidate tool data leave the
 device). The capability vocabulary is app-supplied — add a `decision`
 descriptor to your `caps` array alongside the others.
-  clearLabel={t('settings.unassigned')}
-  disabled={assign.isPending || assignDefault.isPending}
-/>
+
+```tsx
+{
+  id: 'decision',
+  label: t('settings.decisionGroupTitle'),
+  description: t('settings.decisionGroupDescription'),
+  secondary: true,
+  tasks: DECISION_SLOTS.map((slot) => ({
+    id: slot,
+    label: t(`settings.decisionSlots.${slot}`),
+    requires: 'decision',
+    icon: DECISION_ICONS[slot],
+  })),
+}
 ```
+
 
 Both handlers receive `(taskId, modelId | null)` — `null` means cleared.
 Fallback writes must round-trip the primary assignment (send both ids, not

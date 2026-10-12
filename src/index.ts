@@ -116,6 +116,36 @@ export {
   type ProviderPresetOption,
 } from './components/provider-form'
 export {
+  ProviderSetupTiles,
+  ProviderSetupManualTile,
+  type ProviderSetupTilesProps,
+  type ProviderSetupTileData,
+} from './components/provider-setup-tiles'
+export {
+  ProviderSetupForm,
+  SETUP_ERROR_CODES,
+  DEFAULT_SETUP_ERROR_COPY,
+  type ProviderSetupFormProps,
+  type ProviderSetupFormPreset,
+  type ProviderSetupFormValue,
+  type ProviderSetupFormError,
+  type SetupErrorCode,
+} from './components/provider-setup-form'
+export {
+  SetupReview,
+  type SetupReviewProps,
+  type SetupReviewModel,
+  type SetupReviewSlot,
+  type SetupReviewOptions,
+  type SetupReviewOptionsKey,
+} from './components/setup-review'
+export {
+  SetupFirstRunCard,
+  type SetupFirstRunCardProps,
+} from './components/setup-first-run-card'
+export { SwitchRow, type SwitchRowProps } from './components/switch-row'
+export { ProviderLogo, type ProviderLogoProps } from './components/provider-logo'
+export {
   SettingsShell,
   type SettingsNavItem,
   type SettingsShellProps,

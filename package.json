@@ -291,6 +291,30 @@
       "types": "./dist/provider-form.d.ts",
       "import": "./dist/provider-form.js"
     },
+    "./provider-logo": {
+      "types": "./dist/provider-logo.d.ts",
+      "import": "./dist/provider-logo.js"
+    },
+    "./provider-setup-form": {
+      "types": "./dist/provider-setup-form.d.ts",
+      "import": "./dist/provider-setup-form.js"
+    },
+    "./provider-setup-tiles": {
+      "types": "./dist/provider-setup-tiles.d.ts",
+      "import": "./dist/provider-setup-tiles.js"
+    },
+    "./setup-first-run-card": {
+      "types": "./dist/setup-first-run-card.d.ts",
+      "import": "./dist/setup-first-run-card.js"
+    },
+    "./setup-review": {
+      "types": "./dist/setup-review.d.ts",
+      "import": "./dist/setup-review.js"
+    },
+    "./switch-row": {
+      "types": "./dist/switch-row.d.ts",
+      "import": "./dist/switch-row.js"
+    },
     "./portal": {
       "types": "./dist/portal.d.ts",
       "import": "./dist/portal.js"
