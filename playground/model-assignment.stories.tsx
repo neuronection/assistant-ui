@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Bot, Search } from 'lucide-react'
+import { Bot, Scale, Search } from 'lucide-react'
 import {
   ModelPicker,
   type ModelPickerProvider,
@@ -157,6 +157,82 @@ export const TaskAssignmentV2Story = () => {
       renderMeta={(task) =>
         task.id === 'text' ? (
           <span style={{ fontSize: 11, opacity: 0.7 }}>Used when a task has no override</span>
+        ) : undefined
+      }
+    />
+  )
+}
+
+// Decision models group (plan 26 / ADR-0032): `decision:<capability>` slots
+// with primary + fallback. `requires: 'decision'` filters every picker to
+// decision-capable models only — the text models below never appear in a
+// decision slot, and the decision models never satisfy the text default.
+// App copy (labels, privacy notice) is prop-injected, as everywhere.
+const decisionProviders: ModelPickerProvider[] = [
+  {
+    id: 'typesafe',
+    name: 'TypeSafe',
+    models: [{ id: 'jev-latest', name: 'Jev (latest)', capabilities: ['decision'] }],
+  },
+  {
+    id: 'openrouter',
+    name: 'OpenRouter',
+    models: [
+      { id: 'openrouter/auto', name: 'Auto (best match)', capabilities: ['text', 'tools'] },
+      { id: 'openrouter.jev-latest', name: 'Jev via OpenRouter', capabilities: ['decision'] },
+    ],
+  },
+]
+
+const decisionSections = [
+  {
+    id: 'decision',
+    label: 'Decision models',
+    description: 'Cloud decision models are opt-in; prompts and candidate tool data leave the device.',
+    secondary: true,
+    tasks: [
+      { id: 'decision:tool-dispatch', label: 'Tool dispatch', requires: 'decision', icon: Scale },
+      { id: 'decision:boolean-gate', label: 'Boolean gate', requires: 'decision', icon: Scale },
+      { id: 'decision:choice', label: 'Choice', requires: 'decision', icon: Scale },
+      { id: 'decision:score', label: 'Score', requires: 'decision', icon: Scale },
+    ],
+  },
+  {
+    id: 'defaults',
+    label: 'Default models',
+    secondary: true,
+    tasks: [{ id: 'text', label: 'Default text model', requires: 'text', icon: Bot }],
+  },
+]
+
+export const TaskAssignmentDecisionStory = () => {
+  const [value, setValue] = useState<Record<string, string | null>>({
+    'decision:tool-dispatch': 'jev-latest',
+    'decision:boolean-gate': null,
+    'decision:choice': null,
+    'decision:score': null,
+    text: 'openrouter/auto',
+  })
+  const [secondary, setSecondary] = useState<Record<string, string | null>>({
+    'decision:tool-dispatch': 'openrouter.jev-latest',
+  })
+  return (
+    <TaskAssignmentPicker
+      tasks={[]}
+      sections={decisionSections}
+      providers={decisionProviders}
+      value={value}
+      secondaryValue={secondary}
+      onAssign={(taskId, modelId) =>
+        setValue((current) => ({ ...current, [taskId]: modelId }))
+      }
+      onAssignSecondary={(taskId, modelId) =>
+        setSecondary((current) => ({ ...current, [taskId]: modelId }))
+      }
+      secondaryLabel="Fallback"
+      renderMeta={(task) =>
+        task.id === 'text' ? (
+          <span style={{ fontSize: 11, opacity: 0.7 }}>Decision models never satisfy this slot</span>
         ) : undefined
       }
     />

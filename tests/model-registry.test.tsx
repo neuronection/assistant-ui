@@ -20,6 +20,7 @@ const caps: CapabilityDescriptor[] = [
   { value: 'tools', label: 'Tools' },
   { value: 'embeddings', label: 'Embeddings' },
   { value: 'audio', label: 'Audio' },
+  { value: 'decision', label: 'Decision' },
 ]
 
 describe('CapabilityChips', () => {
@@ -88,6 +89,14 @@ const models: ModelRegistryModel[] = [
     reasoningEffort: 'medium',
     temperature: 0.4,
   },
+  {
+    id: 'm2',
+    providerId: 'p1',
+    externalId: 'jev-latest',
+    label: 'Jev (latest)',
+    caps: ['decision'],
+    enabled: true,
+  },
 ]
 
 const remote: ModelRegistryRemoteModel[] = [
@@ -145,6 +154,19 @@ async function openAddModal(user: ReturnType<typeof userEvent.setup>) {
 }
 
 describe('ModelRegistry', () => {
+  it('renders a decision-capable model with the decision chip (plan 26 / ADR-0032)', () => {
+    render(<RegistryDemo />)
+    const id = screen.getByText('jev-latest')
+    const row = id.closest('div')
+    expect(row).not.toBeNull()
+    // the decision model carries the decision chip and no text chip
+    expect(within(row as HTMLElement).getByText('Decision')).toBeInTheDocument()
+    expect(within(row as HTMLElement).queryByText('Text')).not.toBeInTheDocument()
+    // the text/vision model keeps its own chips — decision never leaks there
+    const textRow = screen.getByText('qwen2.5-vl').closest('div')
+    expect(within(textRow as HTMLElement).queryByText('Decision')).not.toBeInTheDocument()
+  })
+
   it('expands and collapses a provider via its header', async () => {
     const user = userEvent.setup()
     render(<RegistryDemo />)

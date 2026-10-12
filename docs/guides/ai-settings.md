@@ -338,6 +338,23 @@ const sections: TaskAssignmentSection[] = [
   onAssign={handleAssign}
   onAssignSecondary={handleAssignSecondary}
   secondaryLabel={t('settings.defaultFallbackLabel')}
+```
+
+### Decision models group (plan 26 / ADR-0032)
+
+Decision models are ordinary catalog rows whose `capabilities` include
+`decision`; their assignment slots are ordinary rows with
+`requires: 'decision'` and `decision:<capability>` ids
+(`decision:tool-dispatch | decision:boolean-gate | decision:choice |
+decision:score` — `open-args` is reserved and never offered). The picker's
+capability filter enforces slot separation in both directions for free:
+decision slots list only decision-capable models, and text/vision slots
+never list them. Ship the group with `secondary: true` (primary +
+fallback — a second provider's decision model is the resilience story)
+and surface the app's privacy notice at assignment time (cloud decision
+models are explicit opt-in; prompt + candidate tool data leave the
+device). The capability vocabulary is app-supplied — add a `decision`
+descriptor to your `caps` array alongside the others.
   clearLabel={t('settings.unassigned')}
   disabled={assign.isPending || assignDefault.isPending}
 />

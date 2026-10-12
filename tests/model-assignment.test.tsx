@@ -340,3 +340,130 @@ describe('TaskAssignmentPicker v2', () => {
     expect(await axe(container)).toHaveNoViolations()
   })
 })
+
+describe('TaskAssignmentPicker decision slots (plan 26 / ADR-0032)', () => {
+  const decisionProviders: ModelPickerProvider[] = [
+    {
+      id: 'typesafe',
+      name: 'TypeSafe',
+      models: [{ id: 'jev-latest', name: 'Jev (latest)', capabilities: ['decision'] }],
+    },
+    {
+      id: 'openrouter',
+      name: 'OpenRouter',
+      models: [
+        { id: 'openrouter/auto', name: 'Auto (best match)', capabilities: ['text', 'tools'] },
+        { id: 'openrouter.jev-latest', name: 'Jev via OpenRouter', capabilities: ['decision'] },
+      ],
+    },
+  ]
+
+  const decisionSections = [
+    {
+      id: 'decision',
+      label: 'Decision models',
+      description: 'Cloud decision models are opt-in.',
+      secondary: true,
+      tasks: [
+        { id: 'decision:tool-dispatch', label: 'Tool dispatch', requires: 'decision' },
+        { id: 'decision:boolean-gate', label: 'Boolean gate', requires: 'decision' },
+      ],
+    },
+    {
+      id: 'defaults',
+      label: 'Default models',
+      secondary: true,
+      tasks: [{ id: 'text', label: 'Default text model', requires: 'text' }],
+    },
+  ]
+
+  it('renders the Decision models group with primary + fallback pickers', () => {
+    render(
+      <TaskAssignmentPicker
+        tasks={[]}
+        sections={decisionSections}
+        providers={decisionProviders}
+        value={{
+          'decision:tool-dispatch': 'jev-latest',
+          'decision:boolean-gate': null,
+          text: 'openrouter/auto',
+        }}
+        secondaryValue={{ 'decision:tool-dispatch': 'openrouter.jev-latest' }}
+        onAssign={vi.fn()}
+        onAssignSecondary={vi.fn()}
+      />,
+    )
+    expect(screen.getByText('Decision models')).toBeInTheDocument()
+    expect(screen.getByText('Cloud decision models are opt-in.')).toBeInTheDocument()
+    const primary = screen.getByRole('combobox', { name: 'Tool dispatch' })
+    expect(primary).toHaveTextContent('Jev (latest)')
+    const fallback = screen.getByRole('combobox', {
+      name: 'Fallback — Tool dispatch',
+    })
+    expect(fallback).toHaveTextContent('Jev via OpenRouter')
+  })
+
+  it('offers only decision-capable models in decision:<cap> slots (slot separation)', async () => {
+    const user = userEvent.setup()
+    render(
+      <TaskAssignmentPicker
+        tasks={[]}
+        sections={decisionSections}
+        providers={decisionProviders}
+        value={{}}
+        secondaryValue={{}}
+        onAssign={vi.fn()}
+        onAssignSecondary={vi.fn()}
+      />,
+    )
+    await user.click(screen.getByRole('combobox', { name: 'Boolean gate' }))
+    expect(screen.getByRole('option', { name: /Jev \(latest\)/ })).toBeInTheDocument()
+    expect(screen.getByRole('option', { name: /Jev via OpenRouter/ })).toBeInTheDocument()
+    // text/tools models never satisfy a decision slot
+    expect(screen.queryByRole('option', { name: /Auto \(best match\)/ })).not.toBeInTheDocument()
+    // and the reverse: the text default never lists decision models
+    await user.keyboard('{Escape}')
+    await user.click(screen.getByRole('combobox', { name: 'Default text model' }))
+    expect(screen.getByRole('option', { name: /Auto \(best match\)/ })).toBeInTheDocument()
+    expect(screen.queryByRole('option', { name: /Jev \(latest\)/ })).not.toBeInTheDocument()
+    expect(screen.queryByRole('option', { name: /Jev via OpenRouter/ })).not.toBeInTheDocument()
+  })
+
+  it('assigns a decision model and its cross-provider fallback', async () => {
+    const user = userEvent.setup()
+    const onAssign = vi.fn()
+    const onAssignSecondary = vi.fn()
+    render(
+      <TaskAssignmentPicker
+        tasks={[]}
+        sections={decisionSections}
+        providers={decisionProviders}
+        value={{}}
+        secondaryValue={{}}
+        onAssign={onAssign}
+        onAssignSecondary={onAssignSecondary}
+      />,
+    )
+    await user.click(screen.getByRole('combobox', { name: 'Boolean gate' }))
+    await user.click(screen.getByRole('option', { name: /Jev via OpenRouter/ }))
+    expect(onAssign).toHaveBeenCalledWith('decision:boolean-gate', 'openrouter.jev-latest')
+    await user.click(screen.getByRole('combobox', { name: 'Fallback — Tool dispatch' }))
+    await user.click(screen.getByRole('option', { name: /Jev \(latest\)/ }))
+    expect(onAssignSecondary).toHaveBeenCalledWith('decision:tool-dispatch', 'jev-latest')
+  })
+
+  it('has no axe violations with the Decision group', async () => {
+    const { container } = render(
+      <TaskAssignmentPicker
+        tasks={[]}
+        sections={decisionSections}
+        providers={decisionProviders}
+        value={{}}
+        secondaryValue={{}}
+        onAssign={vi.fn()}
+        onAssignSecondary={vi.fn()}
+      />,
+    )
+    expect(await axe(container)).toHaveNoViolations()
+  })
+})

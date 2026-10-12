@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { AudioLines, Database, Eye, FileText, Sparkles, Wrench } from 'lucide-react'
+import { AudioLines, Database, Eye, FileText, Scale, Sparkles, Wrench } from 'lucide-react'
 import {
   CapabilityChips,
   type CapabilityDescriptor,
@@ -17,6 +17,7 @@ const caps: CapabilityDescriptor[] = [
   { value: 'tools', label: 'Tools', icon: Wrench },
   { value: 'embeddings', label: 'Embeddings', icon: Database },
   { value: 'audio', label: 'Audio', icon: AudioLines },
+  { value: 'decision', label: 'Decision', icon: Scale },
 ]
 
 const remote: ModelRegistryRemoteModel[] = [
@@ -24,6 +25,7 @@ const remote: ModelRegistryRemoteModel[] = [
   { id: 'qwen2.5:7b', caps: ['text', 'tools'] },
   { id: 'nomic-embed-text', caps: ['embeddings'] },
   { id: 'whisper-small', caps: ['audio'] },
+  { id: 'jev-latest', caps: ['decision'] },
   { id: 'tiny-random-merge', caps: [] },
 ]
 
@@ -53,6 +55,15 @@ const models: ModelRegistryModel[] = [
     externalId: 'nomic-embed-text',
     caps: ['embeddings'],
     enabled: true,
+  },
+  {
+    id: 'm3',
+    providerId: 'ollama',
+    externalId: 'jev-latest',
+    label: 'Jev (latest)',
+    caps: ['decision'],
+    enabled: true,
+    extra: { description: 'Decision model — never satisfies text/vision tasks.' },
   },
 ]
 
