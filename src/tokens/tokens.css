@@ -45,8 +45,19 @@
     --as-radius: 0.625rem;
     --as-radius-lg: calc(var(--as-radius) + 0.25rem);
 
+    --as-duration-fast: 120ms;
+    --as-duration-base: 180ms;
+    --as-duration-slow: 280ms;
+    --as-duration-spring: 420ms;
+    --as-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+    --as-ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+    --as-ease-spring: cubic-bezier(0.34, 1.3, 0.44, 1);
+
     --as-font-sans: 'Inter Variable', ui-sans-serif, system-ui, sans-serif;
     --as-font-mono: 'JetBrains Mono', ui-monospace, 'Cascadia Mono', monospace;
+
+    --as-scrollbar-thumb: var(--as-muted);
+    --as-scrollbar-track: transparent;
 
     --as-shadow-1: 0 1px 2px 0 oklch(0 0 0 / 0.04), 0 1px 3px 0 oklch(0 0 0 / 0.03);
     --as-shadow-2: 0 2px 4px -1px oklch(0 0 0 / 0.05), 0 4px 12px -2px oklch(0 0 0 / 0.06);
@@ -96,16 +107,16 @@
 }
 
 .as-anim-fade {
-  animation: as-fade-in 0.15s ease-out;
+  animation: as-fade-in var(--as-duration-fast) var(--as-ease-standard);
 }
 
 .as-anim-modal {
-  animation: as-zoom-in 0.15s ease-out;
+  animation: as-zoom-in var(--as-duration-base) var(--as-ease-out);
 }
 
 .as-anim-pop {
   transform-origin: var(--as-origin-y, top) var(--as-origin-x, center);
-  animation: as-pop-in 0.16s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: as-pop-in var(--as-duration-base) var(--as-ease-out);
 }
 
 @keyframes as-pop-in {
@@ -120,7 +131,7 @@
 }
 
 .as-anim-drawer {
-  animation: as-drawer-in 0.2s ease-out;
+  animation: as-drawer-in var(--as-duration-slow) var(--as-ease-out);
 }
 
 @keyframes as-skeleton-sweep {
@@ -147,6 +158,233 @@
 @media (prefers-reduced-motion: reduce) {
   [data-as='skeleton'] {
     animation: none;
+  }
+}
+
+/*
+ * Motion vocabulary (plan 100 / ADR-012): compositor-only keyframes,
+ * token-timed, every utility guarded by the reduced-motion block at the
+ * end of this section.
+ */
+
+@keyframes as-message-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.as-anim-message-in {
+  animation: as-message-in var(--as-duration-base) var(--as-ease-out);
+}
+
+@keyframes as-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.as-anim-slide-up {
+  animation: as-slide-up var(--as-duration-slow) var(--as-ease-out);
+}
+
+@keyframes as-fade-swap {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.as-anim-fade-swap {
+  animation: as-fade-swap var(--as-duration-fast) var(--as-ease-standard);
+}
+
+@keyframes as-caret-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.25;
+  }
+}
+
+@keyframes as-check-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.as-anim-check-draw {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: as-check-draw var(--as-duration-slow) var(--as-ease-out) both;
+}
+
+@keyframes as-pulse-ring {
+  from {
+    box-shadow: 0 0 0 0 color-mix(in oklab, var(--as-pulse-color, var(--as-ai)) 45%, transparent);
+  }
+  to {
+    box-shadow: 0 0 0 6px color-mix(in oklab, var(--as-pulse-color, var(--as-ai)) 0%, transparent);
+  }
+}
+
+.as-anim-pulse-once {
+  animation: as-pulse-ring var(--as-duration-spring) var(--as-ease-out);
+}
+
+@keyframes as-shimmer-ai {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}
+
+.as-anim-shimmer {
+  background-image: linear-gradient(
+    100deg,
+    transparent 30%,
+    color-mix(in oklab, var(--as-ai) 14%, var(--as-surface-raised)) 50%,
+    transparent 70%
+  );
+  background-size: 200% 100%;
+  background-repeat: no-repeat;
+  animation: as-shimmer-ai 1.8s linear infinite;
+}
+
+@keyframes as-breathe {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.85;
+  }
+  50% {
+    transform: scale(1.04);
+    opacity: 1;
+  }
+}
+
+.as-anim-breathe {
+  animation: as-breathe 6s var(--as-ease-standard) infinite;
+}
+
+@keyframes as-morph-in {
+  from {
+    opacity: 0;
+    transform: rotate(-90deg) scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: rotate(0deg) scale(1);
+  }
+}
+
+.as-anim-morph-in {
+  animation: as-morph-in var(--as-duration-fast) var(--as-ease-out);
+}
+
+/* composer row (plan 100 S4): token-timed focus glow + drag-over pulse,
+   owned here so TW3 app CSS can never collide. */
+[data-as='chat-composer-row'] {
+  transition:
+    border-color var(--as-duration-fast) var(--as-ease-standard),
+    background-color var(--as-duration-fast) var(--as-ease-standard),
+    box-shadow var(--as-duration-fast) var(--as-ease-standard);
+}
+
+[data-as='chat-composer-row']:focus-within {
+  border-color: var(--as-primary);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--as-primary) 14%, transparent);
+}
+
+[data-as='chat-composer-row'][data-dragging='true'] {
+  animation: as-dropzone-pulse 1.4s var(--as-ease-standard) infinite;
+}
+
+@keyframes as-dropzone-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--as-primary) 10%, transparent);
+  }
+  50% {
+    box-shadow: 0 0 0 6px color-mix(in oklab, var(--as-primary) 18%, transparent);
+  }
+}
+
+/*
+ * Height reveal without JS: closed content collapses via grid-template-rows
+ * and leaves the a11y tree + tab order after the transition (visibility
+ * delay), opening reveals instantly.
+ */
+
+.as-collapse {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows var(--as-duration-slow) var(--as-ease-out);
+}
+
+.as-collapse[data-open='true'] {
+  grid-template-rows: 1fr;
+}
+
+.as-collapse-inner {
+  overflow: hidden;
+  min-height: 0;
+  visibility: hidden;
+  transition: visibility 0s linear var(--as-duration-slow);
+}
+
+.as-collapse[data-open='true'] .as-collapse-inner {
+  visibility: visible;
+  transition-delay: 0s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .as-anim-fade,
+  .as-anim-modal,
+  .as-anim-pop,
+  .as-anim-drawer,
+  .as-anim-message-in,
+  .as-anim-slide-up,
+  .as-anim-fade-swap,
+  .as-anim-check-draw,
+  .as-anim-pulse-once,
+  .as-anim-shimmer,
+  .as-anim-breathe,
+  .as-anim-morph-in {
+    animation: none;
+  }
+
+  [data-as='chat-composer-row'],
+  [data-as='chat-composer-row'][data-dragging='true'] {
+    transition: none;
+    animation: none;
+  }
+
+  .as-anim-check-draw {
+    stroke-dashoffset: 0;
+  }
+
+  .as-collapse,
+  .as-collapse-inner {
+    transition: none;
   }
 }
 
@@ -423,6 +661,161 @@
   overflow-x: auto;
   overflow-y: hidden;
   padding: 0.25rem 0;
+}
+
+/* streaming caret (plan 100 S2): pulsing --as-ai bar at the tail of the
+   last block while the turn streams; static (still visible) under
+   reduced motion so the streaming state stays legible. */
+[data-as='chat-markdown'][data-streaming='true'] > :last-child::after {
+  content: '';
+  display: inline-block;
+  width: 2px;
+  height: 0.95em;
+  margin-left: 2px;
+  vertical-align: text-bottom;
+  border-radius: 1px;
+  background: var(--as-ai);
+  animation: as-caret-pulse 0.9s var(--as-ease-standard) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-as='chat-markdown'][data-streaming='true'] > :last-child::after {
+    animation: none;
+  }
+}
+
+/* message hover action row (plan 100 S3): opacity + 2px rise reveal on
+   message hover or row focus-within. Plain CSS (not Tailwind utilities)
+   so TW3 app CSS can never collide, and token-timed. */
+[data-as='chat-message-actions'] {
+  opacity: 0;
+  transform: translateY(2px);
+  transition:
+    opacity var(--as-duration-fast) var(--as-ease-out),
+    transform var(--as-duration-fast) var(--as-ease-out);
+}
+
+[data-as='chat-message']:hover [data-as='chat-message-actions'],
+[data-as='chat-message-actions']:focus-within {
+  opacity: 1;
+  transform: none;
+}
+
+/* transcript (plan 100 S5): thin themed scrollbar (progressive
+   enhancement — silently absent where unsupported) + top fade mask
+   while the thread is scrolled under the header. */
+[data-as='chat-transcript'] > [role='log'] {
+  scrollbar-width: thin;
+  scrollbar-color: var(--as-scrollbar-thumb) var(--as-scrollbar-track);
+}
+
+[data-as='chat-transcript'][data-fade-top='true'] > [role='log'] {
+  mask-image: linear-gradient(to bottom, transparent 0, black 1.25rem);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, black 1.25rem);
+}
+
+/* in-chat search (plan 101 P2): warning-tinted match marks inside
+   markdown, and a one-shot flash on the row the search jumps to. */
+[data-as='chat-markdown'] mark[data-as='chat-search-match'] {
+  background: color-mix(in oklab, var(--as-warning) 35%, transparent);
+  color: inherit;
+  border-radius: 2px;
+  padding: 0 1px;
+}
+
+@keyframes as-search-flash {
+  from {
+    background: color-mix(in oklab, var(--as-primary) 16%, transparent);
+  }
+  to {
+    background: transparent;
+  }
+}
+
+[data-as='chat-transcript'] [data-search-flash='true'] {
+  border-radius: var(--as-radius);
+  animation: as-search-flash 1.2s var(--as-ease-standard);
+}
+
+/* session rows (plan 101 P4): gentle mount stagger, 30 ms steps. */
+[data-as='chat-session-rows'] > * {
+  animation: as-slide-up var(--as-duration-base) var(--as-ease-out) backwards;
+}
+
+[data-as='chat-session-rows'] > *:nth-child(2) {
+  animation-delay: 30ms;
+}
+
+[data-as='chat-session-rows'] > *:nth-child(3) {
+  animation-delay: 60ms;
+}
+
+[data-as='chat-session-rows'] > *:nth-child(4) {
+  animation-delay: 90ms;
+}
+
+[data-as='chat-session-rows'] > *:nth-child(n + 5) {
+  animation-delay: 120ms;
+}
+
+/* chat-welcome (plan 100 S6): suggestions stagger in, 40 ms steps. */
+[data-as='chat-welcome-suggestions'] > * {
+  animation: as-slide-up var(--as-duration-base) var(--as-ease-out) backwards;
+}
+
+[data-as='chat-welcome-suggestions'] > *:nth-child(2) {
+  animation-delay: 40ms;
+}
+
+[data-as='chat-welcome-suggestions'] > *:nth-child(3) {
+  animation-delay: 80ms;
+}
+
+[data-as='chat-welcome-suggestions'] > *:nth-child(4) {
+  animation-delay: 120ms;
+}
+
+[data-as='chat-welcome-suggestions'] > *:nth-child(5) {
+  animation-delay: 160ms;
+}
+
+[data-as='chat-welcome-suggestions'] > *:nth-child(n + 6) {
+  animation-delay: 200ms;
+}
+
+/* launcher + drawer (plan 100 S6): spring re-curve of the pop/drawer
+   entrances — longhand overrides of the base utilities, still fully
+   disabled under reduced motion through the base classes. */
+[data-as='chat-launcher-panel'] {
+  --as-origin-y: bottom;
+  animation-duration: var(--as-duration-spring);
+  animation-timing-function: var(--as-ease-spring);
+}
+
+[data-as='chat-drawer'] {
+  animation-duration: var(--as-duration-spring);
+  animation-timing-function: var(--as-ease-spring);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-as='chat-welcome-suggestions'] > * {
+    animation: none;
+  }
+
+  [data-as='chat-transcript'] [data-search-flash='true'] {
+    animation: none;
+  }
+
+  [data-as='chat-session-rows'] > * {
+    animation: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-as='chat-message-actions'] {
+    transform: none;
+    transition: none;
+  }
 }
 
 /* chat-turn-status dots (plan 12 L1): study-proven bounce, token-colored;

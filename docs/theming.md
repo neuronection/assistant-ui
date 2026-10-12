@@ -31,6 +31,34 @@ Key semantic tokens: `--as-primary(-fg)`, `--as-secondary(-fg)`,
 them in `theme.css` when your app chrome sits above the default 50),
 `--as-radius(-sm/-lg)`, `--as-font-sans/mono`, `--as-shadow-1/2/3`.
 
+## Motion tokens (ADR-012)
+
+All library animation is CSS, token-timed, compositor-only, and guarded
+by `prefers-reduced-motion: reduce` (a static test enforces the guard
+for every animation/transition rule in `tokens.css`).
+
+```css
+:root {
+  --as-duration-fast: 120ms;    /* micro: presses, fades */
+  --as-duration-base: 180ms;    /* entrances, swaps */
+  --as-duration-slow: 280ms;    /* reveals, drawer content */
+  --as-duration-spring: 420ms;  /* panels, launcher */
+  --as-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --as-ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --as-ease-spring: cubic-bezier(0.34, 1.3, 0.44, 1);
+}
+```
+
+Retune any of these in `theme.css` to re-pace the whole family — no
+component code changes. Utilities (`.as-anim-message-in`, `.as-anim-slide-up`,
+`.as-anim-fade-swap`, `.as-anim-check-draw`, `.as-anim-shimmer`,
+`.as-anim-pulse-once`, `.as-anim-breathe`, plus the `.as-collapse`
+height reveal) are the shipped vocabulary; the `--as-ai` accent is the
+"model at work" identity (streaming caret, pending shimmer, reasoning
+and running-tool edges). A runtime animation library was deliberately
+rejected (ADR-012) — bundle weight and a forced peer dep for every app.
+
+
 ## App integration
 
 ```ts

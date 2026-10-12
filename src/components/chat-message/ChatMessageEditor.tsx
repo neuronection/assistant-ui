@@ -45,8 +45,9 @@ export const ChatMessageEditor = React.forwardRef<HTMLDivElement, ChatMessageEdi
     }
 
     return (
-      <div ref={ref} data-as="chat-message-editor" className={cn('flex w-full flex-col gap-2', className)}>
+      <div ref={ref} data-as="chat-message-editor" className={cn('as-anim-slide-up flex w-full flex-col gap-2', className)}>
         <textarea
+          autoFocus
           value={value}
           rows={rows}
           aria-label={labels?.ariaLabel ?? 'Edit message'}

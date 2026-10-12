@@ -60,6 +60,12 @@ export const ChatLauncher = React.forwardRef<HTMLButtonElement, ChatLauncherProp
     const isControlled = openProp !== undefined
     const open = isControlled ? openProp : uncontrolledOpen
     const panelRef = React.useRef<HTMLDivElement | null>(null)
+    const prevOpenRef = React.useRef(open)
+    const [morphed, setMorphed] = React.useState(false)
+    if (prevOpenRef.current !== open) {
+      prevOpenRef.current = open
+      setMorphed(true)
+    }
 
     const setOpen = (next: boolean) => {
       if (!isControlled) {
@@ -127,9 +133,16 @@ export const ChatLauncher = React.forwardRef<HTMLButtonElement, ChatLauncherProp
             className,
           )}
         >
-          <Icon className="size-5" aria-hidden />
+          {open ? (
+            <CloseIcon className="as-anim-morph-in size-5" aria-hidden />
+          ) : (
+            <Icon className={cn('size-5', morphed && 'as-anim-morph-in')} aria-hidden />
+          )}
           {showBadge ? (
-            <span className="absolute -right-0.5 -top-0.5 flex h-5 min-w-5 items-center justify-center rounded-full border-2 border-[var(--as-surface)] bg-[var(--as-danger)] px-1 text-[10px] font-semibold text-[var(--as-danger-fg)]">
+            <span
+              key={String(badge)}
+              className="as-anim-pulse-once [--as-pulse-color:var(--as-danger)] absolute -right-0.5 -top-0.5 flex h-5 min-w-5 items-center justify-center rounded-full border-2 border-[var(--as-surface)] bg-[var(--as-danger)] px-1 text-[10px] font-semibold text-[var(--as-danger-fg)]"
+            >
               {badge}
             </span>
           ) : null}

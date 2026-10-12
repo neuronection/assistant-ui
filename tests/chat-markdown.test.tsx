@@ -30,6 +30,50 @@ describe('MarkdownSurface', () => {
     expect(screen.getByText('two')).toBeInTheDocument()
   })
 
+  it('keys the streaming caret off the streaming flag', () => {
+    const { container, rerender } = render(<MarkdownSurface value="warming up" streaming />)
+    const root = container.querySelector('[data-as="chat-markdown"]')
+    expect(root).toHaveAttribute('data-streaming', 'true')
+    rerender(<MarkdownSurface value="settled" />)
+    expect(root).not.toHaveAttribute('data-streaming')
+  })
+
+  it('wraps case-insensitive search matches in marks', () => {
+    const { container } = render(
+      <MarkdownSurface value={'A **limit** is the value a function approaches. The LIMIT exists.'} query="limit" />,
+    )
+    const marks = container.querySelectorAll('mark[data-as="chat-search-match"]')
+    expect(marks).toHaveLength(2)
+    expect(marks[0]).toHaveTextContent('limit')
+    expect(marks[1]).toHaveTextContent('LIMIT')
+  })
+
+  it('skips highlighting for blank queries', () => {
+    const { container, rerender } = render(<MarkdownSurface value="limit text" query="  " />)
+    expect(container.querySelectorAll('mark')).toHaveLength(0)
+    rerender(<MarkdownSurface value="limit text" />)
+    expect(container.querySelectorAll('mark')).toHaveLength(0)
+  })
+
+  it('zooms images in a modal when lightbox is on', async () => {
+    const user = userEvent.setup()
+    const { container } = render(
+      <MarkdownSurface value={'![x-ray](https://example.com/x-ray.png)'} lightbox />,
+    )
+    const zoomButton = screen.getByRole('button', { name: 'Zoom image: x-ray' })
+    expect(container.querySelector('img')).toHaveAttribute('src', 'https://example.com/x-ray.png')
+    await user.click(zoomButton)
+    const dialog = await screen.findByRole('dialog')
+    expect(dialog.querySelector('img')).toHaveAttribute('src', 'https://example.com/x-ray.png')
+    await user.keyboard('{Escape}')
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
+  })
+
+  it('keeps images inert without lightbox', () => {
+    render(<MarkdownSurface value={'![x-ray](https://example.com/x-ray.png)'} />)
+    expect(screen.queryByRole('button')).not.toBeInTheDocument()
+  })
+
   it('renders code blocks with a language tag and a copy control', async () => {
     render(<MarkdownSurface value={'```python\nprint("hi")\n```'} />)
     expect(screen.getByText('python')).toBeInTheDocument()

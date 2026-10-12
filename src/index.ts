@@ -455,6 +455,23 @@ export {
   type ChatTurnStatusLabels,
 } from './components/chat-turn-status'
 export {
+  ChatSearchField,
+  type ChatSearchFieldProps,
+  type ChatSearchFieldLabels,
+} from './components/chat-transcript'
+export {
+  ChatPending,
+  type ChatPendingProps,
+} from './components/chat-pending'
+export {
+  ChatWelcome,
+  type ChatWelcomeProps,
+} from './components/chat-welcome'
+export {
+  ChatSuggestionCard,
+  type ChatSuggestionCardProps,
+} from './components/chat-suggestion-card'
+export {
   HitlProposalCard,
   type HitlProposalCardProps,
   type HitlProposalCardLabels,

@@ -3,7 +3,9 @@
 The resizable chat sidepanel (health's `AIDrawer` + study's resizable
 sidebar, family-standard): portal overlay built on Radix Dialog (focus
 trap, Escape, `role="dialog"`), drag and keyboard resize on a
-`role="separator"` handle, full-screen below the breakpoint.
+`role="separator"` handle, full-screen below the breakpoint. The slide-in
+runs on the spring curve (`--as-ease-spring`, `--as-duration-spring`),
+disabled under `prefers-reduced-motion`.
 
 ## import
 

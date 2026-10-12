@@ -77,6 +77,52 @@ export function Transcript() {
   )
 }
 
+export function TranscriptFlatGrouped() {
+  const grouped: ChatMessageView[] = [
+    { id: 'u1', role: 'user', content: 'Plan my revision for the calculus test.', status: 'done' },
+    { id: 'a1', role: 'assistant', content: 'Three sessions: **limits** Tuesday, derivatives Thursday, integrals Sunday.', status: 'done' },
+    { id: 'a2', role: 'assistant', content: 'I will add past-paper drills after each session.', status: 'done' },
+    { id: 'u2', role: 'user', content: 'Sounds good — start with limits.', status: 'done' },
+  ]
+  return (
+    <div style={{ height: 420, maxWidth: 520, display: 'flex', flexDirection: 'column', border: '1px solid var(--as-border)', borderRadius: 'var(--as-radius-lg)' }}>
+      <ChatTranscript items={grouped} groupConsecutive design="flat" />
+    </div>
+  )
+}
+
+export function TranscriptSearch() {
+  const [query, setQuery] = useState('')
+  const searchable: ChatMessageView[] = [
+    { id: 'u1', role: 'user', content: 'what is a limit?', status: 'done' },
+    { id: 'a1', role: 'assistant', content: 'A **limit** is the value a function approaches — the limit of f(x) as x → 2.', status: 'done' },
+    { id: 'u2', role: 'user', content: 'and continuity?', status: 'done' },
+    { id: 'a2', role: 'assistant', content: 'A function is continuous where the limit equals the value.', status: 'done' },
+  ]
+  return (
+    <div style={{ height: 420, maxWidth: 520, display: 'flex', flexDirection: 'column', border: '1px solid var(--as-border)', borderRadius: 'var(--as-radius-lg)' }}>
+      <ChatTranscript items={searchable} search={{ query, onQueryChange: setQuery }} />
+    </div>
+  )
+}
+
+export function TranscriptDateSeparators() {
+  const now = Date.now()
+  const day = 86_400_000
+  const timed: ChatMessageView[] = [
+    { id: 'u0', role: 'user', content: 'start me a revision plan.', status: 'done', createdAt: new Date(now - 2 * day).toISOString() },
+    { id: 'a0', role: 'assistant', content: 'Here is a two-day plan — today limits, tomorrow integrals.', status: 'done', createdAt: new Date(now - 2 * day).toISOString() },
+    { id: 'u1', role: 'user', content: 'quiz me on limits.', status: 'done', createdAt: new Date(now - day).toISOString() },
+    { id: 'a1', role: 'assistant', content: 'Sure — five questions, increasing difficulty.', status: 'done', createdAt: new Date(now - day).toISOString() },
+    { id: 'u2', role: 'user', content: 'my score?', status: 'done', createdAt: new Date(now).toISOString() },
+  ]
+  return (
+    <div style={{ height: 420, maxWidth: 520, display: 'flex', flexDirection: 'column', border: '1px solid var(--as-border)', borderRadius: 'var(--as-radius-lg)' }}>
+      <ChatTranscript items={timed} showDateSeparators groupConsecutive design="flat" />
+    </div>
+  )
+}
+
 export function BranchTree() {
   const [selected, setSelected] = useState<string | null>(null)
   return (

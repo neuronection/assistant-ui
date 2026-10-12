@@ -79,6 +79,18 @@
       "types": "./dist/chat-panel.d.ts",
       "import": "./dist/chat-panel.js"
     },
+    "./chat-pending": {
+      "types": "./dist/chat-pending.d.ts",
+      "import": "./dist/chat-pending.js"
+    },
+    "./chat-welcome": {
+      "types": "./dist/chat-welcome.d.ts",
+      "import": "./dist/chat-welcome.js"
+    },
+    "./chat-suggestion-card": {
+      "types": "./dist/chat-suggestion-card.d.ts",
+      "import": "./dist/chat-suggestion-card.js"
+    },
     "./chat-transcript": {
       "types": "./dist/chat-transcript.d.ts",
       "import": "./dist/chat-transcript.js"

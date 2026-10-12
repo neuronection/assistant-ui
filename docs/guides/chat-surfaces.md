@@ -76,14 +76,23 @@ as a rejected `send` — the hook already ignores it (user-stopped).
       variants={m.variants} onSelectVariant={selectVariant} />
   )}
   live={stream.live ? (
-    <ChatMessage role="assistant" status="streaming"
-      content={<MarkdownSurface value={stream.text ?? ''} streaming />}
-      reasoning={stream.reasoning !== null
-        ? <ChatReasoning text={stream.reasoning} streaming /> : null} />
+    stream.text === null ? (
+      <ChatPending label="thinking" startedAt={stream.startedAt ?? undefined} />
+    ) : (
+      <ChatMessage role="assistant" status="streaming"
+        content={<MarkdownSurface value={stream.text ?? ''} streaming />}
+        reasoning={stream.reasoning !== null
+          ? <ChatReasoning text={stream.reasoning} streaming /> : null} />
+    )
   ) : null}
   emptyState={<EmptyState title="Ask anything" />}
 />
 ```
+
+The pending → streaming handoff is the choreography seam (plan 100):
+`ChatPending` narrates the first-token latency (phase + AI-accented
+shimmer), then `MarkdownSurface`'s `streaming` caret takes over, and
+`ChatReasoning` folds itself when its stream ends.
 
 `ChatTranscript` owns `role="log"`, polite turn-completion announcements,
 stick-to-bottom and the jump pill — never hand-roll these.

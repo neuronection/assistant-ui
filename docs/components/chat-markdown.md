@@ -16,7 +16,9 @@ import { MarkdownSurface } from '@neuronection/assistant-ui/chat-markdown'
 | Prop | Type | Description |
 | --- | --- | --- |
 | `value` | `string` | Markdown source. |
-| `streaming` | `boolean` | Live turn — defers mermaid to the final render; math stays on (error-tolerant). |
+| `streaming` | `boolean` | Live turn — defers mermaid to the final render; math stays on (error-tolerant); renders the pulsing `--as-ai` caret at the tail of the last block (static but visible under reduced motion). |
+| `query` | `string` | Search highlight — case-insensitive matches wrap in `<mark data-as="chat-search-match">` (warning-tinted). Blank queries are ignored; zero cost when unset. |
+| `lightbox` | `boolean` | Click-to-zoom images in a labelled modal (library `Modal`, Escape/arrows from Radix). Inert images by default. |
 | `gfm` | `boolean` | remark-gfm (tables, strikethrough, task lists). Default `true`. |
 | `math` | `boolean` | remark-math + rehype-katex (`throwOnError: false`). Default `true`. |
 | `mermaid` | `boolean` | Render ```mermaid fences as diagrams (forced off while `streaming`). Default `true`. |
