@@ -172,7 +172,7 @@ export const ChatMessage = React.forwardRef<HTMLDivElement, ChatMessageProps>(
                 'relative flex max-w-[92%] flex-col gap-1.5 rounded-[var(--as-radius)] px-3 py-2 text-sm',
                 compact && 'px-2.5 py-1.5',
                 isUser
-                  ? 'rounded-br-[var(--as-radius-sm)] bg-[var(--as-primary)] text-[var(--as-primary-fg)]'
+                  ? 'rounded-br-[var(--as-radius-sm)] bg-[var(--as-primary)] font-medium text-[var(--as-primary-fg)]'
                   : design === 'flat'
                     ? 'max-w-full rounded-bl-[var(--as-radius-sm)] bg-transparent px-0 py-0'
                     : 'rounded-bl-[var(--as-radius-sm)] bg-[var(--as-muted)] text-[var(--as-fg)]',

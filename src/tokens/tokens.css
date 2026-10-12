@@ -14,7 +14,9 @@
     --as-tone-500: oklch(0.5 0.012 90);
     --as-tone-700: oklch(0.37 0.014 90);
     --as-tone-900: oklch(0.235 0.012 90);
-    --as-accent: oklch(0.55 0.16 258);
+    /* raw tier — private to tokens.css. Accent cleared for tone-50 text at
+       5.4:1 (WCAG AA + headroom); keep any future tweak above 4.5:1. */
+    --as-accent: oklch(0.52 0.17 258);
     --as-accent-strong: oklch(0.48 0.18 258);
     --as-success: oklch(0.55 0.15 152);
     --as-warning: oklch(0.72 0.15 78);

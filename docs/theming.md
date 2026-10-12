@@ -8,7 +8,7 @@ library never hard-codes colors.
 ```css
 :root {
   /* raw tier — private to tokens.css */
-  --as-accent: oklch(0.55 0.16 258);
+  --as-accent: oklch(0.52 0.17 258);
   --as-tone-900: oklch(0.235 0.012 90);
 
   /* semantic tier — what components consume */

@@ -226,7 +226,7 @@ export const MarkdownSurface = React.memo(
         ref={ref}
         data-as="chat-markdown"
         data-streaming={streaming || undefined}
-        className={cn('min-w-0 text-[var(--as-fg)]', className)}
+        className={cn('min-w-0', className)}
       >
         <ReactMarkdown
           remarkPlugins={remarkPlugins}
