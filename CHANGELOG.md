@@ -1,5 +1,11 @@
 # @neuronection/assistant-ui
 
+## 0.55.0
+
+### Minor Changes
+
+- [`20e78c5`](https://github.com/neuronection/assistant-ui/commit/20e78c58c3b1397afa7f2ca88e8fd99bf4361caf) Thanks [@constLiakos](https://github.com/constLiakos)! - **ProviderSetupTiles: per-tile capability chips (plan 26 §13.3 follow-up).** Preset entries gain an additive optional `chips?: { key: string; label: string }[]` (`ProviderSetupTileChip`), rendered with the existing `CapabilityChips` badge pattern — neutral styling, i18n labels prop-injected per the family rule (the app derives chips from its preset data: wire type → chat/vision/stt, `decision_models` → decision, keyless-local → local). Frozen props untouched; chips carry text (part of the tile's accessible name) and never rank tiles. Story, docs page, a11y row and README updated in the same change — visual baselines need the CI rebaseline flow for the `ai-settings-setup-tiles-story`.
+
 ## 0.54.0
 
 ### Minor Changes
