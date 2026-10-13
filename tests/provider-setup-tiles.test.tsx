@@ -89,9 +89,45 @@ describe('ProviderSetupTiles', () => {
     expect(onManual).toHaveBeenCalledOnce()
   })
 
+  it('renders per-tile capability chips in the given order, neutral (equal weight)', async () => {
+    const user = userEvent.setup()
+    const onSelect = vi.fn()
+    render(
+      <ProviderSetupTiles
+        presets={[
+          { key: 'openai', name: 'OpenAI', chips: [{ key: 'chat', label: 'Chat' }, { key: 'vision', label: 'Vision' }] },
+          { key: 'openrouter', name: 'OpenRouter', chips: [{ key: 'chat', label: 'Chat' }, { key: 'decision', label: 'Decision' }] },
+          { key: 'typesafe', name: 'TypeSafe', chips: [{ key: 'decision', label: 'Decision' }] },
+          { key: 'ollama', name: 'Ollama', chips: [{ key: 'chat', label: 'Chat' }, { key: 'local', label: 'Local' }, { key: 'decision', label: 'Decision' }] },
+        ]}
+        onSelect={onSelect}
+      />,
+    )
+    const typesafe = screen.getByRole('button', { name: /TypeSafe/i })
+    const typesafeChips = within(typesafe).getAllByText('Decision')
+    expect(typesafeChips).toHaveLength(1)
+    const ollama = screen.getByRole('button', { name: /Ollama/i })
+    for (const chip of ['Chat', 'Local', 'Decision']) {
+      expect(within(ollama).getByText(chip)).toBeInTheDocument()
+    }
+    const chipsRow = within(ollama).getAllByText(/chat|local|decision/i)
+    expect(chipsRow.map((node) => node.textContent)).toEqual(['Chat', 'Local', 'Decision'])
+    // chips never rank (all neutral) and never block selection
+    expect(ollama.querySelectorAll('[data-as-cap][data-active]')).toHaveLength(0)
+    await user.click(ollama)
+    expect(onSelect).toHaveBeenCalledWith('ollama')
+  })
+
   it('has no axe violations', async () => {
     const { container } = render(
-      <ProviderSetupTiles presets={presets} configured={['openai']} onSelect={() => {}} />,
+      <ProviderSetupTiles
+        presets={[
+          ...presets,
+          { key: 'typesafe', name: 'TypeSafe', chips: [{ key: 'decision', label: 'Decision' }] },
+        ]}
+        configured={['openai']}
+        onSelect={() => {}}
+      />,
     )
     expect(await axe(container)).toHaveNoViolations()
   })

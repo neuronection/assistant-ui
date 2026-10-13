@@ -1,7 +1,17 @@
 import * as React from 'react'
 import { Check, Settings2 } from 'lucide-react'
 import { cn } from '../../lib/utils'
+import { CapabilityChips } from '../capability-chips/CapabilityChips'
 import { ProviderLogo } from '../provider-logo/ProviderLogo'
+
+/** A capability chip rendered on the tile (plan 26 follow-up): the app
+ * derives chips from its preset data (wire type → chat/vision/stt,
+ * decision models → decision, keyless-local → local) and supplies the
+ * translated label — the library never guesses copy (ADR-006). */
+export interface ProviderSetupTileChip {
+  key: string
+  label: string
+}
 
 /** One preset entry (ADR-006: the catalog is app data — the tiles only
  * render it, in the order given, with equal weight). */
@@ -10,6 +20,9 @@ export interface ProviderSetupTileData {
   name: string
   /** Keyless local preset (e.g. Ollama) — renders the `localLabel` caption. */
   local?: boolean
+  /** Capability chips (e.g. chat / vision / decision / local) — rendered
+   * with the capability-chips badge pattern, neutral (equal weight). */
+  chips?: ProviderSetupTileChip[]
   /** Disabled tiles render inert with their reason (health's overlay). */
   disabled?: boolean
   disabledReason?: string
@@ -95,6 +108,14 @@ export const ProviderSetupTiles = React.forwardRef<
           >
             <ProviderLogo preset={preset.key} />
             <span className="w-full truncate text-center">{preset.name}</span>
+            {preset.chips && preset.chips.length > 0 ? (
+              <CapabilityChips
+                variant="badge"
+                className="justify-center"
+                caps={preset.chips.map((chip) => ({ value: chip.key, label: chip.label }))}
+                selected={[]}
+              />
+            ) : null}
             {preset.local ? (
               <span className="text-xs font-normal text-[var(--as-muted-fg)]">
                 {localLabel}

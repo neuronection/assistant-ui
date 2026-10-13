@@ -22,14 +22,41 @@ import {
 import type { ModelPickerProvider } from '../src/components/model-picker/ModelPicker'
 
 const presets: ProviderSetupTileData[] = [
-  { key: 'openai', name: 'OpenAI' },
+  {
+    key: 'openai',
+    name: 'OpenAI',
+    chips: [
+      { key: 'chat', label: 'Chat' },
+      { key: 'vision', label: 'Vision' },
+    ],
+  },
   { key: 'gemini', name: 'Google AI Studio' },
-  { key: 'openrouter', name: 'OpenRouter' },
+  {
+    key: 'openrouter',
+    name: 'OpenRouter',
+    chips: [
+      { key: 'chat', label: 'Chat' },
+      { key: 'decision', label: 'Decision' },
+    ],
+  },
+  {
+    key: 'typesafe',
+    name: 'TypeSafe',
+    chips: [{ key: 'decision', label: 'Decision' }],
+  },
   { key: 'anthropic', name: 'Anthropic' },
   { key: 'groq', name: 'Groq' },
   { key: 'mistral', name: 'Mistral AI' },
   { key: 'deepseek', name: 'DeepSeek' },
-  { key: 'ollama', name: 'Ollama', local: true },
+  {
+    key: 'ollama',
+    name: 'Ollama',
+    chips: [
+      { key: 'chat', label: 'Chat' },
+      { key: 'local', label: 'Local' },
+      { key: 'decision', label: 'Decision' },
+    ],
+  },
 ]
 
 export const AiSettingsFirstRunStory = () => {

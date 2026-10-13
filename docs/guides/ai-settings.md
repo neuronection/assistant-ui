@@ -57,9 +57,18 @@ The app drives the phases (a modal or the library `Wizard`); each step is a
 promoted component:
 
 ```tsx
-// step 1 — tiles: app data in family order, manual tile appended
+// step 1 — tiles: app data in family order, manual tile appended;
+// chips derive from the preset data (chat/vision/stt by wire type,
+// decision when decision_models exist, local for keyless presets) with
+// translated labels — e.g. openrouter [Chat, Decision], ollama
+// [Chat, Local, Decision], typesafe [Decision]
 <ProviderSetupTiles
-  presets={PRESET_ORDER.map((key) => ({ key, name: PRESETS[key].name, local: PRESETS[key].local }))}
+  presets={PRESET_ORDER.map((key) => ({
+    key,
+    name: PRESETS[key].name,
+    local: PRESETS[key].local,
+    chips: chipsForPreset(key), // { key, label }[] — i18n labels, prop-injected
+  }))}
   configured={configuredPresetKeys}
   onSelect={openForm}
   label={TEXT.SETUP_TILES_ARIA}

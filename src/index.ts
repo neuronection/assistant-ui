@@ -120,6 +120,7 @@ export {
   ProviderSetupManualTile,
   type ProviderSetupTilesProps,
   type ProviderSetupTileData,
+  type ProviderSetupTileChip,
 } from './components/provider-setup-tiles'
 export {
   ProviderSetupForm,
