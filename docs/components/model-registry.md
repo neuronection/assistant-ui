@@ -22,6 +22,9 @@ import { ModelRegistry } from '@neuronection/assistant-ui/model-registry'
 | `standaloneLabel` | `string` | `'Standalone'` | label for the standalone cluster |
 | `decisionTransport` | `string` | — | the app's shipping decision transport (e.g. `systemone`): models with the decision capability render a read-only transport row and carry the value on `Draft`/`Patch` |
 | `decisionTransportLabel` | `string` | `'Transport'` | label for the transport row |
+| `capImplications` | `Record<string, string[]>` | — | selection implications between combinable caps (e.g. `{ vision: ['text'], tools: ['text'] }` — every vision/tool-capable model is a text model too): selecting a key auto-enables its values; deselecting a value deselects everything that implies it |
+| `useCatalogLabel` | `string` | `'Pick from the catalog'` | manual↔catalog toggle copy when manual entry is active |
+| `providerContextLabel` | `string` | `'Provider'` | visually-hidden prefix for the provider context banner (configured name + base URL, top of the modal) |
 | `expandedProviderId` | `string \| null` | — | which provider card is open |
 | `onExpandedProviderChange` | `(providerId: string \| null) => void` | — | disclosure is controlled |
 | `remoteModels` | `ModelRegistryRemoteModel[]` | — | `{ id, caps }[]` for the expanded provider, fetched app-side |

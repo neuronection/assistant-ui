@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Check, ChevronDown, ChevronRight, ChevronUp, Pencil, Plus, X } from 'lucide-react'
+import { Check, ChevronDown, ChevronRight, ChevronUp, Library, Pencil, PenLine, Plus, X } from 'lucide-react'
 import { cn } from '../../lib/utils'
 import { Button } from '../button'
 import { CapabilityChips, type CapabilityDescriptor } from '../capability-chips'
@@ -98,6 +98,11 @@ export interface ModelRegistryProps {
   editTitle?: string
   selectModelLabel?: string
   manualIdToggleLabel?: string
+  /** Shown on the manual↔catalog toggle when manual entry is active
+   * (returning to the catalog picker). */
+  useCatalogLabel?: string
+  /** Visually-hidden prefix for the provider context banner. */
+  providerContextLabel?: string
   editLabel?: string
   removeLabel?: string
   missingLabel?: string
@@ -111,6 +116,11 @@ export interface ModelRegistryProps {
   standaloneCaps?: string[]
   /** Label for the standalone-kinds cluster (`standaloneCaps`). */
   standaloneLabel?: string
+  /** Selection implications between combinable caps (e.g.
+   * `{ vision: ['text'], tools: ['text'] }` — every vision/tool-capable
+   * model is a text model too): selecting a key auto-enables its values,
+   * and deselecting a value deselects everything that implies it. */
+  capImplications?: Record<string, string[]>
   searchPlaceholder?: string
   searchLabel?: string
   emptyProviderLabel?: string
@@ -156,6 +166,41 @@ const hasParametricCaps = (caps: string[]): boolean =>
 const normalizeCaps = (next: string[], standalone: ReadonlySet<string>): string[] => {
   const standaloneHit = next.find((cap) => standalone.has(cap))
   return standaloneHit ? [standaloneHit] : next
+}
+
+/**
+ * `capImplications` closure over a selection toggle: selecting a cap
+ * enables its implications (vision → text); deselecting a cap drops
+ * everything that implies it (text off → vision + tools off). Idempotent
+ * for caps the implications do not mention.
+ */
+const applyImplications = (
+  next: string[],
+  implications: Record<string, string[]>,
+  toggled: string,
+  selected: boolean,
+): string[] => {
+  if (Object.keys(implications).length === 0) return next
+  if (selected) {
+    const implied = implications[toggled] ?? []
+    return [...next, ...implied.filter((cap) => !next.includes(cap))]
+  }
+  const dependents = Object.entries(implications)
+    .filter(([, values]) => values.includes(toggled))
+    .map(([cap]) => cap)
+  return dependents.length === 0 ? next : next.filter((cap) => cap !== toggled && !dependents.includes(cap))
+}
+
+/** ON-implications folded over a whole caps set (catalog picks). */
+const withImplications = (
+  caps: string[],
+  implications: Record<string, string[]>,
+): string[] => {
+  let out = [...caps]
+  for (const cap of caps) {
+    out = applyImplications(out, implications, cap, true)
+  }
+  return out
 }
 
 const CUSTOM = '__custom__'
@@ -276,6 +321,8 @@ export const ModelRegistry = React.forwardRef<HTMLDivElement, ModelRegistryProps
       editTitle = 'Edit model',
       selectModelLabel = 'Model',
       manualIdToggleLabel = 'Enter the model id manually',
+      useCatalogLabel = 'Pick from the catalog',
+      providerContextLabel = 'Provider',
       editLabel = 'Edit',
       removeLabel = 'Remove',
       missingLabel = 'Missing',
@@ -283,6 +330,7 @@ export const ModelRegistry = React.forwardRef<HTMLDivElement, ModelRegistryProps
       capsHint,
       standaloneCaps,
       standaloneLabel = 'Standalone',
+      capImplications,
       searchPlaceholder = 'Search models…',
       searchLabel = 'Search models',
       emptyProviderLabel = 'No models yet — use Add model to pick from the live catalog.',
@@ -394,7 +442,10 @@ export const ModelRegistry = React.forwardRef<HTMLDivElement, ModelRegistryProps
       const remote = (remoteModels ?? []).find((entry) => entry.id === remoteId)
       setModal((current) => {
         if (!current) return current
-        const nextCaps = remote ? normalizeCaps([...remote.caps], standaloneSet) : current.caps
+        const normalized = remote ? normalizeCaps([...remote.caps], standaloneSet) : current.caps
+        // catalog caps pass through the ON-implications (a vision/tool
+        // catalog entry carries its text base)
+        const nextCaps = withImplications(normalized, capImplications ?? {})
         return {
           ...current,
           externalId: remoteId,
@@ -411,7 +462,7 @@ export const ModelRegistry = React.forwardRef<HTMLDivElement, ModelRegistryProps
       setModal((current) => {
         if (!current) return current
         const isStandalone = standaloneSet.has(value)
-        const nextCaps = isStandalone
+        const raw = isStandalone
           ? // a standalone kind replaces everything (or clears when toggled off)
             current.caps.includes(value)
             ? current.caps.filter((entry) => entry !== value)
@@ -419,6 +470,9 @@ export const ModelRegistry = React.forwardRef<HTMLDivElement, ModelRegistryProps
           : current.caps.includes(value)
             ? current.caps.filter((entry) => entry !== value)
             : [...current.caps.filter((entry) => !standaloneSet.has(entry)), value]
+        const nextCaps = isStandalone
+          ? raw
+          : applyImplications(raw, capImplications ?? {}, value, !current.caps.includes(value))
         return {
           ...current,
           caps: nextCaps,
@@ -515,6 +569,27 @@ export const ModelRegistry = React.forwardRef<HTMLDivElement, ModelRegistryProps
               </ModalTitle>
             </ModalHeader>
             <div className="flex flex-col gap-4 p-4">
+              {provider ? (
+                <div
+                  data-as="model-registry-provider-context"
+                  className="flex min-w-0 items-center gap-2 rounded-[var(--as-radius)] border border-[var(--as-border)] bg-[var(--as-muted)]/50 px-3 py-2"
+                >
+                  <span className="sr-only">{providerContextLabel}:</span>
+                  <span className="shrink-0 text-xs font-medium text-[var(--as-fg)]">
+                    {provider.name}
+                  </span>
+                  {provider.baseUrl ? (
+                    <>
+                      <span aria-hidden className="text-[var(--as-border)]">
+                        ·
+                      </span>
+                      <span className="truncate font-mono text-[10px] text-[var(--as-muted-fg)]">
+                        {provider.baseUrl}
+                      </span>
+                    </>
+                  ) : null}
+                </div>
+              ) : null}
               {modal.mode === 'add' ? (
                 remoteState === 'loading' ? (
                   <p className="flex items-center justify-center gap-2 py-4 text-xs text-[var(--as-muted-fg)]">
@@ -546,9 +621,11 @@ export const ModelRegistry = React.forwardRef<HTMLDivElement, ModelRegistryProps
                     ) : (
                       <button
                         type="button"
-                        className="cursor-pointer self-start text-xs text-[var(--as-muted-fg)] underline-offset-2 hover:text-[var(--as-fg)] hover:underline"
+                        data-as="model-registry-manual-toggle"
+                        className="inline-flex cursor-pointer items-center gap-1.5 self-end rounded-[var(--as-radius)] border border-[var(--as-border)] bg-transparent px-2.5 py-1 text-xs text-[var(--as-muted-fg)] transition-colors hover:bg-[var(--as-muted)] hover:text-[var(--as-fg)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--as-focus-ring)]"
                         onClick={() => setModal((c) => (c ? { ...c, manual: true } : c))}
                       >
+                        <PenLine className="size-3.5" aria-hidden />
                         {manualIdToggleLabel}
                       </button>
                     )}
@@ -580,10 +657,21 @@ export const ModelRegistry = React.forwardRef<HTMLDivElement, ModelRegistryProps
                     )}
                     <button
                       type="button"
-                      className="cursor-pointer self-start text-xs text-[var(--as-muted-fg)] underline-offset-2 hover:text-[var(--as-fg)] hover:underline"
+                      data-as="model-registry-manual-toggle"
+                      className="inline-flex cursor-pointer items-center gap-1.5 self-end rounded-[var(--as-radius)] border border-[var(--as-border)] bg-transparent px-2.5 py-1 text-xs text-[var(--as-muted-fg)] transition-colors hover:bg-[var(--as-muted)] hover:text-[var(--as-fg)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--as-focus-ring)]"
                       onClick={() => setModal((c) => (c ? { ...c, manual: !c.manual } : c))}
                     >
-                      {manualIdToggleLabel}
+                      {modal.manual ? (
+                        <>
+                          <Library className="size-3.5" aria-hidden />
+                          {useCatalogLabel}
+                        </>
+                      ) : (
+                        <>
+                          <PenLine className="size-3.5" aria-hidden />
+                          {manualIdToggleLabel}
+                        </>
+                      )}
                     </button>
                   </>
                 )

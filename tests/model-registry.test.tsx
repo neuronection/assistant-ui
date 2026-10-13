@@ -526,6 +526,72 @@ describe('ModelRegistry extra fields and enable toggle', () => {
     expect(await axe(container)).toHaveNoViolations()
   })
 
+  it('shows the provider context (name + base URL) at the top of the add modal', async () => {
+    const user = userEvent.setup()
+    render(<RegistryDemo />)
+    const dialog = await openAddModal(user)
+    const context = within(dialog).getByText('Ollama (local)')
+    expect(context).toBeInTheDocument()
+    expect(within(dialog).getByText('http://localhost:11434/v1')).toBeInTheDocument()
+  })
+
+  it('manual toggle is a labelled ghost control and swaps direction copy', async () => {
+    const user = userEvent.setup()
+    render(<RegistryDemo />)
+    const dialog = await openAddModal(user)
+    const manual = within(dialog).getByRole('button', { name: /enter the model id manually/i })
+    expect(manual).toHaveAttribute('data-as', 'model-registry-manual-toggle')
+    await user.click(manual)
+    expect(within(dialog).getByLabelText('Model')).toBeInTheDocument()
+    expect(
+      within(dialog).getByRole('button', { name: /pick from the catalog/i }),
+    ).toBeInTheDocument()
+  })
+
+  it('capImplications: vision/tools imply text; deselecting text drops its dependents', async () => {
+    const user = userEvent.setup()
+    const onAddModel = vi.fn()
+    render(
+      <RegistryDemo
+        onAddModel={onAddModel}
+        capImplications={{ vision: ['text'], tools: ['text'] }}
+      />,
+    )
+    const dialog = await openAddModal(user)
+    await user.click(within(dialog).getByRole('button', { name: /manual/i }))
+    await user.type(within(dialog).getByLabelText('Model'), 'qwen3-vl')
+    // selecting a modifier auto-enables its text base
+    await user.click(within(dialog).getByRole('button', { name: 'Vision' }))
+    expect(within(dialog).getByRole('button', { name: 'Text' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    )
+    await user.click(within(dialog).getByRole('button', { name: 'Tools' }))
+    expect(within(dialog).getByRole('button', { name: 'Tools' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    )
+    // deselecting the base drops everything that implies it
+    await user.click(within(dialog).getByRole('button', { name: 'Text' }))
+    expect(within(dialog).getByRole('button', { name: 'Text' })).toHaveAttribute(
+      'aria-pressed',
+      'false',
+    )
+    expect(within(dialog).getByRole('button', { name: 'Vision' })).toHaveAttribute(
+      'aria-pressed',
+      'false',
+    )
+    expect(within(dialog).getByRole('button', { name: 'Tools' })).toHaveAttribute(
+      'aria-pressed',
+      'false',
+    )
+    await user.click(within(dialog).getByRole('button', { name: 'Add model' }))
+    expect(onAddModel).toHaveBeenCalledWith(
+      'p1',
+      expect.objectContaining({ externalId: 'qwen3-vl', caps: [] }),
+    )
+  })
+
   it('standalone kinds are exclusive: selecting one replaces the chat caps and vice versa', async () => {
     const user = userEvent.setup()
     const onAddModel = vi.fn()
