@@ -16,8 +16,12 @@ import { ModelRegistry } from '@neuronection/assistant-ui/model-registry'
 | prop | type | default | notes |
 |---|---|---|---|
 | `providers` | `ModelRegistryProvider[]` | — | `{ id, name, type?, baseUrl?, readOnly? }` — `readOnly` hides Add/Edit/Remove for that provider |
-| `models` | `ModelRegistryModel[]` | — | `{ id, providerId, externalId, label?, caps, enabled, reasoningEffort?, temperature?, maxTokens?, extra?, missing? }` |
+| `models` | `ModelRegistryModel[]` | — | `{ id, providerId, externalId, label?, caps, enabled, reasoningEffort?, temperature?, maxTokens?, decisionTransport?, extra?, missing? }` |
 | `caps` | `CapabilityDescriptor[]` | — | `{ value, label, icon? }` — labels/icons come from the app |
+| `standaloneCaps` | `string[]` | — | capability values that are **standalone kinds** (e.g. decision, stt, tts, embeddings): the modal renders them in their own cluster and selection is exclusive — a standalone kind replaces the chat caps, a chat cap clears the standalone kind (the family's slot-separation law, D4, expressed in the form) |
+| `standaloneLabel` | `string` | `'Standalone'` | label for the standalone cluster |
+| `decisionTransport` | `string` | — | the app's shipping decision transport (e.g. `systemone`): models with the decision capability render a read-only transport row and carry the value on `Draft`/`Patch` |
+| `decisionTransportLabel` | `string` | `'Transport'` | label for the transport row |
 | `expandedProviderId` | `string \| null` | — | which provider card is open |
 | `onExpandedProviderChange` | `(providerId: string \| null) => void` | — | disclosure is controlled |
 | `remoteModels` | `ModelRegistryRemoteModel[]` | — | `{ id, caps }[]` for the expanded provider, fetched app-side |
@@ -102,9 +106,20 @@ extra description field and enable toggle):
   extraFields={[{ key: 'description', label: t('settings.modelDescription'), multiline: true }]}
   reasoningEffortOptions={['none', 'low', 'medium', 'high', 'max', 'xhigh']}
   capsLabel={t('settings.modelCaps')}
+  standaloneCaps={['stt', 'tts', 'embeddings', 'decision']}
+  standaloneLabel={t('settings.modelCapsStandalone')}
+  decisionTransport="systemone"
+  decisionTransportLabel={t('settings.modelTransport')}
   searchPlaceholder={t('settings.searchModels')}
 />
 ```
+
+The add/edit modal is **capability-conditional**: generation options
+(temperature, max tokens, reasoning effort) render only when a
+chat-family capability (`text`/`vision`/`tools`) is selected — decision,
+stt, tts and embeddings models get the minimal form, and a decision
+selection stamps the app's transport (read-only; one shipping transport
+today).
 
 ## accessibility
 

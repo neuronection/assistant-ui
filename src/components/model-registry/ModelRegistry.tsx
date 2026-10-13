@@ -27,6 +27,9 @@ export interface ModelRegistryModel {
   reasoningEffort?: string
   temperature?: number | null
   maxTokens?: number | null
+  /** The model's decision transport (e.g. `systemone`) — set when `caps`
+   * carries the app's decision capability. */
+  decisionTransport?: string
   /** App-defined extra fields (see `extraFields`), carried verbatim. */
   extra?: Record<string, string>
   missing?: boolean
@@ -44,6 +47,7 @@ export interface ModelRegistryDraft {
   reasoningEffort?: string
   temperature?: number | null
   maxTokens?: number | null
+  decisionTransport?: string
   extra?: Record<string, string>
 }
 
@@ -53,6 +57,7 @@ export interface ModelRegistryPatch {
   reasoningEffort?: string
   temperature?: number | null
   maxTokens?: number | null
+  decisionTransport?: string
   extra?: Record<string, string>
 }
 
@@ -99,6 +104,13 @@ export interface ModelRegistryProps {
   capsLabel?: string
   /** Muted explainer under the capability chips (what they gate). */
   capsHint?: string
+  /** Capability values that are standalone kinds (e.g. decision, stt, tts,
+   * embeddings): selecting one makes the model exactly that kind — the
+   * chat-family caps combine, standalone kinds replace everything (the
+   * family's slot-separation law, D4, expressed in the form). */
+  standaloneCaps?: string[]
+  /** Label for the standalone-kinds cluster (`standaloneCaps`). */
+  standaloneLabel?: string
   searchPlaceholder?: string
   searchLabel?: string
   emptyProviderLabel?: string
@@ -111,12 +123,39 @@ export interface ModelRegistryProps {
   maxTokensLabel?: string
   labelLabel?: string
   reasoningEffortLabel?: string
+  /** The app's shipping decision transport (e.g. `systemone`): when set,
+   * models with the decision capability render a read-only transport row
+   * and carry the value on Draft/Patch. */
+  decisionTransport?: string
+  decisionTransportLabel?: string
   saveLabel?: string
   cancelLabel?: string
   addDraftLabel?: string
   providersEmptyLabel?: string
   emptyAction?: React.ReactNode
   className?: string
+}
+
+/**
+ * Capabilities whose models take generation-side parameters (temperature,
+ * max tokens, reasoning effort). Other capabilities (stt/tts/embeddings/
+ * decision) render without those sections — plan 26 follow-up: options
+ * are shown per capability, never always.
+ */
+const PARAMETRIC_CAPS = new Set(['text', 'vision', 'tools'])
+
+/** Whether any selected capability takes generation-side parameters. */
+const hasParametricCaps = (caps: string[]): boolean =>
+  caps.some((cap) => PARAMETRIC_CAPS.has(cap))
+
+/**
+ * Catalog normalization for `standaloneCaps` (remote model pick): a caps
+ * set may carry either one standalone kind (alone) or any combination of
+ * the chat-family caps — never both, never two standalone kinds.
+ */
+const normalizeCaps = (next: string[], standalone: ReadonlySet<string>): string[] => {
+  const standaloneHit = next.find((cap) => standalone.has(cap))
+  return standaloneHit ? [standaloneHit] : next
 }
 
 const CUSTOM = '__custom__'
@@ -203,6 +242,7 @@ interface ModalState {
   reasoningCustom: boolean
   temperature: string
   maxTokens: string
+  decisionTransport: string
   extra: Record<string, string>
   extraTouched: boolean
   labelTouched: boolean
@@ -241,6 +281,8 @@ export const ModelRegistry = React.forwardRef<HTMLDivElement, ModelRegistryProps
       missingLabel = 'Missing',
       capsLabel = 'Capabilities',
       capsHint,
+      standaloneCaps,
+      standaloneLabel = 'Standalone',
       searchPlaceholder = 'Search models…',
       searchLabel = 'Search models',
       emptyProviderLabel = 'No models yet — use Add model to pick from the live catalog.',
@@ -253,6 +295,8 @@ export const ModelRegistry = React.forwardRef<HTMLDivElement, ModelRegistryProps
       maxTokensLabel = 'Max tokens',
       labelLabel = 'Display label',
       reasoningEffortLabel = 'Reasoning effort',
+      decisionTransport,
+      decisionTransportLabel = 'Transport',
       saveLabel = 'Save',
       cancelLabel = 'Cancel',
       addDraftLabel = 'Add model',
@@ -264,6 +308,19 @@ export const ModelRegistry = React.forwardRef<HTMLDivElement, ModelRegistryProps
   ) {
     const [modal, setModal] = React.useState<ModalState | null>(null)
     const [draftError, setDraftError] = React.useState<string | null>(null)
+
+    const standaloneSet = React.useMemo(
+      () => new Set(standaloneCaps ?? []),
+      [standaloneCaps],
+    )
+    const combinableCaps = React.useMemo(
+      () => caps.filter((cap) => !standaloneSet.has(cap.value)),
+      [caps, standaloneSet],
+    )
+    const standaloneDescriptors = React.useMemo(
+      () => caps.filter((cap) => standaloneSet.has(cap.value)),
+      [caps, standaloneSet],
+    )
 
     const descriptorFor = React.useCallback(
       (value: string): CapabilityDescriptor =>
@@ -281,16 +338,18 @@ export const ModelRegistry = React.forwardRef<HTMLDivElement, ModelRegistryProps
     }
 
     const openAddModal = (providerId: string) => {
+      const firstCap = combinableCaps[0] ?? caps[0]
       setModal({
         mode: 'add',
         providerId,
         externalId: '',
         label: '',
-        caps: caps[0] ? [caps[0].value] : [],
+        caps: firstCap ? [firstCap.value] : [],
         reasoningEffort: '',
         reasoningCustom: false,
         temperature: '',
         maxTokens: '',
+        decisionTransport: '',
         extra: {},
         extraTouched: false,
         labelTouched: false,
@@ -314,6 +373,7 @@ export const ModelRegistry = React.forwardRef<HTMLDivElement, ModelRegistryProps
           !(reasoningEffortOptions ?? []).includes(model.reasoningEffort),
         temperature: model.temperature != null ? String(model.temperature) : '',
         maxTokens: model.maxTokens != null ? String(model.maxTokens) : '',
+        decisionTransport: model.decisionTransport ?? '',
         extra: { ...(model.extra ?? {}) },
         extraTouched: false,
         model,
@@ -332,29 +392,43 @@ export const ModelRegistry = React.forwardRef<HTMLDivElement, ModelRegistryProps
 
     const selectRemote = (remoteId: string) => {
       const remote = (remoteModels ?? []).find((entry) => entry.id === remoteId)
-      setModal((current) =>
-        current
-          ? {
-              ...current,
-              externalId: remoteId,
-              caps: remote ? [...remote.caps] : current.caps,
-              label: current.labelTouched ? current.label : beautifyId(remoteId),
-            }
-          : current,
-      )
+      setModal((current) => {
+        if (!current) return current
+        const nextCaps = remote ? normalizeCaps([...remote.caps], standaloneSet) : current.caps
+        return {
+          ...current,
+          externalId: remoteId,
+          caps: nextCaps,
+          decisionTransport: nextCaps.includes('decision')
+            ? (decisionTransport ?? current.decisionTransport ?? '')
+            : '',
+          label: current.labelTouched ? current.label : beautifyId(remoteId),
+        }
+      })
     }
 
     const toggleDraftCap = (value: string) => {
-      setModal((current) =>
-        current
-          ? {
-              ...current,
-              caps: current.caps.includes(value)
-                ? current.caps.filter((entry) => entry !== value)
-                : [...current.caps, value],
-            }
-          : current,
-      )
+      setModal((current) => {
+        if (!current) return current
+        const isStandalone = standaloneSet.has(value)
+        const nextCaps = isStandalone
+          ? // a standalone kind replaces everything (or clears when toggled off)
+            current.caps.includes(value)
+            ? current.caps.filter((entry) => entry !== value)
+            : [value]
+          : current.caps.includes(value)
+            ? current.caps.filter((entry) => entry !== value)
+            : [...current.caps.filter((entry) => !standaloneSet.has(entry)), value]
+        return {
+          ...current,
+          caps: nextCaps,
+          // The decision capability stamps the app's shipping transport;
+          // without it there is no transport to carry.
+          decisionTransport: nextCaps.includes('decision')
+            ? (decisionTransport ?? current.decisionTransport ?? '')
+            : '',
+        }
+      })
     }
 
     const patchField = (field: keyof ModalState, value: string) => {
@@ -379,6 +453,7 @@ export const ModelRegistry = React.forwardRef<HTMLDivElement, ModelRegistryProps
         modal.extraTouched || Object.values(modal.extra).some((value) => value.trim() !== '')
           ? { ...modal.extra }
           : undefined
+      const isDecision = modal.caps.includes('decision')
       const payload: ModelRegistryDraft = {
         externalId,
         label: modal.label.trim() || undefined,
@@ -386,12 +461,21 @@ export const ModelRegistry = React.forwardRef<HTMLDivElement, ModelRegistryProps
         reasoningEffort: modal.reasoningEffort.trim(),
         temperature: numberOr(modal.temperature),
         maxTokens: numberOr(modal.maxTokens),
+        ...(isDecision && modal.decisionTransport
+          ? { decisionTransport: modal.decisionTransport }
+          : {}),
         ...(extra !== undefined ? { extra } : {}),
       }
       if (modal.mode === 'add') {
         onAddModel(modal.providerId, payload)
       } else if (modal.model) {
-        onUpdateModel(modal.model, payload)
+        const patch: ModelRegistryPatch = { ...payload }
+        if (isDecision) {
+          patch.decisionTransport = modal.decisionTransport || decisionTransport
+        } else {
+          patch.decisionTransport = undefined
+        }
+        onUpdateModel(modal.model, patch)
       }
       resetModal()
     }
@@ -523,17 +607,47 @@ export const ModelRegistry = React.forwardRef<HTMLDivElement, ModelRegistryProps
               </label>
               <div className="space-y-1">
                 <span className="text-sm font-medium text-[var(--as-fg)]">{capsLabel}</span>
-                <CapabilityChips
-                  caps={caps}
-                  selected={modal.caps}
-                  onToggle={toggleDraftCap}
-                  ariaLabel={capsLabel}
-                />
+                {standaloneDescriptors.length > 0 ? (
+                  <>
+                    <CapabilityChips
+                      caps={combinableCaps}
+                      selected={modal.caps}
+                      onToggle={toggleDraftCap}
+                      ariaLabel={capsLabel}
+                    />
+                    <p className="flex items-center gap-2 pt-1 text-[10px] font-semibold uppercase tracking-wide text-[var(--as-muted-fg)]">
+                      <span className="h-px flex-1 bg-[var(--as-border)]" aria-hidden />
+                      {standaloneLabel}
+                      <span className="h-px flex-1 bg-[var(--as-border)]" aria-hidden />
+                    </p>
+                    <CapabilityChips
+                      caps={standaloneDescriptors}
+                      selected={modal.caps}
+                      onToggle={toggleDraftCap}
+                      ariaLabel={standaloneLabel}
+                    />
+                  </>
+                ) : (
+                  <CapabilityChips
+                    caps={caps}
+                    selected={modal.caps}
+                    onToggle={toggleDraftCap}
+                    ariaLabel={capsLabel}
+                  />
+                )}
+                {modal.caps.includes('decision') && decisionTransport ? (
+                  <p className="flex items-center gap-1.5 text-xs text-[var(--as-muted-fg)]">
+                    <span>{decisionTransportLabel}:</span>
+                    <code className="rounded-[var(--as-radius-sm)] bg-[var(--as-muted)] px-1.5 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wide text-[var(--as-fg)]">
+                      {decisionTransport}
+                    </code>
+                  </p>
+                ) : null}
                 {capsHint ? (
                   <p className="text-xs text-[var(--as-muted-fg)]">{capsHint}</p>
                 ) : null}
               </div>
-              {reasoningEffortOptions ? (
+              {hasParametricCaps(modal.caps) && reasoningEffortOptions ? (
                 <label className="block space-y-1 text-sm">
                   <span className="text-sm font-medium text-[var(--as-fg)]">
                     {reasoningEffortLabel}
@@ -578,25 +692,27 @@ export const ModelRegistry = React.forwardRef<HTMLDivElement, ModelRegistryProps
                   </div>
                 </label>
               ) : null}
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                <NumberField
-                  label={temperatureLabel}
-                  value={modal.temperature}
-                  onChange={(value) => patchField('temperature', value)}
-                  onClear={() => patchField('temperature', '')}
-                  step="0.1"
-                  min="0"
-                  max="2"
-                />
-                <NumberField
-                  label={maxTokensLabel}
-                  value={modal.maxTokens}
-                  onChange={(value) => patchField('maxTokens', value)}
-                  onClear={() => patchField('maxTokens', '')}
-                  step="256"
-                  min="1"
-                />
-              </div>
+              {hasParametricCaps(modal.caps) ? (
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  <NumberField
+                    label={temperatureLabel}
+                    value={modal.temperature}
+                    onChange={(value) => patchField('temperature', value)}
+                    onClear={() => patchField('temperature', '')}
+                    step="0.1"
+                    min="0"
+                    max="2"
+                  />
+                  <NumberField
+                    label={maxTokensLabel}
+                    value={modal.maxTokens}
+                    onChange={(value) => patchField('maxTokens', value)}
+                    onClear={() => patchField('maxTokens', '')}
+                    step="256"
+                    min="1"
+                  />
+                </div>
+              ) : null}
               {(extraFields ?? []).map((field) => {
                 const value = modal.extra[field.key] ?? ''
                 const common =

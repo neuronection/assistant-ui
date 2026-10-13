@@ -525,4 +525,109 @@ describe('ModelRegistry extra fields and enable toggle', () => {
     )
     expect(await axe(container)).toHaveNoViolations()
   })
+
+  it('standalone kinds are exclusive: selecting one replaces the chat caps and vice versa', async () => {
+    const user = userEvent.setup()
+    const onAddModel = vi.fn()
+    render(
+      <RegistryDemo
+        onAddModel={onAddModel}
+        standaloneCaps={['embeddings', 'audio', 'decision']}
+        standaloneLabel="Standalone kind"
+      />,
+    )
+    const dialog = await openAddModal(user)
+    // the add modal opens with the first combinable cap pressed
+    expect(within(dialog).getByRole('button', { name: 'Text' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    )
+    await user.click(within(dialog).getByRole('button', { name: 'Text' }))
+    await user.click(within(dialog).getByRole('button', { name: 'Decision' }))
+    expect(within(dialog).getByRole('button', { name: 'Decision' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    )
+    expect(within(dialog).getByRole('button', { name: 'Text' })).toHaveAttribute(
+      'aria-pressed',
+      'false',
+    )
+    // and back: a chat cap clears the standalone kind
+    await user.click(within(dialog).getByRole('button', { name: 'Text' }))
+    expect(within(dialog).getByRole('button', { name: 'Decision' })).toHaveAttribute(
+      'aria-pressed',
+      'false',
+    )
+    expect(within(dialog).getByRole('button', { name: 'Text' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    )
+  })
+
+  it('generation options render per capability: hidden for standalone-only, shown for chat caps', async () => {
+    const user = userEvent.setup()
+    render(
+      <RegistryDemo
+        standaloneCaps={['embeddings', 'audio', 'decision']}
+        reasoningEffortOptions={['low', 'medium', 'high']}
+      />,
+    )
+    const dialog = await openAddModal(user)
+    // chat caps (text default) → parametric fields visible
+    expect(within(dialog).getByLabelText('Temperature')).toBeInTheDocument()
+    expect(within(dialog).getByLabelText('Max tokens')).toBeInTheDocument()
+    expect(within(dialog).getByLabelText('Reasoning effort')).toBeInTheDocument()
+    // switching to a standalone kind hides them
+    await user.click(within(dialog).getByRole('button', { name: 'Text' }))
+    await user.click(within(dialog).getByRole('button', { name: 'Embeddings' }))
+    expect(within(dialog).queryByLabelText('Temperature')).not.toBeInTheDocument()
+    expect(within(dialog).queryByLabelText('Max tokens')).not.toBeInTheDocument()
+    expect(within(dialog).queryByLabelText('Reasoning effort')).not.toBeInTheDocument()
+  })
+
+  it('decision selection stamps the transport, shows it read-only, and carries it on the draft', async () => {
+    const user = userEvent.setup()
+    const onAddModel = vi.fn()
+    render(
+      <RegistryDemo
+        onAddModel={onAddModel}
+        standaloneCaps={['embeddings', 'audio', 'decision']}
+        decisionTransport="systemone"
+        decisionTransportLabel="Transport"
+      />,
+    )
+    const dialog = await openAddModal(user)
+    await user.click(within(dialog).getByRole('button', { name: 'Enter the model id manually' }))
+    await user.type(within(dialog).getByLabelText('Model'), 'custom-jev')
+    await user.click(within(dialog).getByRole('button', { name: 'Text' }))
+    await user.click(within(dialog).getByRole('button', { name: 'Decision' }))
+    expect(within(dialog).getByText('Transport:')).toBeInTheDocument()
+    expect(within(dialog).getByText('systemone')).toBeInTheDocument()
+    await user.click(within(dialog).getByRole('button', { name: 'Add model' }))
+    expect(onAddModel).toHaveBeenCalledWith(
+      'p1',
+      expect.objectContaining({ externalId: 'custom-jev', caps: ['decision'], decisionTransport: 'systemone' }),
+    )
+  })
+
+  it('edit round-trips a decision model transport and clears it when the kind changes', async () => {
+    const user = userEvent.setup()
+    const onUpdateModel = vi.fn()
+    render(
+      <RegistryDemo
+        onUpdateModel={onUpdateModel}
+        standaloneCaps={['embeddings', 'audio', 'decision']}
+        decisionTransport="systemone"
+      />,
+    )
+    await user.click(await screen.findByRole('button', { name: 'Edit jev-latest' }))
+    const dialog = await screen.findByRole('dialog')
+    expect(within(dialog).getByText('systemone')).toBeInTheDocument()
+    await user.click(within(dialog).getByRole('button', { name: 'Text' }))
+    await user.click(within(dialog).getByRole('button', { name: 'Save' }))
+    expect(onUpdateModel).toHaveBeenCalledWith(
+      expect.objectContaining({ externalId: 'jev-latest' }),
+      expect.objectContaining({ caps: ['text'], decisionTransport: undefined }),
+    )
+  })
 })
