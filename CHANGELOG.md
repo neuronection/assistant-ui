@@ -1,5 +1,11 @@
 # @neuronection/assistant-ui
 
+## 0.56.0
+
+### Minor Changes
+
+- [`ca62ca8`](https://github.com/neuronection/assistant-ui/commit/ca62ca8cc92816788b35bf254cf1b8376725c112) Thanks [@constLiakos](https://github.com/constLiakos)! - **ModelRegistry: capability-kind add/edit form (plan 26 follow-up).** The add/edit modal becomes capability-conditional and grouped. New additive optional props: `standaloneCaps` + `standaloneLabel` (capabilities that are standalone kinds — decision, stt, tts, embeddings — render in their own cluster and select exclusively: a standalone kind replaces the chat caps and vice versa, expressing the family's D4 slot-separation law in the form) and `decisionTransport` + `decisionTransportLabel` (the app's shipping transport, e.g. `systemone`: a decision selection renders a read-only transport row and carries `decisionTransport` on `ModelRegistryDraft`/`Patch`/`Model`). Generation options — temperature, max tokens, reasoning effort — now render only when a chat-family capability (`text`/`vision`/`tools`) is selected; decision/stt/tts/embeddings models get the minimal form. Without the new props the form behaves exactly as before. Docs page updated in the same change; visual baselines need the CI rebaseline flow for the model-registry story if it renders the modal.
+
 ## 0.55.0
 
 ### Minor Changes
