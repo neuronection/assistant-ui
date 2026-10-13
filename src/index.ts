@@ -110,6 +110,18 @@ export {
   type ConnectionTestRowProps,
 } from './components/connection-test-row'
 export {
+  WebSearchProvidersPanel,
+  type WebSearchProvidersPanelProps,
+  type WebSearchProvidersPanelLabels,
+  type WebSearchProviderView,
+  type WebSearchProviderCatalog,
+  type WebSearchProviderCatalogEntry,
+  type WebSearchProviderCatalogField,
+  type WebSearchProviderSaveInput,
+  type WebSearchProviderProbeView,
+  type WebSearchProbeStatus,
+} from './components/web-search-providers'
+export {
   ProviderForm,
   CUSTOM_PRESET_KEY,
   type ProviderFormProps,

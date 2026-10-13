@@ -155,6 +155,10 @@
       "types": "./dist/connection-test-row.d.ts",
       "import": "./dist/connection-test-row.js"
     },
+    "./web-search-providers": {
+      "types": "./dist/web-search-providers.d.ts",
+      "import": "./dist/web-search-providers.js"
+    },
     "./check-indicator": {
       "types": "./dist/check-indicator.d.ts",
       "import": "./dist/check-indicator.js"

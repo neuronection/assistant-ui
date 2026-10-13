@@ -113,6 +113,7 @@ const LIBRARY_COMPONENTS = [
   'SetupReview',
   'SetupFirstRunCard',
   'SwitchRow',
+  'WebSearchProvidersPanel',
   'ProviderLogo',
   'CapabilityChips',
   'CapabilityDescriptor',
