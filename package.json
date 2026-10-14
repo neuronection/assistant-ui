@@ -315,6 +315,14 @@
       "types": "./dist/setup-review.d.ts",
       "import": "./dist/setup-review.js"
     },
+    "./setup-steps": {
+      "types": "./dist/setup-steps.d.ts",
+      "import": "./dist/setup-steps.js"
+    },
+    "./setup-assignments": {
+      "types": "./dist/setup-assignments.d.ts",
+      "import": "./dist/setup-assignments.js"
+    },
     "./switch-row": {
       "types": "./dist/switch-row.d.ts",
       "import": "./dist/switch-row.js"
