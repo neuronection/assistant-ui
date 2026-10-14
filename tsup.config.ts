@@ -83,6 +83,7 @@ export const entry: Record<string, string> = {
   'setup-review': 'src/components/setup-review/index.ts',
   'setup-steps': 'src/components/setup-steps/index.ts',
   'setup-assignments': 'src/components/setup-assignments/index.ts',
+  'provider-card': 'src/components/provider-card/index.ts',
   'switch-row': 'src/components/switch-row/index.ts',
   'range-bar': 'src/components/range-bar/index.ts',
   'scale-slider': 'src/components/scale-slider/index.ts',

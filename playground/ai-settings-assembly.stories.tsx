@@ -18,6 +18,10 @@ import {
   SetupAssignments,
   type SetupAssignmentRow,
 } from '../src/components/setup-assignments/SetupAssignments'
+import {
+  ProviderCard,
+  type ProviderCardAction,
+} from '../src/components/provider-card/ProviderCard'
 import { SwitchRow } from '../src/components/switch-row/SwitchRow'
 import { ProviderLogo } from '../src/components/provider-logo/ProviderLogo'
 import {
@@ -231,6 +235,49 @@ export const AiSettingsSetupAssignmentsStory = () => {
         onCheckedChange: () => flip(row.id),
       }))}
     />
+  )
+}
+
+export const AiSettingsProviderCardStory = () => {
+  const [status, setStatus] = useState<'idle' | 'testing' | 'ok' | 'fail'>('idle')
+  const [error, setError] = useState<string | null>(null)
+  const runTest = () => {
+    setStatus('testing')
+    setTimeout(() => {
+      const ok = Math.random() > 0.4
+      setStatus(ok ? 'ok' : 'fail')
+      setError(ok ? null : '401 — check the key and try again')
+    }, 800)
+  }
+  const actions: ProviderCardAction[] = [
+    { key: 'setup', label: 'Set up automatically', onSelect: () => {} },
+    { key: 'edit', label: 'Edit', onSelect: () => {} },
+    { key: 'test', label: 'Test connection', disabled: status === 'testing', onSelect: runTest },
+    { key: 'delete', label: 'Delete', danger: true, onSelect: () => {} },
+  ]
+  return (
+    <div style={{ maxWidth: 560, display: 'grid', gap: 12 }}>
+      <ProviderCard
+        name="OpenAI"
+        logoPreset="openai"
+        nameTitle="https://api.openai.com/v1"
+        badges={[
+          { key: 'type', label: 'openai' },
+          { key: 'hosting', label: 'Cloud' },
+          { key: 'key', label: '🔑', title: 'API key configured' },
+        ]}
+        status={status}
+        errorMessage={error}
+        meta="4 models"
+        okLabel="Connected"
+        failLabel="Failed"
+        actions={actions}
+        actionsLabel="Actions for OpenAI"
+      />
+      <p style={{ fontSize: 12, opacity: 0.7 }}>
+        The connection string lives on the name tooltip; Test lives in the ⋯ menu.
+      </p>
+    </div>
   )
 }
 

@@ -323,6 +323,10 @@
       "types": "./dist/setup-assignments.d.ts",
       "import": "./dist/setup-assignments.js"
     },
+    "./provider-card": {
+      "types": "./dist/provider-card.d.ts",
+      "import": "./dist/provider-card.js"
+    },
     "./switch-row": {
       "types": "./dist/switch-row.d.ts",
       "import": "./dist/switch-row.js"
