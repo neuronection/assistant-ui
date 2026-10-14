@@ -33,9 +33,11 @@ export interface ProviderCardProps
   /** Preset key for the provider mark — unknown keys fall back to the
    * monogram. */
   logoPreset?: string
-  /** Tooltip on the name — the connection string's only at-a-glance home
-   * (config detail lives in Edit; the card stays status-forward). */
+  /** Tooltip on the name (the card keeps this line status-forward). */
   nameTitle?: string
+  /** Muted, truncated second line under the name — discrete always-on
+   * context (e.g. the endpoint URL); the full text rides its tooltip. */
+  subtitle?: string
   badges?: ProviderCardBadge[]
   status?: ConnectionTestStatus
   /** Accessible label for the connection row. */
@@ -55,17 +57,19 @@ export interface ProviderCardProps
   actionsLabel?: string
 }
 
-/** One provider summary card: mark + name + identity badges, the
- * connection result as the card's second line (status display only —
- * the test action lives in the `⋯` overflow menu alongside the other
- * management actions), and config detail (base URL) as a name tooltip.
- * Presentational and controlled: data in via props, events out. */
+/** One provider summary card: mark + name + identity badges, a muted
+ * subtitle for discrete always-on context (the endpoint URL), the
+ * connection result as the status line (display only — the test action
+ * lives in the `⋯` overflow menu alongside the other management
+ * actions). Presentational and controlled: data in via props, events
+ * out. */
 export const ProviderCard = React.forwardRef<HTMLDivElement, ProviderCardProps>(
   function ProviderCard(
     {
       name,
       logoPreset,
       nameTitle,
+      subtitle,
       badges,
       status = 'idle',
       connectionLabel,
@@ -113,6 +117,11 @@ export const ProviderCard = React.forwardRef<HTMLDivElement, ProviderCardProps>(
               </span>
             ))}
           </p>
+          {subtitle ? (
+            <p className="mt-0.5 truncate text-xs text-[var(--as-muted-fg)]" title={subtitle}>
+              {subtitle}
+            </p>
+          ) : null}
           <ConnectionTestRow
             variant="inline"
             className="mt-1.5"
