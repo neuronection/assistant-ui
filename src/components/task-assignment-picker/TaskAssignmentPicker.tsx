@@ -58,6 +58,10 @@ export interface TaskAssignmentPickerProps {
   fallbackInfo?: React.ReactNode
   /** App-rendered per-row context (inherit notes, spend, badges). */
   renderMeta?: (task: TaskAssignmentTask) => React.ReactNode
+  /** Trigger text for unassigned rows (e.g. "Inherits from the default
+   * decision model") — communicates what empty means without an explicit
+   * inherit option in the model list. */
+  placeholder?: string
   clearLabel?: string
   disabled?: boolean
   className?: string
@@ -95,6 +99,7 @@ export const TaskAssignmentPicker = React.forwardRef<
     primaryInfo,
     fallbackInfo,
     renderMeta,
+    placeholder,
     clearLabel = 'Clear assignment',
     disabled = false,
     className,
@@ -139,6 +144,7 @@ export const TaskAssignmentPicker = React.forwardRef<
                 value={secondaryValue?.[task.id] ?? ''}
                 onChange={(modelId) => onAssignSecondary(task.id, modelId)}
                 disabled={disabled}
+                placeholder={placeholder}
                 clearable={false}
                 clearLabel={clearLabel}
                 label={`${secondaryLabel} — ${task.label}`}
@@ -177,6 +183,7 @@ export const TaskAssignmentPicker = React.forwardRef<
                   value={value[task.id] ?? ''}
                   onChange={(modelId) => onAssign(task.id, modelId)}
                   disabled={disabled}
+                  placeholder={placeholder}
                   clearable={false}
                   clearLabel={clearLabel}
                   label={task.label}
@@ -213,6 +220,7 @@ export const TaskAssignmentPicker = React.forwardRef<
               value={value[task.id] ?? ''}
               onChange={(modelId) => onAssign(task.id, modelId)}
               disabled={disabled}
+              placeholder={placeholder}
               clearable={false}
               clearLabel={clearLabel}
               label={task.label}
