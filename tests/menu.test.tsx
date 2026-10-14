@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event'
 import { axe } from 'jest-axe'
 import { ActionMenu, Menu, MenuContent, MenuItem, MenuTrigger } from '../src/components/menu/Menu'
 import { ContextMenu } from '../src/components/context-menu/ContextMenu'
-import { Trash2 } from 'lucide-react'
+import { Trash2, EllipsisVertical } from 'lucide-react'
 import { Button } from '../src/components/button/Button'
 
 describe('Menu / ActionMenu', () => {
@@ -154,6 +154,7 @@ describe('ActionMenu / MenuItem highlight', () => {
     render(
       <ActionMenu
         label="Actions for Org OpenAI"
+        trigger={<EllipsisVertical aria-hidden />}
         items={[
           { key: 'edit', label: 'Edit', onSelect: onEdit },
           { key: 'delete', label: 'Delete', danger: true, onSelect: onDelete },
