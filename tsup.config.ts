@@ -81,6 +81,8 @@ export const entry: Record<string, string> = {
   'provider-setup-tiles': 'src/components/provider-setup-tiles/index.ts',
   'setup-first-run-card': 'src/components/setup-first-run-card/index.ts',
   'setup-review': 'src/components/setup-review/index.ts',
+  'setup-steps': 'src/components/setup-steps/index.ts',
+  'setup-assignments': 'src/components/setup-assignments/index.ts',
   'switch-row': 'src/components/switch-row/index.ts',
   'range-bar': 'src/components/range-bar/index.ts',
   'scale-slider': 'src/components/scale-slider/index.ts',

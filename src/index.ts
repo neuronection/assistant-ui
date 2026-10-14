@@ -156,6 +156,16 @@ export {
   SetupFirstRunCard,
   type SetupFirstRunCardProps,
 } from './components/setup-first-run-card'
+export {
+  SetupSteps,
+  type SetupStepsProps,
+  type SetupStep,
+} from './components/setup-steps'
+export {
+  SetupAssignments,
+  type SetupAssignmentsProps,
+  type SetupAssignmentRow,
+} from './components/setup-assignments'
 export { SwitchRow, type SwitchRowProps } from './components/switch-row'
 export { ProviderLogo, type ProviderLogoProps } from './components/provider-logo'
 export {

@@ -13,6 +13,11 @@ import {
   type SetupReviewOptions,
 } from '../src/components/setup-review/SetupReview'
 import { SetupFirstRunCard } from '../src/components/setup-first-run-card/SetupFirstRunCard'
+import { SetupSteps } from '../src/components/setup-steps/SetupSteps'
+import {
+  SetupAssignments,
+  type SetupAssignmentRow,
+} from '../src/components/setup-assignments/SetupAssignments'
 import { SwitchRow } from '../src/components/switch-row/SwitchRow'
 import { ProviderLogo } from '../src/components/provider-logo/ProviderLogo'
 import {
@@ -156,6 +161,76 @@ export const AiSettingsReviewStory = () => {
       />
       <p style={{ marginTop: 8, fontSize: 12 }}>{JSON.stringify(options)}</p>
     </div>
+  )
+}
+
+export const AiSettingsSetupStepsStory = () => (
+  <div style={{ maxWidth: 460, display: 'grid', gap: 16 }}>
+    <SetupSteps
+      steps={[
+        { id: 'connect', label: 'Connect provider' },
+        { id: 'defaults', label: 'Choose defaults' },
+      ]}
+      current={0}
+    />
+    <SetupSteps
+      steps={[
+        { id: 'connect', label: 'Connect provider' },
+        { id: 'defaults', label: 'Choose defaults' },
+      ]}
+      current={1}
+    />
+    <SetupSteps
+      steps={[
+        { id: 'connect', label: 'Connect provider' },
+        { id: 'defaults', label: 'Choose defaults' },
+      ]}
+      current={2}
+    />
+  </div>
+)
+
+const assignmentRows: Array<Omit<SetupAssignmentRow, 'onCheckedChange'>> = [
+  {
+    id: 'chat',
+    label: 'Chat default',
+    hint: 'now: unset · fills: openrouter/auto',
+    checked: true,
+  },
+  {
+    id: 'vision',
+    label: 'Vision default',
+    hint: 'no model selected',
+    checked: false,
+    disabled: true,
+  },
+  {
+    id: 'decision',
+    label: 'Default decision model',
+    hint: 'now: unset · fills: Jev 1.13 via OpenRouter (pinned)',
+    checked: true,
+  },
+]
+
+export const AiSettingsSetupAssignmentsStory = () => {
+  const [rows, setRows] = useState(assignmentRows)
+  const flip = (id: string) =>
+    setRows((current) =>
+      current.map((row) =>
+        row.id === id && !row.disabled
+          ? { ...row, checked: !row.checked }
+          : row,
+      ),
+    )
+  return (
+    <SetupAssignments
+      title="Default assignments"
+      hint="Each switch fills that empty default with the shown model — existing assignments are never touched."
+      rows={rows.map((row) => ({
+        ...row,
+        onCheckedChange: () => flip(row.id),
+      }))}
+    />
   )
 }
 
