@@ -110,7 +110,9 @@ describe('WebSearchProvidersPanel', () => {
   it('test emits the provider id and shows the probe', async () => {
     const user = userEvent.setup()
     const { handlers } = renderPanel()
-    await user.click(screen.getAllByRole('button', { name: 'Test' })[0])
+    const firstTest = screen.getAllByRole('button', { name: 'Test' })[0]
+    expect(firstTest).toBeDefined()
+    if (firstTest) await user.click(firstTest)
     expect(handlers.onTest).toHaveBeenCalledWith('sp1')
   })
 
