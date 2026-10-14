@@ -467,3 +467,140 @@ describe('TaskAssignmentPicker decision slots (plan 26 / ADR-0032)', () => {
     expect(await axe(container)).toHaveNoViolations()
   })
 })
+
+describe('ModelPicker nullOption (plan 29 / ADR-0036 — the inherit entry)', () => {
+  const inheritLabel = 'Inherits — Jev (latest)'
+
+  async function openPicker(jsx: React.ReactElement) {
+    const user = userEvent.setup()
+    render(jsx)
+    await user.click(screen.getByRole('combobox'))
+    const option = screen.getByRole('option', { name: inheritLabel })
+    const listbox = option.closest('[role="listbox"]')
+    if (!listbox) throw new Error('listbox not found')
+    const names = Array.from(listbox.querySelectorAll('[role="option"]')).map(
+      (entry) => entry.textContent,
+    )
+    return { user, names }
+  }
+
+  it('leads the option list with the labeled null entry (resolved default name)', async () => {
+    const { names } = await openPicker(
+      <ModelPicker
+        providers={providers}
+        value=""
+        onChange={vi.fn()}
+        nullOption={{ label: inheritLabel }}
+        label="Model"
+      />,
+    )
+    expect(names[0]).toBe(inheritLabel)
+    // The inherit entry has no group of its own — it renders above the
+    // provider groups, which keep their order.
+    expect(names).toHaveLength(4)
+  })
+
+  it('shows the inherit label in the trigger when the value is empty', () => {
+    render(
+      <ModelPicker
+        providers={providers}
+        value=""
+        onChange={vi.fn()}
+        nullOption={{ label: inheritLabel }}
+        label="Model"
+      />,
+    )
+    expect(screen.getByRole('combobox')).toHaveTextContent(inheritLabel)
+  })
+
+  it('assigns null when the inherit entry is chosen (click)', async () => {
+    const user = userEvent.setup()
+    const onChange = vi.fn()
+    render(
+      <ModelPicker
+        providers={providers}
+        value="gpt-5"
+        onChange={onChange}
+        nullOption={{ label: inheritLabel }}
+        label="Model"
+      />,
+    )
+    await user.click(screen.getByRole('combobox'))
+    await user.click(screen.getByRole('option', { name: inheritLabel }))
+    expect(onChange).toHaveBeenCalledTimes(1)
+    expect(onChange).toHaveBeenCalledWith(null)
+  })
+
+  it('assigns null via the keyboard (Enter on the leading active option)', async () => {
+    const user = userEvent.setup()
+    const onChange = vi.fn()
+    render(
+      <ModelPicker
+        providers={providers}
+        value=""
+        onChange={onChange}
+        nullOption={{ label: inheritLabel }}
+        label="Model"
+      />,
+    )
+    await user.click(screen.getByRole('combobox'))
+    // Opening focuses the first enabled option — the inherit entry.
+    await user.keyboard('{Enter}')
+    expect(onChange).toHaveBeenCalledWith(null)
+  })
+
+  it('assigns the model id when a model is chosen (override wins)', async () => {
+    const user = userEvent.setup()
+    const onChange = vi.fn()
+    render(
+      <ModelPicker
+        providers={providers}
+        value=""
+        onChange={onChange}
+        nullOption={{ label: inheritLabel }}
+        label="Model"
+      />,
+    )
+    await user.click(screen.getByRole('combobox'))
+    await user.click(screen.getByRole('option', { name: /Claude/ }))
+    expect(onChange).toHaveBeenCalledWith('claude')
+  })
+
+  it('shows the selected model in the trigger when one is assigned', () => {
+    render(
+      <ModelPicker
+        providers={providers}
+        value="claude"
+        onChange={vi.fn()}
+        nullOption={{ label: inheritLabel }}
+        label="Model"
+      />,
+    )
+    expect(screen.getByRole('combobox')).toHaveTextContent('Claude')
+  })
+
+  it('is absent-safe: no inherit entry and string-only assignments without nullOption', async () => {
+    const user = userEvent.setup()
+    const onChange = vi.fn()
+    render(<ModelPicker providers={providers} value="" onChange={onChange} label="Model" />)
+    expect(screen.getByRole('combobox')).toHaveTextContent(/select a model/i)
+    await user.click(screen.getByRole('combobox'))
+    expect(screen.queryByRole('option', { name: /Inherits/ })).not.toBeInTheDocument()
+    await user.click(screen.getByRole('option', { name: /Claude/ }))
+    expect(onChange).toHaveBeenCalledTimes(1)
+    expect(onChange).toHaveBeenCalledWith('claude')
+  })
+
+  it('has no axe violations with the inherit entry', async () => {
+    const { container } = render(
+      <ModelPicker
+        providers={providers}
+        value=""
+        onChange={vi.fn()}
+        nullOption={{ label: inheritLabel }}
+        label="Model"
+      />,
+    )
+    expect(await axe(container)).toHaveNoViolations()
+  })
+})

@@ -21,7 +21,8 @@ import {
 |---|---|---|---|
 | `providers` | `ModelPickerProvider[]` | — | `{ id, name, models: { id, name, capability?, capabilities? }[] }` |
 | `value` | `string` | — | model id |
-| `onChange` | `(modelId: string) => void` | — | |
+| `onChange` | `(modelId: string) => void` | — | with `nullOption` set: `(modelId: string \| null) => void` — receives `null` when the inherit entry is chosen |
+| `nullOption` | `{ label: string }` | — | leads the option list with the labeled null (inherit) entry; choosing it assigns `null`. Absent → unchanged contract. Pair with `clearable={false}` — the inherit entry replaces the clear affordance |
 | `placeholder` | `string` | `'Select a model…'` | |
 | `searchPlaceholder` | `string` | `'Search models…'` | |
 | `searchLabel` | `string` | — | |
@@ -41,6 +42,14 @@ import {
 `value` in, `onChange(modelId)` out. Filtering/fuzzy ranking is the
 Combobox's (synchronous). `capabilities` is not rendered — it exists for
 [`TaskAssignmentPicker`](./task-assignment-picker.md) `requires` matching.
+
+**Labeled null option (plan 29 / ADR-0036).** With `nullOption` set, the
+entry the props name leads the option list (no group of its own — it
+renders above every provider group) and an empty `value` selects it, so
+the trigger names the inherit state. The label is app-composed copy —
+typically `"Inherits — {resolved default model}"`; when no default
+resolves, pass the bare "Inherits" copy. Absent `nullOption`, behavior
+is unchanged.
 
 ## labels & i18n
 
@@ -67,6 +76,24 @@ realistic (per-task picker inside an assignment row, from study
   providers={catalog}
   value={value[task.id] ?? ''}
   onChange={(modelId) => onAssign(task.id, modelId)}
+  clearable={false}
+  label={task.label}
+  hideLabel
+/>
+```
+
+inherit row (plan 29 / ADR-0036 — a Decision defaults card kind row; the
+list leads with "Inherits — {resolved default model}", choosing it
+assigns `null`):
+
+```tsx
+<ModelPicker
+  providers={decisionCatalog}
+  value={kindAssignment ?? ''}
+  nullOption={{ label: inheritModel ? `Inherits — ${inheritModel}` : t('Inherits') }}
+  onChange={(modelId) =>
+    modelId === null ? onAssign(task.id, null) : onAssign(task.id, modelId)
+  }
   clearable={false}
   label={task.label}
   hideLabel

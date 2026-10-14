@@ -45,6 +45,31 @@ export const ModelPickerStory = () => {
   )
 }
 
+// The labeled null option (plan 29 / ADR-0036): the option list leads with
+// the inherit entry; choosing it assigns `null` (= inherit — the app renders
+// the resolved default), choosing a model assigns the override. The label is
+// app-composed copy, as everywhere (no i18n in the library).
+export const ModelPickerNullOptionStory = () => {
+  const [model, setModel] = useState<string | null>(null)
+  return (
+    <div style={{ maxWidth: 380, display: 'grid', gap: 8 }}>
+      <p style={{ fontSize: 12, opacity: 0.75 }}>
+        {model === null
+          ? 'Inherits — Jev (latest) serves every decision kind'
+          : `Override: ${model}`}
+      </p>
+      <ModelPicker
+        providers={providers}
+        value={model ?? ''}
+        nullOption={{ label: 'Inherits — Jev (latest)' }}
+        onChange={setModel}
+        clearable={false}
+        label="Decision model"
+      />
+    </div>
+  )
+}
+
 const tasks: TaskAssignmentTask[] = [
   { id: 'summarize', label: 'Summarize documents', description: 'Daily digests' },
   { id: 'chat', label: 'Chat' },

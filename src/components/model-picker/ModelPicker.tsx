@@ -20,10 +20,9 @@ export interface ModelPickerProvider {
   models: ModelPickerModel[]
 }
 
-export interface ModelPickerProps {
+interface ModelPickerBaseProps {
   providers: ModelPickerProvider[]
   value?: string
-  onChange: (modelId: string) => void
   placeholder?: string
   searchPlaceholder?: string
   searchLabel?: string
@@ -42,15 +41,28 @@ export interface ModelPickerProps {
 }
 
 /**
+ * Discriminated on `nullOption` (plan 29 / ADR-0036): with the labeled
+ * null option set, the option list leads with it and `onChange` receives
+ * `null` when it is chosen (the inherit state). Without it the contract
+ * is unchanged — `onChange` only ever receives model ids.
+ */
+export type ModelPickerProps = ModelPickerBaseProps &
+  (
+    | { nullOption?: undefined; onChange: (modelId: string) => void }
+    | { nullOption: { label: string }; onChange: (modelId: string | null) => void }
+  )
+
+/**
  * Grouped, searchable provider → model picker. Presentational: the model
  * list comes in via props, selection goes out via `onChange`.
  */
 export const ModelPicker = React.forwardRef<HTMLButtonElement, ModelPickerProps>(
-  function ModelPicker(
-    {
+  function ModelPicker(props, ref) {
+    const {
       providers,
       value,
       onChange,
+      nullOption,
       placeholder = 'Select a model…',
       searchPlaceholder = 'Search models…',
       searchLabel,
@@ -65,28 +77,54 @@ export const ModelPicker = React.forwardRef<HTMLButtonElement, ModelPickerProps>
       id,
       className,
       panelClassName,
-    },
-    ref,
-  ) {
+    } = props
+
+    // Per-instance sentinel value for the labeled null entry — cannot
+    // collide with a real model id. Internal only: it never reaches the
+    // DOM or `onChange`.
+    const nullSentinel = React.useId()
+
     const options: ComboboxOption[] = React.useMemo(
-      () =>
-        providers.flatMap((provider) =>
+      () => {
+        const modelOptions = providers.flatMap((provider) =>
           provider.models.map((model) => ({
             value: model.id,
             label: model.name,
             group: provider.name,
             badge: model.capability,
           })),
-        ),
-      [providers],
+        )
+        // The inherit state leads the list (ADR-0036 §4): no group of its
+        // own, so it renders above every provider group.
+        return nullOption
+          ? [{ value: nullSentinel, label: nullOption.label }, ...modelOptions]
+          : modelOptions
+      },
+      [providers, nullOption, nullSentinel],
     )
+
+    const emitChange = (modelId: string | null): void => {
+      if (modelId === null) {
+        if (nullOption) {
+          // The props union types `onChange` as null-capable exactly when
+          // `nullOption` is set; destructuring loses that correlation.
+          (onChange as (modelId: string | null) => void)(null)
+        }
+        return
+      }
+      onChange(modelId)
+    }
+
+    // Empty value + null option = the inherit entry is the selection, so
+    // the trigger names it. Without `nullOption` this is `value` verbatim.
+    const selectedValue = value ? value : nullOption ? nullSentinel : value
 
     return (
       <Combobox
         ref={ref}
         options={options}
-        value={value}
-        onChange={onChange}
+        value={selectedValue}
+        onChange={(next) => emitChange(next === nullSentinel ? null : next)}
         placeholder={placeholder}
         searchPlaceholder={searchPlaceholder}
         searchLabel={searchLabel}
