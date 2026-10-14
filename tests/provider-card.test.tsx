@@ -30,6 +30,18 @@ describe('ProviderCard', () => {
     expect(screen.getByText('4 models')).toBeInTheDocument()
   })
 
+  it('the subtitle renders discretely with the full text on its tooltip', () => {
+    render(
+      <ProviderCard
+        {...base}
+        status="idle"
+        subtitle="https://my-proxy.example/v1"
+      />,
+    )
+    const line = screen.getByText('https://my-proxy.example/v1')
+    expect(line).toHaveAttribute('title', 'https://my-proxy.example/v1')
+  })
+
   it('ok status reads the okLabel; fail status surfaces the error', () => {
     const { rerender } = render(<ProviderCard {...base} status="ok" />)
     expect(screen.getByText('Connected')).toBeInTheDocument()

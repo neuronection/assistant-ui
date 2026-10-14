@@ -261,6 +261,7 @@ export const AiSettingsProviderCardStory = () => {
         name="OpenAI"
         logoPreset="openai"
         nameTitle="https://api.openai.com/v1"
+        subtitle="https://api.openai.com/v1"
         badges={[
           { key: 'type', label: 'openai' },
           { key: 'hosting', label: 'Cloud' },
