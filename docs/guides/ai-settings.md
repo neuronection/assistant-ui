@@ -461,7 +461,9 @@ defaults-first flow — **no standalone card**:
 
 1. **The default row rides the uniform `Default models` section** like
    every capability default: id `default:decision`, `requires:
-   'decision'`, `secondary: true` (primary + fallback). The backend row
+   'decision'`, **single-slot per ADR-0037** (one picker, no fallback —
+   a default *is* the fallback; only specialist assignments — task rows
+   and the kind rows below — carry fallbacks). The backend row
    is the ordinary defaults mechanic (study: `DefaultTaskAssignment` on
    `requires='decision'`; career/health underscore task ids, desktop
    mirror key `decision`) served by the same endpoint. The picker's
@@ -476,7 +478,8 @@ defaults-first flow — **no standalone card**:
    app-side from `ModelPicker` rows whose option list LEADS with the
    labeled null entry ("Inherits — {resolved default model}", bare
    "Inherits" when nothing resolves; chosen = `null` = the inherit
-   state):
+   state). Kind rows keep per-assignment fallbacks where the product
+   supports them (ADR-0036 rule 2; the default row does not — 0037):
 
 ```tsx
 {
