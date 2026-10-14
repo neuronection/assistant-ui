@@ -1,5 +1,16 @@
 # @neuronection/assistant-ui
 
+## 0.61.0
+
+### Minor Changes
+
+- [#89](https://github.com/neuronection/assistant-ui/pull/89) [`9dee853`](https://github.com/neuronection/assistant-ui/commit/9dee853ce919207e11986de0cd86b7e3d1b7d5c1) Thanks [@constLiakos](https://github.com/constLiakos)! - New `ProviderCard` — the provider summary card from the four apps'
+  settings provider lists, consolidated: mark + name + identity badges, the
+  connection result as the card's second line (status display only), and a
+  `⋯` overflow `ActionMenu` for management actions. Config detail (base
+  URL) is a name tooltip, not card content — the card is status-forward,
+  and the test action lives in the menu, not on the card.
+
 ## 0.60.0
 
 ### Minor Changes
