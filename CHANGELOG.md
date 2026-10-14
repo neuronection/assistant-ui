@@ -1,5 +1,14 @@
 # @neuronection/assistant-ui
 
+## 0.63.0
+
+### Minor Changes
+
+- [#93](https://github.com/neuronection/assistant-ui/pull/93) [`6bd960c`](https://github.com/neuronection/assistant-ui/commit/6bd960c41b1254137c300a6018f8a1dbeeb4932b) Thanks [@constLiakos](https://github.com/constLiakos)! - `ProviderCard`: new optional `subtitle` — a muted, truncated line under
+  the name for discrete always-on context (the endpoint URL), full text on
+  its tooltip. Ruling update from the career pilot: the base URL reads
+  better as quiet always-on info than as hover-only.
+
 ## 0.62.0
 
 ### Minor Changes
