@@ -1,5 +1,14 @@
 # @neuronection/assistant-ui
 
+## 0.62.0
+
+### Minor Changes
+
+- [#91](https://github.com/neuronection/assistant-ui/pull/91) [`e472b67`](https://github.com/neuronection/assistant-ui/commit/e472b679e60f5e8005489353e74280d6d7f50782) Thanks [@constLiakos](https://github.com/constLiakos)! - `ConnectionTestRow` / `ProviderCard`: new optional `idleLabel` ("Not
+  tested") — the never-tested state previously rendered no status text at
+  all, which forced apps to keep a static label just to hold the line.
+  No behavior change when the prop is unset.
+
 ## 0.61.0
 
 ### Minor Changes
