@@ -146,3 +146,48 @@ describe('ContextMenu', () => {
     expect(await axe(container)).toHaveNoViolations()
   })
 })
+
+describe('ActionMenu / MenuItem highlight', () => {
+  const renderMenu = () => {
+    const onEdit = vi.fn()
+    const onDelete = vi.fn()
+    render(
+      <ActionMenu
+        label="Actions for Org OpenAI"
+        items={[
+          { key: 'edit', label: 'Edit', onSelect: onEdit },
+          { key: 'delete', label: 'Delete', danger: true, onSelect: onDelete },
+        ]}
+      />,
+    )
+    return { onEdit, onDelete }
+  }
+
+  it('pointer hover sets data-highlighted — the hover tint fires', async () => {
+    const user = userEvent.setup()
+    renderMenu()
+    await user.click(screen.getByRole('button', { name: /actions for/i }))
+    const item = await screen.findByRole('menuitem', { name: 'Edit' })
+    expect(item).not.toHaveAttribute('data-highlighted')
+    await user.hover(item)
+    expect(item).toHaveAttribute('data-highlighted')
+  })
+
+  it('the danger item tints its own danger highlight on hover', async () => {
+    const user = userEvent.setup()
+    renderMenu()
+    await user.click(screen.getByRole('button', { name: /actions for/i }))
+    const item = await screen.findByRole('menuitem', { name: 'Delete' })
+    await user.hover(item)
+    expect(item).toHaveAttribute('data-highlighted')
+    expect(item.className).toContain('data-[highlighted]:bg-[var(--as-danger)]/10')
+  })
+
+  it('has no accessibility violations while open', async () => {
+    const user = userEvent.setup()
+    renderMenu()
+    await user.click(screen.getByRole('button', { name: /actions for/i }))
+    const menu = await screen.findByRole('menu')
+    expect(await axe(menu)).toHaveNoViolations()
+  })
+})
