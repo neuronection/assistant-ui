@@ -1,5 +1,14 @@
 # @neuronection/assistant-ui
 
+## 0.64.0
+
+### Minor Changes
+
+- [#95](https://github.com/neuronection/assistant-ui/pull/95) [`04a9c72`](https://github.com/neuronection/assistant-ui/commit/04a9c726275380fbfbe432f80e44473333bc9240) Thanks [@constLiakos](https://github.com/constLiakos)! - `ConnectionTestRow`: `label` becomes opt-in — nothing renders when unset
+  (previously it defaulted to the word "Connection", forcing cards to
+  carry a filler word just to hold the line; the status text speaks for
+  itself). Consumers that want the word still pass it explicitly.
+
 ## 0.63.0
 
 ### Minor Changes
