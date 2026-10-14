@@ -1,5 +1,17 @@
 # @neuronection/assistant-ui
 
+## 0.60.0
+
+### Minor Changes
+
+- [#87](https://github.com/neuronection/assistant-ui/pull/87) [`29d9e9e`](https://github.com/neuronection/assistant-ui/commit/29d9e9ea59adfe88dee00138369b59cc825fecce) Thanks [@constLiakos](https://github.com/constLiakos)! - New guided-setup wizard pieces: `SetupSteps` — the two-plus-step wizard
+  progress header (numbered badges, done check, current-step highlight,
+  `aria-current="step"`) — and `SetupAssignments` — the titled "Default
+  assignments" section (one bordered row per task, each a `SwitchRow` carrying
+  its live `now: … · fills: …` context). Both extracted from the four apps'
+  setup wizards (career/study/health/desktop), which currently hand-roll them
+  app-side; they adopt these on the next version bump.
+
 ## 0.59.0
 
 ### Minor Changes
