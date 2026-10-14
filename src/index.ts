@@ -169,6 +169,12 @@ export {
 export { SwitchRow, type SwitchRowProps } from './components/switch-row'
 export { ProviderLogo, type ProviderLogoProps } from './components/provider-logo'
 export {
+  ProviderCard,
+  type ProviderCardProps,
+  type ProviderCardAction,
+  type ProviderCardBadge,
+} from './components/provider-card'
+export {
   SettingsShell,
   type SettingsNavItem,
   type SettingsShellProps,
