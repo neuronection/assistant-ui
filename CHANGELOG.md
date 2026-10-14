@@ -1,5 +1,15 @@
 # @neuronection/assistant-ui
 
+## 0.65.0
+
+### Minor Changes
+
+- [#104](https://github.com/neuronection/assistant-ui/pull/104) [`9660a1e`](https://github.com/neuronection/assistant-ui/commit/9660a1e66728e366f5204ef08b3be2667e494de2) Thanks [@constLiakos](https://github.com/constLiakos)! - `TaskAssignmentPicker`: new optional `placeholder` — the trigger text for
+  unassigned rows (e.g. "Inherits from Default decision model"). Lets apps
+  express what _empty_ means without adding an explicit inherit option to
+  the model list: nothing selected = inherit, selecting = a real model.
+  No behavior change when unset (generic "Select a model…" placeholder).
+
 ## 0.64.1
 
 ### Patch Changes
