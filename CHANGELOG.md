@@ -1,5 +1,11 @@
 # @neuronection/assistant-ui
 
+## 0.59.0
+
+### Minor Changes
+
+- [`2bf4216`](https://github.com/neuronection/assistant-ui/commit/2bf4216c2b1ea1da3f2dc1367298ce6fcd16c058) Thanks [@constLiakos](https://github.com/constLiakos)! - ModelPicker labeled null option (`nullOption?: { label: string }`): the option list leads with the labeled null (inherit) entry — rendered "Inherits — {resolved default model}" by the app — and choosing it assigns `null` (plan 29 / ADR-0036, the Decision defaults card's inherit rows). The props are discriminated: with `nullOption` set, `onChange` receives `string | null`; without it the contract is unchanged.
+
 ## 0.58.0
 
 ### Minor Changes
