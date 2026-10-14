@@ -42,6 +42,9 @@ export interface ProviderCardProps
   connectionLabel?: string
   okLabel?: string
   failLabel?: string
+  /** Text for the never-tested state ("Not tested") — shown when the
+   * connection has never been tested. */
+  idleLabel?: string
   latencyLabel?: string
   latencyMs?: number | null
   errorMessage?: string | null
@@ -68,6 +71,7 @@ export const ProviderCard = React.forwardRef<HTMLDivElement, ProviderCardProps>(
       connectionLabel,
       okLabel,
       failLabel,
+      idleLabel,
       latencyLabel,
       latencyMs,
       errorMessage,
@@ -116,6 +120,7 @@ export const ProviderCard = React.forwardRef<HTMLDivElement, ProviderCardProps>(
             status={status}
             latencyMs={latencyMs}
             latencyLabel={latencyLabel}
+            idleLabel={idleLabel}
             errorMessage={errorMessage}
             meta={meta}
             okLabel={okLabel}

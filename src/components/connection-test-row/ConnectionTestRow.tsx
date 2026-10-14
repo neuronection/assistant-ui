@@ -12,6 +12,9 @@ export interface ConnectionTestRowProps {
   testLabel?: string
   okLabel?: string
   failLabel?: string
+  /** Text for the never-tested state ("Not tested") — the row shows no
+   * status text when idle unless this is set. */
+  idleLabel?: string
   latencyLabel?: string
   errorMessage?: string | null
   onTest?: () => void
@@ -38,6 +41,7 @@ export const ConnectionTestRow = React.forwardRef<
     testLabel = 'Test',
     okLabel = 'Connected',
     failLabel = 'Failed',
+    idleLabel,
     latencyLabel = 'ms',
     errorMessage,
     onTest,
@@ -89,6 +93,10 @@ export const ConnectionTestRow = React.forwardRef<
                 {latencyLabel}
               </span>
             ) : null}
+          </span>
+        ) : status === 'idle' && idleLabel ? (
+          <span className="flex items-center gap-1 font-medium text-[var(--as-muted-fg)]">
+            {idleLabel}
           </span>
         ) : null}
         {status === 'fail' && errorMessage ? (
