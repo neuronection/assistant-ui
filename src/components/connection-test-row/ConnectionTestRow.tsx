@@ -8,6 +8,8 @@ export type ConnectionTestStatus = 'idle' | 'testing' | 'ok' | 'fail'
 export interface ConnectionTestRowProps {
   status: ConnectionTestStatus
   latencyMs?: number | null
+  /** Optional row label ("Connection") — omit it on cards where the
+   * status line speaks for itself; nothing renders when unset. */
   label?: string
   testLabel?: string
   okLabel?: string
@@ -37,7 +39,7 @@ export const ConnectionTestRow = React.forwardRef<
   {
     status,
     latencyMs,
-    label = 'Connection',
+    label,
     testLabel = 'Test',
     okLabel = 'Connected',
     failLabel = 'Failed',
@@ -77,7 +79,9 @@ export const ConnectionTestRow = React.forwardRef<
       )}
     >
       <div className="flex min-w-0 items-center gap-2 text-sm">
-        <span className="font-medium text-[var(--as-fg)]">{label}</span>
+        {label ? (
+          <span className="font-medium text-[var(--as-fg)]">{label}</span>
+        ) : null}
         {status === 'testing' ? (
           <span className="flex items-center gap-1.5 text-[var(--as-muted-fg)]" role="status">
             <Spinner size="sm" />
