@@ -3,7 +3,7 @@
 The settings stack the family uses to wire up AI: **first-run setup**
 (one-click provider wizard), **providers** (credentials), **models**
 (registered models + remote catalog), **tasks** (task → model assignments,
-including the Decision models group). Every component is presentational
+including the decision default + kinds). Every component is presentational
 (ADR-006): the catalog, the API calls and the persistence are app-side; data
 comes in via props and actions go out via events.
 
@@ -95,7 +95,7 @@ promoted component:
 // step 3 — editable review: every edit emits the full five-bind body
 <SetupReview
   models={(preset.curatedModels ?? []).map((id) => ({ id, name: id, caps: inferCaps(id), selected: options.curatedIds.includes(id) }))}
-  slots={reviewSlots /* text/vision/stt for chat presets; decision-only presets show the decision slot only */}
+  slots={reviewSlots /* text/vision/stt for chat presets; add the ONE decision row (the `decision` default) for presets declaring decision_models */}
   onOptionsChange={setOptions /* {curatedIds, bindChat, bindVision, bindStt, bindDecision} */}
   footnote={neverRemovesFootnote}
 />
@@ -108,11 +108,14 @@ over desktop IPC, snake_case (`curated_ids`, `bind_chat`, `bind_vision`,
 ### 3. Success + ongoing — defaults-first assignment list
 
 The success panel rebinds the just-filled slots (per-slot `ModelPicker` or
-`Combobox` rows — app composition). Ongoing, the tasks surface is a
-defaults-first list — text, vision, transcription (stt), speech (tts), then
-the **Decision models group** (`decision:<cap>` slots, primary + fallback,
-transport-filtered) — then derived tasks; see §3 below for the
-`TaskAssignmentPicker` wiring and the Decision group contract.
+`Combobox` rows — app composition; decision presets render ONE review row,
+the `decision` default — `bind_decision` binds the default slot only).
+Ongoing, the tasks surface is a defaults-first list — text, vision,
+transcription (stt), speech (tts), embeddings, and the decision default
+riding the same section — then the "Decision kinds" group with the
+inherit-labeled pickers (§3 below), then derived tasks; see §3 below for
+the `TaskAssignmentPicker` wiring and the Decision default + kinds
+contract.
 
 ### 4. Re-configuration is first-class
 
@@ -445,36 +448,60 @@ const sections: TaskAssignmentSection[] = [
   secondaryLabel={t('settings.defaultFallbackLabel')}
 ```
 
-### Decision models group (plan 26 / ADR-0032)
+### Decision default + kinds (plan 29 / ADR-0036, uniform ruling)
 
 Decision models are ordinary catalog rows whose `capabilities` include
-`decision`; their assignment slots are ordinary rows with
-`requires: 'decision'` and `decision:<capability>` ids
-(`decision:tool-dispatch | decision:boolean-gate | decision:choice |
-decision:score` — `open-args` is reserved and never offered). The picker's
-capability filter enforces slot separation in both directions for free:
-decision slots list only decision-capable models, and text/vision slots
-never list them. Ship the group with `secondary: true` (primary +
-fallback — a second provider's decision model is the resilience story)
-and surface the app's privacy notice at assignment time (cloud decision
-models are explicit opt-in; prompt + candidate tool data leave the
-device). The capability vocabulary is app-supplied — add a `decision`
-descriptor to your `caps` array alongside the others.
+`decision`; slot separation stays enforced for free by the picker's
+capability filter — decision slots list only decision-capable models,
+and text/vision slots never list them. The capability vocabulary is
+app-supplied (`decision` in your `caps` array).
+
+The Decision group has two halves, both inside the standard
+defaults-first flow — **no standalone card**:
+
+1. **The default row rides the uniform `Default models` section** like
+   every capability default: id `default:decision`, `requires:
+   'decision'`, `secondary: true` (primary + fallback). The backend row
+   is the ordinary defaults mechanic (study: `DefaultTaskAssignment` on
+   `requires='decision'`; career/health underscore task ids, desktop
+   mirror key `decision`) served by the same endpoint. The picker's
+   `requires` filter narrows its options to decision-capable models —
+   exactly how the vision row narrows to vision-capable ones. Per-row
+   `renderMeta` carries the decision row's context: the empty-default
+   hint line, the preset-data suggestion, and the D7 "Simplify: use as
+   default" chip (shown only when all four kinds resolve to one model
+   and the default is empty — never automatic).
+2. **The four kind rows form a quiet "Decision kinds" group directly
+   below** (the privacy notice as the section description) — composed
+   app-side from `ModelPicker` rows whose option list LEADS with the
+   labeled null entry ("Inherits — {resolved default model}", bare
+   "Inherits" when nothing resolves; chosen = `null` = the inherit
+   state):
 
 ```tsx
 {
-  id: 'decision',
-  label: t('settings.decisionGroupTitle'),
-  description: t('settings.decisionGroupDescription'),
-  secondary: true,
-  tasks: DECISION_SLOTS.map((slot) => ({
-    id: slot,
-    label: t(`settings.decisionSlots.${slot}`),
-    requires: 'decision',
-    icon: DECISION_ICONS[slot],
-  })),
+  id: 'decision-kinds',
+  label: t('settings.decisionKindsTitle'),
+  description: t('settings.decisionGroupPrivacy'),
+  tasks: DECISION_SLOTS.map((slot) => ({ /* app-rendered DecisionKindRow */ })),
 }
+<ModelPicker
+  providers={decisionCatalog}
+  value={value[slot] ?? ''}
+  nullOption={{ label: inheritLabelFor(slot) }}
+  onChange={(modelId) => onAssign(slot, modelId)} /* modelId: string | null */
+  clearable={false}
+  label={slotLabel}
+  hideLabel
+/>
 ```
+
+Resolution order (law): kind override → `decision` default → honestly
+unavailable. The resolved inherit names come from the API — study
+surfaces `resolved_inherit_label` per kind row on `GET /tasks/defaults`.
+Setup binds the **default slot only** (`bind_decision`; the per-kind
+fill is retired), so the review shows one decision row. `open-args` is
+vocabulary-reserved and never offered.
 
 
 Both handlers receive `(taskId, modelId | null)` — `null` means cleared.

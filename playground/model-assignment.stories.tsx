@@ -188,11 +188,16 @@ export const TaskAssignmentV2Story = () => {
   )
 }
 
-// Decision models group (plan 26 / ADR-0032): `decision:<capability>` slots
-// with primary + fallback. `requires: 'decision'` filters every picker to
-// decision-capable models only — the text models below never appear in a
-// decision slot, and the decision models never satisfy the text default.
-// App copy (labels, privacy notice) is prop-injected, as everywhere.
+// Decision slots as a TaskAssignmentPicker section — library capability
+// demo. The family pattern since plan 29 / ADR-0036 is different: the
+// decision DEFAULT rides the "Default models" section (id `default:decision`)
+// and the four kind rows are app-composed `ModelPicker` rows leading with
+// the labeled null entry — see ModelPickerNullOptionStory above and the
+// ai-settings guide's "Decision default + kinds". This section shape is
+// what pre-adoption surfaces still ship; `requires: 'decision'` filters
+// every picker to decision-capable models only — the text models below
+// never appear in a decision slot, and the decision models never satisfy
+// the text default. App copy (labels, privacy notice) is prop-injected.
 const decisionProviders: ModelPickerProvider[] = [
   {
     id: 'typesafe',
