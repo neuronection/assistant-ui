@@ -1,5 +1,18 @@
 # @neuronection/assistant-ui
 
+## 0.58.0
+
+### Minor Changes
+
+- [`255c074`](https://github.com/neuronection/assistant-ui/commit/255c074c16bdbc7cc4d919d9ffea0d0334e0462e) Thanks [@constLiakos](https://github.com/constLiakos)! - `WebSearchProvidersPanel` — the family web-search settings surface
+  (ADR-0035 / plan 28): a controlled, presentational ordered multi-provider
+  list (enable, reorder, probe-test, edit, delete) with a catalog-driven
+  add/edit form. Data contracts mirror the family `providers[]` shape and
+  the vendored `search-providers.json` catalog; persistence, key sealing and
+  probe calls stay app-side. Study-assistant is the first consumer (its
+  local panel is deleted same-commit on adoption); desktop and career follow
+  in plan 28 Phases 3–4.
+
 ## 0.57.0
 
 ### Minor Changes
