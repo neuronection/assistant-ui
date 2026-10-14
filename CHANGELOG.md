@@ -1,5 +1,14 @@
 # @neuronection/assistant-ui
 
+## 0.64.1
+
+### Patch Changes
+
+- [#97](https://github.com/neuronection/assistant-ui/pull/97) [`622e0a9`](https://github.com/neuronection/assistant-ui/commit/622e0a9de4396edfaa7694e59904e30ca04b189d) Thanks [@constLiakos](https://github.com/constLiakos)! - `MenuItem` now styles Radix's `data-highlighted` state (the highlight tint
+  previously keyed on `:focus` alone, which pointer hover does not reliably
+  produce in every embed — menu rows could hover with no visible change).
+  Keyboard navigation keeps the same tint. No API changes.
+
 ## 0.64.0
 
 ### Minor Changes
