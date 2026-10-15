@@ -1,6 +1,8 @@
 # ProviderSetupForm
 
-Guided one-click setup form (plan 26 §6): vendor checklist with copy buttons
+Guided one-click setup form (plan 26 §6): the selected provider's mark
+beside its name (`ProviderLogo`, keyed by `preset.key` — the same mark the
+tiles show), vendor checklist with copy buttons
 and a get-a-key link, factual free-tier note, connection name, a **write-only
 API key** (`type="password"` + `autoComplete="new-password"` — the library
 never renders a stored key, ADR-006), and an **Advanced disclosure** whose
@@ -25,7 +27,7 @@ Extends `React.ComponentProps<'form'>` (spread onto the root form).
 
 | prop | type | default | notes |
 |---|---|---|---|
-| `preset` | `ProviderSetupFormPreset` | — | `{ name, keyUrl?, steps?, freeTierNote?, fixedBase?, baseUrl, local? }`; `steps` entries interpolate `{url}` → `keyUrl`; `local` renders `noKeyLabel` instead of the key field |
+| `preset` | `ProviderSetupFormPreset` | — | `{ key?, name, keyUrl?, steps?, freeTierNote?, fixedBase?, baseUrl, local? }`; `key` renders the provider mark beside the name (same `ProviderLogo` the tiles use — omit for keyless/manual entries); `steps` entries interpolate `{url}` → `keyUrl`; `local` renders `noKeyLabel` instead of the key field |
 | `value` | `ProviderSetupFormValue` | — | controlled `{ name, apiKey, baseUrl? }` |
 | `error` | `{ code, suspectedVendor? } \| null` | — | §15 enum code + optional vendor-key mis-paste hint |
 | `testing` | `boolean` | `false` | disables + marks the submit busy |
@@ -67,7 +69,7 @@ minimal:
 
 ```tsx
 <ProviderSetupForm
-  preset={{ name: 'OpenAI', keyUrl, steps, fixedBase: false, baseUrl }}
+  preset={{ key: 'openai', name: 'OpenAI', keyUrl, steps, fixedBase: false, baseUrl }}
   value={value}
   onChange={setValue}
   onSubmit={submit}

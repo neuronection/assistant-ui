@@ -12,6 +12,7 @@ import {
 } from '../src/components/provider-setup-form/ProviderSetupForm'
 
 const preset: ProviderSetupFormPreset = {
+  key: 'openai',
   name: 'OpenAI',
   keyUrl: 'https://platform.openai.com/api-keys',
   steps: ['Open {url}', 'Create a key', 'Paste it below'],
@@ -56,6 +57,15 @@ function FormDemo({
 }
 
 describe('ProviderSetupForm', () => {
+  it('renders the provider mark for the selected preset key beside the name; no mark without a key', () => {
+    const { container } = render(<FormDemo />)
+    expect(container.querySelector('[data-as="provider-logo"][data-preset="openai"]')).toBeInTheDocument()
+    const { container: bare } = render(
+      <FormDemo preset={{ ...preset, key: undefined }} />,
+    )
+    expect(bare.querySelector('[data-as="provider-logo"]')).toBeNull()
+  })
+
   it('renders the guided checklist with {url} substituted and copy buttons, plus the key link and free-tier note', () => {
     render(<FormDemo />)
     expect(screen.getByText('Open https://platform.openai.com/api-keys')).toBeInTheDocument()

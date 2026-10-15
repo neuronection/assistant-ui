@@ -4,6 +4,7 @@ import { cn } from '../../lib/utils'
 import { Button } from '../button/Button'
 import { CopyButton } from '../copy-button/CopyButton'
 import { Input } from '../input/Input'
+import { ProviderLogo } from '../provider-logo/ProviderLogo'
 
 /** The shared §15 error-routing enum (family contract — apps key their i18n
  * off exactly these codes). */
@@ -33,6 +34,9 @@ export const DEFAULT_SETUP_ERROR_COPY: Record<SetupErrorCode, string> = {
 
 /** Guided-setup preset slice (app data; snake_case API fields map app-side). */
 export interface ProviderSetupFormPreset {
+  /** Preset key — renders the provider mark beside the name (same
+   * `ProviderLogo` the tiles use; omit for keyless/manual entries). */
+  key?: string
   name: string
   keyUrl?: string
   steps?: string[]
@@ -153,7 +157,10 @@ export const ProviderSetupForm = React.forwardRef<
       }}
       {...props}
     >
-      <h3 className="text-sm font-semibold text-[var(--as-fg)]">{preset.name}</h3>
+      <div className="flex items-center gap-2">
+        {preset.key ? <ProviderLogo preset={preset.key} /> : null}
+        <h3 className="text-sm font-semibold text-[var(--as-fg)]">{preset.name}</h3>
+      </div>
 
       {preset.steps && preset.steps.length > 0 ? (
         <ol
