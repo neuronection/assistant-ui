@@ -28,11 +28,13 @@ function FormDemo({
   initialValue,
   error,
   onValueChange,
+  onCopyStep,
 }: {
   preset?: ProviderSetupFormPreset
   initialValue?: Partial<ProviderSetupFormValue>
   error?: ProviderSetupFormError | null
   onValueChange?: Change
+  onCopyStep?: (command: string) => void
 }) {
   const [value, setValue] = React.useState<ProviderSetupFormValue>({
     name: 'OpenAI',
@@ -52,6 +54,7 @@ function FormDemo({
       onSubmit={() => {}}
       onCancel={() => {}}
       error={error}
+      onCopyStep={onCopyStep}
     />
   )
 }
@@ -66,16 +69,41 @@ describe('ProviderSetupForm', () => {
     expect(bare.querySelector('[data-as="provider-logo"]')).toBeNull()
   })
 
-  it('renders the guided checklist with {url} substituted and copy buttons, plus the key link and free-tier note', () => {
+  it('renders the guided checklist with {url} substituted and no copy buttons on command-less steps, plus the key link and free-tier note', () => {
     render(<FormDemo />)
     expect(screen.getByText('Open https://platform.openai.com/api-keys')).toBeInTheDocument()
     expect(screen.getByText('Create a key')).toBeInTheDocument()
-    const copyButtons = screen.getAllByRole('button', { name: 'Copy' })
-    expect(copyButtons).toHaveLength(3)
+    // plain guidance steps carry no copy affordance — only `run:` commands do
+    expect(screen.queryByRole('button', { name: 'Copy' })).toBeNull()
     expect(
       screen.getByRole('link', { name: /get an api key/i }),
     ).toHaveAttribute('href', 'https://platform.openai.com/api-keys')
     expect(screen.getByText('Free tier available.')).toBeInTheDocument()
+  })
+
+  it('steps with a run command render it as a code chip and copy only the command', async () => {
+    const user = userEvent.setup()
+    const onCopyStep = vi.fn()
+    render(
+      <FormDemo
+        preset={{
+          ...preset,
+          steps: [
+            'Install the CLI from the site.',
+            'Pull a model, e.g. run: ollama pull gpt-9-turbo',
+          ],
+        }}
+        onCopyStep={onCopyStep}
+      />,
+    )
+    // the command tail renders as inline code, the prose stays outside it
+    expect(screen.getByText('Pull a model, e.g. run:')).toBeInTheDocument()
+    expect(screen.getByText('ollama pull gpt-9-turbo').tagName).toBe('CODE')
+    // guidance-only steps have no copy button; the command step has exactly one
+    const copyButtons = screen.getAllByRole('button', { name: 'Copy' })
+    expect(copyButtons).toHaveLength(1)
+    await user.click(copyButtons[0]!)
+    expect(onCopyStep).toHaveBeenCalledWith('ollama pull gpt-9-turbo')
   })
 
   it('key field is write-only: password + autoComplete new-password', () => {
