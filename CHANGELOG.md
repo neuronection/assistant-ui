@@ -1,5 +1,40 @@
 # @neuronection/assistant-ui
 
+## 0.66.0
+
+### Minor Changes
+
+- `ModelRegistry`: the add-model flow becomes a kind-first wizard and can
+  open pre-seeded. New optional props:
+
+  - `defaultCaps` — what the add modal opens with (e.g. `['text', 'vision',
+'tools']` for providers whose models usually carry the whole chat family,
+    `['decision']` for decision-only presets). A function form decides per
+    provider (`type` is on the provider object); returning `undefined` falls
+    back to the previous behavior (first combinable cap). Values normalize
+    through the same rules as a catalog pick: standalone exclusivity, then
+    the `capImplications` closure, and a `decision` default stamps the
+    app's `decisionTransport`.
+  - `modifiersLabel` — label for a nested modifier row: the `capImplications`
+    keys (e.g. vision, tools) render under their base cap and only while it
+    is selected, making the "these exist only as modifiers of a chat model"
+    dependency visible. Deselecting the base removes the row (and the caps,
+    as before). When `capImplications` is unset nothing changes.
+  - `kindStepLabel`, `changeKindLabel`, `kindDescriptions` — when the app
+    declares `standaloneCaps`, the add modal becomes a two-step wizard:
+    step 1 renders the kinds as cards (the LLM/text base card plus one card
+    per standalone kind — titles from the `caps` descriptors, one-line
+    sublines from `kindDescriptions`); picking a card seeds the caps and
+    advances to the details step, which carries a compact kind summary with
+    a "change type" way back (typed input preserved). Edit mode opens
+    directly on the details. Catalog picks can still flip the kind
+    implicitly — the kind is always derived from `caps`, which stay the
+    single source of truth. Apps without `standaloneCaps` keep the flat
+    chips, unchanged.
+
+  Apps rendering the modifier row should pass `modifiersLabel`; the chips'
+  toggle semantics are unchanged.
+
 ## 0.65.0
 
 ### Minor Changes
