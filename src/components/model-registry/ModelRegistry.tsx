@@ -121,6 +121,27 @@ export interface ModelRegistryProps {
    * model is a text model too): selecting a key auto-enables its values,
    * and deselecting a value deselects everything that implies it. */
   capImplications?: Record<string, string[]>
+  /** Initial capability selection for the add modal (e.g.
+   * `['text', 'vision', 'tools']` for providers whose models usually
+   * carry the whole chat family, `['decision']` for decision-only
+   * presets). A function form decides per provider; returning undefined
+   * falls back to the first combinable cap. Values are normalized through
+   * the same rules as a catalog pick (`standaloneCaps` exclusivity +
+   * `capImplications` closure); when unset the form opens on the first
+   * combinable cap, as before. */
+  defaultCaps?: string[] | ((provider: ModelRegistryProvider) => string[] | undefined)
+  /** Label for the nested modifier-cap row — the `capImplications` keys
+   * (e.g. vision, tools) render under their base cap while it is
+   * selected, expressing that they exist only as its modifiers. */
+  modifiersLabel?: string
+  /** Step-1 heading of the kind-picker wizard (rendered when the app
+   * declares `standaloneCaps`): pick the model's kind before the details. */
+  kindStepLabel?: string
+  /** Label of the step-2 control that returns to the kind cards. */
+  changeKindLabel?: string
+  /** One-line description per kind, rendered under the card title
+   * (e.g. `{ text: 'Chat & reasoning — usually with vision and tools' }`). */
+  kindDescriptions?: Partial<Record<string, string>>
   searchPlaceholder?: string
   searchLabel?: string
   emptyProviderLabel?: string
@@ -283,6 +304,10 @@ interface ModalState {
   externalId: string
   label: string
   caps: string[]
+  /** Wizard position when the app declares standalone kinds: 'kind' picks
+   * the model's kind (cards), 'details' is the rest of the form. Edit mode
+   * opens on 'details' — the kind is already known. */
+  step: 'kind' | 'details'
   reasoningEffort: string
   reasoningCustom: boolean
   temperature: string
@@ -331,6 +356,11 @@ export const ModelRegistry = React.forwardRef<HTMLDivElement, ModelRegistryProps
       standaloneCaps,
       standaloneLabel = 'Standalone',
       capImplications,
+      defaultCaps,
+      modifiersLabel,
+      kindStepLabel = 'What kind of model is this?',
+      changeKindLabel = 'Change type',
+      kindDescriptions,
       searchPlaceholder = 'Search models…',
       searchLabel = 'Search models',
       emptyProviderLabel = 'No models yet — use Add model to pick from the live catalog.',
@@ -369,6 +399,57 @@ export const ModelRegistry = React.forwardRef<HTMLDivElement, ModelRegistryProps
       () => caps.filter((cap) => standaloneSet.has(cap.value)),
       [caps, standaloneSet],
     )
+    /** `capImplications` keys (e.g. vision, tools) — caps that exist only
+     * as modifiers of their base, rendered in a nested row instead of the
+     * primary one. */
+    const modifierKeys = React.useMemo(
+      () => Object.keys(capImplications ?? {}).filter((key) => !standaloneSet.has(key)),
+      [capImplications, standaloneSet],
+    )
+    const primaryCaps = React.useMemo(
+      () => caps.filter((cap) => !standaloneSet.has(cap.value) && !modifierKeys.includes(cap.value)),
+      [caps, standaloneSet, modifierKeys],
+    )
+    /** Modifiers whose implied bases are all selected in the draft — the
+     * nested row renders exactly these. */
+    const activeModifiers = React.useMemo(() => {
+      if (modifierKeys.length === 0 || !modal) return []
+      return modifierKeys.filter((key) =>
+        (capImplications?.[key] ?? []).every((base) => modal.caps.includes(base)),
+      )
+    }, [modal, modifierKeys, capImplications])
+    /** Wizard kinds: the LLM (text) base card plus one card per standalone
+     * kind. The wizard activates only when the app declares standalones —
+     * otherwise the flat chips render, as before. */
+    const kindDescriptors = React.useMemo(
+      () => [...caps.filter((cap) => cap.value === 'text'), ...standaloneDescriptors],
+      [caps, standaloneDescriptors],
+    )
+    const wizard = kindDescriptors.length > 1
+    /** The kind a caps set represents: its standalone kind if present, else
+     * the LLM (text) base. Derived, never stored — `caps` stays the single
+     * source of truth (catalog picks can flip the kind implicitly). */
+    const kindFromCaps = React.useCallback(
+      (of: string[]) => of.find((cap) => standaloneSet.has(cap)) ?? 'text',
+      [standaloneSet],
+    )
+    /** Caps a kind choice seeds: standalone kinds are exact; the LLM kind
+     * rides the app's `defaultCaps` (normalized like a catalog pick). */
+    const kindSeed = React.useCallback(
+      (kind: string, providerId: string): string[] => {
+        if (standaloneSet.has(kind)) return [kind]
+        const provider = providers.find((entry) => entry.id === providerId)
+        const declared =
+          typeof defaultCaps === 'function'
+            ? defaultCaps(provider ?? { id: providerId, name: '' })
+            : defaultCaps
+        if (declared && declared.length > 0) {
+          return withImplications(normalizeCaps(declared, standaloneSet), capImplications ?? {})
+        }
+        return [kind]
+      },
+      [providers, defaultCaps, standaloneSet, capImplications],
+    )
 
     const descriptorFor = React.useCallback(
       (value: string): CapabilityDescriptor =>
@@ -387,17 +468,32 @@ export const ModelRegistry = React.forwardRef<HTMLDivElement, ModelRegistryProps
 
     const openAddModal = (providerId: string) => {
       const firstCap = combinableCaps[0] ?? caps[0]
+      // App-declared defaults win — normalized through the same rules as a
+      // catalog pick (standalone exclusivity, then the ON-implications so a
+      // modifier default carries its base). Without them, the first
+      // combinable cap, as before.
+      const provider = providers.find((entry) => entry.id === providerId)
+      const declared =
+        typeof defaultCaps === 'function'
+          ? defaultCaps(provider ?? { id: providerId, name: '' })
+          : defaultCaps
+      const seededCaps = declared
+        ? withImplications(normalizeCaps(declared, standaloneSet), capImplications ?? {})
+        : firstCap
+          ? [firstCap.value]
+          : []
       setModal({
         mode: 'add',
         providerId,
         externalId: '',
         label: '',
-        caps: firstCap ? [firstCap.value] : [],
+        caps: seededCaps,
+        step: 'kind',
         reasoningEffort: '',
         reasoningCustom: false,
         temperature: '',
         maxTokens: '',
-        decisionTransport: '',
+        decisionTransport: seededCaps.includes('decision') ? (decisionTransport ?? '') : '',
         extra: {},
         extraTouched: false,
         labelTouched: false,
@@ -413,6 +509,7 @@ export const ModelRegistry = React.forwardRef<HTMLDivElement, ModelRegistryProps
         externalId: model.externalId,
         label: model.label ?? '',
         caps: [...model.caps],
+        step: 'details',
         labelTouched: true,
         reasoningEffort: model.reasoningEffort ?? '',
         reasoningCustom:
@@ -457,6 +554,25 @@ export const ModelRegistry = React.forwardRef<HTMLDivElement, ModelRegistryProps
         }
       })
     }
+
+    const chooseKind = (kind: string) => {
+      setModal((current) => {
+        if (!current) return current
+        const caps = kindSeed(kind, current.providerId)
+        return {
+          ...current,
+          caps,
+          step: 'details',
+          // the decision capability stamps the app's shipping transport
+          decisionTransport: caps.includes('decision')
+            ? (decisionTransport ?? current.decisionTransport ?? '')
+            : '',
+        }
+      })
+      setDraftError(null)
+    }
+    const goToKindStep = () =>
+      setModal((current) => (current ? { ...current, step: 'kind' } : current))
 
     const toggleDraftCap = (value: string) => {
       setModal((current) => {
@@ -590,8 +706,71 @@ export const ModelRegistry = React.forwardRef<HTMLDivElement, ModelRegistryProps
                   ) : null}
                 </div>
               ) : null}
-              {modal.mode === 'add' ? (
-                remoteState === 'loading' ? (
+              {wizard && modal.step === 'kind' ? (
+                <div className="space-y-3">
+                  <p className="text-sm text-[var(--as-muted-fg)]">{kindStepLabel}</p>
+                  <div
+                    role="group"
+                    aria-label={kindStepLabel}
+                    data-as="model-kind-cards"
+                    className="grid grid-cols-2 gap-2 sm:grid-cols-3"
+                  >
+                    {kindDescriptors.map((kind) => {
+                      const pressed = kindFromCaps(modal.caps) === kind.value
+                      const Icon = kind.icon
+                      const description = kindDescriptions?.[kind.value]
+                      return (
+                        <button
+                          key={kind.value}
+                          type="button"
+                          data-kind={kind.value}
+                          aria-pressed={pressed}
+                          onClick={() => chooseKind(kind.value)}
+                          className={cn(
+                            'flex h-auto cursor-pointer flex-col items-center gap-2 rounded-[var(--as-radius)] border px-3 py-4 text-sm font-medium text-[var(--as-fg)] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--as-focus-ring)]',
+                            pressed
+                              ? 'border-[var(--as-focus-ring)] bg-[var(--as-muted)]'
+                              : 'border-[var(--as-border)] bg-[var(--as-surface)] hover:bg-[var(--as-muted)]',
+                          )}
+                        >
+                          {Icon ? <Icon className="size-5" aria-hidden /> : null}
+                          <span className="w-full truncate text-center">{kind.label}</span>
+                          {description ? (
+                            <span className="text-xs font-normal leading-snug text-[var(--as-muted-fg)]">
+                              {description}
+                            </span>
+                          ) : null}
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+              ) : (
+                <>
+                  {wizard ? (
+                    <div className="flex items-center justify-between gap-2 rounded-[var(--as-radius)] border border-[var(--as-border)] bg-[var(--as-muted)] px-3 py-2">
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-medium text-[var(--as-fg)]">
+                          {descriptorFor(kindFromCaps(modal.caps)).label}
+                        </p>
+                        {kindDescriptions?.[kindFromCaps(modal.caps)] ? (
+                          <p className="truncate text-xs text-[var(--as-muted-fg)]">
+                            {kindDescriptions[kindFromCaps(modal.caps)]}
+                          </p>
+                        ) : null}
+                      </div>
+                      <button
+                        type="button"
+                        data-as="model-registry-change-kind"
+                        onClick={goToKindStep}
+                        className="inline-flex cursor-pointer items-center gap-1.5 rounded-[var(--as-radius)] border border-[var(--as-border)] bg-transparent px-2.5 py-1 text-xs text-[var(--as-muted-fg)] transition-colors hover:bg-[var(--as-muted)] hover:text-[var(--as-fg)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--as-focus-ring)]"
+                      >
+                        {changeKindLabel}
+                      </button>
+                    </div>
+                  ) : null}
+                  {modal.mode === 'add' ? (
+                    remoteState === 'loading' ? (
                   <p className="flex items-center justify-center gap-2 py-4 text-xs text-[var(--as-muted-fg)]">
                     <Spinner size="sm" />
                     {remoteLoadingLabel}
@@ -694,34 +873,64 @@ export const ModelRegistry = React.forwardRef<HTMLDivElement, ModelRegistryProps
                 />
               </label>
               <div className="space-y-1">
-                <span className="text-sm font-medium text-[var(--as-fg)]">{capsLabel}</span>
-                {standaloneDescriptors.length > 0 ? (
+                {!(wizard && kindFromCaps(modal.caps) !== 'text') ? (
+                  <span className="text-sm font-medium text-[var(--as-fg)]">{capsLabel}</span>
+                ) : null}
+                {wizard ? (
+                  kindFromCaps(modal.caps) === 'text' && activeModifiers.length > 0 ? (
+                    <div className="space-y-1">
+                      {modifiersLabel ? (
+                        <p className="text-[10px] font-semibold uppercase tracking-wide text-[var(--as-muted-fg)]">
+                          {modifiersLabel}
+                        </p>
+                      ) : null}
+                      <CapabilityChips
+                        caps={activeModifiers.map((value) => descriptorFor(value))}
+                        selected={modal.caps}
+                        onToggle={toggleDraftCap}
+                        ariaLabel={modifiersLabel ?? capsLabel}
+                      />
+                    </div>
+                  ) : null
+                ) : (
                   <>
                     <CapabilityChips
-                      caps={combinableCaps}
+                      caps={primaryCaps}
                       selected={modal.caps}
                       onToggle={toggleDraftCap}
                       ariaLabel={capsLabel}
                     />
-                    <p className="flex items-center gap-2 pt-1 text-[10px] font-semibold uppercase tracking-wide text-[var(--as-muted-fg)]">
-                      <span className="h-px flex-1 bg-[var(--as-border)]" aria-hidden />
-                      {standaloneLabel}
-                      <span className="h-px flex-1 bg-[var(--as-border)]" aria-hidden />
-                    </p>
-                    <CapabilityChips
-                      caps={standaloneDescriptors}
-                      selected={modal.caps}
-                      onToggle={toggleDraftCap}
-                      ariaLabel={standaloneLabel}
-                    />
+                    {activeModifiers.length > 0 ? (
+                      <div className="space-y-1 pt-1">
+                        {modifiersLabel ? (
+                          <p className="text-[10px] font-semibold uppercase tracking-wide text-[var(--as-muted-fg)]">
+                            {modifiersLabel}
+                          </p>
+                        ) : null}
+                        <CapabilityChips
+                          caps={activeModifiers.map((value) => descriptorFor(value))}
+                          selected={modal.caps}
+                          onToggle={toggleDraftCap}
+                          ariaLabel={modifiersLabel ?? capsLabel}
+                        />
+                      </div>
+                    ) : null}
+                    {standaloneDescriptors.length > 0 ? (
+                      <>
+                        <p className="flex items-center gap-2 pt-1 text-[10px] font-semibold uppercase tracking-wide text-[var(--as-muted-fg)]">
+                          <span className="h-px flex-1 bg-[var(--as-border)]" aria-hidden />
+                          {standaloneLabel}
+                          <span className="h-px flex-1 bg-[var(--as-border)]" aria-hidden />
+                        </p>
+                        <CapabilityChips
+                          caps={standaloneDescriptors}
+                          selected={modal.caps}
+                          onToggle={toggleDraftCap}
+                          ariaLabel={standaloneLabel}
+                        />
+                      </>
+                    ) : null}
                   </>
-                ) : (
-                  <CapabilityChips
-                    caps={caps}
-                    selected={modal.caps}
-                    onToggle={toggleDraftCap}
-                    ariaLabel={capsLabel}
-                  />
                 )}
                 {modal.caps.includes('decision') && decisionTransport ? (
                   <p className="flex items-center gap-1.5 text-xs text-[var(--as-muted-fg)]">
@@ -833,9 +1042,11 @@ export const ModelRegistry = React.forwardRef<HTMLDivElement, ModelRegistryProps
                   {draftError}
                 </p>
               ) : null}
+                </>
+              )}
             </div>
             <ModalFooter>
-              {modal.mode === 'add' && onAddAll ? (
+              {modal.mode === 'add' && onAddAll && !(wizard && modal.step === 'kind') ? (
                 <Button
                   variant="outline"
                   size="sm"
@@ -870,10 +1081,12 @@ export const ModelRegistry = React.forwardRef<HTMLDivElement, ModelRegistryProps
               <Button variant="ghost" size="sm" onClick={resetModal}>
                 {cancelLabel}
               </Button>
-              <Button size="sm" onClick={submitModal}>
-                <Check aria-hidden />
-                {modal.mode === 'add' ? addDraftLabel : saveLabel}
-              </Button>
+              {!(wizard && modal.step === 'kind') ? (
+                <Button size="sm" onClick={submitModal}>
+                  <Check aria-hidden />
+                  {modal.mode === 'add' ? addDraftLabel : saveLabel}
+                </Button>
+              ) : null}
             </ModalFooter>
           </ModalContent>
         </Modal>
