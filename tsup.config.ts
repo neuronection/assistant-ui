@@ -39,6 +39,7 @@ export const entry: Record<string, string> = {
   'connection-test-row': 'src/components/connection-test-row/index.ts',
   'web-search-providers': 'src/components/web-search-providers/index.ts',
   'extension-sources': 'src/components/extension-sources/index.ts',
+  'surface-renderer': 'src/components/surface-renderer/index.ts',
   'check-indicator': 'src/components/check-indicator/index.ts',
   'chip-input': 'src/components/chip-input/index.ts',
   'chip-list': 'src/components/chip-list/index.ts',

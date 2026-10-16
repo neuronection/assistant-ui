@@ -159,6 +159,14 @@
       "types": "./dist/web-search-providers.d.ts",
       "import": "./dist/web-search-providers.js"
     },
+    "./extension-sources": {
+      "types": "./dist/extension-sources.d.ts",
+      "import": "./dist/extension-sources.js"
+    },
+    "./surface-renderer": {
+      "types": "./dist/surface-renderer.d.ts",
+      "import": "./dist/surface-renderer.js"
+    },
     "./check-indicator": {
       "types": "./dist/check-indicator.d.ts",
       "import": "./dist/check-indicator.js"
