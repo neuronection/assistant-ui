@@ -159,9 +159,49 @@
       "types": "./dist/web-search-providers.d.ts",
       "import": "./dist/web-search-providers.js"
     },
-    "./extension-sources": {
-      "types": "./dist/extension-sources.d.ts",
-      "import": "./dist/extension-sources.js"
+    "./integration-contracts": {
+      "types": "./dist/integration-contracts.d.ts",
+      "import": "./dist/integration-contracts.js"
+    },
+    "./integration-atoms": {
+      "types": "./dist/integration-atoms.d.ts",
+      "import": "./dist/integration-atoms.js"
+    },
+    "./integration-card": {
+      "types": "./dist/integration-card.d.ts",
+      "import": "./dist/integration-card.js"
+    },
+    "./integration-catalog-grid": {
+      "types": "./dist/integration-catalog-grid.d.ts",
+      "import": "./dist/integration-catalog-grid.js"
+    },
+    "./integration-instances-list": {
+      "types": "./dist/integration-instances-list.d.ts",
+      "import": "./dist/integration-instances-list.js"
+    },
+    "./integration-sources-list": {
+      "types": "./dist/integration-sources-list.d.ts",
+      "import": "./dist/integration-sources-list.js"
+    },
+    "./add-integration-source-dialog": {
+      "types": "./dist/add-integration-source-dialog.d.ts",
+      "import": "./dist/add-integration-source-dialog.js"
+    },
+    "./consent-dialog": {
+      "types": "./dist/consent-dialog.d.ts",
+      "import": "./dist/consent-dialog.js"
+    },
+    "./integration-config-form": {
+      "types": "./dist/integration-config-form.d.ts",
+      "import": "./dist/integration-config-form.js"
+    },
+    "./integration-action-result-dialog": {
+      "types": "./dist/integration-action-result-dialog.d.ts",
+      "import": "./dist/integration-action-result-dialog.js"
+    },
+    "./integration-docs-dialog": {
+      "types": "./dist/integration-docs-dialog.d.ts",
+      "import": "./dist/integration-docs-dialog.js"
     },
     "./surface-renderer": {
       "types": "./dist/surface-renderer.d.ts",

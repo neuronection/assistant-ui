@@ -122,19 +122,105 @@ export {
   type WebSearchProbeStatus,
 } from './components/web-search-providers'
 export {
-  ExtensionSourcesPanel,
-  DefaultConsentBody,
-  type ExtensionSourcesPanelProps,
-  type ExtensionSourcesPanelLabels,
-  type ExtensionSourceView,
-  type ExtensionSourceRef,
-  type ExtensionSourceRefStrategy,
-  type ExtensionSourceDraft,
-  type ExtensionCandidateView,
-  type ExtensionInstallView,
-  type ExtensionConsentPayload,
-  type ExtensionConsentProvenance,
-} from './components/extension-sources'
+  parseIntegrationConfigSchema,
+  INTEGRATION_VIEW_MODELS_VERSION,
+  type IntegrationCapabilityView,
+  type IntegrationCatalogEntryView,
+  type IntegrationConditionId,
+  type IntegrationConfigFieldView,
+  type IntegrationConfigSaveInput,
+  type IntegrationConfigSchema,
+  type IntegrationConfigSchemaField,
+  type IntegrationConfigValidationView,
+  type IntegrationConfigValues,
+  type IntegrationConsentChangeView,
+  type IntegrationConsentPayloadView,
+  type IntegrationDiscoveredView,
+  type IntegrationExtensionGroupView,
+  type IntegrationExtensionView,
+  type IntegrationInstanceView,
+  type IntegrationProvenanceView,
+  type IntegrationSourceDraft,
+  type IntegrationSourceRowView,
+  type IntegrationUpdateView,
+  EXTENSION_API_ENVELOPE,
+  EXTENSION_CATEGORIES,
+  EXTENSION_CAPABILITIES,
+  EXTENSION_CAPABILITY_TIERS,
+  EXTENSION_CONSENT_DISCLOSURES,
+  EXTENSION_ERROR_CODES,
+  EXTENSION_IMPORTABLE_CAPABILITIES,
+  EXTENSION_KINDS,
+  EXTENSION_LIFECYCLE_STATES,
+  EXTENSION_ORIGIN_CLASSES,
+  EXTENSION_REF_STRATEGIES,
+  EXTENSION_RISK_CLASSES,
+  EXTENSION_RETRYABLE_VALUES,
+  EXTENSION_STATUS_CONDITIONS,
+  EXTENSION_STATUS_STATES,
+  EXTENSION_SURFACES,
+  EXTENSION_TIER_NAMES,
+  EXTENSION_TIERS,
+} from './contracts'
+export {
+  IntegrationCapabilityChips,
+  OriginChip,
+  StatusBadge,
+  TierBadge,
+  isExtensionOriginClass,
+  isExtensionStatusState,
+  isExtensionTier,
+  type IntegrationCapabilityChipsProps,
+  type OriginChipProps,
+  type StatusBadgeProps,
+  type TierBadgeProps,
+} from './components/integration-atoms'
+export {
+  IntegrationCard,
+  type IntegrationCardLabels,
+  type IntegrationCardProps,
+} from './components/integration-card'
+export {
+  IntegrationCatalogGrid,
+  type IntegrationCatalogGridLabels,
+  type IntegrationCatalogGridProps,
+} from './components/integration-catalog-grid'
+export {
+  IntegrationInstancesList,
+  type IntegrationInstancesListLabels,
+  type IntegrationInstancesListProps,
+} from './components/integration-instances-list'
+export {
+  IntegrationSourcesList,
+  type IntegrationSourcesListLabels,
+  type IntegrationSourcesListProps,
+} from './components/integration-sources-list'
+export {
+  AddIntegrationSourceDialog,
+  type AddIntegrationSourceDialogLabels,
+  type AddIntegrationSourceDialogProps,
+} from './components/add-integration-source-dialog'
+export {
+  ConsentDialog,
+  type ConsentDialogLabels,
+  type ConsentDialogProps,
+} from './components/consent-dialog'
+export {
+  IntegrationConfigForm,
+  type IntegrationConfigFormLabels,
+  type IntegrationConfigFormProps,
+} from './components/integration-config-form'
+export {
+  ActionResultDialog,
+  type ActionResultDialogLabels,
+  type ActionResultDialogProps,
+} from './components/integration-action-result-dialog'
+export {
+  DocsDialog,
+  type DocsDialogLabels,
+  type DocsDialogProps,
+  type IntegrationDocsNode,
+} from './components/integration-docs-dialog'
 export {
   SurfaceRenderer,
   SURFACE_NODE_TYPES,
