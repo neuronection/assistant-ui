@@ -1,5 +1,75 @@
 # @neuronection/assistant-ui
 
+## 0.67.0
+
+### Minor Changes
+
+- [`14fbcd8`](https://github.com/neuronection/assistant-ui/commit/14fbcd8523518512c8cf31ee918e443ac29409c9) Thanks [@constLiakos](https://github.com/constLiakos)! - Integrations UI kit (plan 33 / ADR-0040): the family add / import /
+  configure flows as ten presentational modules, generated from the vendored
+  extension-charter contract (`@neuronection/assistant-ui/integration-contracts`
+  — vocabulary + view-models regenerated from `contracts/extension-charter.json`
+  by `sync-extension-vocab.mjs`, byte-identity walled in the test suite and by
+  dev's verify-wiring probe).
+
+  - Registry surfaces: `IntegrationCard` (identity, verbatim provenance, D25
+    origin chip, tier badge, risk-marked capability chips, update +
+    digest-drift states, typed actions out, detail/actions slots),
+    `IntegrationCatalogGrid` (charter-category groups, controlled search,
+    host-compat reasons verbatim, loading/error/empty),
+    `IntegrationInstancesList` (instances grouped under their extension —
+    one extension, N configured occurrences — with needs-config/needs-secret
+    conditions and runtime fields), `IntegrationSourcesList` (sources with
+    status, pinned-ref short forms, GitOps indicators, candidates that hand
+    off to the host's consent flow).
+  - Flow dialogs: `AddIntegrationSourceDialog` (one flow for git + local
+    sources, sealed credential slot, fetch/validate progress),
+    `ConsentDialog` (install + capability-growth re-consent + update — the
+    charter payload rendered VERBATIM, the D22 law disclosure as data, the
+    change summary above the law text), `IntegrationConfigForm`
+    (JSON-schema-subset fields, `x-secret` password fields with hint-only
+    sealed slots, async host validation via `onValidate` + the `validation`
+    result prop).
+  - Extension-content dialogs: `ActionResultDialog` (hosts SurfaceRenderer
+    for declarative result payloads — loading/error/retry, typed actions
+    out, per-product chrome slot), `DocsDialog` (bundle docs tree with an
+    app-owned content slot).
+  - Atoms: `OriginChip`, `StatusBadge`, `TierBadge`,
+    `IntegrationCapabilityChips` (risk-class-marked).
+  - `ExtensionSourcesPanel` (plan 32 Phase 3) is absorbed by this kit and is
+    REMOVED before its first release — it was never published; career's
+    Phase-3 local surface swaps onto the kit in the same wave. The pending
+    extension-sources changeset is folded into this one.
+
+  Rides the owner's next Version-Packages wave together with the pending
+  surface-renderer changeset — do not publish from a laptop.
+
+- [`6cf27bc`](https://github.com/neuronection/assistant-ui/commit/6cf27bca77e812ecc257e29016292efb32f23832) Thanks [@constLiakos](https://github.com/constLiakos)! - ProviderSetupForm: render the selected provider's mark (ProviderLogo) beside the
+  name. The form is the second phase of the guided setup — tiles already show
+  each provider's logo, and the form now carries the selection's icon forward via
+  the new optional `preset.key` field (omitted = no mark, e.g. manual entries).
+
+- [`6ffee0e`](https://github.com/neuronection/assistant-ui/commit/6ffee0eb17abd5363ad0293a73317134661caac8) Thanks [@constLiakos](https://github.com/constLiakos)! - `ProviderSetupForm`: the setup checklist's copyable unit is now the `run:`
+  command tail of a step, not the whole prose line. Steps containing
+  "run: <command>" render the command as an inline code chip with its own copy
+  button (only the command lands in the clipboard, and `onCopyStep` now
+  receives the command); guidance-only steps render without any copy
+  affordance. Consumers mirroring copies through `onCopyStep` (Electron IPC)
+  should expect the command string.
+
+- [`b381285`](https://github.com/neuronection/assistant-ui/commit/b381285b2ff8192ba491ade76675545b1743c639) Thanks [@constLiakos](https://github.com/constLiakos)! - SurfaceRenderer: the family declarative-surface renderer (ADR-0040 clause 16,
+  plan 32 Phase 4) — renders the charter's closed component vocabulary
+  (stat, table, cards, filter-bar, select, badge, progress, actions, evidence)
+  from a schema + view with RESOLVED labels; controlled facet
+  facets (aria-pressed chip rows and selects driving a single
+  `onFilterChange` funnel) and typed `run:*` / `item:*` action ids out via
+  `onAction` (the host binds semantics). Evidence rows carry host-resolved
+  summaries in an evidence disclosure; unknown node/action ids never render;
+  raw markup from an extension never mounts (D17). Promoted from desktop's
+  PackReportRenderer — career + desktop are the two hosts, pinned by the
+  family fixture wall (`dev/contracts/surface-renderer.fixtures.json`).
+  Also adds the previously missing subpath export entry for
+  `extension-sources` (the panel's module was staged without it).
+
 ## 0.66.0
 
 ### Minor Changes
