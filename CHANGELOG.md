@@ -1,5 +1,11 @@
 # @neuronection/assistant-ui
 
+## 0.68.0
+
+### Minor Changes
+
+- [`626dd66`](https://github.com/neuronection/assistant-ui/commit/626dd660e77033723da1f31573f8b059834a36c9) Thanks [@constLiakos](https://github.com/constLiakos)! - The integrations-kit additive gap fixes (plan 33 Phase D / §2.5 — all optional props, zero breaking changes): per-capability chip labels (`capabilityLabels`), sources-list rows honor `statusLabels` (consistency with the instances list), the `isExtensionCapabilityId` guard export, the consent `context` slot (host copy above the verbatim law text), and the opt-in card `kindLabel` badge channel.
+
 ## 0.67.0
 
 ### Minor Changes
