@@ -25,6 +25,8 @@ import { ConsentDialog } from '@neuronection/assistant-ui/consent-dialog'
 - `onDecline?(payload)` — fires and closes.
 - `labels?: ConsentDialogLabels` — per-variant titles, field labels,
   change-summary labels, confirm/decline/close, `busyLabel`.
+- `context?: string | null` — host-authored context copy (origin/coverage
+  note) rendered above the verbatim law text; the library never words it.
 - `busy?: boolean` — disables confirm/decline while the app applies.
 - `className` — merges onto the modal content.
 

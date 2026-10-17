@@ -16,6 +16,7 @@ export const Default = () => (
     <IntegrationCard
       extension={entry({ originClass: 'bundled', provenance: null, id: 'csv-builtins', name: 'CSV built-ins' })}
       enabled
+      labels={{ kindLabel: 'mini-app' }}
       onEnable={(e, enabled) => action('onEnable')(`${e.id} → ${enabled}`)}
       onRemove={(e) => action('onRemove')(e.id)}
     />

@@ -34,6 +34,8 @@ export interface ConsentDialogProps {
   onOpenChange: (open: boolean) => void
   /** The consent payload — law text (disclosure, provenance) arrives as data. */
   payload: IntegrationConsentPayloadView | null
+  /** Host-authored context copy (origin/coverage note), rendered above the verbatim law text. */
+  context?: string | null
   labels?: ConsentDialogLabels
   busy?: boolean
   onConsent: (payload: IntegrationConsentPayloadView) => void
@@ -51,12 +53,12 @@ function changeValue(change: { from?: string | null; to?: string | null }): stri
  * provenance, the pinned digest and the law disclosure, all arriving as data
  * in the payload (the library never words consent). One surface for install
  * consent, capability-growth re-consent and update consent; the change
- * summary renders above the verbatim law text. Consent persistence is
- * app-side; the dialog only emits explicit user acts.
+ * summary and the host's `context` copy render above the verbatim law text.
+ * Consent persistence is app-side; the dialog only emits explicit user acts.
  */
 export const ConsentDialog = React.forwardRef<HTMLDivElement, ConsentDialogProps>(
   function ConsentDialog(
-    { open, onOpenChange, payload, labels, busy = false, onConsent, onDecline, className },
+    { open, onOpenChange, payload, context = null, labels, busy = false, onConsent, onDecline, className },
     ref,
   ) {
     const t = React.useMemo(
@@ -189,6 +191,15 @@ export const ConsentDialog = React.forwardRef<HTMLDivElement, ConsentDialogProps
                     ))}
                   </dl>
                 </div>
+              ) : null}
+
+              {context ? (
+                <p
+                  className="rounded-[var(--as-radius-sm)] bg-[var(--as-secondary)] p-2 text-xs text-[var(--as-fg)]"
+                  data-testid="integration-consent-context"
+                >
+                  {context}
+                </p>
               ) : null}
 
               {payload.disclosure ? (

@@ -167,6 +167,7 @@ export {
   OriginChip,
   StatusBadge,
   TierBadge,
+  isExtensionCapabilityId,
   isExtensionOriginClass,
   isExtensionStatusState,
   isExtensionTier,

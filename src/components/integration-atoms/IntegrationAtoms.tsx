@@ -1,10 +1,12 @@
 import * as React from 'react'
 import { cn } from '../../lib/utils'
 import {
+  EXTENSION_CAPABILITIES,
   EXTENSION_ORIGIN_CLASSES,
   EXTENSION_RISK_CLASSES,
   EXTENSION_STATUS_STATES,
   EXTENSION_TIERS,
+  type ExtensionCapabilityId,
   type ExtensionOriginClass,
   type ExtensionRiskClass,
   type ExtensionStatusState,
@@ -105,6 +107,8 @@ export const TierBadge = React.forwardRef<HTMLSpanElement, TierBadgeProps>(
 export interface IntegrationCapabilityChipsProps {
   capabilities: IntegrationCapabilityView[]
   labels?: Partial<Record<ExtensionRiskClass, string>>
+  /** Per-capability display labels keyed by capability id; the raw id stays the fallback. */
+  capabilityLabels?: Partial<Record<string, string>>
   capabilityTitle?: string | null
   className?: string
 }
@@ -119,7 +123,7 @@ export const IntegrationCapabilityChips = React.forwardRef<
   HTMLDivElement,
   IntegrationCapabilityChipsProps
 >(function IntegrationCapabilityChips(
-  { capabilities, labels, capabilityTitle, className },
+  { capabilities, labels, capabilityLabels, capabilityTitle, className },
   ref,
 ) {
   return (
@@ -150,7 +154,7 @@ export const IntegrationCapabilityChips = React.forwardRef<
               risk ? RISK_CLASS[risk] : null,
             )}
           >
-            {capability.id}
+            {capabilityLabels?.[capability.id] ?? capability.id}
             {risk ? (
               <span className="ml-1 font-semibold uppercase tracking-wide opacity-75">
                 {labels?.[risk] ?? risk}
@@ -162,6 +166,10 @@ export const IntegrationCapabilityChips = React.forwardRef<
     </div>
   )
 })
+
+export function isExtensionCapabilityId(value: string): value is ExtensionCapabilityId {
+  return (EXTENSION_CAPABILITIES as readonly string[]).includes(value)
+}
 
 export function isExtensionOriginClass(value: string): value is ExtensionOriginClass {
   return (EXTENSION_ORIGIN_CLASSES as readonly string[]).includes(value)

@@ -39,6 +39,13 @@ describe('IntegrationSourcesList', () => {
     expect(screen.getByTestId('integration-source-status-src-1').textContent).toBe('ok')
   })
 
+  it('honors statusLabels on source rows (consistency with the instances list)', () => {
+    setup([source({ gitops: true, groups: [] })], {
+      labels: { statusLabels: { ok: 'healthy' } },
+    })
+    expect(screen.getByTestId('integration-source-status-src-1').textContent).toBe('healthy')
+  })
+
   it('renders candidates with digest short form and the verbatim incompatibility reason', () => {
     setup([
       source({

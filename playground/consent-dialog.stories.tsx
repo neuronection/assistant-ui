@@ -71,3 +71,7 @@ export const DeclarativeT0 = () => (
 )
 
 export const Busy = () => <Harness busy />
+
+export const HostContext = () => (
+  <Harness context="Imported from github.com/example/fork — this consent covers code not authored by the app." />
+)

@@ -34,10 +34,13 @@ import {
 - `IntegrationCapabilityChipsProps` — `capabilities:
   IntegrationCapabilityView[]` (`{ id, riskClass? }`), `labels?`
   (`Partial<Record<ExtensionRiskClass, string>>` for the risk marker),
-  `capabilityTitle?` (chip tooltip prefix). Risk-marked chips carry
-  `data-risk-class`.
-- `isExtensionOriginClass` / `isExtensionStatusState` / `isExtensionTier` —
-  narrow raw strings (registry/DB values) to the charter vocabularies.
+  `capabilityLabels?` (`Partial<Record<string, string>>` — per-capability
+  display labels keyed by capability id; the raw id stays the fallback and
+  tooltips keep the id), `capabilityTitle?` (chip tooltip prefix).
+  Risk-marked chips carry `data-risk-class`.
+- `isExtensionOriginClass` / `isExtensionStatusState` / `isExtensionTier` /
+  `isExtensionCapabilityId` — narrow raw strings (registry/DB values) to
+  the charter vocabularies.
 
 ## controlled contract
 

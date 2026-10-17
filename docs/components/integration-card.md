@@ -24,7 +24,9 @@ import { IntegrationCard } from '@neuronection/assistant-ui/integration-card'
   semantics); the toggle renders only when set and `onEnable` is provided.
 - `instanceCount?: number | null` — configured-occurrences summary.
 - `busy?: boolean` — disables affordances while app-side work runs.
-- `labels?: IntegrationCardLabels` — every visible string (English defaults).
+- `labels?: IntegrationCardLabels` — every visible string (English defaults);
+  `kindLabel` is the opt-in kind-badge channel — the chip renders only when
+  the label is set and the view carries a `kind`.
 - `onEnable?(extension, enabled)` / `onConfigure?(extension)` /
   `onPark?(extension)` / `onRestore?(extension)` / `onRemove?(extension)` /
   `onApplyUpdate?(extension)` — each button renders only when its callback is
@@ -44,10 +46,11 @@ auto-apply, clause 21).
 ## label/i18n contract
 
 `labels` with English defaults: `authorLabel`, `licenseLabel`,
-`repositoryLabel`, `capabilitiesLabel`, `instancesLabel`,
-`updateAvailableLabel`, `reconsentRequiredLabel`, `digestDriftLabel`,
-`applyUpdateLabel`, `enableLabel`, `disableLabel`, `configureLabel`,
-`parkLabel`, `restoreLabel`, `removeLabel`, `enabledAriaLabel`.
+`repositoryLabel`, `capabilitiesLabel`, `kindLabel` (opt-in kind badge),
+`instancesLabel`, `updateAvailableLabel`, `reconsentRequiredLabel`,
+`digestDriftLabel`, `applyUpdateLabel`, `enableLabel`, `disableLabel`,
+`configureLabel`, `parkLabel`, `restoreLabel`, `removeLabel`,
+`enabledAriaLabel`.
 
 ## accessibility
 

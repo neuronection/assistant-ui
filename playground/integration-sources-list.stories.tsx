@@ -30,6 +30,10 @@ export const Default = () => (
       }
       onPark={(sourceId, instance) => action('onPark')(`${sourceId}:${instance.id}`)}
       onTombstone={(sourceId, instance) => action('onTombstone')(`${sourceId}:${instance.id}`)}
+      labels={{
+        statusLabels: { ok: 'healthy', failing: 'unreachable' },
+        kindLabels: { git: 'git source', local: 'local path' },
+      }}
     />
   </div>
 )

@@ -38,6 +38,16 @@ describe('IntegrationCard', () => {
     expect(screen.getByTestId('integration-card').textContent).toContain('destructive')
   })
 
+  it('renders the kind badge only through the opt-in kindLabel channel', () => {
+    const noChannel = render(<IntegrationCard extension={extension()} />)
+    expect(screen.queryByTestId('integration-card-kind')).toBeNull()
+    noChannel.unmount()
+    render(<IntegrationCard extension={extension()} labels={{ kindLabel: 'connector' }} />)
+    const kind = screen.getByTestId('integration-card-kind')
+    expect(kind.textContent).toBe('connector')
+    expect(kind.getAttribute('data-kind')).toBe('connector')
+  })
+
   it('shows the instance count and update states', () => {
     setup(
       {

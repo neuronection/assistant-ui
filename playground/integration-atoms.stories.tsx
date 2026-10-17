@@ -42,3 +42,16 @@ export const CapabilityChips = () => (
     ]}
   />
 )
+
+export const CapabilityChipsLabeled = () => (
+  <IntegrationCapabilityChips
+    capabilities={[
+      { id: 'sync' },
+      { id: 'fs-read' },
+      { id: 'chat-tools', riskClass: 'state-changing' },
+    ]}
+    capabilityLabels={{ sync: 'Keep data in sync', 'fs-read': 'Read files' }}
+    labels={{ 'state-changing': 'state-changing' }}
+    capabilityTitle="Capabilities"
+  />
+)

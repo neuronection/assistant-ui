@@ -28,6 +28,8 @@ export interface IntegrationCardLabels {
   licenseLabel?: string
   repositoryLabel?: string
   capabilitiesLabel?: string
+  /** Kind badge label — renders the kind chip when set and the view carries a kind. */
+  kindLabel?: string
   instancesLabel?: string
   updateAvailableLabel?: string
   reconsentRequiredLabel?: string
@@ -99,6 +101,7 @@ export const IntegrationCard = React.forwardRef<HTMLDivElement, IntegrationCardP
         enableLabel: labels?.enableLabel ?? 'Enable',
         disableLabel: labels?.disableLabel ?? 'Disable',
         configureLabel: labels?.configureLabel ?? 'Configure',
+        kindLabel: labels?.kindLabel,
         parkLabel: labels?.parkLabel ?? 'Park',
         restoreLabel: labels?.restoreLabel ?? 'Restore',
         removeLabel: labels?.removeLabel ?? 'Remove',
@@ -139,6 +142,17 @@ export const IntegrationCard = React.forwardRef<HTMLDivElement, IntegrationCardP
               ) : null}
               <OriginChip originClass={extension.originClass} />
               <TierBadge tier={extension.tier} />
+              {extension.kind && t.kindLabel ? (
+                <span
+                  data-as="integration-card-kind"
+                  data-kind={extension.kind}
+                  data-testid="integration-card-kind"
+                  title={`kind: ${extension.kind}`}
+                  className="rounded-full bg-[var(--as-secondary)] px-2 py-0.5 text-[11px] text-[var(--as-muted-fg)]"
+                >
+                  {t.kindLabel}
+                </span>
+              ) : null}
               {instanceCount !== null ? (
                 <span className="text-xs text-[var(--as-muted-fg)]" data-testid="integration-card-instances">
                   {instanceCount} {t.instancesLabel}

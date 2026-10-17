@@ -7,6 +7,7 @@ import {
   OriginChip,
   StatusBadge,
   TierBadge,
+  isExtensionCapabilityId,
   isExtensionOriginClass,
   isExtensionStatusState,
   isExtensionTier,
@@ -62,6 +63,27 @@ describe('integration atoms', () => {
     expect(screen.getByText('net')).toBeTruthy()
   })
 
+  it('IntegrationCapabilityChips renders per-capability labels with the raw id as fallback', () => {
+    render(
+      <IntegrationCapabilityChips
+        capabilities={[
+          { id: 'fs-read' },
+          { id: 'sync' },
+          { id: 'chat-tools', riskClass: 'destructive' },
+        ]}
+        labels={{ destructive: 'destructive' }}
+        capabilityLabels={{ 'fs-read': 'Read files' }}
+        capabilityTitle="Capabilities"
+      />,
+    )
+    expect(screen.getByText('Read files')).toBeTruthy()
+    expect(screen.getByText('sync')).toBeTruthy()
+    const labeled = screen.getByText('Read files').closest('[data-as-cap]')
+    expect(labeled?.getAttribute('data-as-cap')).toBe('fs-read')
+    expect(labeled?.getAttribute('title')).toBe('Capabilities: fs-read')
+    expect(screen.getByText('chat-tools')).toBeTruthy()
+  })
+
   it('guard helpers narrow raw strings to the charter vocabularies', () => {
     expect(isExtensionOriginClass('imported')).toBe(true)
     expect(isExtensionOriginClass('official')).toBe(false)
@@ -69,6 +91,9 @@ describe('integration atoms', () => {
     expect(isExtensionStatusState('paused')).toBe(false)
     expect(isExtensionTier('T3')).toBe(true)
     expect(isExtensionTier('T9')).toBe(false)
+    expect(isExtensionCapabilityId('fs-read')).toBe(true)
+    expect(isExtensionCapabilityId('ui:custom-code')).toBe(true)
+    expect(isExtensionCapabilityId('teleport')).toBe(false)
   })
 
   it('atoms are non-interactive: no axe violations', async () => {

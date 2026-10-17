@@ -41,7 +41,9 @@ host's (D22); the list only emits.
 
 ## label/i18n contract
 
-`labels` with English defaults; `kindLabels` maps `git`/`local`.
+`labels` with English defaults; `kindLabels` maps `git`/`local`;
+`statusLabels` (inherited from the instances list) labels the source-row
+status badge too — the raw state stays the fallback.
 
 ## accessibility
 

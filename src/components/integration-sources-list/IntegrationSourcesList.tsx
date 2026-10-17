@@ -120,6 +120,7 @@ export const IntegrationSourcesList = React.forwardRef<
       installLabel: labels?.installLabel ?? 'Install with consent…',
       incompatibleLabel: labels?.incompatibleLabel ?? 'incompatible',
       kindLabels: labels?.kindLabels ?? {},
+      statusLabels: labels?.statusLabels ?? {},
     }),
     [labels],
   )
@@ -177,7 +178,11 @@ export const IntegrationSourcesList = React.forwardRef<
               {t.kindLabels[source.kind] ?? source.kind}
             </span>
             {source.status ? (
-              <StatusBadge status={source.status} data-testid={`integration-source-status-${source.id}`} />
+              <StatusBadge
+                status={source.status}
+                label={t.statusLabels[source.status] ?? source.status}
+                data-testid={`integration-source-status-${source.id}`}
+              />
             ) : null}
             {source.gitops ? (
               <span className="rounded-full bg-[var(--as-primary)]/10 px-2 py-0.5 text-[11px] text-[var(--as-primary)]">

@@ -141,6 +141,32 @@ describe('ConsentDialog', () => {
     ).toBe(true)
   })
 
+  it('renders the host context copy above the verbatim law text when provided', () => {
+    const view = render(
+      <ConsentDialog
+        open
+        onOpenChange={() => {}}
+        payload={consent()}
+        context="Imported from github.com/example/fork — this consent covers code not authored by the app."
+        onConsent={vi.fn()}
+      />,
+    )
+    const context = screen.getByTestId('integration-consent-context')
+    expect(context.textContent).toBe(
+      'Imported from github.com/example/fork — this consent covers code not authored by the app.',
+    )
+    const dialog = screen.getByTestId('integration-consent')
+    expect(
+      dialog.textContent?.indexOf('github.com/example/fork') <
+        dialog.textContent?.indexOf(T3_DISCLOSURE),
+    ).toBe(true)
+    view.unmount()
+    render(
+      <ConsentDialog open onOpenChange={() => {}} payload={consent()} onConsent={vi.fn()} />,
+    )
+    expect(screen.queryByTestId('integration-consent-context')).toBeNull()
+  })
+
   it('fires onConsent only from the explicit confirm; decline emits and closes', async () => {
     const user = userEvent.setup()
     const onConsent = vi.fn()
