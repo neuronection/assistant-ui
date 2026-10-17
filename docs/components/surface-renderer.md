@@ -130,5 +130,5 @@ const view: SurfaceView = {
 
 ## Related
 
-- [`extension-sources`](./extension-sources.md) — the ADR-0040 import/consent surface this renderer's mini-apps install through
+- [`add-integration-source-dialog`](./add-integration-source-dialog.md) / [`consent-dialog`](./consent-dialog.md) — the ADR-0040 import/consent flow this renderer's mini-apps install through; [`ActionResultDialog`](./integration-action-result-dialog.md) hosts this renderer for action results
 - [`badge`](./badge.md) / [`button`](./button.md) — the primitives the renderer composes
