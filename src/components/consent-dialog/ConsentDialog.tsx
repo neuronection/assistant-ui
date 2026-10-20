@@ -97,6 +97,9 @@ export const ConsentDialog = React.forwardRef<HTMLDivElement, ConsentDialogProps
 
     const changes = payload?.changeSummary ?? null
     const changeRows: Array<[string, React.ReactNode]> = []
+    if (changes?.changed?.length) {
+      changeRows.push([t.changesLabel, changes.changed.join(', ')])
+    }
     if (changes?.addedCapabilities?.length) {
       changeRows.push([t.addedLabel, changes.addedCapabilities.join(', ')])
     }

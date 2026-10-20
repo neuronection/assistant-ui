@@ -34,6 +34,8 @@ export interface IntegrationUpdateView {
 }
 
 export interface IntegrationConsentChangeView {
+  /** The machine change-summary groups (plan 37 §3.3): which manifest field groups changed — "what changed", not just "something changed". */
+  changed?: string[]
   addedCapabilities?: string[]
   removedCapabilities?: string[]
   versionChange?: { from?: string | null; to?: string | null } | null
