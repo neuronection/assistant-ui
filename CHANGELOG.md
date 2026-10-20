@@ -1,5 +1,11 @@
 # @neuronection/assistant-ui
 
+## 0.69.0
+
+### Minor Changes
+
+- [`3f6d92d`](https://github.com/neuronection/assistant-ui/commit/3f6d92deb70c368167efbe5f3257ef61af607e10) Thanks [@constLiakos](https://github.com/constLiakos)! - Consent change-summary depth (plan 38 W6): `IntegrationConsentChangeView` carries the machine `changed` manifest-group list and `ConsentDialog` renders it — "what changed" (version, i18n, report, data, provenance, capabilities, configSchema), not just "something changed". Additive; the desktop host feeds `manifestDiff.changed`.
+
 ## 0.68.0
 
 ### Minor Changes
