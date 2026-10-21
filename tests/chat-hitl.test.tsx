@@ -124,6 +124,60 @@ describe('HitlProposalCard', () => {
     expect(screen.queryByRole('button')).not.toBeInTheDocument()
   })
 
+  it('re-applies a conflicted proposal through the refreshed-diff action', async () => {
+    const onApprove = vi.fn()
+    const onReject = vi.fn()
+    render(
+      <HitlProposalCard
+        title="Update note · Calculus"
+        status="conflict"
+        diff={DIFF}
+        conflictNote="The note changed since this was proposed."
+        labels={{ reapply: 'Re-apply' }}
+        onApprove={onApprove}
+        onReject={onReject}
+      />,
+    )
+    expect(
+      screen.getByText('The note changed since this was proposed.'),
+    ).toBeInTheDocument()
+    const user = userEvent.setup()
+    await user.click(screen.getByRole('button', { name: 'Re-apply' }))
+    expect(onApprove).toHaveBeenCalledTimes(1)
+    await user.click(screen.getByRole('button', { name: 'Reject' }))
+    expect(onReject).toHaveBeenCalledTimes(1)
+  })
+
+  it('renders the app-owned body slot between rows and actions', () => {
+    const { container } = render(
+      <HitlProposalCard title="Update note · X" status="pending" diff={DIFF} onApprove={() => {}}>
+        <p>Target · Calculus › Derivatives</p>
+      </HitlProposalCard>,
+    )
+    expect(screen.getByText('Target · Calculus › Derivatives')).toBeInTheDocument()
+    const body = container.querySelector('[data-as="hitl-proposal-body"]')
+    expect(body).not.toBeNull()
+    expect(
+      body?.nextElementSibling?.contains(
+        screen.getByRole('button', { name: 'Approve' }),
+      ),
+    ).toBe(true)
+  })
+
+  it('passes axe for a conflicted card with a custom note', async () => {
+    const { container } = render(
+      <HitlProposalCard
+        title="Update note · X"
+        status="conflict"
+        diff={DIFF}
+        conflictNote="Drifted."
+        onApprove={() => {}}
+        onReject={() => {}}
+      />,
+    )
+    expect(await axe(container)).toHaveNoViolations()
+  })
+
   it('passes axe in pending and conflict states', async () => {
     const { container } = render(
       <HitlProposalCard
