@@ -152,6 +152,9 @@ export interface ModelRegistryProps {
   customOptionLabel?: string
   temperatureLabel?: string
   maxTokensLabel?: string
+  /** Collapsed-by-default disclosure wrapping the tuning fields
+   * (reasoning effort, temperature, max tokens) in the add/edit modal. */
+  advancedLabel?: string
   labelLabel?: string
   reasoningEffortLabel?: string
   /** The app's shipping decision transport (e.g. `systemone`): when set,
@@ -371,6 +374,7 @@ export const ModelRegistry = React.forwardRef<HTMLDivElement, ModelRegistryProps
       customOptionLabel = 'Custom…',
       temperatureLabel = 'Temperature',
       maxTokensLabel = 'Max tokens',
+      advancedLabel = 'Advanced',
       labelLabel = 'Display label',
       reasoningEffortLabel = 'Reasoning effort',
       decisionTransport,
@@ -688,20 +692,34 @@ export const ModelRegistry = React.forwardRef<HTMLDivElement, ModelRegistryProps
               {provider ? (
                 <div
                   data-as="model-registry-provider-context"
-                  className="flex min-w-0 items-center gap-2 rounded-[var(--as-radius)] border border-[var(--as-border)] bg-[var(--as-muted)]/50 px-3 py-2"
+                  className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1 text-xs text-[var(--as-muted-fg)]"
                 >
                   <span className="sr-only">{providerContextLabel}:</span>
-                  <span className="shrink-0 text-xs font-medium text-[var(--as-fg)]">
+                  <span
+                    className="shrink-0 truncate text-xs font-semibold text-[var(--as-fg)]"
+                    title={provider.baseUrl}
+                  >
                     {provider.name}
                   </span>
-                  {provider.baseUrl ? (
+                  {wizard && modal.step !== 'kind' ? (
                     <>
                       <span aria-hidden className="text-[var(--as-border)]">
                         ·
                       </span>
-                      <span className="truncate font-mono text-[10px] text-[var(--as-muted-fg)]">
-                        {provider.baseUrl}
+                      <span
+                        title={kindDescriptions?.[kindFromCaps(modal.caps)]}
+                        className="rounded-full border border-[var(--as-border)] px-2 py-0.5 text-[11px] font-medium text-[var(--as-fg)]"
+                      >
+                        {descriptorFor(kindFromCaps(modal.caps)).label}
                       </span>
+                      <button
+                        type="button"
+                        data-as="model-registry-change-kind"
+                        onClick={goToKindStep}
+                        className="cursor-pointer rounded-[var(--as-radius-sm)] text-[11px] text-[var(--as-muted-fg)] underline-offset-2 transition-colors hover:text-[var(--as-fg)] hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--as-focus-ring)]"
+                      >
+                        {changeKindLabel}
+                      </button>
                     </>
                   ) : null}
                 </div>
@@ -747,28 +765,6 @@ export const ModelRegistry = React.forwardRef<HTMLDivElement, ModelRegistryProps
                 </div>
               ) : (
                 <>
-                  {wizard ? (
-                    <div className="flex items-center justify-between gap-2 rounded-[var(--as-radius)] border border-[var(--as-border)] bg-[var(--as-muted)] px-3 py-2">
-                      <div className="min-w-0">
-                        <p className="truncate text-sm font-medium text-[var(--as-fg)]">
-                          {descriptorFor(kindFromCaps(modal.caps)).label}
-                        </p>
-                        {kindDescriptions?.[kindFromCaps(modal.caps)] ? (
-                          <p className="truncate text-xs text-[var(--as-muted-fg)]">
-                            {kindDescriptions[kindFromCaps(modal.caps)]}
-                          </p>
-                        ) : null}
-                      </div>
-                      <button
-                        type="button"
-                        data-as="model-registry-change-kind"
-                        onClick={goToKindStep}
-                        className="inline-flex cursor-pointer items-center gap-1.5 rounded-[var(--as-radius)] border border-[var(--as-border)] bg-transparent px-2.5 py-1 text-xs text-[var(--as-muted-fg)] transition-colors hover:bg-[var(--as-muted)] hover:text-[var(--as-fg)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--as-focus-ring)]"
-                      >
-                        {changeKindLabel}
-                      </button>
-                    </div>
-                  ) : null}
                   {modal.mode === 'add' ? (
                     remoteState === 'loading' ? (
                   <p className="flex items-center justify-center gap-2 py-4 text-xs text-[var(--as-muted-fg)]">
@@ -944,71 +940,85 @@ export const ModelRegistry = React.forwardRef<HTMLDivElement, ModelRegistryProps
                   <p className="text-xs text-[var(--as-muted-fg)]">{capsHint}</p>
                 ) : null}
               </div>
-              {hasParametricCaps(modal.caps) && reasoningEffortOptions ? (
-                <label className="block space-y-1 text-sm">
-                  <span className="text-sm font-medium text-[var(--as-fg)]">
-                    {reasoningEffortLabel}
-                  </span>
-                  <div className="flex flex-col gap-2 sm:flex-row">
-                    {modal.reasoningCustom ? (
-                      <input
-                        type="text"
-                        value={modal.reasoningEffort}
-                        placeholder={customOptionLabel}
-                        onChange={(event) => patchField('reasoningEffort', event.target.value)}
-                        className="w-full rounded-[var(--as-radius)] border border-[var(--as-border)] bg-[var(--as-surface)] px-3 py-2 font-mono text-sm text-[var(--as-fg)] sm:flex-1"
-                      />
-                    ) : (
-                      <select
-                        value={modal.reasoningCustom ? CUSTOM : modal.reasoningEffort}
-                        onChange={(event) =>
-                          setModal((current) =>
-                            current
-                              ? {
-                                  ...current,
-                                  reasoningCustom: event.target.value === CUSTOM,
-                                  reasoningEffort:
-                                    event.target.value === CUSTOM
-                                      ? current.reasoningEffort
-                                      : event.target.value,
-                                }
-                              : current,
-                          )
-                        }
-                        className="w-full rounded-[var(--as-radius)] border border-[var(--as-border)] bg-[var(--as-surface)] px-3 py-2 text-sm text-[var(--as-fg)] sm:w-40"
-                      >
-                        <option value="">—</option>
-                        {reasoningEffortOptions.map((option) => (
-                          <option key={option} value={option}>
-                            {option}
-                          </option>
-                        ))}
-                        <option value={CUSTOM}>{customOptionLabel}</option>
-                      </select>
-                    )}
-                  </div>
-                </label>
-              ) : null}
               {hasParametricCaps(modal.caps) ? (
-                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                  <NumberField
-                    label={temperatureLabel}
-                    value={modal.temperature}
-                    onChange={(value) => patchField('temperature', value)}
-                    onClear={() => patchField('temperature', '')}
-                    step="0.1"
-                    min="0"
-                    max="2"
-                  />
-                  <NumberField
-                    label={maxTokensLabel}
-                    value={modal.maxTokens}
-                    onChange={(value) => patchField('maxTokens', value)}
-                    onClear={() => patchField('maxTokens', '')}
-                    step="256"
-                    min="1"
-                  />
-                </div>
+                <details
+                  data-as="model-registry-advanced"
+                  className="group rounded-[var(--as-radius)] border border-[var(--as-border)] bg-[var(--as-surface)]"
+                >
+                  <summary className="flex cursor-pointer list-none items-center gap-1.5 rounded-[var(--as-radius)] px-3 py-2 text-sm text-[var(--as-muted-fg)] transition-colors hover:bg-[var(--as-muted)] hover:text-[var(--as-fg)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--as-focus-ring)] [&::-webkit-details-marker]:hidden">
+                    <ChevronRight
+                      className="size-3.5 shrink-0 transition-transform group-open:rotate-90"
+                      aria-hidden
+                    />
+                    {advancedLabel}
+                  </summary>
+                  <div className="flex flex-col gap-4 border-t border-[var(--as-border)] p-3">
+                    {reasoningEffortOptions ? (
+                      <label className="block space-y-1 text-sm">
+                        <span className="text-sm font-medium text-[var(--as-fg)]">
+                          {reasoningEffortLabel}
+                        </span>
+                        <div className="flex flex-col gap-2 sm:flex-row">
+                          {modal.reasoningCustom ? (
+                            <input
+                              type="text"
+                              value={modal.reasoningEffort}
+                              placeholder={customOptionLabel}
+                              onChange={(event) => patchField('reasoningEffort', event.target.value)}
+                              className="w-full rounded-[var(--as-radius)] border border-[var(--as-border)] bg-[var(--as-surface)] px-3 py-2 font-mono text-sm text-[var(--as-fg)] sm:flex-1"
+                            />
+                          ) : (
+                            <select
+                              value={modal.reasoningCustom ? CUSTOM : modal.reasoningEffort}
+                              onChange={(event) =>
+                                setModal((current) =>
+                                  current
+                                    ? {
+                                        ...current,
+                                        reasoningCustom: event.target.value === CUSTOM,
+                                        reasoningEffort:
+                                          event.target.value === CUSTOM
+                                            ? current.reasoningEffort
+                                            : event.target.value,
+                                      }
+                                    : current,
+                                )
+                              }
+                              className="w-full rounded-[var(--as-radius)] border border-[var(--as-border)] bg-[var(--as-surface)] px-3 py-2 text-sm text-[var(--as-fg)] sm:w-40"
+                            >
+                              <option value="">—</option>
+                              {reasoningEffortOptions.map((option) => (
+                                <option key={option} value={option}>
+                                  {option}
+                                </option>
+                              ))}
+                              <option value={CUSTOM}>{customOptionLabel}</option>
+                            </select>
+                          )}
+                        </div>
+                      </label>
+                    ) : null}
+                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                      <NumberField
+                        label={temperatureLabel}
+                        value={modal.temperature}
+                        onChange={(value) => patchField('temperature', value)}
+                        onClear={() => patchField('temperature', '')}
+                        step="0.1"
+                        min="0"
+                        max="2"
+                      />
+                      <NumberField
+                        label={maxTokensLabel}
+                        value={modal.maxTokens}
+                        onChange={(value) => patchField('maxTokens', value)}
+                        onClear={() => patchField('maxTokens', '')}
+                        step="256"
+                        min="1"
+                      />
+                    </div>
+                  </div>
+                </details>
               ) : null}
               {(extraFields ?? []).map((field) => {
                 const value = modal.extra[field.key] ?? ''

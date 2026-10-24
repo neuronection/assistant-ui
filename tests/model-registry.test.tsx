@@ -247,6 +247,7 @@ describe('ModelRegistry', () => {
     const dialog = await openAddModal(user)
     await user.click(within(dialog).getByRole('combobox', { name: 'Model' }))
     await user.click(screen.getByRole('option', { name: 'llava' }))
+    await user.click(within(dialog).getByText('Advanced'))
     await user.selectOptions(within(dialog).getByLabelText('Reasoning effort'), 'high')
     await user.click(within(dialog).getByRole('button', { name: 'Add model' }))
     expect(onAddModel).toHaveBeenCalledWith(
@@ -263,6 +264,7 @@ describe('ModelRegistry', () => {
     const dialog = await openAddModal(user)
     await user.click(within(dialog).getByRole('combobox', { name: 'Model' }))
     await user.click(screen.getByRole('option', { name: 'llava' }))
+    await user.click(within(dialog).getByText('Advanced'))
     await user.selectOptions(within(dialog).getByLabelText('Reasoning effort'), '__custom__')
     await user.type(within(dialog).getByLabelText('Reasoning effort'), 'wizard')
     await user.click(within(dialog).getByRole('button', { name: 'Add model' }))
@@ -272,6 +274,28 @@ describe('ModelRegistry', () => {
     )
   })
 
+  it('hides the tuning fields under a collapsed Advanced disclosure', async () => {
+    const user = userEvent.setup()
+    render(<RegistryDemo />)
+    const dialog = await openAddModal(user)
+    await user.click(within(dialog).getByRole('combobox', { name: 'Model' }))
+    await user.click(screen.getByRole('option', { name: 'llava' }))
+    const advanced = within(dialog).getByText('Advanced').closest('details')
+    expect(advanced).not.toBeNull()
+    expect(advanced).not.toHaveAttribute('open')
+    await user.click(within(dialog).getByText('Advanced'))
+    expect(advanced).toHaveAttribute('open')
+    expect(within(dialog).getByLabelText('Temperature')).toBeInTheDocument()
+    expect(within(dialog).getByLabelText('Reasoning effort')).toBeInTheDocument()
+  })
+
+  it('labels the advanced disclosure via advancedLabel', async () => {
+    const user = userEvent.setup()
+    render(<RegistryDemo advancedLabel="More settings" />)
+    const dialog = await openAddModal(user)
+    expect(within(dialog).getByText('More settings')).toBeInTheDocument()
+  })
+
   it('sets and clears temperature and max tokens', async () => {
     const user = userEvent.setup()
     const onAddModel = vi.fn()
@@ -279,6 +303,7 @@ describe('ModelRegistry', () => {
     const dialog = await openAddModal(user)
     await user.click(within(dialog).getByRole('combobox', { name: 'Model' }))
     await user.click(screen.getByRole('option', { name: 'llava' }))
+    await user.click(within(dialog).getByText('Advanced'))
     await user.type(within(dialog).getByLabelText('Temperature'), '0.7')
     await user.type(within(dialog).getByLabelText('Max tokens'), '4096')
     await user.click(within(dialog).getByRole('button', { name: 'Add model' }))
@@ -296,6 +321,7 @@ describe('ModelRegistry', () => {
     const dialog = await openAddModal(user)
     await user.click(within(dialog).getByRole('combobox', { name: 'Model' }))
     await user.click(screen.getByRole('option', { name: 'llava' }))
+    await user.click(within(dialog).getByText('Advanced'))
     await user.type(within(dialog).getByLabelText('Temperature'), '0.9')
     await user.click(within(dialog).getByRole('button', { name: 'Temperature clear' }))
     await user.click(within(dialog).getByRole('button', { name: 'Add model' }))
@@ -305,6 +331,31 @@ describe('ModelRegistry', () => {
     )
   })
 
+  it('renders a compact context line with the kind chip on the details step (wizard)', async () => {
+    const user = userEvent.setup()
+    render(<RegistryDemo standaloneCaps={['embeddings', 'decision']} />)
+    const dialog = await openAddModal(user)
+    await user.click(within(dialog).getByRole('button', { name: 'Text' }))
+    const context = dialog.querySelector('[data-as="model-registry-provider-context"]')
+    expect(context).not.toBeNull()
+    expect(context).toHaveTextContent('Ollama (local)')
+    expect(context).toHaveTextContent('Text')
+    const change = within(context as HTMLElement).getByRole('button', { name: 'Change type' })
+    await user.click(change)
+    expect(
+      within(dialog).getByRole('group', { name: 'What kind of model is this?' }),
+    ).toBeInTheDocument()
+  })
+
+  it('has no axe violations with the wizard context line and the advanced disclosure open', async () => {
+    const user = userEvent.setup()
+    render(<RegistryDemo standaloneCaps={['embeddings', 'decision']} />)
+    const dialog = await openAddModal(user)
+    await user.click(within(dialog).getByRole('button', { name: 'Text' }))
+    await user.click(within(dialog).getByText('Advanced'))
+    expect(await axe(document.body)).toHaveNoViolations()
+  })
+
   it('edits an existing model through the same modal', async () => {
     const user = userEvent.setup()
     const onUpdateModel = vi.fn()
@@ -312,6 +363,7 @@ describe('ModelRegistry', () => {
     await user.click(await screen.findByRole('button', { name: 'Edit qwen2.5-vl' }))
     const dialog = await screen.findByRole('dialog')
     expect(within(dialog).getByText('qwen2.5-vl')).toBeInTheDocument()
+    await user.click(within(dialog).getByText('Advanced'))
     await user.type(within(dialog).getByLabelText('Display label'), '2')
     await user.clear(within(dialog).getByLabelText('Temperature'))
     await user.type(within(dialog).getByLabelText('Temperature'), '0.9')
@@ -526,13 +578,13 @@ describe('ModelRegistry extra fields and enable toggle', () => {
     expect(await axe(container)).toHaveNoViolations()
   })
 
-  it('shows the provider context (name + base URL) at the top of the add modal', async () => {
+  it('shows the provider context (name + base URL on hover) at the top of the add modal', async () => {
     const user = userEvent.setup()
     render(<RegistryDemo />)
     const dialog = await openAddModal(user)
     const context = within(dialog).getByText('Ollama (local)')
     expect(context).toBeInTheDocument()
-    expect(within(dialog).getByText('http://localhost:11434/v1')).toBeInTheDocument()
+    expect(context).toHaveAttribute('title', 'http://localhost:11434/v1')
   })
 
   it('manual toggle is a labelled ghost control and swaps direction copy', async () => {

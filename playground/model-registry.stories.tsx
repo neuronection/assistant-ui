@@ -158,6 +158,15 @@ export const ModelRegistryStory = () => {
           { key: 'description', label: 'Description', placeholder: 'What is this model used for?', multiline: true },
         ]}
         reasoningEffortOptions={['none', 'low', 'medium', 'high']}
+        standaloneCaps={['embeddings', 'audio', 'decision']}
+        standaloneLabel="Standalone"
+        kindDescriptions={{
+          text: 'Chat & reasoning — usually with vision and tools',
+          embeddings: 'Vectorize text for search',
+          audio: 'Transcribe or speak',
+          decision: 'Routing decisions only',
+        }}
+        advancedLabel="Advanced"
       />
     </div>
   )
