@@ -1,5 +1,22 @@
 # @neuronection/assistant-ui
 
+## 0.70.0
+
+### Minor Changes
+
+- [`3f795e7`](https://github.com/neuronection/assistant-ui/commit/3f795e7a12f32d7aa0b07dac1b9205a345c4de10) Thanks [@constLiakos](https://github.com/constLiakos)! - ModelRegistry: compact add/edit modal — the provider context banner and the
+  change-kind box merge into one quiet context line (provider name, kind chip,
+  change-kind link; base URL moves to the name's `title`), and the tuning
+  fields (reasoning effort, temperature, max tokens) move under a collapsed
+  `<details>` disclosure with the new `advancedLabel` prop (default
+  `'Advanced'`). Common fields — model picker and label — now lead the form.
+
+- [`0fbb61c`](https://github.com/neuronection/assistant-ui/commit/0fbb61c3affb301c0b578948fcb730c0735df5e2) Thanks [@constLiakos](https://github.com/constLiakos)! - chat-hitl: `HitlProposalCard` gains the study-promoted resolution extras —
+  a `children` body slot rendered between the field rows and the actions
+  (app-owned target/edit summaries, rendered diffs, previews), an app-supplied
+  `conflictNote`, and conflict-resolvable actions with a `reapply` label
+  (approve re-applies the refreshed diff instead of dead-ending the card).
+
 ## 0.69.0
 
 ### Minor Changes
