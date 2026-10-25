@@ -4,7 +4,7 @@ import {
   type WebSearchProviderCatalog,
   type WebSearchProviderProbeView,
   type WebSearchProviderView,
-} from '../src/components/web-search-providers/WebSearchProvidersPanel'
+} from '../src/components/web-search-providers'
 
 const catalog: WebSearchProviderCatalog = {
   order: ['searxng', 'tavily', 'brave', 'exa', 'serper', 'google-pse'],

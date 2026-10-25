@@ -1,14 +1,15 @@
 import * as React from 'react'
 import { describe, expect, it, vi } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { axe } from 'jest-axe'
 
 import {
   WebSearchProvidersPanel,
+  WebSearchProviderWizard,
   type WebSearchProviderCatalog,
   type WebSearchProviderView,
-} from '../src/components/web-search-providers/WebSearchProvidersPanel'
+} from '../src/components/web-search-providers'
 
 const CATALOG: WebSearchProviderCatalog = {
   order: ['searxng', 'tavily', 'google-pse'],
@@ -64,7 +65,9 @@ const PROVIDERS: WebSearchProviderView[] = [
   },
 ]
 
-function renderPanel(overrides: Partial<React.ComponentProps<typeof WebSearchProvidersPanel>> = {}) {
+function renderPanel(
+  overrides: Partial<React.ComponentProps<typeof WebSearchProvidersPanel>> = {},
+) {
   const handlers = {
     onSave: vi.fn(),
     onDelete: vi.fn(),
@@ -78,113 +81,81 @@ function renderPanel(overrides: Partial<React.ComponentProps<typeof WebSearchPro
   return { ...utils, handlers }
 }
 
-describe('WebSearchProvidersPanel', () => {
-  it('renders ordered rows with type labels, key state and the disabled badge', () => {
+async function openActions(user: ReturnType<typeof userEvent.setup>, name: string) {
+  await user.click(screen.getByRole('button', { name: `Actions for ${name}` }))
+}
+
+describe('WebSearchProvidersPanel (card list)', () => {
+  it('renders provider cards with type, priority, disabled and key badges', () => {
     renderPanel()
     expect(screen.getByText('Web search providers')).toBeInTheDocument()
     expect(screen.getByTestId('wsp-row-sp1')).toBeInTheDocument()
     expect(screen.getByTestId('wsp-row-sp2')).toBeInTheDocument()
-    expect(screen.getByText('Tavily')).toBeInTheDocument()
-    expect(screen.getByText('••••cret')).toBeInTheDocument()
+    expect(screen.getByText('Tavily main')).toBeInTheDocument()
+    expect(screen.getAllByText('Tavily').length).toBeGreaterThan(0)
+    expect(screen.getByText('priority 1')).toBeInTheDocument()
+    expect(screen.getByText('priority 2')).toBeInTheDocument()
     expect(screen.getByText('disabled')).toBeInTheDocument()
+    expect(screen.getByText('••••cret')).toBeInTheDocument()
+    expect(screen.getByText('https://searx.example.org')).toBeInTheDocument()
+    expect(screen.getAllByText('Not tested').length).toBeGreaterThan(0)
   })
 
-  it('toggle emits the flipped enabled state', async () => {
-    const user = userEvent.setup()
-    const { handlers } = renderPanel()
-    await user.click(screen.getByRole('checkbox', { name: 'Enable provider: Tavily main' }))
-    expect(handlers.onToggle).toHaveBeenCalledWith('sp1', false)
+  it('marks key-requiring providers without a stored key', () => {
+    renderPanel({
+      providers: [
+        { id: 'sp3', name: 'Bare brave', type: 'tavily', enabled: true, keySet: false },
+      ],
+    })
+    expect(screen.getByTestId('wsp-key-sp3')).toHaveTextContent('no key')
   })
 
-  it('move emits up/down and boundary moves are disabled', async () => {
-    const user = userEvent.setup()
-    const { handlers } = renderPanel()
-    expect(screen.getByRole('button', { name: 'Move up: Tavily main' })).toBeDisabled()
-    expect(screen.getByRole('button', { name: 'Move down: Campus SearXNG' })).toBeDisabled()
-    await user.click(screen.getByRole('button', { name: 'Move down: Tavily main' }))
-    expect(handlers.onMove).toHaveBeenCalledWith('sp1', 'down')
-    await user.click(screen.getByRole('button', { name: 'Move up: Campus SearXNG' }))
-    expect(handlers.onMove).toHaveBeenCalledWith('sp2', 'up')
-  })
-
-  it('test emits the provider id and shows the probe', async () => {
-    const user = userEvent.setup()
-    const { handlers } = renderPanel()
-    const firstTest = screen.getAllByRole('button', { name: 'Test' })[0]
-    expect(firstTest).toBeDefined()
-    if (firstTest) await user.click(firstTest)
-    expect(handlers.onTest).toHaveBeenCalledWith('sp1')
-  })
-
-  it('shows the testing state and the probe status row', () => {
+  it('shows the testing state and the probe status line', () => {
     renderPanel({
       testingId: 'sp1',
       probes: { sp2: { status: 'json_disabled', latencyMs: 120, error: 'JSON format disabled' } },
     })
-    expect(screen.getAllByText('Test…').length).toBeGreaterThan(0)
-    // failLabel + errorMessage both surface the reason
+    expect(screen.getAllByText(/Test…/).length).toBeGreaterThan(0)
     expect(screen.getAllByText(/JSON format disabled/).length).toBeGreaterThan(0)
+    expect(screen.getByText('failed')).toBeInTheDocument()
   })
 
-  it('add opens the catalog-driven form; save emits the input and required fields gate', async () => {
+  it('toggle emits the flipped enabled state from the actions menu', async () => {
     const user = userEvent.setup()
     const { handlers } = renderPanel()
-    await user.click(screen.getByRole('button', { name: /add provider/i }))
-
-    // default type = first catalog entry (searxng) → base URL required, key hidden requirement
-    const save = screen.getByRole('button', { name: /save provider/i })
-    expect(save).toBeDisabled()
-    const baseUrl = screen.getByPlaceholderText('Base URL (required)')
-    await user.type(baseUrl, 'https://searx.example.org')
-    await user.type(screen.getByPlaceholderText('Name (optional)'), 'Campus SearXNG')
-    expect(save).toBeEnabled()
-
-    await user.click(save)
-    expect(handlers.onSave).toHaveBeenCalledWith({
-      id: undefined,
-      type: 'searxng',
-      name: 'Campus SearXNG',
-      baseUrl: 'https://searx.example.org',
-      googleCx: '',
-      apiKey: null,
-    })
+    await openActions(user, 'Tavily main')
+    await user.click(screen.getByRole('menuitem', { name: 'Disable' }))
+    expect(handlers.onToggle).toHaveBeenCalledWith('sp1', false)
+    await openActions(user, 'Campus SearXNG')
+    await user.click(screen.getByRole('menuitem', { name: 'Enable' }))
+    expect(handlers.onToggle).toHaveBeenCalledWith('sp2', true)
   })
 
-  it('tavily type requires a key before saving', async () => {
+  it('move emits up/down; boundary moves are disabled menu items', async () => {
     const user = userEvent.setup()
-    renderPanel()
-    await user.click(screen.getByRole('button', { name: /add provider/i }))
-    await user.selectOptions(screen.getByLabelText('Provider type'), 'tavily')
-    const save = screen.getByRole('button', { name: /save provider/i })
-    expect(save).toBeDisabled()
-    await user.type(screen.getByLabelText('API key'), 'tvly-key')
-    expect(save).toBeEnabled()
+    const { handlers } = renderPanel()
+    await openActions(user, 'Tavily main')
+    expect(screen.getByRole('menuitem', { name: 'Move up' })).toHaveAttribute('aria-disabled', 'true')
+    await user.click(screen.getByRole('menuitem', { name: 'Move down' }))
+    expect(handlers.onMove).toHaveBeenCalledWith('sp1', 'down')
+    await openActions(user, 'Campus SearXNG')
+    await user.click(screen.getByRole('menuitem', { name: 'Move up' }))
+    expect(handlers.onMove).toHaveBeenCalledWith('sp2', 'up')
   })
 
-  it('google-pse renders the catalog cx field', async () => {
+  it('test emits the provider id from the actions menu', async () => {
     const user = userEvent.setup()
-    renderPanel()
-    await user.click(screen.getByRole('button', { name: /add provider/i }))
-    await user.selectOptions(screen.getByLabelText('Provider type'), 'google-pse')
-    const cx = screen.getByLabelText('Engine id (cx)')
-    await user.type(cx, 'cx-123')
-    expect(cx).toHaveValue('cx-123')
-  })
-
-  it('edit pre-fills the draft from the provider row and locks the type', async () => {
-    const user = userEvent.setup()
-    renderPanel()
-    await user.click(screen.getByRole('button', { name: 'Edit provider: Tavily main' }))
-    const typeSelect = screen.getByLabelText('Provider type') as HTMLSelectElement
-    expect(typeSelect).toBeDisabled()
-    expect(typeSelect).toHaveValue('tavily')
-    expect(screen.getByPlaceholderText('Name (optional)')).toHaveValue('Tavily main')
+    const { handlers } = renderPanel()
+    await openActions(user, 'Tavily main')
+    await user.click(screen.getByRole('menuitem', { name: 'Test' }))
+    expect(handlers.onTest).toHaveBeenCalledWith('sp1')
   })
 
   it('delete emits the provider id (confirmation is app policy)', async () => {
     const user = userEvent.setup()
     const { handlers } = renderPanel()
-    await user.click(screen.getByRole('button', { name: 'Delete provider: Tavily main' }))
+    await openActions(user, 'Tavily main')
+    await user.click(screen.getByRole('menuitem', { name: 'Delete provider' }))
     expect(handlers.onDelete).toHaveBeenCalledWith('sp1')
   })
 
@@ -193,31 +164,190 @@ describe('WebSearchProvidersPanel', () => {
     expect(screen.getByTestId('wsp-empty')).toBeInTheDocument()
   })
 
-  it('keyboard: tab order runs add → rows → form in sequence', async () => {
-    const user = userEvent.setup()
-    renderPanel()
-    await user.tab()
-    expect(screen.getByRole('button', { name: /add provider/i })).toHaveFocus()
-    await user.click(screen.getByRole('button', { name: /add provider/i }))
-    // focus the form's first control, then walk the natural order
-    screen.getByLabelText('Provider type').focus()
-    await user.tab()
-    expect(screen.getByPlaceholderText('Name (optional)')).toHaveFocus()
-    await user.tab()
-    expect(screen.getByPlaceholderText('Base URL (required)')).toHaveFocus()
-  })
-
-  it('has no axe violations (rows + probes + form)', async () => {
+  it('has no axe violations (cards + probes)', async () => {
     const { container } = renderPanel({
       probes: { sp2: { status: 'auth', latencyMs: 40, error: 'key rejected' } },
     })
     expect(await axe(container)).toHaveNoViolations()
   })
+})
 
-  it('has no axe violations in the form', async () => {
+describe('WebSearchProvidersPanel (add wizard)', () => {
+  it('tiles step lists catalog types in order with key chips; select opens the form', async () => {
+    const user = userEvent.setup()
+    renderPanel()
+    await user.click(screen.getByRole('button', { name: /add provider/i }))
+    const tiles = screen.getByRole('group', { name: 'Choose a search provider' })
+    expect(within(tiles).getByRole('button', { name: /searxng/i })).toBeInTheDocument()
+    expect(within(tiles).getByRole('button', { name: /tavily/i })).toBeInTheDocument()
+    expect(within(tiles).getByRole('button', { name: /google programmable search/i })).toBeInTheDocument()
+    expect(within(tiles).getAllByText('API key').length).toBeGreaterThan(0)
+    expect(within(tiles).getByText('No API key')).toBeInTheDocument()
+    await user.click(within(tiles).getByRole('button', { name: /searxng/i }))
+    expect(screen.getByRole('list', { name: 'Setup progress' })).toBeInTheDocument()
+    expect(screen.getByText('Choose provider')).toBeInTheDocument()
+    expect(screen.getByText('Configure')).toBeInTheDocument()
+    expect(screen.getByText('SearXNG')).toBeInTheDocument()
+  })
+
+  it('searxng: base URL gates save; save emits the create input', async () => {
+    const user = userEvent.setup()
+    const { handlers } = renderPanel()
+    await user.click(screen.getByRole('button', { name: /add provider/i }))
+    await user.click(screen.getByRole('button', { name: /searxng/i }))
+    const save = screen.getByRole('button', { name: /save provider/i })
+    expect(save).toBeDisabled()
+    await user.type(screen.getByPlaceholderText('https://searx.example.org'), 'https://searx.example.org')
+    await user.type(screen.getByPlaceholderText('SearXNG'), 'Campus SearXNG')
+    expect(save).toBeEnabled()
+    await user.click(save)
+    expect(handlers.onSave).toHaveBeenCalledWith({
+      type: 'searxng',
+      name: 'Campus SearXNG',
+      baseUrl: 'https://searx.example.org',
+      googleCx: '',
+      apiKey: null,
+      fields: {},
+    })
+  })
+
+  it('tavily: a key is required before saving and rides the payload', async () => {
+    const user = userEvent.setup()
+    const { handlers } = renderPanel()
+    await user.click(screen.getByRole('button', { name: /add provider/i }))
+    await user.click(screen.getByRole('button', { name: /tavily/i }))
+    const save = screen.getByRole('button', { name: /save provider/i })
+    expect(save).toBeDisabled()
+    await user.type(screen.getByLabelText('API key'), 'tvly-key')
+    expect(save).toBeEnabled()
+    await user.click(save)
+    expect(handlers.onSave).toHaveBeenCalledWith(
+      expect.objectContaining({ type: 'tavily', apiKey: 'tvly-key' }),
+    )
+  })
+
+  it('google-pse renders the catalog cx field and gates on it', async () => {
+    const user = userEvent.setup()
+    const { handlers } = renderPanel()
+    await user.click(screen.getByRole('button', { name: /add provider/i }))
+    await user.click(screen.getByRole('button', { name: /google programmable search/i }))
+    const save = screen.getByRole('button', { name: /save provider/i })
+    expect(save).toBeDisabled()
+    await user.type(screen.getByLabelText('API key'), 'g-key')
+    expect(save).toBeDisabled()
+    await user.type(screen.getByLabelText('Engine id (cx)'), 'cx-123')
+    expect(save).toBeEnabled()
+    await user.click(save)
+    expect(handlers.onSave).toHaveBeenCalledWith(
+      expect.objectContaining({ googleCx: 'cx-123', fields: { google_cx: 'cx-123' } }),
+    )
+  })
+
+  it('extra fields ride the form and the payload (app-declared tuning)', async () => {
+    const user = userEvent.setup()
+    const handlers = { onSave: vi.fn() }
+    render(
+      <WebSearchProviderWizard
+        catalog={CATALOG}
+        extraFields={[{ id: 'timeout_ms', label: 'Timeout (ms)', required: false, type: 'number', advanced: true }]}
+        onSave={handlers.onSave}
+      />,
+    )
+    await user.click(screen.getByRole('button', { name: /tavily/i }))
+    await user.type(screen.getByLabelText('API key'), 'tvly-key')
+    screen.getByText('Advanced').click()
+    await user.type(screen.getByLabelText('Timeout (ms)'), '4000')
+    await user.click(screen.getByRole('button', { name: /save provider/i }))
+    expect(handlers.onSave).toHaveBeenCalledWith(
+      expect.objectContaining({ fields: { timeout_ms: '4000' } }),
+    )
+  })
+
+  it('back returns to the tiles, then out of the wizard', async () => {
+    const user = userEvent.setup()
+    renderPanel()
+    await user.click(screen.getByRole('button', { name: /add provider/i }))
+    await user.click(screen.getByRole('button', { name: /tavily/i }))
+    await user.click(screen.getByRole('button', { name: 'Back' }))
+    expect(screen.getByRole('group', { name: 'Choose a search provider' })).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Back' }))
+    expect(screen.getByTestId('wsp-row-sp1')).toBeInTheDocument()
+  })
+
+  it('seeds the form with the catalog base URL for optional-endpoint types', async () => {
+    const user = userEvent.setup()
+    renderPanel()
+    await user.click(screen.getByRole('button', { name: /add provider/i }))
+    await user.click(screen.getByRole('button', { name: /tavily/i }))
+    expect(screen.getByLabelText('Base URL (optional)')).toHaveValue('https://api.tavily.com')
+  })
+
+  it('has no axe violations on the tiles step', async () => {
     const user = userEvent.setup()
     const { container } = renderPanel()
     await user.click(screen.getByRole('button', { name: /add provider/i }))
+    expect(await axe(container)).toHaveNoViolations()
+  })
+
+  it('has no axe violations on the form step', async () => {
+    const user = userEvent.setup()
+    const { container } = renderPanel()
+    await user.click(screen.getByRole('button', { name: /add provider/i }))
+    await user.click(screen.getByRole('button', { name: /tavily/i }))
+    expect(await axe(container)).toHaveNoViolations()
+  })
+
+  it('keyboard: tiles are buttons in the tab order', async () => {
+    const user = userEvent.setup()
+    renderPanel()
+    await user.click(screen.getByRole('button', { name: /add provider/i }))
+    await user.tab()
+    const focused = screen.getByRole('group', { name: 'Choose a search provider' }).querySelector(':focus')
+    expect(focused).toBeInstanceOf(HTMLElement)
+  })
+})
+
+describe('WebSearchProvidersPanel (edit)', () => {
+  it('edit pre-fills from the card; a blank key keeps the stored one', async () => {
+    const user = userEvent.setup()
+    const { handlers } = renderPanel()
+    await openActions(user, 'Tavily main')
+    await user.click(screen.getByRole('menuitem', { name: 'Edit provider' }))
+    expect(screen.getByText('Edit provider')).toBeInTheDocument()
+    expect(screen.getByDisplayValue('Tavily main')).toBeInTheDocument()
+    expect(screen.getByText('API key saved')).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: /save provider/i }))
+    expect(handlers.onSave).toHaveBeenCalledWith(
+      expect.objectContaining({ id: 'sp1', type: 'tavily', apiKey: null }),
+    )
+  })
+
+  it('a new key value replaces the stored one', async () => {
+    const user = userEvent.setup()
+    const { handlers } = renderPanel()
+    await openActions(user, 'Tavily main')
+    await user.click(screen.getByRole('menuitem', { name: 'Edit provider' }))
+    await user.type(screen.getByPlaceholderText('••••cret'), 'tvly-new')
+    await user.click(screen.getByRole('button', { name: /save provider/i }))
+    expect(handlers.onSave).toHaveBeenCalledWith(
+      expect.objectContaining({ apiKey: 'tvly-new' }),
+    )
+  })
+
+  it('cancel returns to the card list', async () => {
+    const user = userEvent.setup()
+    renderPanel()
+    await openActions(user, 'Tavily main')
+    await user.click(screen.getByRole('menuitem', { name: 'Edit provider' }))
+    await user.click(screen.getByRole('button', { name: 'Cancel' }))
+    expect(screen.getByTestId('wsp-row-sp1')).toBeInTheDocument()
+  })
+
+  it('has no axe violations in the edit form', async () => {
+    const user = userEvent.setup()
+    const { container } = renderPanel()
+    await openActions(user, 'Tavily main')
+    await user.click(screen.getByRole('menuitem', { name: 'Edit provider' }))
     expect(await axe(container)).toHaveNoViolations()
   })
 })
