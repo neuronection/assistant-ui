@@ -217,6 +217,7 @@ describe('ModelRegistry', () => {
     const dialog = await openAddModal(user)
     await user.click(within(dialog).getByRole('combobox', { name: 'Model' }))
     await user.click(screen.getByRole('option', { name: 'gpt-4o-mini' }))
+    await user.click(within(dialog).getByText('Advanced'))
     expect(within(dialog).getByLabelText('Display label')).toHaveValue('GPT 4o Mini')
     await user.type(within(dialog).getByLabelText('Display label'), '!')
     await user.click(within(dialog).getByRole('button', { name: 'Add model' }))
@@ -274,7 +275,7 @@ describe('ModelRegistry', () => {
     )
   })
 
-  it('hides the tuning fields under a collapsed Advanced disclosure', async () => {
+  it('hides the label and tuning fields under a collapsed Advanced disclosure', async () => {
     const user = userEvent.setup()
     render(<RegistryDemo />)
     const dialog = await openAddModal(user)
@@ -285,6 +286,7 @@ describe('ModelRegistry', () => {
     expect(advanced).not.toHaveAttribute('open')
     await user.click(within(dialog).getByText('Advanced'))
     expect(advanced).toHaveAttribute('open')
+    expect(within(dialog).getByLabelText('Display label')).toBeInTheDocument()
     expect(within(dialog).getByLabelText('Temperature')).toBeInTheDocument()
     expect(within(dialog).getByLabelText('Reasoning effort')).toBeInTheDocument()
   })

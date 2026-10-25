@@ -25,7 +25,7 @@ import { ModelRegistry } from '@neuronection/assistant-ui/model-registry'
 | `capImplications` | `Record<string, string[]>` | — | selection implications between combinable caps (e.g. `{ vision: ['text'], tools: ['text'] }` — every vision/tool-capable model is a text model too): selecting a key auto-enables its values; deselecting a value deselects everything that implies it |
 | `useCatalogLabel` | `string` | `'Pick from the catalog'` | manual↔catalog toggle copy when manual entry is active |
 | `providerContextLabel` | `string` | `'Provider'` | visually-hidden prefix for the provider context line (configured name — base URL on hover — plus the kind chip and change-kind link on the details step) |
-| `advancedLabel` | `string` | `'Advanced'` | collapsed-by-default disclosure wrapping the tuning fields (reasoning effort, temperature, max tokens) in the add/edit modal |
+| `advancedLabel` | `string` | `'Advanced'` | collapsed-by-default disclosure holding the optional display label and the capability-conditional tuning fields (reasoning effort, temperature, max tokens) in the add/edit modal |
 | `expandedProviderId` | `string \| null` | — | which provider card is open |
 | `onExpandedProviderChange` | `(providerId: string \| null) => void` | — | disclosure is controlled |
 | `remoteModels` | `ModelRegistryRemoteModel[]` | — | `{ id, caps }[]` for the expanded provider, fetched app-side |
@@ -125,11 +125,12 @@ stt, tts and embeddings models get the minimal form, and a decision
 selection stamps the app's transport (read-only; one shipping transport
 today).
 
-The modal leads with what users edit — the model picker and label — under
-one quiet context line (provider name, kind chip, change-kind link; the
-base URL rides the name's `title`). The tuning fields live in a collapsed
-`<details>` disclosure (`advancedLabel`); capability-conditional as above,
-the disclosure renders only for chat-family selections.
+The modal leads with what users edit — the model picker — under one quiet
+context line (provider name, kind chip, change-kind link; the base URL
+rides the name's `title`). Capabilities follow, then everything secondary
+lives in a collapsed `<details>` disclosure (`advancedLabel`): the
+optional display label (auto-filled from the model id when the app picks
+from the catalog) plus the capability-conditional tuning fields.
 
 ## accessibility
 

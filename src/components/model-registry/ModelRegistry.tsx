@@ -853,21 +853,6 @@ export const ModelRegistry = React.forwardRef<HTMLDivElement, ModelRegistryProps
               ) : (
                 <p className="font-mono text-sm text-[var(--as-fg)]">{modal.externalId}</p>
               )}
-              <label className="block space-y-1 text-sm">
-                <span className="text-sm font-medium text-[var(--as-fg)]">{labelLabel}</span>
-                <input
-                  type="text"
-                  value={modal.label}
-                  onChange={(event) =>
-                    setModal((current) =>
-                      current
-                        ? { ...current, label: event.target.value, labelTouched: true }
-                        : current,
-                    )
-                  }
-                  className="w-full rounded-[var(--as-radius)] border border-[var(--as-border)] bg-[var(--as-surface)] px-3 py-2 text-sm text-[var(--as-fg)]"
-                />
-              </label>
               <div className="space-y-1">
                 {!(wizard && kindFromCaps(modal.caps) !== 'text') ? (
                   <span className="text-sm font-medium text-[var(--as-fg)]">{capsLabel}</span>
@@ -940,11 +925,10 @@ export const ModelRegistry = React.forwardRef<HTMLDivElement, ModelRegistryProps
                   <p className="text-xs text-[var(--as-muted-fg)]">{capsHint}</p>
                 ) : null}
               </div>
-              {hasParametricCaps(modal.caps) ? (
-                <details
-                  data-as="model-registry-advanced"
-                  className="group rounded-[var(--as-radius)] border border-[var(--as-border)] bg-[var(--as-surface)]"
-                >
+              <details
+                data-as="model-registry-advanced"
+                className="group rounded-[var(--as-radius)] border border-[var(--as-border)] bg-[var(--as-surface)]"
+              >
                   <summary className="flex cursor-pointer list-none items-center gap-1.5 rounded-[var(--as-radius)] px-3 py-2 text-sm text-[var(--as-muted-fg)] transition-colors hover:bg-[var(--as-muted)] hover:text-[var(--as-fg)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--as-focus-ring)] [&::-webkit-details-marker]:hidden">
                     <ChevronRight
                       className="size-3.5 shrink-0 transition-transform group-open:rotate-90"
@@ -953,7 +937,22 @@ export const ModelRegistry = React.forwardRef<HTMLDivElement, ModelRegistryProps
                     {advancedLabel}
                   </summary>
                   <div className="flex flex-col gap-4 border-t border-[var(--as-border)] p-3">
-                    {reasoningEffortOptions ? (
+                    <label className="block space-y-1 text-sm">
+                      <span className="text-sm font-medium text-[var(--as-fg)]">{labelLabel}</span>
+                      <input
+                        type="text"
+                        value={modal.label}
+                        onChange={(event) =>
+                          setModal((current) =>
+                            current
+                              ? { ...current, label: event.target.value, labelTouched: true }
+                              : current,
+                          )
+                        }
+                        className="w-full rounded-[var(--as-radius)] border border-[var(--as-border)] bg-[var(--as-surface)] px-3 py-2 text-sm text-[var(--as-fg)]"
+                      />
+                    </label>
+                    {reasoningEffortOptions && hasParametricCaps(modal.caps) ? (
                       <label className="block space-y-1 text-sm">
                         <span className="text-sm font-medium text-[var(--as-fg)]">
                           {reasoningEffortLabel}
@@ -998,28 +997,29 @@ export const ModelRegistry = React.forwardRef<HTMLDivElement, ModelRegistryProps
                         </div>
                       </label>
                     ) : null}
-                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                      <NumberField
-                        label={temperatureLabel}
-                        value={modal.temperature}
-                        onChange={(value) => patchField('temperature', value)}
-                        onClear={() => patchField('temperature', '')}
-                        step="0.1"
-                        min="0"
-                        max="2"
-                      />
-                      <NumberField
-                        label={maxTokensLabel}
-                        value={modal.maxTokens}
-                        onChange={(value) => patchField('maxTokens', value)}
-                        onClear={() => patchField('maxTokens', '')}
-                        step="256"
-                        min="1"
-                      />
-                    </div>
+                    {hasParametricCaps(modal.caps) ? (
+                      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                        <NumberField
+                          label={temperatureLabel}
+                          value={modal.temperature}
+                          onChange={(value) => patchField('temperature', value)}
+                          onClear={() => patchField('temperature', '')}
+                          step="0.1"
+                          min="0"
+                          max="2"
+                        />
+                        <NumberField
+                          label={maxTokensLabel}
+                          value={modal.maxTokens}
+                          onChange={(value) => patchField('maxTokens', value)}
+                          onClear={() => patchField('maxTokens', '')}
+                          step="256"
+                          min="1"
+                        />
+                      </div>
+                    ) : null}
                   </div>
                 </details>
-              ) : null}
               {(extraFields ?? []).map((field) => {
                 const value = modal.extra[field.key] ?? ''
                 const common =
