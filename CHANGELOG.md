@@ -1,5 +1,16 @@
 # @neuronection/assistant-ui
 
+## 0.71.0
+
+### Minor Changes
+
+- [`a3124c2`](https://github.com/neuronection/assistant-ui/commit/a3124c2eeec02c55a1eadb0251c75e158e1e7658) Thanks [@constLiakos](https://github.com/constLiakos)! - ModelRegistry: the optional display label moves under the Advanced
+  disclosure, next to the tuning fields. The main form is now the model
+  picker plus capabilities — the label is secondary (it auto-fills from
+  the model id on catalog picks) and always reachable via Advanced, for
+  every model kind. The disclosure renders unconditionally; the tuning
+  fields inside stay capability-conditional.
+
 ## 0.70.0
 
 ### Minor Changes
