@@ -21,12 +21,21 @@ describe('ProviderLogo', () => {
     expect(container.querySelector('path')?.getAttribute('fill-rule')).toBe('evenodd')
   })
 
-  it('falls back to a monogram for keys without a shipped mark (groq/serper/typesafe)', () => {
+  it('falls back to a monogram for keys without a shipped mark (serper only now)', () => {
     const { container } = render(<ProviderLogo preset="serper" />)
     expect(container.querySelector('svg')).toBeNull()
     expect(container).toHaveTextContent('S')
-    const { container: groq } = render(<ProviderLogo preset="groq" />)
-    expect(groq).toHaveTextContent('G')
+  })
+
+  it('groq renders the bolt mark extracted from the vendor wordmark', () => {
+    const { container } = render(<ProviderLogo preset="groq" />)
+    expect(container.querySelector('svg')).not.toBeNull()
+  })
+
+  it('colored marks keep their brand fills', () => {
+    const { container } = render(<ProviderLogo preset="microsoft" />)
+    const fills = Array.from(container.querySelectorAll('path')).map((p) => p.getAttribute('fill'))
+    expect(fills).toContain('#F25022')
   })
 
   it('is decorative (aria-hidden) and sizes from the size prop', () => {
