@@ -22,8 +22,8 @@ describe('ProviderSetupTiles', () => {
     const names = within(group)
       .getAllByRole('button')
       .map((button) => button.textContent)
-    // 'OOpenAI' = monogram fallback (openai mark gone upstream) + tile label
-    expect(names).toEqual(['OOpenAI', 'Google AI Studio', 'OllamaLocal'])
+    // 'OpenAI' = monogram fallback (openai mark gone upstream) + tile label
+    expect(names).toEqual(['OpenAI', 'Google AI Studio', 'OllamaLocal'])
     expect(screen.queryByText(/recommended/i)).not.toBeInTheDocument()
   })
 

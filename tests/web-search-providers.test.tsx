@@ -12,7 +12,7 @@ import {
 } from '../src/components/web-search-providers'
 
 const CATALOG: WebSearchProviderCatalog = {
-  order: ['searxng', 'tavily', 'exa', 'google-pse'],
+  order: ['searxng', 'tavily', 'exa', 'serper', 'google-pse'],
   entries: {
     searxng: {
       label: 'SearXNG',
@@ -31,6 +31,16 @@ const CATALOG: WebSearchProviderCatalog = {
       baseUrl: 'https://api.tavily.com',
       baseUrlRequired: false,
       baseUrlHint: 'https://api.tavily.com',
+      notes: null,
+      hosting: 'cloud',
+    },
+    serper: {
+      label: 'Serper (Google)',
+      requiresKey: true,
+      keyUrl: 'https://serper.dev/api-key',
+      baseUrl: 'https://google.serper.dev',
+      baseUrlRequired: false,
+      baseUrlHint: 'https://google.serper.dev',
       notes: null,
       hosting: 'cloud',
     },
@@ -213,8 +223,8 @@ describe('WebSearchProvidersPanel (add wizard)', () => {
     expect(searxngTile.querySelector('svg')).not.toBeNull()
     const tavilyTile = within(tiles).getByRole('button', { name: /tavily/i })
     expect(tavilyTile.querySelector('svg')).not.toBeNull()
-    const exaTile = within(tiles).getByRole('button', { name: /exa/i })
-    expect(exaTile.querySelector('svg')).toBeNull()
+    const serperTile = within(tiles).getByRole('button', { name: /serper/i })
+    expect(serperTile.querySelector('svg')).toBeNull()
   })
 
   it('cards render the brand mark for types with one', () => {
