@@ -53,8 +53,10 @@ export interface WebSearchProviderSettingsFormProps
 
 /** Catalog-driven settings form for one web-search provider type — the
  * "configure" step of the tile wizard and the body of an edit page
- * (mirrors the AI ProviderSetupForm principles: vendor key link, write-only
- * key, required-field gating, Advanced disclosure for tuning fields).
+ * (mirrors the AI ProviderSetupForm principles). The main page stays
+ * minimal: the key (or the base URL when the catalog requires one —
+ * self-hosted instances), with the name, optional endpoint overrides and
+ * `advanced` tuning fields collected under the Advanced disclosure.
  * Fully controlled; persistence and secrets are app-side (ADR-006). */
 export const WebSearchProviderSettingsForm = React.forwardRef<
   HTMLFormElement,
@@ -171,13 +173,6 @@ export const WebSearchProviderSettingsForm = React.forwardRef<
         <p className="text-xs text-[var(--as-muted-fg)]">{entry.notes}</p>
       ) : null}
 
-      <Input
-        label={t.nameLabel}
-        placeholder={entry.label}
-        value={value.name}
-        onChange={(event) => onChange({ ...value, name: event.target.value })}
-      />
-
       {entry.requiresKey ? (
         <Input
           label={mode === 'edit' ? t.keyStoredLabel : t.apiKeyLabel}
@@ -196,24 +191,44 @@ export const WebSearchProviderSettingsForm = React.forwardRef<
         <p className="text-sm text-[var(--as-muted-fg)]">{t.noKeyLabel}</p>
       )}
 
-      <Input
-        label={entry.baseUrlRequired ? t.baseUrlRequiredLabel : t.baseUrlLabel}
-        hint={entry.baseUrlHint ?? undefined}
-        placeholder={entry.baseUrlHint ?? undefined}
-        className="font-mono"
-        required={entry.baseUrlRequired}
-        value={value.baseUrl}
-        onChange={(event) => onChange({ ...value, baseUrl: event.target.value })}
-      />
+      {!entry.baseUrlRequired ? null : (
+        <Input
+          label={t.baseUrlRequiredLabel}
+          hint={entry.baseUrlHint ?? undefined}
+          placeholder={entry.baseUrlHint ?? undefined}
+          className="font-mono"
+          required
+          value={value.baseUrl}
+          onChange={(event) => onChange({ ...value, baseUrl: event.target.value })}
+        />
+      )}
 
       {primaryFields.map(renderField)}
 
-      {advancedFields.length > 0 ? (
+      {advancedFields.length > 0 || !entry.baseUrlRequired ? (
         <details className="rounded-[var(--as-radius)] border border-[var(--as-border)] px-3 py-2">
           <summary className="cursor-pointer text-sm font-medium text-[var(--as-fg)]">
             {t.advancedLabel}
           </summary>
-          <div className="flex flex-col gap-2 pt-2">{advancedFields.map(renderField)}</div>
+          <div className="flex flex-col gap-2 pt-2">
+            <Input
+              label={t.nameLabel}
+              placeholder={entry.label}
+              value={value.name}
+              onChange={(event) => onChange({ ...value, name: event.target.value })}
+            />
+            {!entry.baseUrlRequired ? (
+              <Input
+                label={t.baseUrlLabel}
+                hint={entry.baseUrlHint ?? undefined}
+                placeholder={entry.baseUrlHint ?? undefined}
+                className="font-mono"
+                value={value.baseUrl}
+                onChange={(event) => onChange({ ...value, baseUrl: event.target.value })}
+              />
+            ) : null}
+            {advancedFields.map(renderField)}
+          </div>
         </details>
       ) : null}
 

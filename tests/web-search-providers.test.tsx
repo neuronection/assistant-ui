@@ -219,17 +219,47 @@ describe('WebSearchProvidersPanel (add wizard)', () => {
     const save = screen.getByRole('button', { name: /save provider/i })
     expect(save).toBeDisabled()
     await user.type(screen.getByPlaceholderText('https://searx.example.org'), 'https://searx.example.org')
-    await user.type(screen.getByPlaceholderText('SearXNG'), 'Campus SearXNG')
     expect(save).toBeEnabled()
     await user.click(save)
     expect(handlers.onSave).toHaveBeenCalledWith({
       type: 'searxng',
-      name: 'Campus SearXNG',
+      name: '',
       baseUrl: 'https://searx.example.org',
       googleCx: '',
       apiKey: null,
       fields: {},
     })
+  })
+
+  it('cloud providers keep the main page to the key; name and endpoint override live under Advanced', async () => {
+    const user = userEvent.setup()
+    renderPanel()
+    await user.click(screen.getByRole('button', { name: /add provider/i }))
+    await user.click(screen.getByRole('button', { name: /tavily/i }))
+    const details = screen.getByText('Advanced').closest('details')
+    expect(details).not.toBeNull()
+    const keyInput = screen.getByLabelText('API key')
+    const nameInput = screen.getByLabelText('Name')
+    const baseUrlInput = screen.getByLabelText(/base url/i)
+    expect(details?.contains(keyInput)).toBe(false)
+    expect(details?.contains(nameInput)).toBe(true)
+    expect(details?.contains(baseUrlInput)).toBe(true)
+    expect(nameInput).toHaveValue('')
+  })
+
+  it('defaultName seeds the advanced name field per type', async () => {
+    const user = userEvent.setup()
+    render(
+      <WebSearchProviderWizard
+        catalog={CATALOG}
+        defaultName={(type) => (type === 'tavily' ? 'Tavily 2' : null)}
+        onSave={vi.fn()}
+      />,
+    )
+    await user.click(screen.getByRole('button', { name: /tavily/i }))
+    const details = screen.getByText('Advanced').closest('details')
+    if (details) details.open = true
+    expect(screen.getByLabelText('Name')).toHaveValue('Tavily 2')
   })
 
   it('tavily: a key is required before saving and rides the payload', async () => {
@@ -335,6 +365,8 @@ describe('WebSearchProvidersPanel (edit)', () => {
     await openActions(user, 'Tavily main')
     await user.click(screen.getByRole('menuitem', { name: 'Edit provider' }))
     expect(screen.getByText('Edit provider')).toBeInTheDocument()
+    const details = screen.getByText('Advanced').closest('details')
+    if (details) details.open = true
     expect(screen.getByDisplayValue('Tavily main')).toBeInTheDocument()
     expect(screen.getByText('API key saved')).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: /save provider/i }))

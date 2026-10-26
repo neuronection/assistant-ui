@@ -107,7 +107,7 @@ export const ProviderSetupTiles = React.forwardRef<
             )}
           >
             <ProviderLogo preset={preset.key} />
-            <span className="w-full truncate text-center">{preset.name}</span>
+            <span className="w-full text-center leading-snug">{preset.name}</span>
             {preset.chips && preset.chips.length > 0 ? (
               <CapabilityChips
                 variant="badge"

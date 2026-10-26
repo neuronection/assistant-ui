@@ -33,6 +33,10 @@ export interface WebSearchProviderWizardProps
   catalog: WebSearchProviderCatalog
   /** Pre-selects a type and opens the form step directly. */
   initialType?: string | null
+  /** Default connection name per type — the app derives it from its
+   * existing instances (label, numbered when taken). Seeded into the
+   * form's name field, which lives under Advanced. */
+  defaultName?: (type: string) => string | null
   /** App-declared extra fields rendered by the settings form. */
   extraFields?: WebSearchProviderCatalogField[]
   busy?: boolean
@@ -63,6 +67,7 @@ export const WebSearchProviderWizard = React.forwardRef<
   {
     catalog,
     initialType = null,
+    defaultName,
     extraFields,
     busy = false,
     error = null,
@@ -95,7 +100,7 @@ export const WebSearchProviderWizard = React.forwardRef<
 
   const selectType = (type: string): void => {
     setSelectedType(type)
-    setValue({ ...emptyValue(), baseUrl: catalog.entries[type]?.baseUrl ?? '' })
+    setValue({ ...emptyValue(), name: defaultName?.(type) ?? '', baseUrl: catalog.entries[type]?.baseUrl ?? '' })
   }
 
   const reset = (): void => {

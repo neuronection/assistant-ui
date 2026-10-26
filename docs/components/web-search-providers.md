@@ -84,7 +84,8 @@ the panel's: `orderLabel(position)`, `actionsLabel(name)`,
 The two-step add flow body (mount in a modal or inline): `SetupSteps`
 progress ("Choose provider" → "Configure"), provider tiles, then the
 settings form for the selected type. `initialType` opens the form step
-directly; `extraFields` appends app-declared tuning fields (rendered by
+directly; `defaultName(type)` seeds the form's name field (Advanced)
+with an app-computed default — label, numbered when already taken; `extraFields` appends app-declared tuning fields (rendered by
 the same form machinery); `error` surfaces a save failure on the form
 step. `onSave` emits the final `WebSearchProviderSaveInput`; `onCancel`
 fires from the tiles step's back button (the form step backs into the
@@ -93,13 +94,16 @@ tiles first).
 ## WebSearchProviderSettingsForm
 
 The catalog-driven settings form for one type (the wizard's step 2 and
-the body of an edit page): vendor key link (`onOpenKeyUrl` bridges
-Electron's `openExternal` — anchor by default), connection name, write-only
-API key (or the no-key note), base URL (required/optional per catalog,
-with hint), catalog fields, and an Advanced disclosure for
-`advanced: true` fields. `mode: 'edit'` renders the stored-key note
-(`storedKeyHint`) instead of gating on a key; submit stays disabled until
-the catalog's required fields are filled.
+the body of an edit page). The main page stays minimal: the vendor key
+link (`onOpenKeyUrl` bridges Electron's `openExternal` — anchor by
+default), the write-only API key (or the no-key note), and the base URL
+when the catalog requires it (self-hosted instances). Everything else —
+the connection name, the optional base-URL override, and `advanced`
+tuning fields — lives under the Advanced disclosure. `mode: 'edit'`
+renders the stored-key note (`storedKeyHint`) instead of gating on a
+key; submit stays disabled until the catalog's required fields are
+filled. Apps seed the name via the wizard's `defaultName(type)` (label,
+numbered when already taken — app-side, which owns the instances).
 
 ## WebSearchProviderTiles
 
