@@ -12,7 +12,7 @@ import {
 } from '../src/components/web-search-providers'
 
 const CATALOG: WebSearchProviderCatalog = {
-  order: ['searxng', 'tavily', 'google-pse'],
+  order: ['searxng', 'tavily', 'exa', 'google-pse'],
   entries: {
     searxng: {
       label: 'SearXNG',
@@ -31,6 +31,16 @@ const CATALOG: WebSearchProviderCatalog = {
       baseUrl: 'https://api.tavily.com',
       baseUrlRequired: false,
       baseUrlHint: 'https://api.tavily.com',
+      notes: null,
+      hosting: 'cloud',
+    },
+    exa: {
+      label: 'Exa',
+      requiresKey: true,
+      keyUrl: 'https://dashboard.exa.ai/api-keys',
+      baseUrl: 'https://api.exa.ai',
+      baseUrlRequired: false,
+      baseUrlHint: 'https://api.exa.ai',
       notes: null,
       hosting: 'cloud',
     },
@@ -185,7 +195,7 @@ describe('WebSearchProvidersPanel (add wizard)', () => {
     expect(within(tiles).getByRole('button', { name: /google programmable search/i })).toBeInTheDocument()
     expect(within(tiles).getAllByText('API key').length).toBeGreaterThan(0)
     expect(within(tiles).getByText('No API key')).toBeInTheDocument()
-    expect(within(tiles).getByText('Cloud')).toBeInTheDocument()
+    expect(within(tiles).getAllByText('Cloud').length).toBeGreaterThan(0)
     expect(within(tiles).getByText('Self-hosted')).toBeInTheDocument()
     await user.click(within(tiles).getByRole('button', { name: /searxng/i }))
     expect(screen.getByRole('list', { name: 'Setup progress' })).toBeInTheDocument()
@@ -202,7 +212,9 @@ describe('WebSearchProvidersPanel (add wizard)', () => {
     const searxngTile = within(tiles).getByRole('button', { name: /searxng/i })
     expect(searxngTile.querySelector('svg')).not.toBeNull()
     const tavilyTile = within(tiles).getByRole('button', { name: /tavily/i })
-    expect(tavilyTile.querySelector('svg')).toBeNull()
+    expect(tavilyTile.querySelector('svg')).not.toBeNull()
+    const exaTile = within(tiles).getByRole('button', { name: /exa/i })
+    expect(exaTile.querySelector('svg')).toBeNull()
   })
 
   it('cards render the brand mark for types with one', () => {
