@@ -159,6 +159,10 @@
       "types": "./dist/web-search-providers.d.ts",
       "import": "./dist/web-search-providers.js"
     },
+    "./translation-providers": {
+      "types": "./dist/translation-providers.d.ts",
+      "import": "./dist/translation-providers.js"
+    },
     "./integration-contracts": {
       "types": "./dist/integration-contracts.d.ts",
       "import": "./dist/integration-contracts.js"
