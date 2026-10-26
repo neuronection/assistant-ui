@@ -24,6 +24,8 @@ export interface WebSearchProviderWizardLabels
   backLabel?: string
   keyChipLabel?: string
   keylessChipLabel?: string
+  cloudChipLabel?: string
+  selfHostedChipLabel?: string
 }
 
 export interface WebSearchProviderWizardProps
@@ -80,6 +82,8 @@ export const WebSearchProviderWizard = React.forwardRef<
     backLabel: labels?.backLabel ?? 'Back',
     keyChipLabel: labels?.keyChipLabel,
     keylessChipLabel: labels?.keylessChipLabel,
+    cloudChipLabel: labels?.cloudChipLabel,
+    selfHostedChipLabel: labels?.selfHostedChipLabel,
   }
   const steps = [
     { id: 'choose', label: t.chooseStepLabel },
@@ -141,6 +145,8 @@ export const WebSearchProviderWizard = React.forwardRef<
             label={t.tilesLabel}
             keyChipLabel={t.keyChipLabel}
             keylessChipLabel={t.keylessChipLabel}
+            cloudChipLabel={t.cloudChipLabel}
+            selfHostedChipLabel={t.selfHostedChipLabel}
           />
           {onCancel ? (
             <div className="flex justify-end">

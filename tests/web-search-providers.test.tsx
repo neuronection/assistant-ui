@@ -22,6 +22,7 @@ const CATALOG: WebSearchProviderCatalog = {
       baseUrlRequired: true,
       baseUrlHint: 'https://searx.example.org',
       notes: 'Self-hosted metasearch.',
+      hosting: 'self-hosted',
     },
     tavily: {
       label: 'Tavily',
@@ -31,6 +32,7 @@ const CATALOG: WebSearchProviderCatalog = {
       baseUrlRequired: false,
       baseUrlHint: 'https://api.tavily.com',
       notes: null,
+      hosting: 'cloud',
     },
     'google-pse': {
       label: 'Google Programmable Search',
@@ -183,11 +185,30 @@ describe('WebSearchProvidersPanel (add wizard)', () => {
     expect(within(tiles).getByRole('button', { name: /google programmable search/i })).toBeInTheDocument()
     expect(within(tiles).getAllByText('API key').length).toBeGreaterThan(0)
     expect(within(tiles).getByText('No API key')).toBeInTheDocument()
+    expect(within(tiles).getByText('Cloud')).toBeInTheDocument()
+    expect(within(tiles).getByText('Self-hosted')).toBeInTheDocument()
     await user.click(within(tiles).getByRole('button', { name: /searxng/i }))
     expect(screen.getByRole('list', { name: 'Setup progress' })).toBeInTheDocument()
     expect(screen.getByText('Choose provider')).toBeInTheDocument()
     expect(screen.getByText('Configure')).toBeInTheDocument()
     expect(screen.getByText('SearXNG')).toBeInTheDocument()
+  })
+
+  it('tiles render brand marks where the catalog type has one and monograms otherwise', async () => {
+    const user = userEvent.setup()
+    renderPanel()
+    await user.click(screen.getByRole('button', { name: /add provider/i }))
+    const tiles = screen.getByRole('group', { name: 'Choose a search provider' })
+    const searxngTile = within(tiles).getByRole('button', { name: /searxng/i })
+    expect(searxngTile.querySelector('svg')).not.toBeNull()
+    const tavilyTile = within(tiles).getByRole('button', { name: /tavily/i })
+    expect(tavilyTile.querySelector('svg')).toBeNull()
+  })
+
+  it('cards render the brand mark for types with one', () => {
+    renderPanel()
+    const row = screen.getByTestId('wsp-row-sp2')
+    expect(row.querySelector('svg')).not.toBeNull()
   })
 
   it('searxng: base URL gates save; save emits the create input', async () => {

@@ -37,6 +37,9 @@ export interface WebSearchProviderCatalogEntry {
   baseUrlRequired: boolean
   baseUrlHint?: string | null
   notes?: string | null
+  /** Where the provider runs — rendered as a tile chip. Unknown values
+   * render nothing (fail-honest). */
+  hosting?: 'cloud' | 'self-hosted'
   fields?: WebSearchProviderCatalogField[]
 }
 

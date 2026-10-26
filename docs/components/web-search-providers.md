@@ -34,8 +34,11 @@ import {
   `search-providers.json`: per type, `label`, `requiresKey`, `keyUrl` +
   `baseUrl`/`baseUrlRequired`/`baseUrlHint`, optional `notes` and extra
   `fields` (label, required, placeholder, `type: 'text' | 'number'`,
-  `advanced`). The tiles, the settings form and the card badges all render
-  from it.
+  `advanced`), plus the optional `hosting` tag
+  (`'cloud' | 'self-hosted'`) rendered as a tile chip. The tiles, the
+  settings form and the card badges all render from it. Types with a
+  simple-icons mark (searxng, brave, google-pse) render the brand
+  logo; the rest keep the monogram fallback.
 - `WebSearchProviderFormValue` — the form's controlled value:
   `{ name, apiKey, baseUrl, fields }` (`fields` keyed by catalog/app field
   id, e.g. `google_cx`).
@@ -101,8 +104,9 @@ the catalog's required fields are filled.
 ## WebSearchProviderTiles
 
 The "choose" step alone: the family `ProviderSetupTiles` fed from the
-catalog — one tile per type in catalog order, a key/keyless chip derived
-from `requiresKey` (equal weight, no ranking).
+catalog — one tile per type in catalog order, a key chip derived from
+`requiresKey` and a hosting chip from `hosting` (equal weight, no
+ranking; unknown hosting values render nothing).
 
 ## minimal snippet
 
