@@ -31,6 +31,14 @@ import { AddIntegrationSourceDialog } from '@neuronection/assistant-ui/add-integ
 - `secretSlot?: string | null` — renders the sealed-credential password
   field only when the host declares a slot id; the value never persists in
   props (it rides the submit event once).
+- `kind?: 'chooser' | 'git' | 'local'` — source-kind mode. `'chooser'`
+  opens on two cards (git repository / local folder — the Add-provider
+  tile pattern) and reveals only the chosen kind's fields; `'git'` /
+  `'local'` pin one kind. Omitted = the legacy flat form (both fields).
+  Choosing *local* prefills `branch`/`main` (the local-checkout default).
+- `initial?: Partial<IntegrationSourceDraft>` — prefill for edit flows,
+  merged over the empty draft when opened (e.g. re-opening an existing
+  source's descriptor).
 - `className` — merges onto the modal content.
 
 ## controlled contract

@@ -23,6 +23,9 @@ import { IntegrationSourcesList } from '@neuronection/assistant-ui/integration-s
   `installLabel`, `incompatibleLabel`, `kindLabels`.
 - `busy?`, `loading?`, `error?: string | null`, `checkingId?: string | null`.
 - `onCheck?(sourceId)` / `onRemoveSource?(sourceId)` — source lifecycle out
+- `onEditSource?(sourceId)` — edit affordance out (pencil, rendered before
+  check); the host opens the prefill dialog (`AddIntegrationSourceDialog`
+  `initial`). Labels: `editSourceLabel` / `editSourceAriaLabel`.
   (labels announce the origin).
 - `onInstallCandidate?(sourceId, candidate)` — emitted for compatible
   candidates only; the host opens

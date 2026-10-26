@@ -234,6 +234,7 @@ export {
 } from './components/integration-sources-list'
 export {
   AddIntegrationSourceDialog,
+  type AddIntegrationSourceKind,
   type AddIntegrationSourceDialogLabels,
   type AddIntegrationSourceDialogProps,
 } from './components/add-integration-source-dialog'

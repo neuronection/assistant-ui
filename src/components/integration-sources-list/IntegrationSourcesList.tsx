@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { RefreshCw, Trash2 } from 'lucide-react'
+import { Pencil, RefreshCw, Trash2 } from 'lucide-react'
 import { cn } from '../../lib/utils'
 import { Button } from '../button/Button'
 import { IntegrationInstancesList } from '../integration-instances-list/IntegrationInstancesList'
@@ -16,8 +16,10 @@ export interface IntegrationSourcesListLabels extends IntegrationInstancesListLa
   loadingLabel?: string
   checkLabel?: string
   removeSourceLabel?: string
+  editSourceLabel?: string
   checkAriaLabel?: string
   removeSourceAriaLabel?: string
+  editSourceAriaLabel?: string
   gitopsSourceLabel?: string
   candidateLabel?: string
   installLabel?: string
@@ -34,6 +36,8 @@ export interface IntegrationSourcesListProps {
   checkingId?: string | null
   onCheck?: (sourceId: string) => void
   onRemoveSource?: (sourceId: string) => void
+  /** Edit the source descriptor; the host opens the prefill dialog. */
+  onEditSource?: (sourceId: string) => void
   /** Emits the discovered candidate; the host opens ConsentDialog for it. */
   onInstallCandidate?: (sourceId: string, candidate: IntegrationDiscoveredView) => void
   onToggleEnabled?: (
@@ -95,6 +99,7 @@ export const IntegrationSourcesList = React.forwardRef<
     checkingId = null,
     onCheck,
     onRemoveSource,
+    onEditSource,
     onInstallCandidate,
     onToggleEnabled,
     onConfigure,
@@ -113,8 +118,10 @@ export const IntegrationSourcesList = React.forwardRef<
       loadingLabel: labels?.loadingLabel ?? 'Loading…',
       checkLabel: labels?.checkLabel ?? 'Check',
       removeSourceLabel: labels?.removeSourceLabel ?? 'Remove source',
+      editSourceLabel: labels?.editSourceLabel ?? 'Edit',
       checkAriaLabel: labels?.checkAriaLabel ?? 'Check source',
       removeSourceAriaLabel: labels?.removeSourceAriaLabel ?? 'Remove source',
+      editSourceAriaLabel: labels?.editSourceAriaLabel ?? 'Edit source',
       gitopsSourceLabel: labels?.gitopsSourceLabel ?? 'gitops',
       candidateLabel: labels?.candidateLabel ?? 'listed',
       installLabel: labels?.installLabel ?? 'Install with consent…',
@@ -196,6 +203,18 @@ export const IntegrationSourcesList = React.forwardRef<
               </span>
             ) : null}
             <div className="ml-auto flex items-center gap-1.5">
+              {onEditSource ? (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={busy}
+                  aria-label={`${t.editSourceAriaLabel}: ${source.origin}`}
+                  onClick={() => onEditSource(source.id)}
+                >
+                  <Pencil className="size-4" aria-hidden />
+                  {t.editSourceLabel}
+                </Button>
+              ) : null}
               {onCheck ? (
                 <Button
                   variant="outline"
