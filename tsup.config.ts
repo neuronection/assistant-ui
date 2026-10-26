@@ -38,6 +38,7 @@ export const entry: Record<string, string> = {
   'chat-tools-catalog': 'src/components/chat-tools-catalog/index.ts',
   'connection-test-row': 'src/components/connection-test-row/index.ts',
   'web-search-providers': 'src/components/web-search-providers/index.ts',
+  'translation-providers': 'src/components/translation-providers/index.ts',
   'integration-contracts': 'src/contracts/index.ts',
   'integration-atoms': 'src/components/integration-atoms/index.ts',
   'integration-card': 'src/components/integration-card/index.ts',
