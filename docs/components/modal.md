@@ -67,6 +67,23 @@ available for simple cases. Overlays portal to `document.body` and stack via
 
 `closeLabel` (both variants) defaults to `'Close'`; titles are children.
 
+## spacing rhythm (the popup standard)
+
+Every dialog in the family shares one vertical/horizontal rhythm — new
+dialogs copy it, existing ones never invent their own:
+
+- **Sections stack `space-y-4`**; field groups inside a section use
+  `space-y-3`. `ModalContent` never carries a `gap-*` — the section
+  rhythm owns the spacing.
+- **Horizontal inset `px-6`**; the content region's bottom is `pb-6`
+  (`ModalBody`'s default) — inline content regions copy the same
+  `px-6 pb-6` so buttons never crowd the body.
+- **Header `p-6 pb-4`, Footer `p-6 pt-0`** — the content-to-footer gap
+  is the content's `pb-6`, never a second padding stack.
+- **Meta (label/value) grids `gap-x-6 gap-y-3`**; bordered or tinted
+  inset blocks `p-3` with `space-y-2` inside; accent-law text (the
+  charter disclosures) gets padding on all sides (`py-1 pl-3 pr-2`).
+
 ## examples
 
 minimal:

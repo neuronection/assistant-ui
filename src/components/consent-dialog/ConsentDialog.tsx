@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { cn } from '../../lib/utils'
 import { Button } from '../button/Button'
 import { IntegrationCapabilityChips } from '../integration-atoms/IntegrationAtoms'
 import { Modal, ModalContent, ModalDescription, ModalFooter, ModalHeader, ModalTitle } from '../modal/Modal'
@@ -118,15 +117,13 @@ export const ConsentDialog = React.forwardRef<HTMLDivElement, ConsentDialogProps
 
     return (
       <Modal open={open} onOpenChange={onOpenChange}>
-        <ModalContent
-          size="lg"
-          className={cn('gap-3', className)}
-          closeLabel={t.closeLabel}
-        >
+        <ModalContent size="lg" className={className} closeLabel={t.closeLabel}>
           <ModalHeader>
             <ModalTitle>
               {title}
-              {payload?.extensionId ? `: ${payload.extensionId}` : ''}
+              {payload?.extensionId && !title.includes(payload.extensionId)
+                ? `: ${payload.extensionId}`
+                : ''}
             </ModalTitle>
             {t.description ? <ModalDescription>{t.description}</ModalDescription> : null}
           </ModalHeader>
@@ -136,9 +133,9 @@ export const ConsentDialog = React.forwardRef<HTMLDivElement, ConsentDialogProps
               data-as="consent-dialog"
               data-variant={payload.variant}
               data-testid="integration-consent"
-              className="space-y-3"
+              className="space-y-4 px-6 pb-6"
             >
-              <dl className="grid gap-x-4 gap-y-1 text-xs sm:grid-cols-2">
+              <dl className="grid gap-x-6 gap-y-3 text-xs sm:grid-cols-2">
                 <div className="min-w-0">
                   <dt className="font-medium text-[var(--as-fg)]">{t.tierLabel}</dt>
                   <dd data-testid="integration-consent-tier">
@@ -181,7 +178,7 @@ export const ConsentDialog = React.forwardRef<HTMLDivElement, ConsentDialogProps
 
               {changeRows.length > 0 ? (
                 <div
-                  className="space-y-1 rounded-[var(--as-radius-sm)] border border-[var(--as-border)] p-2"
+                  className="space-y-2 rounded-[var(--as-radius-sm)] border border-[var(--as-border)] p-3"
                   data-testid="integration-consent-changes"
                 >
                   <p className="text-xs font-semibold text-[var(--as-fg)]">{t.changesLabel}</p>
@@ -198,7 +195,7 @@ export const ConsentDialog = React.forwardRef<HTMLDivElement, ConsentDialogProps
 
               {context ? (
                 <p
-                  className="rounded-[var(--as-radius-sm)] bg-[var(--as-secondary)] p-2 text-xs text-[var(--as-fg)]"
+                  className="rounded-[var(--as-radius-sm)] bg-[var(--as-secondary)] p-3 text-xs text-[var(--as-fg)]"
                   data-testid="integration-consent-context"
                 >
                   {context}
@@ -207,7 +204,7 @@ export const ConsentDialog = React.forwardRef<HTMLDivElement, ConsentDialogProps
 
               {payload.disclosure ? (
                 <p
-                  className="border-l-4 border-[var(--as-warning)] pl-2 text-xs text-[var(--as-fg)]"
+                  className="border-l-4 border-[var(--as-warning)] py-1 pl-3 pr-2 text-xs leading-relaxed text-[var(--as-fg)]"
                   data-testid="integration-consent-disclosure"
                 >
                   {payload.disclosure}

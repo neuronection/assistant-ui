@@ -83,7 +83,7 @@ export function FormModal({
             </div>
             {description ? <ModalDescription>{description}</ModalDescription> : null}
           </ModalHeader>
-          <div className={cn('px-6 pb-2', bodyClassName)}>{children}</div>
+          <div className={cn('px-6 pb-6', bodyClassName)}>{children}</div>
           {footer ?? (hideFooter ? null : (
             <ModalFooter>
               {onReject ? (

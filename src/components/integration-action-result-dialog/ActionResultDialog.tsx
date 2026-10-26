@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { cn } from '../../lib/utils'
 import { Button } from '../button/Button'
 import { Modal, ModalContent, ModalDescription, ModalFooter, ModalHeader, ModalTitle } from '../modal/Modal'
 import { Skeleton } from '../skeleton/Skeleton'
@@ -79,7 +78,7 @@ export const ActionResultDialog = React.forwardRef<
     <Modal open={open} onOpenChange={onOpenChange}>
       <ModalContent
         size="lg"
-        className={cn('gap-3', className)}
+        className={className}
         closeLabel={t.closeLabel}
         ref={ref}
       >
@@ -93,12 +92,12 @@ export const ActionResultDialog = React.forwardRef<
           data-as="action-result-dialog"
           data-status={status}
           data-testid="integration-action-result"
-          className="min-h-0 flex-1 overflow-y-auto"
+          className="min-h-0 flex-1 space-y-3 overflow-y-auto px-6 pb-6"
         >
           {renderChrome ? renderChrome({ status }) : null}
           {status === 'loading' ? (
             <div
-              className="space-y-2"
+              className="space-y-3"
               role="status"
               aria-label={t.loadingLabel}
               data-testid="integration-action-result-loading"

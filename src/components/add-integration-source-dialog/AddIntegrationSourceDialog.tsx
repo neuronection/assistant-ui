@@ -177,13 +177,13 @@ export const AddIntegrationSourceDialog = React.forwardRef<
 
   return (
     <Modal open={open} onOpenChange={onOpenChange}>
-      <ModalContent size="md" className={cn('gap-3', className)} closeLabel={t.closeLabel}>
+      <ModalContent size="md" className={className} closeLabel={t.closeLabel}>
         <ModalHeader>
           <ModalTitle>{t.title}</ModalTitle>
           {t.description ? <ModalDescription>{t.description}</ModalDescription> : null}
         </ModalHeader>
         {chooserPending ? (
-          <div className="space-y-2" data-testid="integration-source-kind-chooser">
+          <div className="space-y-3 px-6 pb-6" data-testid="integration-source-kind-chooser">
             <p className="text-sm text-[var(--as-muted-fg)]">{t.kindPrompt}</p>
             <div className="flex flex-wrap gap-2">
               <button
@@ -221,9 +221,9 @@ export const AddIntegrationSourceDialog = React.forwardRef<
           ref={ref}
           data-as="add-integration-source-dialog"
           data-testid="integration-source-form"
-          className="space-y-2"
           onSubmit={submit}
         >
+          <div className="space-y-3 px-6 pb-6">
           {showGit ? (
             <input
               className={inputClass}
@@ -284,15 +284,24 @@ export const AddIntegrationSourceDialog = React.forwardRef<
             />
           ) : null}
           {busy ? (
-            <p role="status" className="text-xs text-[var(--as-muted-fg)]" data-testid="integration-source-busy">
+            <p
+              role="status"
+              className="text-xs text-[var(--as-muted-fg)]"
+              data-testid="integration-source-busy"
+            >
               {t.submittingLabel}
             </p>
           ) : null}
           {error ? (
-            <p role="alert" className="text-xs text-[var(--as-danger)]" data-testid="integration-source-error">
+            <p
+              role="alert"
+              className="text-xs text-[var(--as-danger)]"
+              data-testid="integration-source-error"
+            >
               {error}
             </p>
           ) : null}
+          </div>
           <ModalFooter>
             <Button size="sm" type="submit" disabled={busy || !usable || !refValueOk}>
               {t.submitLabel}
