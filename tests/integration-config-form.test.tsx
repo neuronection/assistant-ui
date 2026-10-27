@@ -193,3 +193,104 @@ describe('IntegrationConfigForm', () => {
     expect(await axe(container)).toHaveNoViolations()
   })
 })
+
+
+describe('IntegrationConfigForm — schema hints (x-choices / x-presets / x-section)', () => {
+  const CHOICES_SCHEMA: IntegrationConfigSchema = {
+    type: 'object',
+    properties: {
+      levels: {
+        type: 'string',
+        title: 'Experience levels',
+        'x-choices': [
+          { value: 'internship', label: 'Internship' },
+          { value: 'entry', label: 'Entry' },
+          { value: 'mid_senior', label: 'Mid-senior' },
+        ],
+        'x-csv': true,
+      },
+      pages: {
+        type: 'number',
+        title: 'Pages',
+        'x-choices': [
+          { value: '1', label: '1' },
+          { value: '2', label: '2' },
+        ],
+      },
+      pause: { type: 'number', title: 'Pause', 'x-section': 'advanced' },
+    },
+    'x-presets': [{ label: 'Remote only', values: { levels: 'entry' } }],
+  }
+
+  const choiceFields = parseIntegrationConfigSchema(CHOICES_SCHEMA)
+
+  function renderChoices(
+    handlers: {
+      onValuesChange: (values: IntegrationConfigValues) => void
+      onSave?: () => void
+    } = { onValuesChange: () => {} },
+    props = {},
+  ) {
+    return render(
+      <IntegrationConfigForm
+        fields={choiceFields}
+        values={{}}
+        onSave={() => {}}
+        presets={CHOICES_SCHEMA['x-presets']}
+        {...handlers}
+        {...props}
+      />,
+    )
+  }
+
+  function ControlledChoices({ seen }: { seen: IntegrationConfigValues[] }) {
+    const [values, setValues] = React.useState<IntegrationConfigValues>({})
+    return (
+      <IntegrationConfigForm
+        fields={choiceFields}
+        values={values}
+        onValuesChange={(next) => {
+          seen.push(next)
+          setValues(next)
+        }}
+        onSave={() => {}}
+        presets={CHOICES_SCHEMA['x-presets']}
+      />
+    )
+  }
+
+  it('csv choices toggle chips and store the value in choices order', async () => {
+    const user = userEvent.setup()
+    const seen: IntegrationConfigValues[] = []
+    render(<ControlledChoices seen={seen} />)
+    await user.click(screen.getByRole('button', { name: 'Mid-senior' }))
+    await user.click(screen.getByRole('button', { name: 'Internship' }))
+    expect(seen.at(-1)?.levels).toBe('internship,mid_senior')
+    await user.click(screen.getByRole('button', { name: 'Mid-senior' }))
+    expect(seen.at(-1)?.levels).toBe('internship')
+  })
+
+  it('single-choice chips select and clear', async () => {
+    const user = userEvent.setup()
+    const seen: IntegrationConfigValues[] = []
+    render(<ControlledChoices seen={seen} />)
+    await user.click(screen.getByRole('button', { name: '2' }))
+    expect(seen.at(-1)?.pages).toBe('2')
+    await user.click(screen.getByRole('button', { name: '2' }))
+    expect(seen.at(-1)?.pages).toBeNull()
+  })
+
+  it('presets merge their values into the form', async () => {
+    const user = userEvent.setup()
+    const handlers = { onValuesChange: vi.fn() }
+    renderChoices(handlers)
+    await user.click(screen.getByRole('button', { name: 'Remote only' }))
+    expect(handlers.onValuesChange.mock.calls.at(-1)?.[0].levels).toBe('entry')
+  })
+
+  it('groups x-section fields under an Advanced disclosure', () => {
+    renderChoices()
+    expect(screen.getByText('Advanced')).toBeTruthy()
+    expect(screen.getByText('Pause')).toBeTruthy()
+  })
+})

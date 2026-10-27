@@ -161,12 +161,26 @@ export interface IntegrationConfigSchemaField {
   maxItems?: number
   items?: { type: 'string' }
   'x-secret'?: true
+  /** Render as toggle chips over these values; with `x-csv`, the value is
+   * the comma-separated string of the selected values (in choices order). */
+  'x-choices'?: Array<{ value: string; label: string }>
+  /** The field's value is a comma-separated string (see `x-choices`). */
+  'x-csv'?: true
+  /** Group the field under a collapsed section ('advanced'). */
+  'x-section'?: string
+}
+
+export interface IntegrationConfigPreset {
+  label: string
+  values: Record<string, string>
 }
 
 export interface IntegrationConfigSchema {
   type: 'object'
   properties: Record<string, IntegrationConfigSchemaField>
   required?: string[]
+  /** One-click starting points rendered above the fields. */
+  'x-presets'?: IntegrationConfigPreset[]
 }
 
 export interface IntegrationConfigFieldView {
@@ -186,6 +200,9 @@ export interface IntegrationConfigFieldView {
   itemType?: 'string' | null
   secret?: boolean
   required?: boolean
+  choices?: Array<{ value: string; label: string }> | null
+  csv?: boolean
+  section?: string | null
 }
 
 export type IntegrationConfigValues = Record<
@@ -225,5 +242,14 @@ export function parseIntegrationConfigSchema(
     itemType: field.items?.type ?? null,
     secret: field['x-secret'] === true,
     required: required.has(name),
+    choices: field['x-choices'] ?? null,
+    csv: field['x-csv'] === true,
+    section: field['x-section'] ?? null,
   }))
+}
+
+export function integrationConfigPresets(
+  schema: IntegrationConfigSchema,
+): IntegrationConfigPreset[] {
+  return schema['x-presets'] ?? []
 }

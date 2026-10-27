@@ -164,6 +164,7 @@ export {
   type IntegrationCatalogEntryView,
   type IntegrationConditionId,
   type IntegrationConfigFieldView,
+  type IntegrationConfigPreset,
   type IntegrationConfigSaveInput,
   type IntegrationConfigSchema,
   type IntegrationConfigSchemaField,
@@ -197,6 +198,7 @@ export {
   EXTENSION_SURFACES,
   EXTENSION_TIER_NAMES,
   EXTENSION_TIERS,
+  integrationConfigPresets,
 } from './contracts'
 export {
   IntegrationCapabilityChips,

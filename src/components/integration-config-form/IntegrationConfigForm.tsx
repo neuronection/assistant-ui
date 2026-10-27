@@ -6,6 +6,7 @@ import { Spinner } from '../spinner/Spinner'
 import type {
   IntegrationConditionId,
   IntegrationConfigFieldView,
+  IntegrationConfigPreset,
   IntegrationConfigSaveInput,
   IntegrationConfigValidationView,
   IntegrationConfigValues,
@@ -27,10 +28,14 @@ export interface IntegrationConfigFormLabels {
   secretHintLabel?: string
   requiredMark?: string
   enumPlaceholder?: string
+  presetLabel?: string
+  advancedLabel?: string
 }
 
 export interface IntegrationConfigFormProps {
   fields: IntegrationConfigFieldView[]
+  /** One-click starting points from the schema's `x-presets`. */
+  presets?: IntegrationConfigPreset[]
   /** Controlled non-secret values; secret values never cross props. */
   values: IntegrationConfigValues
   onValuesChange: (values: IntegrationConfigValues) => void
@@ -66,6 +71,7 @@ export const IntegrationConfigForm = React.forwardRef<
 >(function IntegrationConfigForm(
   {
     fields,
+    presets = [],
     values,
     onValuesChange,
     onSave,
@@ -101,6 +107,8 @@ export const IntegrationConfigForm = React.forwardRef<
       secretHintLabel: labels?.secretHintLabel ?? 'not set',
       requiredMark: labels?.requiredMark ?? '*',
       enumPlaceholder: labels?.enumPlaceholder ?? 'Select…',
+      presetLabel: labels?.presetLabel ?? 'Start with',
+      advancedLabel: labels?.advancedLabel ?? 'Advanced',
     }),
     [labels],
   )
@@ -233,6 +241,56 @@ export const IntegrationConfigForm = React.forwardRef<
       )
     }
 
+    if (field.choices && field.choices.length > 0) {
+      const choices = field.choices
+      const current = String(values[field.name] ?? '')
+      const selected = field.csv
+        ? current.split(',').map((part) => part.trim()).filter(Boolean)
+        : current
+          ? [current]
+          : []
+      const toggle = (value: string) => {
+        if (field.csv) {
+          const next = selected.includes(value)
+            ? selected.filter((item) => item !== value)
+            : [...selected, value]
+          // keep the stored order deterministic (choices order)
+          const ordered = choices
+            .filter((choice) => next.includes(choice.value))
+            .map((choice) => choice.value)
+          setValue(field.name, ordered.length ? ordered.join(',') : null)
+          return
+        }
+        setValue(field.name, selected.includes(value) ? null : value)
+      }
+      return (
+        <div key={field.name} className="space-y-1">
+          {label}
+          <div className="flex flex-wrap gap-1.5" role="group" aria-label={field.title ?? field.name}>
+            {choices.map((choice) => (
+              <button
+                key={choice.value}
+                type="button"
+                aria-pressed={selected.includes(choice.value)}
+                onClick={() => toggle(choice.value)}
+                className={`rounded-full border px-3 py-1 text-sm transition-colors ${
+                  selected.includes(choice.value)
+                    ? 'border-[var(--as-focus-ring)] bg-[var(--as-surface-raised)] font-medium'
+                    : 'border-[var(--as-border)] bg-[var(--as-surface)] hover:bg-[var(--as-muted)]'
+                }`}
+              >
+                {choice.label}
+              </button>
+            ))}
+          </div>
+          {field.description ? (
+            <p className="text-xs text-[var(--as-muted-fg)]">{field.description}</p>
+          ) : null}
+          {errorLine}
+        </div>
+      )
+    }
+
     if (field.enum && field.enum.length > 0) {
       const current = values[field.name]
       return (
@@ -349,7 +407,36 @@ export const IntegrationConfigForm = React.forwardRef<
         </div>
       ) : null}
 
-      {fields.map(renderField)}
+      {presets.length > 0 ? (
+        <div className="space-y-1">
+          <div className="text-xs font-medium text-[var(--as-muted-fg)]">
+            {t.presetLabel}
+          </div>
+          <div className="flex flex-wrap gap-1.5">
+            {presets.map((preset) => (
+              <button
+                key={preset.label}
+                type="button"
+                className="rounded-full border border-[var(--as-border)] bg-[var(--as-muted)] px-3 py-1 text-sm transition-colors hover:bg-[var(--as-surface-raised)]"
+                onClick={() => onValuesChange({ ...values, ...preset.values })}
+              >
+                {preset.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      ) : null}
+      {fields.filter((field) => field.section !== 'advanced').map(renderField)}
+      {fields.some((field) => field.section === 'advanced') ? (
+        <details className="rounded-[var(--as-radius)] border border-[var(--as-border)] p-3">
+          <summary className="cursor-pointer text-sm font-medium text-[var(--as-fg)]">
+            {t.advancedLabel}
+          </summary>
+          <div className="mt-3 space-y-3">
+            {fields.filter((field) => field.section === 'advanced').map(renderField)}
+          </div>
+        </details>
+      ) : null}
 
       {validation?.state === 'validating' ? (
         <p

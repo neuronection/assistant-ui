@@ -1,4 +1,5 @@
 export {
+  integrationConfigPresets,
   parseIntegrationConfigSchema,
   INTEGRATION_VIEW_MODELS_VERSION,
   type IntegrationCapabilityView,
@@ -6,6 +7,7 @@ export {
   type IntegrationConditionId,
   type IntegrationConfigFieldView,
   type IntegrationConfigSaveInput,
+  type IntegrationConfigPreset,
   type IntegrationConfigSchema,
   type IntegrationConfigSchemaField,
   type IntegrationConfigValidationView,

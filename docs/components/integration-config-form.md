@@ -59,3 +59,19 @@ Labelled inputs (`htmlFor`/`id`), per-field errors tied via
 
 Related: [integration-contracts](./integration-contracts.md),
 [IntegrationInstancesList](./integration-instances-list.md).
+
+## Schema hints (x-choices / x-csv / x-section / x-presets)
+
+Manifests can drive richer field rendering without app code:
+
+- `x-choices: [{value, label}]` renders toggle chips. With `x-csv: true`
+  the field value is the comma-separated string of selected values (in
+  choices order); without it, a single select-and-clear choice.
+- `x-section: "advanced"` groups the field under a collapsed
+  **Advanced** disclosure after the main fields.
+- `x-presets: [{label, values}]` (schema level) renders a "Start with"
+  row of one-click starting points that merge their values into the
+  form. Pass the parsed list via the `presets` prop
+  (`integrationConfigPresets(schema)`).
+
+Fields without hints render exactly as before — the hints are additive.
