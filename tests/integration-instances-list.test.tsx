@@ -83,7 +83,7 @@ describe('IntegrationInstancesList', () => {
   it('emits enable, configure, park, restore, tombstone and apply-update per instance', async () => {
     const user = userEvent.setup()
     const { handlers } = setup([group({ instances: [instance({ enabled: false, parked: true })] })])
-    await user.click(screen.getByRole('checkbox', { name: 'Enable: primary' }))
+    await user.click(screen.getByRole('switch', { name: 'Enable: primary' }))
     expect(handlers.onToggleEnabled).toHaveBeenCalledWith(expect.objectContaining({ id: 'inst-1' }), true)
     await user.click(screen.getByRole('button', { name: 'Configure' }))
     expect(handlers.onConfigure).toHaveBeenCalled()
@@ -93,13 +93,14 @@ describe('IntegrationInstancesList', () => {
     expect(handlers.onTombstone).toHaveBeenCalled()
   })
 
-  it('keyboard: the enable checkbox is reachable and togglable with space', async () => {
+  it('keyboard: the enable switch is reachable and togglable with space', async () => {
     const user = userEvent.setup()
     const { handlers } = setup()
     await user.tab()
     const active = document.activeElement
-    expect(active?.getAttribute('type')).toBe('checkbox')
+    expect(active?.getAttribute('role')).toBe('switch')
     expect(active?.getAttribute('aria-label')).toBe('Enable: primary')
+    expect(active?.getAttribute('aria-checked')).toBe('true')
     await user.keyboard(' ')
     expect(handlers.onToggleEnabled).toHaveBeenCalled()
   })

@@ -183,17 +183,34 @@ export const IntegrationInstancesList = React.forwardRef<
                   className="flex flex-wrap items-center gap-2 rounded-[var(--as-radius-sm)] border border-[var(--as-border)] p-2 text-sm text-[var(--as-fg)]"
                 >
                   {onToggleEnabled ? (
-                    <label className="flex cursor-pointer items-center gap-2 font-medium">
-                      <input
-                        type="checkbox"
-                        checked={instance.enabled}
-                        aria-label={`${t.enableAriaLabel}: ${instance.name}`}
-                        title={`${t.enableAriaLabel}: ${instance.name}`}
-                        disabled={busy}
-                        onChange={(event) => onToggleEnabled(instance, event.target.checked)}
-                      />
+                    <button
+                      type="button"
+                      role="switch"
+                      aria-checked={instance.enabled}
+                      aria-label={`${t.enableAriaLabel}: ${instance.name}`}
+                      title={`${t.enableAriaLabel}: ${instance.name}`}
+                      disabled={busy}
+                      data-state={instance.enabled ? "checked" : "unchecked"}
+                      data-testid={`integration-instance-toggle-${instance.id}`}
+                      onClick={() => onToggleEnabled(instance, !instance.enabled)}
+                      className="flex cursor-pointer items-center gap-2 font-medium focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--as-focus-ring)] disabled:pointer-events-none disabled:opacity-50"
+                    >
                       {instance.name}
-                    </label>
+                      <span
+                        aria-hidden="true"
+                        className={cn(
+                          "relative h-5 w-9 shrink-0 rounded-full transition-colors duration-150",
+                          instance.enabled ? "bg-[var(--as-primary)]" : "bg-[var(--as-border)]",
+                        )}
+                      >
+                        <span
+                          className={cn(
+                            "absolute top-0.5 h-4 w-4 rounded-full bg-[var(--as-surface-raised)] shadow transition-all duration-150",
+                            instance.enabled ? "left-[1.125rem]" : "left-0.5",
+                          )}
+                        />
+                      </span>
+                    </button>
                   ) : (
                     <span className="font-medium">{instance.name}</span>
                   )}

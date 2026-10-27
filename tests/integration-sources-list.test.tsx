@@ -89,7 +89,7 @@ describe('IntegrationSourcesList', () => {
   it('scopes instance actions to their source', async () => {
     const user = userEvent.setup()
     const { handlers } = setup()
-    await user.click(screen.getByRole('checkbox', { name: 'Enable: primary' }))
+    await user.click(screen.getByRole('switch', { name: 'Enable: primary' }))
     expect(handlers.onToggleEnabled).toHaveBeenCalledWith(
       'src-1',
       expect.objectContaining({ id: 'inst-1' }),
