@@ -188,6 +188,7 @@ export const IntegrationInstancesList = React.forwardRef<
                         type="checkbox"
                         checked={instance.enabled}
                         aria-label={`${t.enableAriaLabel}: ${instance.name}`}
+                        title={`${t.enableAriaLabel}: ${instance.name}`}
                         disabled={busy}
                         onChange={(event) => onToggleEnabled(instance, event.target.checked)}
                       />
