@@ -1,3 +1,5 @@
+import type { ReactNode } from 'react'
+
 export interface PickerOption {
   value: string
   label: string
@@ -7,6 +9,21 @@ export interface PickerOption {
 export type PickerSelection = PickerOption
 
 export type PickerMode = 'single' | 'multi'
+
+export interface PickerBrowseBodyCtx {
+  search: string
+  onSearchChange: (next: string) => void
+  category: string
+  onCategoryChange: (next: string) => void
+  categories: string[]
+  filters: ReactNode
+  searchInput: ReactNode
+  categorySelect: ReactNode
+  list: ReactNode
+  value: PickerSelection[]
+  isSelected: (option: PickerOption) => boolean
+  toggle: (option: PickerOption) => void
+}
 
 export interface PickerLabels {
   placeholder?: string

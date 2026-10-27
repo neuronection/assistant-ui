@@ -246,6 +246,210 @@ describe('PickerBrowseModal', () => {
   })
 })
 
+describe('MultiSelectPicker slots', () => {
+  it('renders renderChipExtra content inside each chip before the label', async () => {
+    const user = userEvent.setup()
+    const onChange = vi.fn()
+    render(
+      <Demo
+        value={[python]}
+        onChange={onChange}
+        renderChipExtra={(selection) => <span data-testid="chip-extra">{selection.category}</span>}
+      />,
+    )
+    const chip = screen.getByRole('listitem')
+    expect(within(chip).getByTestId('chip-extra')).toHaveTextContent('Engineering')
+    expect(chip.textContent).toMatch(/EngineeringPython/)
+    await user.click(screen.getByRole('button', { name: 'Remove Python' }))
+    expect(onChange).toHaveBeenCalledWith([])
+  })
+
+  it('showChips=false hides the chip list (host renders selections itself)', () => {
+    render(<Demo value={[python, typescript]} showChips={false} />)
+    expect(screen.queryByRole('listitem')).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Remove Python' })).not.toBeInTheDocument()
+    expect(screen.getByRole('combobox', { name: 'Search options' })).toBeInTheDocument()
+  })
+
+  it('forwards browseModalProps to the internal browse modal', async () => {
+    const user = userEvent.setup()
+    const onSearch = vi.fn(async () => [python])
+    render(
+      <Demo
+        browseModalProps={{
+          title: 'Pick a skill',
+          onSearch,
+          labels: { doneLabel: 'Close it' },
+        }}
+      />,
+    )
+    await user.click(screen.getByRole('button', { name: 'Browse' }))
+    const dialog = await screen.findByRole('dialog')
+    expect(within(dialog).getByText('Pick a skill')).toBeInTheDocument()
+    expect(within(dialog).getByRole('button', { name: 'Close it' })).toBeInTheDocument()
+    await user.type(within(dialog).getByRole('searchbox'), 'py')
+    expect(await within(dialog).findByRole('button', { name: 'Add Python' })).toBeInTheDocument()
+    await vi.waitFor(() => expect(onSearch).toHaveBeenCalledWith('py', null))
+  })
+})
+
+describe('PickerBrowseModal slots', () => {
+  it('renderRowContent replaces the row text while the named toggle stays', async () => {
+    const user = userEvent.setup()
+    render(
+      <Demo
+        browseModalProps={{
+          renderRowContent: (option, selected, ctx) => (
+            <div className="flex-1">
+              <span>{option.label}</span>
+              <em data-testid="row-note">{selected ? 'picked' : option.category}</em>
+              <em data-testid="row-query">{ctx.search}</em>
+            </div>
+          ),
+        }}
+      />,
+    )
+    await user.click(screen.getByRole('button', { name: 'Browse' }))
+    const dialog = await screen.findByRole('dialog')
+    expect(within(dialog).getAllByTestId('row-note')[0]).toHaveTextContent('Engineering')
+    await user.type(within(dialog).getByRole('searchbox'), 'py')
+    expect(within(dialog).getAllByTestId('row-query')[0]).toHaveTextContent('py')
+    await user.clear(within(dialog).getByRole('searchbox'))
+    await user.click(within(dialog).getByRole('button', { name: 'Add Python' }))
+    expect(within(dialog).getAllByTestId('row-note')[0]).toHaveTextContent('picked')
+    expect(within(dialog).getByRole('button', { name: 'Added Python' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    )
+  })
+
+  it('filterOption narrows the rendered rows without touching pagination', async () => {
+    const user = userEvent.setup()
+    render(
+      <Demo
+        browseModalProps={{
+          pageSize: 1,
+          filterOption: (option) => option.category === 'Engineering',
+        }}
+      />,
+    )
+    await user.click(screen.getByRole('button', { name: 'Browse' }))
+    const dialog = await screen.findByRole('dialog')
+    expect(within(dialog).getByRole('button', { name: 'Add Python' })).toBeInTheDocument()
+    expect(within(dialog).queryByRole('button', { name: 'Add TypeScript' })).not.toBeInTheDocument()
+    expect(within(dialog).queryByRole('button', { name: 'Add Excel' })).not.toBeInTheDocument()
+    await user.click(within(dialog).getByRole('button', { name: 'Load more' }))
+    expect(within(dialog).getByRole('button', { name: 'Add TypeScript' })).toBeInTheDocument()
+    expect(within(dialog).queryByRole('button', { name: 'Add Excel' })).not.toBeInTheDocument()
+  })
+
+  it('supports a controlled category with onCategoryChange reports', async () => {
+    const user = userEvent.setup()
+    const onCategoryChange = vi.fn()
+    render(
+      <Demo browseModalProps={{ category: 'Office', onCategoryChange }} />,
+    )
+    await user.click(screen.getByRole('button', { name: 'Browse' }))
+    const dialog = await screen.findByRole('dialog')
+    const select = within(dialog).getByRole('combobox', { name: 'Category' })
+    expect(select).toHaveValue('Office')
+    await user.selectOptions(select, 'Health')
+    expect(onCategoryChange).toHaveBeenCalledWith('Health')
+    expect(select).toHaveValue('Office')
+  })
+
+  it('renderBody composes the body from the ctx nodes and keeps ctx.toggle working', async () => {
+    const user = userEvent.setup()
+    render(
+      <Demo
+        browseModalProps={{
+          renderBody: (ctx) => (
+            <div>
+              <div data-testid="custom-chrome">{ctx.category || 'all'}</div>
+              <button type="button" onClick={() => ctx.onSearchChange('py')}>
+                run host search
+              </button>
+              {ctx.searchInput}
+              {ctx.list}
+            </div>
+          ),
+        }}
+      />,
+    )
+    await user.click(screen.getByRole('button', { name: 'Browse' }))
+    const dialog = await screen.findByRole('dialog')
+    expect(within(dialog).getByTestId('custom-chrome')).toHaveTextContent('all')
+    expect(within(dialog).queryByRole('combobox', { name: 'Category' })).not.toBeInTheDocument()
+    await user.click(within(dialog).getByRole('button', { name: 'run host search' }))
+    expect(within(dialog).getByRole('searchbox')).toHaveValue('py')
+    await user.click(within(dialog).getByRole('button', { name: 'Add Python' }))
+    expect(within(dialog).getByRole('button', { name: 'Added Python' })).toBeInTheDocument()
+    expect(within(dialog).getByText('1 selected')).toBeInTheDocument()
+  })
+
+  it('a falsy renderBody result falls back to the default body', async () => {
+    const user = userEvent.setup()
+    render(<Demo browseModalProps={{ renderBody: () => null }} />)
+    await user.click(screen.getByRole('button', { name: 'Browse' }))
+    const dialog = await screen.findByRole('dialog')
+    expect(within(dialog).getByRole('searchbox')).toBeInTheDocument()
+    expect(within(dialog).getByRole('button', { name: 'Add Python' })).toBeInTheDocument()
+  })
+
+  it('hasMore=false hides the Load more button in server mode', async () => {
+    const user = userEvent.setup()
+    const onSearch = vi.fn(async () => options.slice(0, 2))
+    const onLoadMore = vi.fn()
+    render(
+      <Demo
+        onSearch={onSearch}
+        onLoadMore={onLoadMore}
+        browseModalProps={{ hasMore: false }}
+      />,
+    )
+    await user.click(screen.getByRole('button', { name: 'Browse' }))
+    const dialog = await screen.findByRole('dialog')
+    expect(await within(dialog).findByRole('button', { name: 'Add Python' })).toBeInTheDocument()
+    expect(within(dialog).queryByRole('button', { name: 'Load more' })).not.toBeInTheDocument()
+    expect(onLoadMore).not.toHaveBeenCalled()
+  })
+
+  it('reloadKey re-runs the current search when host filters change', async () => {
+    const user = userEvent.setup()
+    const onSearch = vi.fn(async () => [python])
+    const { rerender } = render(
+      <Demo browseModalProps={{ onSearch, reloadKey: 'scope-a' }} />,
+    )
+    await user.click(screen.getByRole('button', { name: 'Browse' }))
+    await vi.waitFor(() => expect(onSearch).toHaveBeenCalled())
+    const before = onSearch.mock.calls.length
+    rerender(<Demo browseModalProps={{ onSearch, reloadKey: 'scope-b' }} />)
+    await vi.waitFor(() => expect(onSearch.mock.calls.length).toBeGreaterThan(before))
+  })
+
+  it('a slotted modal has no axe violations', async () => {
+    const user = userEvent.setup()
+    render(
+      <Demo
+        browseModalProps={{
+          renderRowContent: (option) => <span>{option.label}</span>,
+          renderBody: (ctx) => (
+            <div>
+              {ctx.filters}
+              {ctx.list}
+            </div>
+          ),
+        }}
+      />,
+    )
+    await user.click(screen.getByRole('button', { name: 'Browse' }))
+    await screen.findByRole('dialog')
+    expect(
+      await axe(document.body, { rules: { region: { enabled: false } } }),
+    ).toHaveNoViolations()
+  })
+})
+
 describe('MultiSelectPicker accessibility', () => {
   it('open listbox has no axe violations', async () => {
     const user = userEvent.setup()

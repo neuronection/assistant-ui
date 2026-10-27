@@ -80,3 +80,47 @@ export const ServerSearch = () => {
     </div>
   )
 }
+
+export const Slotted = () => {
+  const [value, setValue] = useState<PickerSelection[]>(skills.slice(0, 1))
+  return (
+    <div style={{ maxWidth: 420 }}>
+      <MultiSelectPicker
+        options={skills}
+        value={value}
+        onChange={setValue}
+        placeholder="Search skills…"
+        renderChipExtra={(selection) => (
+          <span
+            style={{
+              fontSize: 10,
+              fontWeight: 700,
+              textTransform: 'uppercase',
+              opacity: 0.7,
+            }}
+          >
+            {selection.category}
+          </span>
+        )}
+        browseModalProps={{
+          renderRowContent: (option) => (
+            <div style={{ minWidth: 0, flex: 1 }}>
+              <div
+                style={{
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {option.label}
+              </div>
+              <div style={{ fontSize: 11, opacity: 0.6 }}>
+                host-owned row detail — e.g. a description line
+              </div>
+            </div>
+          ),
+        }}
+      />
+    </div>
+  )
+}

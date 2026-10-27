@@ -3,7 +3,7 @@ import { LayoutGrid, Plus, Search, X, type LucideIcon } from 'lucide-react'
 import { cn } from '../../lib/utils'
 import { Portal } from '../portal/Portal'
 import { Spinner } from '../spinner/Spinner'
-import { PickerBrowseModal } from './PickerBrowseModal'
+import { PickerBrowseModal, type PickerBrowseModalProps } from './PickerBrowseModal'
 import {
   optionMatchesQuery,
   resolvePickerLabels,
@@ -12,6 +12,11 @@ import {
   type PickerOption,
   type PickerSelection,
 } from './types'
+
+export type MultiSelectPickerBrowseProps = Omit<
+  PickerBrowseModalProps,
+  'open' | 'onOpenChange' | 'value' | 'onChange' | 'mode'
+>
 
 export interface MultiSelectPickerProps {
   value: PickerSelection[]
@@ -34,6 +39,9 @@ export interface MultiSelectPickerProps {
   pageSize?: number
   browseIcon?: LucideIcon
   onBrowseOpenChange?: (open: boolean) => void
+  renderChipExtra?: (selection: PickerSelection, index: number) => React.ReactNode
+  showChips?: boolean
+  browseModalProps?: MultiSelectPickerBrowseProps
   id?: string
   className?: string
 }
@@ -59,6 +67,9 @@ export const MultiSelectPicker = React.forwardRef<
     pageSize = 50,
     browseIcon: BrowseIcon = LayoutGrid,
     onBrowseOpenChange,
+    renderChipExtra,
+    showChips = true,
+    browseModalProps,
     id: idProp,
     className,
     ...props
@@ -307,13 +318,14 @@ export const MultiSelectPicker = React.forwardRef<
         </Portal>
       ) : null}
 
-      {value.length > 0 ? (
+      {showChips && value.length > 0 ? (
         <ul data-as="picker-chips" className="flex flex-wrap gap-1.5">
-          {value.map((selection) => (
+          {value.map((selection, index) => (
             <li
               key={selection.value}
               className="inline-flex items-center gap-1 rounded-[calc(var(--as-radius-sm)-2px)] bg-[color-mix(in_srgb,var(--as-primary)_12%,transparent)] py-0.5 pl-2.5 pr-1.5 text-xs font-medium text-[var(--as-primary)]"
             >
+              {renderChipExtra?.(selection, index)}
               <span className="max-w-56 truncate">{selection.label}</span>
               <button
                 type="button"
@@ -349,6 +361,7 @@ export const MultiSelectPicker = React.forwardRef<
         pageSize={pageSize}
         debounceMs={debounceMs}
         labels={labels}
+        {...browseModalProps}
       />
     </div>
   )
