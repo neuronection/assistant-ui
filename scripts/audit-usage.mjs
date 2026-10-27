@@ -68,6 +68,8 @@ const LIBRARY_COMPONENTS = [
   'TextDiffView',
   'MarkdownDiffView',
   'ComboboxMulti',
+  'MultiSelectPicker',
+  'PickerBrowseModal',
   'ConfirmationModal',
   'ContextMenu',
   'CopyButton',

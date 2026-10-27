@@ -327,6 +327,10 @@
       "types": "./dist/model-registry.d.ts",
       "import": "./dist/model-registry.js"
     },
+    "./multi-select-picker": {
+      "types": "./dist/multi-select-picker.d.ts",
+      "import": "./dist/multi-select-picker.js"
+    },
     "./task-assignment-picker": {
       "types": "./dist/task-assignment-picker.d.ts",
       "import": "./dist/task-assignment-picker.js"

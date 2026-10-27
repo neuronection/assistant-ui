@@ -458,6 +458,16 @@ export {
   type ModalContentProps,
 } from './components/modal'
 export {
+  MultiSelectPicker,
+  PickerBrowseModal,
+  type MultiSelectPickerProps,
+  type PickerBrowseModalProps,
+  type PickerLabels,
+  type PickerMode,
+  type PickerOption,
+  type PickerSelection,
+} from './components/multi-select-picker'
+export {
   Popover,
   PopoverAnchor,
   PopoverClose,

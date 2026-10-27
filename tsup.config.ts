@@ -84,6 +84,7 @@ export const entry: Record<string, string> = {
   'menu': 'src/components/menu/index.ts',
   'model-picker': 'src/components/model-picker/index.ts',
   'modal': 'src/components/modal/index.ts',
+  'multi-select-picker': 'src/components/multi-select-picker/index.ts',
   'popover': 'src/components/popover/index.ts',
   'popover-button': 'src/components/popover-button/index.ts',
   'portal': 'src/components/portal/index.ts',
