@@ -47,6 +47,12 @@ describe('ConceptGraphView', () => {
     expect(screen.getByText('Python')).toBeTruthy()
   })
 
+  it('defaults to h-full so a height-defined parent sizes the canvas', () => {
+    const { container } = render(<Demo />)
+    const root = container.querySelector('[data-as="concept-graph"]')
+    expect(root?.className).toContain('h-full')
+  })
+
   it('shows the overridden empty-state message when there are no nodes', () => {
     render(
       <Demo nodes={[]} edges={[]} labels={{ empty: 'Nothing to show yet.' }} className="h-[200px]" />,

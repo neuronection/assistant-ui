@@ -387,7 +387,7 @@ export const ConceptGraphView = React.forwardRef<HTMLDivElement, ConceptGraphVie
       // MUST give the parent a height — React Flow needs explicit dimensions).
       // A caller can pass its own height class (e.g. 'h-[500px]') without
       // conflicting.
-      className,
+      className = 'h-full',
     },
     ref,
   ) => {
