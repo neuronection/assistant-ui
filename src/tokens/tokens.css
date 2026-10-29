@@ -453,6 +453,12 @@
   margin-right: 0.375rem;
 }
 
+/* Section label before the first item carrying it (chip mode: hidden —
+   items flow as chips; rail mode: uppercase group label). */
+[data-as='settings-shell-navsection'] {
+  display: none;
+}
+
 [data-as='settings-shell-navtrailing'] {
   margin-left: 0.375rem;
 }
@@ -478,6 +484,20 @@
     margin-bottom: 0.5rem;
     padding: 0.5rem 0.75rem;
     border-bottom: 1px solid var(--as-border);
+  }
+
+  [data-as='settings-shell-navsection'] {
+    display: block;
+    margin: 0.875rem 0.75rem 0.375rem;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--as-muted-fg);
+  }
+
+  [data-as='settings-shell-navsection']:first-child {
+    margin-top: 0.375rem;
   }
 
   [data-as='settings-shell-navitem'] {

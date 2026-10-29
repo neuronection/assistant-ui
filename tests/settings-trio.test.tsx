@@ -99,6 +99,70 @@ describe('SettingsShell', () => {
     expect(trailing).not.toBeNull()
     expect(trailing?.firstElementChild).toHaveAttribute('data-testid', 'dot')
   })
+
+  it('renders a section label once before the first item carrying it', () => {
+    const { container } = render(
+      <SettingsShell
+        nav={[
+          { id: 'account', label: 'Account', section: 'Personal' },
+          { id: 'radar', label: 'Radar', section: 'Personal' },
+          { id: 'ai', label: 'AI', section: 'AI & tools' },
+          { id: 'users', label: 'Users', section: 'Administration' },
+        ]}
+        active="account"
+        onNavigate={vi.fn()}
+      >
+        <p>x</p>
+      </SettingsShell>,
+    )
+    const sections = Array.from(
+      container.querySelectorAll('[data-as="settings-shell-navsection"]'),
+    )
+    expect(sections).toHaveLength(3)
+    expect(sections[0]!).toHaveTextContent('Personal')
+    expect(sections[0]!).toHaveAttribute('role', 'presentation')
+    expect(sections[1]!).toHaveTextContent('AI & tools')
+    expect(sections[2]!).toHaveTextContent('Administration')
+    expect(
+      sections[0]!.compareDocumentPosition(
+        screen.getByRole('button', { name: 'Account' }),
+      ),
+    ).toBe(Node.DOCUMENT_POSITION_FOLLOWING)
+  })
+
+  it('nav without sections renders no section hooks', () => {
+    const { container } = render(
+      <SettingsShell
+        nav={[
+          { id: 'a', label: 'A' },
+          { id: 'b', label: 'B' },
+        ]}
+        active="a"
+        onNavigate={vi.fn()}
+      >
+        <p>x</p>
+      </SettingsShell>,
+    )
+    expect(
+      container.querySelector('[data-as="settings-shell-navsection"]'),
+    ).toBeNull()
+  })
+
+  it('sectioned nav has no axe violations', async () => {
+    const { container } = render(
+      <SettingsShell
+        nav={[
+          { id: 'account', label: 'Account', section: 'Personal' },
+          { id: 'ai', label: 'AI', section: 'AI & tools' },
+        ]}
+        active="ai"
+        onNavigate={vi.fn()}
+      >
+        <p>x</p>
+      </SettingsShell>,
+    )
+    expect(await axe(container)).toHaveNoViolations()
+  })
 })
 
 describe('ProviderForm', () => {
