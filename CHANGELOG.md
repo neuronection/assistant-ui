@@ -1,5 +1,64 @@
 # @neuronection/assistant-ui
 
+## 0.76.0
+
+### Minor Changes
+
+- [`d57c159`](https://github.com/neuronection/assistant-ui/commit/d57c1594969388285d1a35bc14689564b77a5108) Thanks [@constLiakos](https://github.com/constLiakos)! - New `concept-graph` module — the generic node-graph visualizer promoted
+  from health-assistant's catalog ontology graph (second consumer:
+  career-assistant's taxonomy graph). `ConceptGraphView` renders
+  nodes/edges on a React Flow canvas with two synchronous layouts —
+  force (d3-force) and hierarchy (dagre, relation-aware via
+  `hierarchyReversedRelations`) — plus search-to-dim with Enter-to-center,
+  hover quick-preview, collapsible legend, MiniMap, PNG export, and
+  consumer-rendered detail cards / context menus through render props.
+  Domain vocabularies stay app-side: node/edge colors arrive as
+  `kindColors`/`relationColors`, every chrome string is overridable
+  through `labels`, toolbar icons through `icons`; chrome colors come from
+  `--as-*` tokens and React Flow's stylesheet ships inside `dist/styles.css`.
+  `DynamicIcon` (lucide-by-name or DOMPurify-sanitized custom SVG) and the
+  hierarchy direction helper ride along.
+
+- [`8865815`](https://github.com/neuronection/assistant-ui/commit/8865815e47859688123ba46badc3afd44c0d9cc0) Thanks [@constLiakos](https://github.com/constLiakos)! - `multi-select-picker` host slots (additive) — the browse/selection chrome
+  hosts need now rides props instead of forks: `MultiSelectPicker` gains
+  `renderChipExtra` (per-chip leading content, e.g. a relation select),
+  `showChips` (host renders selections itself) and `browseModalProps`
+  (forwards the modal's props/slots to the internal `PickerBrowseModal`);
+  `PickerBrowseModal` gains controlled `category`/`onCategoryChange`,
+  `filterOption` (host row predicate that leaves pagination alone),
+  `renderRowContent` (rich row text with the live `{ search, category }` ctx;
+  the named Add/Added toggle stays), `reloadKey` (re-runs the current search
+  when a host-side server filter changes), `hasMore` (host-declared
+  pagination state for the _Load more_ button) and `renderBody` (body composition via `PickerBrowseBodyCtx` — default
+  filter/search/category/list nodes plus `isSelected`/`toggle` so alternate
+  surfaces like a graph feed the same controlled selection).
+
+- [`afc59a5`](https://github.com/neuronection/assistant-ui/commit/afc59a578d09df9462a7c094ff5875d18e03c13c) Thanks [@constLiakos](https://github.com/constLiakos)! - New `multi-select-picker` module — the "two discovery paths" picker
+  promoted from career-assistant's `SkillPicker` and health-assistant's
+  `CatalogItemPicker`, made generic and data-agnostic (no fetching inside):
+  `MultiSelectPicker` (inline debounced type-ahead + in-input browse button,
+  selection chips, single/multi modes, full combobox ARIA + keyboard nav)
+  and `PickerBrowseModal` (standalone browse half on `PanelModal`: search,
+  optional category filter, per-row Add/Added toggles, Load more
+  pagination, live selected count). Data flows in through either a plain
+  `options` list (client filtering) or `onSearch`/`onLoadMore` callbacks
+  (server search); every string is overridable through `labels`.
+
+- [`f7227c9`](https://github.com/neuronection/assistant-ui/commit/f7227c96c89a0b346f5c793e424567dee2752a40) Thanks [@constLiakos](https://github.com/constLiakos)! - AddIntegrationSourceDialog: additive `kind` mode ('chooser' shows two
+  source-kind cards first — the Add-provider tile pattern — 'git'/'local'
+  pin one kind's fields; choosing local prefills branch/main) and `initial`
+  for edit-flow prefill. IntegrationSourcesList: additive `onEditSource`
+  affordance (+ `editSourceLabel`/`editSourceAriaLabel`). Back-compat:
+  props omitted = the previous behavior everywhere.
+
+  Also: one uniform popup rhythm across the dialog family — content
+  regions `px-6 pb-6` with `space-y-4` blocks / `space-y-3` fields,
+  meta grids `gap-x-6 gap-y-3`, inset blocks `p-3`, and the consent
+  disclosure padded (`py-1 pl-3 pr-2`). ConsentDialog and
+  ActionResultDialog no longer add ad-hoc `gap-3` (the section rhythm
+  owns spacing), FormModal's body matches the ModalBody standard, and
+  consent titles no longer duplicate the extension id.
+
 ## 0.75.0
 
 ### Minor Changes
