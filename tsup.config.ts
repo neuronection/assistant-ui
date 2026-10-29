@@ -25,6 +25,7 @@ export const entry: Record<string, string> = {
   'chat-markdown': 'src/components/chat-markdown/index.ts',
   'chat-message': 'src/components/chat-message/index.ts',
   'chat-branch-tree': 'src/components/chat-branch-tree/index.ts',
+  'concept-graph': 'src/components/concept-graph/index.ts',
   'chat-drawer': 'src/components/chat-drawer/index.ts',
   'chat-reasoning': 'src/components/chat-reasoning/index.ts',
   'chat-session-list': 'src/components/chat-session-list/index.ts',

@@ -732,6 +732,22 @@ export {
   type ChatBranchTreeNode,
 } from './components/chat-branch-tree'
 export {
+  ConceptGraphView,
+  DynamicIcon,
+  sanitizeSvg,
+  DEFAULT_HIERARCHY_REVERSED_RELATIONS,
+  getHierarchyEdgeDirection,
+  type ConceptGraphViewProps,
+  type ConceptGraphEdgeData,
+  type ConceptGraphIcon,
+  type ConceptGraphIcons,
+  type ConceptGraphNode,
+  type ConceptGraphLabels,
+  type GraphNodeSummary,
+  type RenderContextMenu,
+  type RenderNodeDetail,
+} from './components/concept-graph'
+export {
   ChatSessionList,
   type ChatSessionListProps,
   type ChatSessionListLabels,

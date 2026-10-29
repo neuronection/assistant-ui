@@ -1,6 +1,7 @@
 @import 'tailwindcss/theme.css' layer(theme);
 @import 'tailwindcss/utilities.css' layer(utilities);
 @import 'katex/dist/katex.min.css';
+@import 'reactflow/dist/style.css';
 
 @source '../components';
 
@@ -843,5 +844,45 @@
 @media (prefers-reduced-motion: reduce) {
   [data-as='chat-turn-status'] .as-dot {
     animation: none;
+  }
+}
+
+/* ── Concept graph (React Flow chrome on semantic tokens) ───────────── */
+[data-as='concept-graph'] {
+  /* hover highlight without rebuilding node objects (perf: see component) */
+  .react-flow__node-graphItem:not(.selected):hover {
+    filter: brightness(1.12);
+  }
+
+  .react-flow__controls {
+    overflow: hidden;
+    border: 1px solid var(--as-border);
+    border-radius: var(--as-radius-sm);
+    background: var(--as-surface);
+    box-shadow: 0 1px 2px rgb(0 0 0 / 0.08);
+  }
+
+  .react-flow__controls button {
+    border-bottom: 1px solid var(--as-border);
+    background: var(--as-surface);
+    color: var(--as-fg);
+  }
+
+  .react-flow__controls button:hover {
+    background: var(--as-muted);
+  }
+
+  .react-flow__minimap {
+    border: 1px solid var(--as-border);
+    border-radius: var(--as-radius-sm);
+    background: var(--as-surface);
+  }
+
+  .react-flow__edge-textbg {
+    fill: var(--as-surface);
+  }
+
+  .react-flow__edge-text {
+    fill: var(--as-muted-fg);
   }
 }

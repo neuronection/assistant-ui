@@ -70,6 +70,8 @@ const LIBRARY_COMPONENTS = [
   'ComboboxMulti',
   'MultiSelectPicker',
   'PickerBrowseModal',
+  'ConceptGraphView',
+  'DynamicIcon',
   'ConfirmationModal',
   'ContextMenu',
   'CopyButton',
