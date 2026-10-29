@@ -23,6 +23,7 @@ Extends `React.ComponentProps<'button'>` (spread onto the switch button).
 | `onCheckedChange` | `(checked: boolean) => void` | — | controlled toggle |
 | `currentValue` | `ReactNode` | — | sub-line under the label (`now: …`) |
 | `disabled` | `boolean` | `false` | inert + dimmed |
+| `hideLabel` | `boolean` | `false` | knob-only rendering (dense grids) — the label stays in the accessibility tree as visually-hidden text |
 
 ## controlled contract
 
