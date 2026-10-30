@@ -166,6 +166,8 @@ export interface IntegrationConfigSchemaField {
   'x-choices'?: Array<{ value: string; label: string }>
   /** The field's value is a comma-separated string (see `x-choices`). */
   'x-csv'?: true
+  /** Label for the trailing "Custom…" entry on bounded numeric fields. */
+  'x-custom-label'?: string
   /** Group the field under a collapsed section ('advanced'). */
   'x-section'?: string
 }
@@ -203,6 +205,9 @@ export interface IntegrationConfigFieldView {
   choices?: Array<{ value: string; label: string }> | null
   csv?: boolean
   section?: string | null
+  /** Label for the trailing "Custom…" entry on bounded numeric fields —
+   * picking it swaps the chips for a bounded number input (plan 154). */
+  customLabel?: string | null
 }
 
 export type IntegrationConfigValues = Record<
@@ -243,6 +248,7 @@ export function parseIntegrationConfigSchema(
     secret: field['x-secret'] === true,
     required: required.has(name),
     choices: field['x-choices'] ?? null,
+    customLabel: field['x-custom-label'] ?? null,
     csv: field['x-csv'] === true,
     section: field['x-section'] ?? null,
   }))
