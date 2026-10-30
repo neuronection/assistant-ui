@@ -558,7 +558,7 @@
     "date-fns": "^4.4.0",
     "html-to-image": "^1.11.13",
     "katex": "^0.19.0",
-    "mermaid": "^11.17.2",
+    "mermaid": "^12.2.0",
     "react-markdown": "^10.1.0",
     "reactflow": "^11.11.4",
     "rehype-katex": "^7.0.1",
