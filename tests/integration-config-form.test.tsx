@@ -360,12 +360,14 @@ describe('IntegrationConfigForm — schema hints (x-choices / x-presets / x-sect
             },
           },
         })}
-        values={{ pages: 7 }}
+        values={{ pages: '7' }}
         onValuesChange={() => {}}
         onSave={() => {}}
       />,
     )
     expect(screen.getByTestId('integration-config-pages-custom')).toBeInTheDocument()
+    // string-typed host values (the career app keeps options as strings)
+    // still prefill the input
     expect(
       (screen.getByTestId('integration-config-pages-custom-input') as HTMLInputElement).value,
     ).toBe('7')
