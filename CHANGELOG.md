@@ -1,5 +1,13 @@
 # @neuronection/assistant-ui
 
+## 0.77.0
+
+### Minor Changes
+
+- [`721a19c`](https://github.com/neuronection/assistant-ui/commit/721a19c759bc46d16890a39425f7977c943eb56e) Thanks [@constLiakos](https://github.com/constLiakos)! - SettingsShell: optional `section` group labels on nav items — a muted uppercase divider renders before the first entry carrying it in rail mode (hidden in the narrow chip-row mode, SidebarNav's `section` idiom)
+
+- [`64fbc8e`](https://github.com/neuronection/assistant-ui/commit/64fbc8e81ff292f21c1e5ad102f403d7e552f460) Thanks [@constLiakos](https://github.com/constLiakos)! - SwitchRow: `hideLabel` knob-only variant — the label renders visually hidden so dense grids (routing matrices) keep named switches
+
 ## 0.76.0
 
 ### Minor Changes
