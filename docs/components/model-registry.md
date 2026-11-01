@@ -125,6 +125,14 @@ stt, tts and embeddings models get the minimal form, and a decision
 selection stamps the app's transport (read-only; one shipping transport
 today).
 
+A catalog pick classifies the draft from the entry's caps (llava →
+vision, whisper → stt) — **unless the kind was explicitly declared this
+session** (a kind card, or a standalone chip): the pick then fills only
+the model id and label, and the declared standalone kind survives. This
+is what lets an app register an audio model whose id carries no
+classifier token (`lfm3-audio` → Speech) — id-pattern inference alone
+would silently re-classify it as text.
+
 The modal leads with what users edit — the model picker — under one quiet
 context line (provider name, kind chip, change-kind link; the base URL
 rides the name's `title`). Capabilities follow, then everything secondary
