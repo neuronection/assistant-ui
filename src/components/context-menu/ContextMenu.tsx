@@ -49,6 +49,8 @@ export function ContextMenu({ x, y, items, onClose, className }: ContextMenuProp
         collisionPadding={8}
         data-as="context-menu"
         onCloseAutoFocus={(event) => event.preventDefault()}
+        onClick={(event) => event.stopPropagation()}
+        onContextMenu={(event) => event.stopPropagation()}
         className={cn('min-w-40', className)}
       >
         {items.map((item) =>

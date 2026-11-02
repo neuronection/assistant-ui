@@ -196,6 +196,23 @@ describe('ContextMenu', () => {
     await screen.findByRole('menuitem', { name: 'Act' })
     expect(await axe(container)).toHaveNoViolations()
   })
+
+  it('item clicks do not bubble to the host the menu overlays (plan 188)', async () => {
+    const user = userEvent.setup()
+    const onHostClick = vi.fn()
+    render(
+      <div onClick={onHostClick}>
+        <ContextMenu
+          x={10}
+          y={10}
+          items={[{ key: 'a', label: 'Act', onSelect: () => {} }]}
+          onClose={() => {}}
+        />
+      </div>,
+    )
+    await user.click(await screen.findByRole('menuitem', { name: 'Act' }))
+    expect(onHostClick).not.toHaveBeenCalled()
+  })
 })
 
 describe('ActionMenu / MenuItem highlight', () => {

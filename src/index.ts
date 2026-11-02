@@ -369,7 +369,13 @@ export {
   type ConfirmationModalProps,
 } from './components/confirmation-modal'
 export { CopyButton, type CopyButtonProps } from './components/copy-button'
-export { ContextMenu, type ContextMenuProps, type ContextMenuItem } from './components/context-menu'
+export {
+  ContextMenu,
+  type ContextMenuProps,
+  type ContextMenuItem,
+  type ContextMenuSeparator,
+  type ContextMenuEntry,
+} from './components/context-menu'
 export {
   DatePicker,
   type DatePickerProps,

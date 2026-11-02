@@ -200,8 +200,6 @@ export const SidebarNav = React.forwardRef<HTMLElement, SidebarNavProps>(
       if (flyoutTimer.current) clearTimeout(flyoutTimer.current)
     }
     const closeFlyout = () => {
-      // A pending hover-open timer must not fire after an explicit close —
-      // Escape within FLYOUT_DELAY_MS of a hover would ghost-reopen the flyout.
       if (flyoutTimer.current) clearTimeout(flyoutTimer.current)
       flyoutTimer.current = null
       setOpenFlyout(null)
