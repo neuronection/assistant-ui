@@ -1,5 +1,30 @@
 # @neuronection/assistant-ui
 
+## 0.78.0
+
+### Minor Changes
+
+- [`6927077`](https://github.com/neuronection/assistant-ui/commit/69270771076b1958df57badc8c0126bf96643217) Thanks [@constLiakos](https://github.com/constLiakos)! - IntegrationConfigForm: bounded numeric fields with `x-choices` gain a trailing "Custom…" entry (optional `customLabel` / schema `x-custom-label`) — picking it swaps the chips for a bounded number input, and a stored value outside the presets opens the custom input prefilled (plan 154 source knobs: pages per sync, budgets).
+
+- [`b40e777`](https://github.com/neuronection/assistant-ui/commit/b40e77730e498062e4ca6529c498d8cf9a09db78) Thanks [@constLiakos](https://github.com/constLiakos)! - **ModalContent owns popup padding by default.** `ModalContent` gains a
+  `padding` variant — `'padded'` (default) renders a `p-6` frame with
+  `gap-4` between sections; `'none'` opts out for full-bleed dialogs
+  (command palettes, media, self-chromed editors). `ModalHeader`,
+  `ModalBody` and `ModalFooter` are now layout-only — their padding moved
+  into the frame.
+
+  **Migration (all apps):** delete hand-rolled `px-6 pb-6` body wrappers
+  and `p-6`-family padding on composed dialogs — the frame provides them;
+  double padding is the failure mode. Full-bleed dialogs move `p-0` /
+  `gap-0` overrides to `padding="none"` (existing explicit classes keep
+  winning via twMerge, but prefer the prop). `PanelModal` is unchanged
+  (it already defaulted its body padding). Docs: `modal.md` → "spacing
+  rhythm".
+
+### Patch Changes
+
+- [`494c6dc`](https://github.com/neuronection/assistant-ui/commit/494c6dc1f092eadf2ac61ae408fcbbf9a62c854e) Thanks [@constLiakos](https://github.com/constLiakos)! - ModelRegistry: a catalog pick no longer re-classifies an explicitly declared kind — choosing a standalone kind card (or standalone chip) then picking from the live catalog keeps the declared caps (Speech stays `tts` on `lfm3-audio`) and only fills the id/label; undeclared and text-kind drafts keep the catalog cap correction (llava → vision, whisper → stt)
+
 ## 0.77.0
 
 ### Minor Changes
