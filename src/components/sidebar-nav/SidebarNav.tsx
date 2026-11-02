@@ -199,9 +199,16 @@ export const SidebarNav = React.forwardRef<HTMLElement, SidebarNavProps>(
     const flyoutEnterCancel = () => {
       if (flyoutTimer.current) clearTimeout(flyoutTimer.current)
     }
+    const closeFlyout = () => {
+      // A pending hover-open timer must not fire after an explicit close —
+      // Escape within FLYOUT_DELAY_MS of a hover would ghost-reopen the flyout.
+      if (flyoutTimer.current) clearTimeout(flyoutTimer.current)
+      flyoutTimer.current = null
+      setOpenFlyout(null)
+    }
 
     const navigate = (id: string) => {
-      setOpenFlyout(null)
+      closeFlyout()
       onNavigate?.(id)
     }
 
@@ -347,7 +354,7 @@ export const SidebarNav = React.forwardRef<HTMLElement, SidebarNavProps>(
             <PopoverPrimitive.Root
               open={openFlyout === item.id}
               onOpenChange={(open) => {
-                if (!open) setOpenFlyout(null)
+                if (!open) closeFlyout()
               }}
             >
               <PopoverPrimitive.Anchor asChild>
