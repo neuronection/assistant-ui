@@ -76,7 +76,7 @@ describe('Modal', () => {
     expect(await axe(container)).toHaveNoViolations()
   })
 
-  it('ModalBody renders a padded body region and merges className', async () => {
+  it('ModalBody renders a neutral body region and merges className', async () => {
     render(
       <Modal open onOpenChange={() => {}}>
         <ModalContent>
@@ -92,10 +92,43 @@ describe('Modal', () => {
     await screen.findByRole('dialog')
     const body = screen.getByTestId('body')
     expect(body).toHaveAttribute('data-as', 'modal-body')
-    expect(body).toHaveClass('px-6')
-    expect(body).toHaveClass('pb-6')
     expect(body).toHaveClass('grid')
     expect(screen.getByText('Body content')).toBeInTheDocument()
+  })
+
+  it('ModalContent is padded by default and the parts carry no padding', async () => {
+    render(
+      <Modal open onOpenChange={() => {}}>
+        <ModalContent data-testid="content">
+          <ModalHeader data-testid="header">
+            <ModalTitle>T</ModalTitle>
+          </ModalHeader>
+          <ModalBody data-testid="body">b</ModalBody>
+          <ModalFooter data-testid="footer">f</ModalFooter>
+        </ModalContent>
+      </Modal>,
+    )
+    await screen.findByRole('dialog')
+    const content = screen.getByTestId('content')
+    expect(content).toHaveClass('p-6')
+    expect(content).toHaveClass('gap-4')
+    expect(screen.getByTestId('header').className).not.toMatch(/p-6|px-6|pb-4/)
+    expect(screen.getByTestId('body').className).not.toMatch(/p-6|px-6|pb-6/)
+    expect(screen.getByTestId('footer').className).not.toMatch(/p-6|pt-0/)
+  })
+
+  it('padding="none" opts out for full-bleed dialogs', async () => {
+    render(
+      <Modal open onOpenChange={() => {}}>
+        <ModalContent padding="none" data-testid="content">
+          <p>Full-bleed</p>
+        </ModalContent>
+      </Modal>,
+    )
+    await screen.findByRole('dialog')
+    const content = screen.getByTestId('content')
+    expect(content).not.toHaveClass('p-6')
+    expect(content).not.toHaveClass('gap-4')
   })
 })
 

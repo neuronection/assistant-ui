@@ -27,6 +27,7 @@ import {
 | prop | type | default | notes |
 |---|---|---|---|
 | `size` | `'sm' \| 'md' \| 'lg' \| 'xl'` | `'md'` | max-width step (`sm` 24rem … `xl` 36rem) |
+| `padding` | `'padded' \| 'none'` | `'padded'` | `p-6` frame + `gap-4` between sections; `none` for full-bleed dialogs (command palettes, media, self-chromed editors) |
 | `closeLabel` | `string` | `'Close'` | built-in × button accessible name |
 | `className` | `string` | — | merges; height/scroll already set (`max-h-[85vh]`, overflow-y-auto) |
 | …Radix Content props | — | — | `onOpenAutoFocus`, `aria-describedby={undefined}`, etc. |
@@ -38,8 +39,8 @@ or `ModalTrigger` for uncontrolled use. Other parts forward native props.
 
 | prop | type | default | notes |
 |---|---|---|---|
-| `className` | `string` | — | merges; default padding `px-6 pb-6` matches Header/Footer |
-| …div props | — | — | `ModalHeader` uses `pb-4`, `ModalFooter` uses `p-6 pt-0` — the layout owns spacing; consumers don't add per-modal padding wrappers |
+| `className` | `string` | — | layout-only region (`data-as="modal-body"`) — the content frame owns padding; add spacing modifiers (e.g. `space-y-4`) as needed |
+| …div props | — | — | `ModalHeader`/`ModalFooter` are layout-only too — consumers never add per-modal padding wrappers |
 
 ## props — PanelModal
 
@@ -69,20 +70,28 @@ available for simple cases. Overlays portal to `document.body` and stack via
 
 ## spacing rhythm (the popup standard)
 
-Every dialog in the family shares one vertical/horizontal rhythm — new
-dialogs copy it, existing ones never invent their own:
+Every dialog in the family shares one vertical/horizontal rhythm — the
+**content frame owns padding** (`ModalContent padding="padded"` →
+`p-6 gap-4` is the default), so new dialogs just compose the parts:
 
-- **Sections stack `space-y-4`**; field groups inside a section use
-  `space-y-3`. `ModalContent` never carries a `gap-*` — the section
-  rhythm owns the spacing.
-- **Horizontal inset `px-6`**; the content region's bottom is `pb-6`
-  (`ModalBody`'s default) — inline content regions copy the same
-  `px-6 pb-6` so buttons never crowd the body.
-- **Header `p-6 pb-4`, Footer `p-6 pt-0`** — the content-to-footer gap
-  is the content's `pb-6`, never a second padding stack.
-- **Meta (label/value) grids `gap-x-6 gap-y-3`**; bordered or tinted
-  inset blocks `p-3` with `space-y-2` inside; accent-law text (the
+- **The frame**: 24px inset on every side, 16px between
+  header/body/footer — `ModalContent` provides both; parts carry NO
+  padding, and hand-rolled `px-6 pb-6` wrappers are a double-padding bug.
+- **Sections inside the body stack `space-y-4`**; field groups inside a
+  section use `space-y-3`. Inset/bordered blocks keep `p-3` with
+  `space-y-2` inside.
+- **Full-bleed dialogs** (command palettes, media, editors with their own
+  chrome) opt out with `padding="none"` and own every pixel — see the
+  `PaddingNone` story.
+- **Meta (label/value) grids `gap-x-6 gap-y-3`**; accent-law text (the
   charter disclosures) gets padding on all sides (`py-1 pl-3 pr-2`).
+- **`PanelModal`** keeps its own body default (`p-5 sm:p-6` via
+  `bodyClassName`).
+
+**Migrating from the parts-padded contract (≤0.71):** delete hand-rolled
+`px-6 pb-6` body wrappers and `p-6`-family classes on composed dialogs —
+the frame now provides them; full-bleed dialogs move `p-0`/`gap-0`
+overrides to `padding="none"`.
 
 ## examples
 

@@ -16,9 +16,14 @@ const modalContentVariants = cva('', {
       lg: 'max-w-lg',
       xl: 'max-w-xl',
     },
+    padding: {
+      none: '',
+      padded: 'p-6 gap-4',
+    },
   },
   defaultVariants: {
     size: 'md',
+    padding: 'padded',
   },
 })
 
@@ -31,7 +36,7 @@ export interface ModalContentProps
 export const ModalContent = React.forwardRef<
   React.ComponentRef<typeof DialogPrimitive.Content>,
   ModalContentProps
->(function ModalContent({ className, children, size, closeLabel = 'Close', ...props }, ref) {
+>(function ModalContent({ className, children, size, padding, closeLabel = 'Close', ...props }, ref) {
   return (
     <DialogPrimitive.Portal>
       <DialogPrimitive.Overlay
@@ -43,7 +48,7 @@ export const ModalContent = React.forwardRef<
         data-as="modal"
         className={cn(
           'as-anim-modal fixed inset-0 z-[var(--as-z-modal)] m-auto flex h-fit max-h-[85vh] w-[calc(100%-2rem)] flex-col overflow-y-auto rounded-[var(--as-radius-lg)] border border-[var(--as-border)] bg-[var(--as-surface-raised)] text-[var(--as-fg)] shadow-[var(--as-shadow-3)] focus:outline-none',
-          modalContentVariants({ size }),
+          modalContentVariants({ size, padding }),
           className,
         )}
         {...props}
@@ -66,7 +71,7 @@ export const ModalHeader = React.forwardRef<HTMLDivElement, React.ComponentProps
       <div
         ref={ref}
         data-as="modal-header"
-        className={cn('flex flex-col gap-1.5 p-6 pb-4', className)}
+        className={cn('flex flex-col gap-1.5', className)}
         {...props}
       />
     )
@@ -107,7 +112,7 @@ export const ModalBody = React.forwardRef<HTMLDivElement, React.ComponentProps<'
       <div
         ref={ref}
         data-as="modal-body"
-        className={cn('px-6 pb-6', className)}
+        className={cn(className)}
         {...props}
       />
     )
@@ -120,10 +125,7 @@ export const ModalFooter = React.forwardRef<HTMLDivElement, React.ComponentProps
       <div
         ref={ref}
         data-as="modal-footer"
-        className={cn(
-          'flex flex-col-reverse gap-2 p-6 pt-0 sm:flex-row sm:justify-end',
-          className,
-        )}
+        className={cn('flex flex-col-reverse gap-2 sm:flex-row sm:justify-end', className)}
         {...props}
       />
     )
