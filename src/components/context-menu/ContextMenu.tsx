@@ -2,7 +2,7 @@ import * as React from 'react'
 import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu'
 import type { LucideIcon } from 'lucide-react'
 import { cn } from '../../lib/utils'
-import { MenuContent, MenuItem } from '../menu/Menu'
+import { MenuContent, MenuItem, MenuSeparator } from '../menu/Menu'
 
 export interface ContextMenuItem {
   key: string
@@ -14,12 +14,23 @@ export interface ContextMenuItem {
   hint?: string
 }
 
+export interface ContextMenuSeparator {
+  key: string
+  separator: true
+}
+
+export type ContextMenuEntry = ContextMenuItem | ContextMenuSeparator
+
 export interface ContextMenuProps {
   x: number
   y: number
-  items: ContextMenuItem[]
+  items: ContextMenuEntry[]
   onClose: () => void
   className?: string
+}
+
+function isSeparator(item: ContextMenuEntry): item is ContextMenuSeparator {
+  return (item as ContextMenuSeparator).separator === true
 }
 
 export function ContextMenu({ x, y, items, onClose, className }: ContextMenuProps) {
@@ -41,7 +52,9 @@ export function ContextMenu({ x, y, items, onClose, className }: ContextMenuProp
         className={cn('min-w-40', className)}
       >
         {items.map((item) =>
-          item.disabled === true ? (
+          isSeparator(item) ? (
+            <MenuSeparator key={item.key} />
+          ) : item.disabled === true ? (
             <span
               key={item.key}
               role="menuitem"
