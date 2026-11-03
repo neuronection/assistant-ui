@@ -1,5 +1,28 @@
 # @neuronection/assistant-ui
 
+## 0.79.0
+
+### Minor Changes
+
+- [`917d87e`](https://github.com/neuronection/assistant-ui/commit/917d87e20cde01850097686a6cf558ef3e09510b) Thanks [@constLiakos](https://github.com/constLiakos)! - **ContextMenu supports grouped items.** `ContextMenuProps.items` widens from
+  `ContextMenuItem[]` to `ContextMenuEntry[]` — an entry is either an action or
+  `{ key, separator: true }`, which renders a non-focusable divider between item
+  groups (filter actions above navigation is the motivating shape).
+
+  **Migration (all apps):** none — plain `ContextMenuItem[]` arrays type-check
+  unchanged; existing menus render identically. To group, interleave
+  `{ key: 'sep', separator: true }` entries. Item clicks no longer bubble
+  through the React tree to host handlers (a coordinate-anchored menu may
+  overlay clickable cards — the menu consumes its own clicks). New exports:
+  `ContextMenuEntry`, `ContextMenuSeparator`. Docs: `context-menu.md` props
+  table + grouped example; story `menu--context-menu-separator-story`.
+
+### Patch Changes
+
+- [`ebab19b`](https://github.com/neuronection/assistant-ui/commit/ebab19b764e28c8abd013d5fdeb1e6f050e4885f) Thanks [@constLiakos](https://github.com/constLiakos)! - SidebarNav: closing a rail flyout now cancels the pending hover-open timer, so
+  leaving and immediately returning cannot reopen a flyout that was just
+  dismissed.
+
 ## 0.78.0
 
 ### Minor Changes
