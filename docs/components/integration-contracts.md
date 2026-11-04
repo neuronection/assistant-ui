@@ -69,7 +69,7 @@ import type {
 ## generation + drift walls
 
 `scripts/sync-extension-vocab.mjs` (canonical:
-`dev/scripts/sync-extension-vocab.mjs`, byte-identical copies) regenerates
+`the family sync tooling`, byte-identical copies) regenerates
 `src/contracts/extension-charter.vocab.ts` from the vendored charter. The
 library suite regenerates and compares byte-for-byte; dev's
 `verify-wiring.sh` ext probe keeps the vendored JSON artifacts

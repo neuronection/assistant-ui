@@ -2,8 +2,8 @@
 
 Shared React component library for the Assistant family (career-, study-,
 health-, desktop-assistant). Published as `@neuronection/assistant-ui` on npm.
-Strategy lives in `dev/plans/` (local-only, gitignored — keep your own
-backups). In-repo docs: `docs/` is the source of truth for workflows.
+Longer-range planning notes are local-only; the tracked `docs/` are the
+source of truth for workflows.
 
 ## Non-negotiable rules
 

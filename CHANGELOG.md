@@ -297,7 +297,7 @@
   summaries in an evidence disclosure; unknown node/action ids never render;
   raw markup from an extension never mounts (D17). Promoted from desktop's
   PackReportRenderer — career + desktop are the two hosts, pinned by the
-  family fixture wall (`dev/contracts/surface-renderer.fixtures.json`).
+  family fixture wall (`the family contract canonical/surface-renderer.fixtures.json`).
   Also adds the previously missing subpath export entry for
   `extension-sources` (the panel's module was staged without it).
 
@@ -1065,7 +1065,7 @@ anonymous` boot machine and its rendering, the app owns the endpoints —
   attach/equation/dictation controls, attachment rail and suggestion strip
   slots, and drag-drop + paste file wiring behind `onAttachFiles`.
 
-- [`062fca5`](https://github.com/neuronection/assistant-ui/commit/062fca561466dd9d2985fc2ea7a3d9e751e3cab9) Thanks [@constLiakos](https://github.com/constLiakos)! - chat-core — the headless core of the shared chat layer (plan dev/plans/11,
+- [`062fca5`](https://github.com/neuronection/assistant-ui/commit/062fca561466dd9d2985fc2ea7a3d9e751e3cab9) Thanks [@constLiakos](https://github.com/constLiakos)! - chat-core — the headless core of the shared chat layer (plan local planning notes/11,
   ADR-0009): `useChatStream`, a transport-injected live-turn state machine
   (send → pending → streaming → done/error/interrupted) with coalesced
   text/reasoning deltas, tool-call observations, HITL interrupts (resumable)

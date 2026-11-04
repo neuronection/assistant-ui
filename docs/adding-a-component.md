@@ -5,8 +5,7 @@ Checklist for landing a new component in the library.
 ## Before you build
 
 - **Two-app rule**: is it needed by ≥2 family apps? If it exists in only one
-  app, it belongs on the "decide-and-record" list (see
-  `dev/plans/03-component-catalog.md` locally) until a second app needs it.
+  app, it belongs on the "decide-and-record" list until a second app needs it.
 - **Boundary (ADR-006)**: presentational + controlled only. No fetching, no
   stores, no router, no i18n engine, no API keys. Data in, events out.
 - **React 18 + Tailwind 3/4 compatibility**: no React-19-only APIs (banned by

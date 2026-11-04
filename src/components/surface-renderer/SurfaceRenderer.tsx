@@ -12,7 +12,7 @@ import { DetailValue } from '../detail-value/DetailValue'
  * `actions`, `evidence` — from a schema + view object with RESOLVED
  * labels, never raw markup from an extension. Promoted from desktop's
  * PackReportRenderer; career and desktop are the two hosts (fixture
- * parity: `dev/contracts/surface-renderer.fixtures.json` —
+ * parity: `the family contract canonical/surface-renderer.fixtures.json` —
  * implementations may differ, outputs may not).
  */
 
