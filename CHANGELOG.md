@@ -1,5 +1,17 @@
 # @neuronection/assistant-ui
 
+## 0.81.0
+
+### Minor Changes
+
+- [`764119a`](https://github.com/neuronection/assistant-ui/commit/764119a2d6ffcf2ce7a1559b436e662738819570) Thanks [@constLiakos](https://github.com/constLiakos)! - `FamilyMenu`: the sidebar family switcher. A compact trigger (app-drawer
+  glyph + label, default “Explore”) opens a portaled menu with the family
+  products — the blue lowercase Neuronection wordmark, tinted marks, two-line
+  descriptions, a current-app chip, close button, and a hub link with
+  optional version. Presentational: projects,
+  labels and links are props; Radix Popover owns focus, Escape and
+  outside-click behavior.
+
 ## 0.80.0
 
 ### Minor Changes
