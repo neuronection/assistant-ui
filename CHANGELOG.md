@@ -1,5 +1,14 @@
 # @neuronection/assistant-ui
 
+## 0.80.0
+
+### Minor Changes
+
+- [`88622fe`](https://github.com/neuronection/assistant-ui/commit/88622fea22606ab6e1914a380c6dcc583287b4f9) Thanks [@constLiakos](https://github.com/constLiakos)! - SegmentedTabs: new opt-in `wrap` prop — long tab sets flow onto multiple rows
+  instead of overflowing or needing a horizontal scroll wrapper, and the sliding
+  thumb switches from single-row percentage math to measured geometry so it
+  follows the selection across rows. Default single-row mode is unchanged.
+
 ## 0.79.0
 
 ### Minor Changes
