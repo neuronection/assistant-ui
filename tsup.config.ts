@@ -5,6 +5,7 @@ export const entry: Record<string, string> = {
   'tokens': 'src/tokens/tokens.ts',
   'ai-actions-dropdown': 'src/components/ai-actions-dropdown/index.ts',
   'about': 'src/components/about/index.ts',
+  'family-menu': 'src/components/family-menu/index.ts',
   'admin-user-table': 'src/components/admin-user-table/index.ts',
   'instance-mode-control': 'src/components/instance-mode-control/index.ts',
   'auth-gate': 'src/components/auth-gate/index.ts',

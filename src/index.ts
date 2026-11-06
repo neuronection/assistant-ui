@@ -68,6 +68,13 @@ export {
 } from './components/about'
 
 export {
+  FamilyMenu,
+  defaultFamilyProjects,
+  type FamilyMenuProps,
+  type FamilyProject,
+} from './components/family-menu'
+
+export {
   AiActionsDropdown,
   type AiAction,
   type AiActionsDropdownProps,

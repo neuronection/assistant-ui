@@ -459,6 +459,10 @@
       "types": "./dist/sidebar-nav.d.ts",
       "import": "./dist/sidebar-nav.js"
     },
+    "./family-menu": {
+      "types": "./dist/family-menu.d.ts",
+      "import": "./dist/family-menu.js"
+    },
     "./user-menu": {
       "types": "./dist/user-menu.d.ts",
       "import": "./dist/user-menu.js"
