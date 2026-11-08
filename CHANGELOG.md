@@ -1,5 +1,16 @@
 # @neuronection/assistant-ui
 
+## 0.82.0
+
+### Minor Changes
+
+- [`3ca5a6d`](https://github.com/neuronection/assistant-ui/commit/3ca5a6dd4744cf83d72017e7ad89e81a65ed2df0) Thanks [@constLiakos](https://github.com/constLiakos)! - `PanelModal` gains a `description` slot (rendered under the title and wired as
+  the dialog description, so screen readers announce it) and an opt-in `bodyFill`
+  that makes the body the fill region above the sticky footer, letting a child
+  flex column — a form with its own scrolling field area — own scrolling. Both are
+  additive; existing panels render unchanged apart from one wrapper element around
+  the title.
+
 ## 0.81.0
 
 ### Minor Changes
