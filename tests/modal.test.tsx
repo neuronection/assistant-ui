@@ -157,6 +157,68 @@ describe('PanelModal', () => {
     expect(screen.getByRole('button', { name: 'Close' })).toBeInTheDocument()
   })
 
+  it('renders a description and wires it as the dialog description', async () => {
+    render(
+      <PanelModal open onOpenChange={() => {}} title="Record" description="Clinical patient records">
+        <p>Body</p>
+      </PanelModal>,
+    )
+    const dialog = await screen.findByRole('dialog')
+    const description = screen.getByText('Clinical patient records')
+    expect(description).toHaveAttribute('data-as', 'modal-description')
+    expect(dialog).toHaveAttribute('aria-describedby', description.id)
+  })
+
+  it('leaves aria-describedby unset when there is no description', async () => {
+    render(
+      <PanelModal open onOpenChange={() => {}} title="No description">
+        <p>Body</p>
+      </PanelModal>,
+    )
+    const dialog = await screen.findByRole('dialog')
+    expect(dialog).not.toHaveAttribute('aria-describedby')
+  })
+
+  it('renders exactly one close control with a header', async () => {
+    render(
+      <PanelModal open onOpenChange={() => {}} title="One close">
+        <p>Body</p>
+      </PanelModal>,
+    )
+    await screen.findByRole('dialog')
+    expect(screen.getAllByRole('button', { name: 'Close' })).toHaveLength(1)
+  })
+
+  it('bodyFill makes the body the fill region above the footer', async () => {
+    render(
+      <PanelModal
+        open
+        onOpenChange={() => {}}
+        title="Fill"
+        bodyFill
+        bodyClassName="p-0"
+        footer={<button>Save</button>}
+      >
+        <div data-testid="child">Form</div>
+      </PanelModal>,
+    )
+    await screen.findByRole('dialog')
+    const body = screen.getByTestId('child').parentElement!
+    expect(body).toHaveClass('min-h-0', 'flex-1', 'flex', 'flex-col', 'overflow-hidden', 'p-0')
+    expect(body).not.toHaveClass('pt-10')
+    expect(screen.getByRole('button', { name: 'Save' })).toBeInTheDocument()
+  })
+
+  it('keeps the hideHeader top reserve unless bodyFill is used', async () => {
+    render(
+      <PanelModal open onOpenChange={() => {}} title="Reserve" hideHeader>
+        <div data-testid="child">Body</div>
+      </PanelModal>,
+    )
+    await screen.findByRole('dialog')
+    expect(screen.getByTestId('child').parentElement).toHaveClass('pt-10')
+  })
+
   it('Escape closes via onOpenChange (keyboard)', async () => {
     const user = userEvent.setup()
     const onOpenChange = vi.fn()

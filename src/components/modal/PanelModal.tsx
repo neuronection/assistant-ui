@@ -3,6 +3,7 @@ import * as DialogPrimitive from '@radix-ui/react-dialog'
 import { X } from 'lucide-react'
 import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from '../../lib/utils'
+import { ModalDescription } from './Modal'
 
 const panelModalVariants = cva('', {
   variants: {
@@ -27,19 +28,24 @@ export interface PanelModalProps
   open: boolean
   onOpenChange: (open: boolean) => void
   title?: React.ReactNode
+  description?: React.ReactNode
   headerIcon?: React.ReactNode
   headerActions?: React.ReactNode
   footer?: React.ReactNode
   hideHeader?: boolean
+  bodyFill?: boolean
   bodyClassName?: string
   closeLabel?: string
 }
 
 /**
- * Dialog panel with a header (icon, title, actions, close), scrollable body
- * and optional sticky footer — full-screen on mobile, centered card on
- * desktop. For plain dialogs prefer the `Modal` parts; for forms prefer
- * `FormModal`.
+ * Dialog panel with a header (icon, title, description, actions, close),
+ * scrollable body and optional sticky footer — full-screen on mobile,
+ * centered card on desktop. For plain dialogs prefer the `Modal` parts; for
+ * compact forms prefer `FormModal`.
+ *
+ * `bodyFill` makes the body the fill region above the footer so a child flex
+ * column (e.g. a form with its own scrolling field area) can own scrolling.
  */
 export const PanelModal = React.forwardRef<
   React.ComponentRef<typeof DialogPrimitive.Content>,
@@ -49,10 +55,12 @@ export const PanelModal = React.forwardRef<
     open,
     onOpenChange,
     title,
+    description,
     headerIcon,
     headerActions,
     footer,
     hideHeader = false,
+    bodyFill = false,
     bodyClassName,
     closeLabel = 'Close',
     size,
@@ -62,6 +70,9 @@ export const PanelModal = React.forwardRef<
   },
   ref,
 ) {
+  const contentProps = description ? props : { 'aria-describedby': undefined, ...props }
+  const bodyPadding =
+    hideHeader && !bodyFill ? 'px-5 pt-10 pb-5 sm:px-6 sm:pb-6' : 'p-5 sm:p-6'
   return (
     <DialogPrimitive.Root open={open} onOpenChange={onOpenChange}>
       <DialogPrimitive.Portal>
@@ -72,14 +83,13 @@ export const PanelModal = React.forwardRef<
         <DialogPrimitive.Content
           ref={ref}
           data-as="panel-modal"
-          aria-describedby={undefined}
           className={cn(
             'as-anim-pop fixed inset-0 z-[var(--as-z-modal)] flex flex-col overflow-y-auto bg-[var(--as-surface-raised)] text-[var(--as-fg)] shadow-[var(--as-shadow-3)] focus:outline-none',
             'sm:inset-0 sm:mx-auto sm:my-auto sm:h-fit sm:max-h-[90vh] sm:w-fit sm:rounded-[var(--as-radius-lg)] sm:border sm:border-[var(--as-border)]',
             panelModalVariants({ size }),
             className,
           )}
-          {...props}
+          {...contentProps}
         >
           {hideHeader ? (
             <DialogPrimitive.Close
@@ -92,11 +102,16 @@ export const PanelModal = React.forwardRef<
             <div className="flex shrink-0 items-center justify-between gap-3 border-b border-[var(--as-border)] px-5 py-4 sm:px-6">
               <div className="flex min-w-0 items-center gap-2">
                 {headerIcon}
-                {title ? (
-                  <DialogPrimitive.Title className="truncate font-semibold text-[var(--as-fg)]">
-                    {title}
-                  </DialogPrimitive.Title>
-                ) : null}
+                <div className="min-w-0">
+                  {title ? (
+                    <DialogPrimitive.Title className="truncate font-semibold text-[var(--as-fg)]">
+                      {title}
+                    </DialogPrimitive.Title>
+                  ) : null}
+                  {description ? (
+                    <ModalDescription className="truncate text-xs">{description}</ModalDescription>
+                  ) : null}
+                </div>
               </div>
               <div className="flex shrink-0 items-center gap-1">
                 {headerActions}
@@ -109,7 +124,13 @@ export const PanelModal = React.forwardRef<
               </div>
             </div>
           )}
-          <div className={cn('min-h-0 flex-1', hideHeader && 'pt-10', bodyClassName ?? 'p-5 sm:p-6')}>
+          <div
+            className={cn(
+              'min-h-0 flex-1',
+              bodyFill && 'flex flex-col overflow-hidden',
+              bodyClassName ?? bodyPadding,
+            )}
+          >
             {children}
           </div>
           {footer ? (

@@ -48,9 +48,11 @@ or `ModalTrigger` for uncontrolled use. Other parts forward native props.
 |---|---|---|---|
 | `open` / `onOpenChange` | — | — | controlled dialog state |
 | `title` | `ReactNode` | — | rendered as the dialog title |
+| `description` | `ReactNode` | — | rendered under the title and wired as the dialog description (`aria-describedby`) |
 | `headerIcon` / `headerActions` | `ReactNode` | — | leading icon / trailing actions next to the × |
 | `footer` | `ReactNode` | — | sticky footer band |
 | `hideHeader` | `boolean` | `false` | drops the header, keeps a floating × |
+| `bodyFill` | `boolean` | `false` | the body fills the space above the footer (`flex flex-col overflow-hidden`) so a child flex column — a form with its own scrolling field area — owns scrolling; pair with `bodyClassName="p-0"`. With `hideHeader` the consumer owns clearance for the floating × |
 | `bodyClassName` | `string` | — | overrides default body padding |
 | `closeLabel` | `string` | `'Close'` | |
 | `size` | `'sm' \| 'md' \| 'lg' \| 'xl'` | `'md'` | desktop max-width |
@@ -119,6 +121,7 @@ realistic — `PanelModal` with header actions and footer (study pattern):
   open={open}
   onOpenChange={setOpen}
   title={t('settings.editProvider')}
+  description={t('settings.editProviderHint')}
   headerIcon={<KeyRound className="size-4" aria-hidden />}
   footer={
     <div className="flex justify-end gap-2">
@@ -130,6 +133,31 @@ realistic — `PanelModal` with header actions and footer (study pattern):
   <ProviderForm … />
 </PanelModal>
 ```
+
+realistic — form panel where only the fields scroll (`bodyFill`):
+
+```tsx
+<PanelModal
+  open={open}
+  onOpenChange={setOpen}
+  title={t('record.newTitle')}
+  description={t('record.subtitle')}
+  headerIcon={<SyringeBadge />}
+  bodyFill
+  bodyClassName="p-0"
+  footer={<RecordActions formId={formId} … />}
+>
+  <RecordForm formId={formId} />
+</PanelModal>
+```
+
+`RecordForm` / `RecordActions` above are app-side: the library ships the
+shell, the app owns the form and its action bar. The form renders `fields`
+(inside its own `flex flex-col` with `min-h-0 flex-1 overflow-y-auto`) and the
+native `<form id={formId}>`, so the header and footer stay pinned while the
+fields scroll. A submit button in the footer stays a real submit button through
+the `form` attribute. Keep the `<form>` in the form component, never inside the
+footer.
 
 ## accessibility
 
