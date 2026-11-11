@@ -503,6 +503,21 @@ export {
 } from './components/scale-slider'
 export { SearchInput, type SearchInputProps } from './components/search-input'
 export {
+  ModelPriceMeta,
+  type ModelPriceMetaLabels,
+  type ModelPriceMetaProps,
+  type ModelPriceOrigin,
+} from './components/model-price-meta'
+export {
+  ModelPriceTable,
+  microsToUsdPerMillion,
+  usdPerMillionToMicros,
+  type ModelPriceRow,
+  type ModelPriceTableLabels,
+  type ModelPriceTableProps,
+  type PriceMatch,
+} from './components/model-price-table'
+export {
   ModelPicker,
   type ModelPickerModel,
   type ModelPickerProps,

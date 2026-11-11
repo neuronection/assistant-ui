@@ -84,6 +84,8 @@ export const entry: Record<string, string> = {
   'marquee': 'src/components/marquee/index.ts',
   'markdown-diff-view': 'src/components/markdown-diff-view/index.ts',
   'menu': 'src/components/menu/index.ts',
+  'model-price-meta': 'src/components/model-price-meta/index.ts',
+  'model-price-table': 'src/components/model-price-table/index.ts',
   'model-picker': 'src/components/model-picker/index.ts',
   'modal': 'src/components/modal/index.ts',
   'multi-select-picker': 'src/components/multi-select-picker/index.ts',

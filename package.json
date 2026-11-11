@@ -319,6 +319,14 @@
       "types": "./dist/modal.d.ts",
       "import": "./dist/modal.js"
     },
+    "./model-price-meta": {
+      "types": "./dist/model-price-meta.d.ts",
+      "import": "./dist/model-price-meta.js"
+    },
+    "./model-price-table": {
+      "types": "./dist/model-price-table.d.ts",
+      "import": "./dist/model-price-table.js"
+    },
     "./model-picker": {
       "types": "./dist/model-picker.d.ts",
       "import": "./dist/model-picker.js"
