@@ -66,6 +66,7 @@ export const entry: Record<string, string> = {
   'expandable-search': 'src/components/expandable-search/index.ts',
   'file-card': 'src/components/file-card/index.ts',
   'file-queue': 'src/components/file-queue/index.ts',
+  'import-review-card': 'src/components/import-review-card/index.ts',
   'upload-dropzone': 'src/components/upload-dropzone/index.ts',
   'flow-status': 'src/components/flow-status/index.ts',
   'flow-trace': 'src/components/flow-trace/index.ts',

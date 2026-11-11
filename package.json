@@ -499,6 +499,10 @@
       "types": "./dist/undo-notice.d.ts",
       "import": "./dist/undo-notice.js"
     },
+    "./import-review-card": {
+      "types": "./dist/import-review-card.d.ts",
+      "import": "./dist/import-review-card.js"
+    },
     "./upload-dropzone": {
       "types": "./dist/upload-dropzone.d.ts",
       "import": "./dist/upload-dropzone.js"

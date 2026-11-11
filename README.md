@@ -192,3 +192,5 @@ laptop.
 ## License
 
 Apache-2.0 — same as the family apps this library was extracted from.
+
+- **ImportReviewCard** — review-first import card: file pick, mapped/dropped/warnings/conflicts report, explicit apply. `@neuronection/assistant-ui/import-review-card`.

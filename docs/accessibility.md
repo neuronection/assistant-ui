@@ -134,6 +134,7 @@ behavior and focus restoration are listed **only where asserted**.
 
 | Module | ARIA pattern | Keyboard (asserted) | axe |
 | --- | --- | --- | --- |
+| `ImportReviewCard` | heading + choose/apply buttons, hidden file input, report list | choose is a real button (Enter/Space); file input is `aria-hidden`/not tabbable; errors `role="alert"`; Apply disabled while busy; report reads in document order | clean |
 | `UploadDropzone` | labelled dropzone button ("click or drop") | click **and Enter from keyboard focus** open the OS file picker; drop accepted; suppressed while uploading/disabled | clean |
 | `FileCard` | remove button named "`<removeLabel> — <name>`"; include checkbox labelled per file; processing `role="status"`; failure state | remove/include via native controls | clean |
 | `FileQueue` | list of `FileCard`s + aggregate summary; empty state text | remove via card buttons; reorder intent reported on drop | clean |

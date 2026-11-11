@@ -171,6 +171,7 @@ const LIBRARY_COMPONENTS = [
   'TooltipContent',
   'InfoTooltip',
   'UndoNotice',
+  'ImportReviewCard',
   'UploadDropzone',
   'ViewToggle',
   'Wizard',

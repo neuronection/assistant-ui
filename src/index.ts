@@ -23,6 +23,16 @@ export {
 } from './components/file-queue'
 export { Portal, type PortalProps } from './components/portal'
 export {
+  ImportReviewCard,
+  type ImportReviewCardProps,
+  type ImportReviewConflict,
+  type ImportReviewGroup,
+  type ImportReviewLabels,
+  type ImportReviewReport,
+  type ImportReviewStatus,
+} from './components/import-review-card'
+
+export {
   UploadDropzone,
   type UploadDropzoneProps,
 } from './components/upload-dropzone'
