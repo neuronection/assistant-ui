@@ -1,5 +1,13 @@
 # @neuronection/assistant-ui
 
+## 0.83.0
+
+### Minor Changes
+
+- [`c959eae`](https://github.com/neuronection/assistant-ui/commit/c959eaef742e9103756cd4e1623eef5e44a70bd6) Thanks [@constLiakos](https://github.com/constLiakos)! - Add presentational model-pricing surfaces: `ModelPriceMeta`, `ModelPriceTable`
+  and the USD↔micros conversion helpers. `ModelPickerModel` also gained an
+  optional `meta` slot for effective-price text in the option row.
+
 ## 0.82.0
 
 ### Minor Changes
