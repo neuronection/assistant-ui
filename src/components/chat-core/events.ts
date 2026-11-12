@@ -5,9 +5,12 @@ export interface FlowStepInfo {
 
 /**
  * Family streaming vocabulary (guidelines/ai-features.md §5), extended with
- * the `tool_call` observation event. Transports map their wire format
- * (SSE named events, WS topic payloads) onto these shapes app-side; the
- * reducer tolerates unknown `event` values by ignoring them.
+ * the `tool_call` observation event and the terminal `flow_interrupted`
+ * stop. `interrupt` is the resumable HITL pause; `flow_interrupted` is the
+ * terminal cancel the server broadcasts so every consumer of the turn
+ * learns it was stopped. Transports map their wire format (SSE named
+ * events, WS topic payloads) onto these shapes app-side; the reducer
+ * tolerates unknown `event` values by ignoring them.
  */
 export type ChatStreamEvent =
   | { event: 'flow_started'; flow: string; run_id?: string; steps?: FlowStepInfo[] }
@@ -40,3 +43,4 @@ export type ChatStreamEvent =
       retryable: boolean
       run_id?: string
     }
+  | { event: 'flow_interrupted'; reason?: 'user' | 'server'; partial?: boolean }

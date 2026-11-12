@@ -38,6 +38,25 @@ export const Sizes = () => (
   </div>
 )
 
+export const PaddingNone = () => (
+  <Modal>
+    <ModalTrigger asChild>
+      <Button variant="outline">Full-bleed</Button>
+    </ModalTrigger>
+    <ModalContent padding="none">
+      <div className="overflow-hidden rounded-[var(--as-radius-lg)]">
+        <div className="bg-[var(--as-accent)] px-4 py-3 text-white">
+          padding="none" — the dialog owns every pixel (command palettes,
+          media, editors with their own chrome).
+        </div>
+        <div className="p-4">
+          <Input label="Still a dialog" hint="Close button stays top-right" />
+        </div>
+      </div>
+    </ModalContent>
+  </Modal>
+)
+
 export const Confirmation = () => {
   const [open, setOpen] = useState(false)
   const [busy, setBusy] = useState(false)

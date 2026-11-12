@@ -21,14 +21,27 @@ import { SegmentedTabs } from '@neuronection/assistant-ui/segmented-tabs'
 | `onValueChange` | `(value: string) => void` | — | selection follows click *and* arrow keys |
 | `ariaLabel` | `string` | — | accessible name of the `tablist` (required) |
 | `className` | `string` | — | merges onto the root |
+| `wrap` | `boolean` | `false` | flow onto multiple rows when the labels do not fit one line (measured thumb) |
 
 ## controlled contract
 
 `value` in, `onValueChange` out. Arrow keys call `onValueChange` too
 (automatic activation — selection follows focus), then focus moves to the
-new tab. The thumb is a decorative `span` (`aria-hidden`, `data-thumb`)
-positioned by percentage width + `translateX(activeIndex * 100%)`, so it
-adapts to any item count.
+new tab. The thumb is a decorative `span` (`aria-hidden`, `data-thumb`);
+in the default single-row mode it is positioned by percentage width +
+`translateX(activeIndex * 100%)`, so it adapts to any item count.
+
+## wrapping
+
+`wrap` trades the equal-width single-row grid for a `flex-wrap` strip of
+content-sized pills: when the labels fit one line the strip renders as one
+row; when they do not, tabs flow onto further rows instead of overflowing
+or scrolling away. The thumb is then measured from the selected tab's real
+geometry (rect delta, re-measured through a `ResizeObserver` and on every
+selection change), so it slides across rows too. Semantics, roving focus
+and keyboard activation are identical in both modes; the root carries a
+`data-wrap` hook for app styling. Use it for long tab sets (8+ labels)
+that overflow common content widths — short strips keep the default.
 
 ## labels & i18n
 
@@ -65,11 +78,20 @@ realistic (app inspector):
 />
 ```
 
+realistic (many tabs, wrap instead of scroll):
+
+```tsx
+<SegmentedTabs ariaLabel="Audit views" wrap items={AUDIT_TABS.map((tab) => ({
+  value: tab, label: t(`audit.tab.${tab}`),
+}))} value={active} onValueChange={setActive} />
+```
+
 ## accessibility
 
 [`accessibility.md`](../accessibility.md#segmentedtabs) — `role="tablist"`
 + `tab`, `aria-selected`, roving tabIndex, Arrow/Home/End with wrap-around
-and disabled-skip; thumb is `aria-hidden`. Pair each tab with its panel in
+and disabled-skip; thumb is `aria-hidden` (also in `wrap` mode, where it is
+measured rather than percentage-positioned). Pair each tab with its panel in
 app code (panels stay app-owned).
 
 ## related modules

@@ -33,9 +33,20 @@ it (`id`, `role`, markdown `content`, optional `reasoning`, `status`:
 `delta` (`kind: text | reasoning`) / `interrupt` / `flow_finished` /
 `flow_failed` (`code`, `message`, `retryable`) — plus the `tool_call`
 observation event (`id`, `name`, `status`, `args?`, `result?`,
-`durationMs?`). Optional `run_id` fields scope events to a turn. Unknown
-event names are ignored (additive contract), so app-specific extras can
-flow through the same adapter.
+`durationMs?`) and the terminal `flow_interrupted` stop (`reason?:
+'user' | 'server'`, `partial?: boolean`). Optional `run_id` fields scope
+events to a turn. Unknown event names are ignored (additive contract), so
+app-specific extras can flow through the same adapter.
+
+`flow_interrupted` is the **terminal stop**: the server broadcasts it when
+a turn is cancelled, so every consumer of the turn terminalizes — not just
+the one that issued the stop (a user stops the turn in one tab; the others
+learn it via this event). Do not confuse it with `interrupt`: that is the
+resumable HITL pause (`status: 'interrupted'` with `interruptPayload`,
+deltas stream again after resume), while `flow_interrupted` maps to
+`status: 'interrupted'` with `stopped: true` and closes event intake — the
+same terminality class as `flow_finished` / `flow_failed` and the local
+`stop()`.
 
 ## useChatStream
 
@@ -56,13 +67,19 @@ Returns the live-turn state plus `{ live, send, stop, reset }`:
   `interruptPayload`; the next delta resumes streaming.
 - `stop()` flushes the partial text, marks `stopped` (late events are
   ignored), and calls `transport.stop()`.
+- a server-broadcast `flow_interrupted` event terminalizes the turn like a
+  local `stop()` (status `interrupted`, `stopped: true`, late events
+  ignored, watchdog cleared) — this is how a second tab/window learns a
+  turn was cancelled elsewhere; `reset()` re-arms afterwards.
 - `reset()` returns to idle after the app refetched the persisted turn.
 
 ## liveTurnReducer
 
 Pure `LiveTurnState` machine (fixture-testable, career-`chatFlow.ts`
 role): actions `send` / `event` / `stop` / `reset`; terminal intake stops
-on `done`, `error`, or user `stopped`.
+on `done`, `error`, or `stopped` — set by the local stop action or a
+server-broadcast `flow_interrupted` event. The HITL `interrupt` event is
+*not* terminal (resumable pause).
 
 ## Branch-tree utilities
 
