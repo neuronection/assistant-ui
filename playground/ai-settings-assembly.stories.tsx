@@ -115,6 +115,7 @@ export const AiSettingsSetupFormStory = () => {
     <div style={{ maxWidth: 460 }}>
       <ProviderSetupForm
         preset={{
+          key: 'openai',
           name: 'OpenAI',
           keyUrl: 'https://platform.openai.com/api-keys',
           steps: ['Open {url}', 'Create a key', 'Paste it below'],

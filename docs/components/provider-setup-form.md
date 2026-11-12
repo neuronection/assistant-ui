@@ -1,6 +1,8 @@
 # ProviderSetupForm
 
-Guided one-click setup form (plan 26 §6): vendor checklist with copy buttons
+Guided one-click setup form (plan 26 §6): the selected provider's mark
+beside its name (`ProviderLogo`, keyed by `preset.key` — the same mark the
+tiles show), vendor checklist with copy buttons
 and a get-a-key link, factual free-tier note, connection name, a **write-only
 API key** (`type="password"` + `autoComplete="new-password"` — the library
 never renders a stored key, ADR-006), and an **Advanced disclosure** whose
@@ -25,7 +27,7 @@ Extends `React.ComponentProps<'form'>` (spread onto the root form).
 
 | prop | type | default | notes |
 |---|---|---|---|
-| `preset` | `ProviderSetupFormPreset` | — | `{ name, keyUrl?, steps?, freeTierNote?, fixedBase?, baseUrl, local? }`; `steps` entries interpolate `{url}` → `keyUrl`; `local` renders `noKeyLabel` instead of the key field |
+| `preset` | `ProviderSetupFormPreset` | — | `{ key?, name, keyUrl?, steps?, freeTierNote?, fixedBase?, baseUrl, local? }`; `key` renders the provider mark beside the name (same `ProviderLogo` the tiles use — omit for keyless/manual entries); `steps` entries interpolate `{url}` → `keyUrl`; `local` renders `noKeyLabel` instead of the key field |
 | `value` | `ProviderSetupFormValue` | — | controlled `{ name, apiKey, baseUrl? }` |
 | `error` | `{ code, suspectedVendor? } \| null` | — | §15 enum code + optional vendor-key mis-paste hint |
 | `testing` | `boolean` | `false` | disables + marks the submit busy |
@@ -34,7 +36,7 @@ Extends `React.ComponentProps<'form'>` (spread onto the root form).
 | `onChange` | `(value) => void` | — | every field edit |
 | `errorLabels` | `Partial<Record<string, string>>` | — | translated copy per code (English defaults ship in `DEFAULT_SETUP_ERROR_COPY`) |
 | `suspectedVendorHint` | `string` | `'This looks like a {vendor} API key.'` | `{vendor}` interpolates |
-| `onCopyStep` | `(step: string) => void` | — | notified on checklist copy (Electron apps mirror via IPC; the browser write always happens) |
+| `onCopyStep` | `(command: string) => void` | — | notified when a step's `run:` command is copied (the copyable unit is the command tail, not the prose line; Electron apps mirror via IPC) |
 | `onOpenKeyUrl` | `(url: string) => void` | — | renders a button instead of an anchor (Electron `openExternal`) |
 | `advancedExtra` | `ReactNode` | — | app content inside the Advanced disclosure (hosting toggle, country select) |
 | `checklistLabel` | `string` | `'Setup steps'` | checklist `aria-label` |
@@ -67,7 +69,7 @@ minimal:
 
 ```tsx
 <ProviderSetupForm
-  preset={{ name: 'OpenAI', keyUrl, steps, fixedBase: false, baseUrl }}
+  preset={{ key: 'openai', name: 'OpenAI', keyUrl, steps, fixedBase: false, baseUrl }}
   value={value}
   onChange={setValue}
   onSubmit={submit}
@@ -86,7 +88,7 @@ realistic (i18n + classified error + Electron bridges):
   error={result?.ok === false ? { code: result.errorCode ?? 'unknown', suspectedVendor: result.suspectedVendor } : null}
   errorLabels={ERROR_LABELS}
   suspectedVendorHint={TEXT.SETUP_SUSPECTED_PREFIX}
-  onCopyStep={(step) => void window.electronAPI.writeToClipboard(step)}
+  onCopyStep={(command) => void window.electronAPI.writeToClipboard(command)}
   onOpenKeyUrl={(url) => void window.electronAPI.openExternal(url)}
   submitLabel={preset.local ? TEXT.SETUP_OLLAMA_CONNECT : TEXT.SETUP_SUBMIT}
   cancelLabel={TEXT.SETUP_BACK_TILES}

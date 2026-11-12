@@ -1,6 +1,6 @@
 # Chat surfaces — the adoption recipe
 
-The shared chat layer (plan dev/plans/11, ADR-0009) serves all three
+The shared chat layer (ADR-0009) serves all three
 surfaces — **bubble, sidepanel, full page** — from the same modular
 pieces. This guide assembles them; per-module reference lives in
 [docs/components/](../components/chat-core.md).

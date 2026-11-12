@@ -69,4 +69,19 @@ describe('SwitchRow', () => {
     )
     expect(await axe(container)).toHaveNoViolations()
   })
+
+  it('hideLabel keeps the name in the accessibility tree, knob only visible', async () => {
+    const { container } = render(
+      <SwitchRow
+        label="Email for matches"
+        checked
+        hideLabel
+        onCheckedChange={() => {}}
+      />,
+    )
+    const control = screen.getByRole('switch', { name: 'Email for matches' })
+    expect(control.querySelector('.sr-only')).not.toBeNull()
+    expect(control.querySelector('.truncate.font-medium')).toBeNull()
+    expect(await axe(container)).toHaveNoViolations()
+  })
 })

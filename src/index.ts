@@ -23,6 +23,16 @@ export {
 } from './components/file-queue'
 export { Portal, type PortalProps } from './components/portal'
 export {
+  ImportReviewCard,
+  type ImportReviewCardProps,
+  type ImportReviewConflict,
+  type ImportReviewGroup,
+  type ImportReviewLabels,
+  type ImportReviewReport,
+  type ImportReviewStatus,
+} from './components/import-review-card'
+
+export {
   UploadDropzone,
   type UploadDropzoneProps,
 } from './components/upload-dropzone'
@@ -66,6 +76,13 @@ export {
   type SponsorCardProps,
   type SponsorChannel,
 } from './components/about'
+
+export {
+  FamilyMenu,
+  defaultFamilyProjects,
+  type FamilyMenuProps,
+  type FamilyProject,
+} from './components/family-menu'
 
 export {
   AiActionsDropdown,
@@ -113,14 +130,174 @@ export {
   WebSearchProvidersPanel,
   type WebSearchProvidersPanelProps,
   type WebSearchProvidersPanelLabels,
+  WebSearchProvidersList,
+  type WebSearchProvidersListProps,
+  type WebSearchProvidersListLabels,
+  WebSearchProviderWizard,
+  type WebSearchProviderWizardProps,
+  type WebSearchProviderWizardLabels,
+  WebSearchProviderTiles,
+  type WebSearchProviderTilesProps,
+  WebSearchProviderSettingsForm,
+  type WebSearchProviderSettingsFormProps,
+  type WebSearchProviderSettingsFormLabels,
   type WebSearchProviderView,
   type WebSearchProviderCatalog,
   type WebSearchProviderCatalogEntry,
   type WebSearchProviderCatalogField,
+  type WebSearchProviderFormValue,
   type WebSearchProviderSaveInput,
   type WebSearchProviderProbeView,
   type WebSearchProbeStatus,
 } from './components/web-search-providers'
+export {
+  TranslationProvidersPanel,
+  type TranslationProvidersPanelProps,
+  type TranslationProvidersPanelLabels,
+  TranslationProvidersList,
+  type TranslationProvidersListProps,
+  type TranslationProvidersListLabels,
+  TranslationProviderWizard,
+  type TranslationProviderWizardProps,
+  type TranslationProviderWizardLabels,
+  TranslationEngineTiles,
+  type TranslationEngineTilesProps,
+  TranslationProviderSettingsForm,
+  type TranslationProviderSettingsFormProps,
+  type TranslationProviderSettingsFormLabels,
+  type TranslationProviderView,
+  type TranslationEngineCatalog,
+  type TranslationEngineCatalogEntry,
+  type TranslationEngineCatalogField,
+  type TranslationProviderFormValue,
+  type TranslationProviderSaveInput,
+  type TranslationProbeView,
+  type TranslationProbeStatus,
+} from './components/translation-providers'
+export {
+  parseIntegrationConfigSchema,
+  INTEGRATION_VIEW_MODELS_VERSION,
+  type IntegrationCapabilityView,
+  type IntegrationCatalogEntryView,
+  type IntegrationConditionId,
+  type IntegrationConfigFieldView,
+  type IntegrationConfigPreset,
+  type IntegrationConfigSaveInput,
+  type IntegrationConfigSchema,
+  type IntegrationConfigSchemaField,
+  type IntegrationConfigValidationView,
+  type IntegrationConfigValues,
+  type IntegrationConsentChangeView,
+  type IntegrationConsentPayloadView,
+  type IntegrationDiscoveredView,
+  type IntegrationExtensionGroupView,
+  type IntegrationExtensionView,
+  type IntegrationInstanceView,
+  type IntegrationProvenanceView,
+  type IntegrationSourceDraft,
+  type IntegrationSourceRowView,
+  type IntegrationUpdateView,
+  EXTENSION_API_ENVELOPE,
+  EXTENSION_CATEGORIES,
+  EXTENSION_CAPABILITIES,
+  EXTENSION_CAPABILITY_TIERS,
+  EXTENSION_CONSENT_DISCLOSURES,
+  EXTENSION_ERROR_CODES,
+  EXTENSION_IMPORTABLE_CAPABILITIES,
+  EXTENSION_KINDS,
+  EXTENSION_LIFECYCLE_STATES,
+  EXTENSION_ORIGIN_CLASSES,
+  EXTENSION_REF_STRATEGIES,
+  EXTENSION_RISK_CLASSES,
+  EXTENSION_RETRYABLE_VALUES,
+  EXTENSION_STATUS_CONDITIONS,
+  EXTENSION_STATUS_STATES,
+  EXTENSION_SURFACES,
+  EXTENSION_TIER_NAMES,
+  EXTENSION_TIERS,
+  integrationConfigPresets,
+} from './contracts'
+export {
+  IntegrationCapabilityChips,
+  OriginChip,
+  StatusBadge,
+  TierBadge,
+  isExtensionCapabilityId,
+  isExtensionOriginClass,
+  isExtensionStatusState,
+  isExtensionTier,
+  type IntegrationCapabilityChipsProps,
+  type OriginChipProps,
+  type StatusBadgeProps,
+  type TierBadgeProps,
+} from './components/integration-atoms'
+export {
+  IntegrationCard,
+  type IntegrationCardLabels,
+  type IntegrationCardProps,
+} from './components/integration-card'
+export {
+  IntegrationCatalogGrid,
+  type IntegrationCatalogGridLabels,
+  type IntegrationCatalogGridProps,
+} from './components/integration-catalog-grid'
+export {
+  IntegrationInstancesList,
+  type IntegrationInstancesListLabels,
+  type IntegrationInstancesListProps,
+} from './components/integration-instances-list'
+export {
+  IntegrationSourcesList,
+  type IntegrationSourcesListLabels,
+  type IntegrationSourcesListProps,
+} from './components/integration-sources-list'
+export {
+  AddIntegrationSourceDialog,
+  type AddIntegrationSourceKind,
+  type AddIntegrationSourceDialogLabels,
+  type AddIntegrationSourceDialogProps,
+} from './components/add-integration-source-dialog'
+export {
+  ConsentDialog,
+  type ConsentDialogLabels,
+  type ConsentDialogProps,
+} from './components/consent-dialog'
+export {
+  IntegrationConfigForm,
+  type IntegrationConfigFormLabels,
+  type IntegrationConfigFormProps,
+} from './components/integration-config-form'
+export {
+  ActionResultDialog,
+  type ActionResultDialogLabels,
+  type ActionResultDialogProps,
+} from './components/integration-action-result-dialog'
+export {
+  DocsDialog,
+  type DocsDialogLabels,
+  type DocsDialogProps,
+  type IntegrationDocsNode,
+} from './components/integration-docs-dialog'
+export {
+  SurfaceRenderer,
+  SURFACE_NODE_TYPES,
+  SURFACE_NODE_ORDER,
+  SURFACE_RUN_ACTION_IDS,
+  SURFACE_ITEM_ACTION_IDS,
+  SURFACE_PAGE_SIZE,
+  surfaceActionId,
+  surfaceProgressPercent,
+  type SurfaceAction,
+  type SurfaceActionId,
+  type SurfaceFilter,
+  type SurfaceFilterOption,
+  type SurfaceLabels,
+  type SurfaceNode,
+  type SurfaceNodeType,
+  type SurfaceRendererProps,
+  type SurfaceRow,
+  type SurfaceView,
+} from './components/surface-renderer'
 export {
   ProviderForm,
   CUSTOM_PRESET_KEY,
@@ -209,7 +386,13 @@ export {
   type ConfirmationModalProps,
 } from './components/confirmation-modal'
 export { CopyButton, type CopyButtonProps } from './components/copy-button'
-export { ContextMenu, type ContextMenuProps, type ContextMenuItem } from './components/context-menu'
+export {
+  ContextMenu,
+  type ContextMenuProps,
+  type ContextMenuItem,
+  type ContextMenuSeparator,
+  type ContextMenuEntry,
+} from './components/context-menu'
 export {
   DatePicker,
   type DatePickerProps,
@@ -298,6 +481,16 @@ export {
   type ModalContentProps,
 } from './components/modal'
 export {
+  MultiSelectPicker,
+  PickerBrowseModal,
+  type MultiSelectPickerProps,
+  type PickerBrowseModalProps,
+  type PickerLabels,
+  type PickerMode,
+  type PickerOption,
+  type PickerSelection,
+} from './components/multi-select-picker'
+export {
   Popover,
   PopoverAnchor,
   PopoverClose,
@@ -319,6 +512,21 @@ export {
   type ScaleSliderProps,
 } from './components/scale-slider'
 export { SearchInput, type SearchInputProps } from './components/search-input'
+export {
+  ModelPriceMeta,
+  type ModelPriceMetaLabels,
+  type ModelPriceMetaProps,
+  type ModelPriceOrigin,
+} from './components/model-price-meta'
+export {
+  ModelPriceTable,
+  microsToUsdPerMillion,
+  usdPerMillionToMicros,
+  type ModelPriceRow,
+  type ModelPriceTableLabels,
+  type ModelPriceTableProps,
+  type PriceMatch,
+} from './components/model-price-table'
 export {
   ModelPicker,
   type ModelPickerModel,
@@ -561,6 +769,22 @@ export {
   type ChatBranchTreeIcons,
   type ChatBranchTreeNode,
 } from './components/chat-branch-tree'
+export {
+  ConceptGraphView,
+  DynamicIcon,
+  sanitizeSvg,
+  DEFAULT_HIERARCHY_REVERSED_RELATIONS,
+  getHierarchyEdgeDirection,
+  type ConceptGraphViewProps,
+  type ConceptGraphEdgeData,
+  type ConceptGraphIcon,
+  type ConceptGraphIcons,
+  type ConceptGraphNode,
+  type ConceptGraphLabels,
+  type GraphNodeSummary,
+  type RenderContextMenu,
+  type RenderNodeDetail,
+} from './components/concept-graph'
 export {
   ChatSessionList,
   type ChatSessionListProps,

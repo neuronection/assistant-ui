@@ -4,6 +4,7 @@ import { cn } from '../../lib/utils'
 import { Button } from '../button/Button'
 import { CopyButton } from '../copy-button/CopyButton'
 import { Input } from '../input/Input'
+import { ProviderLogo } from '../provider-logo/ProviderLogo'
 
 /** The shared §15 error-routing enum (family contract — apps key their i18n
  * off exactly these codes). */
@@ -33,6 +34,9 @@ export const DEFAULT_SETUP_ERROR_COPY: Record<SetupErrorCode, string> = {
 
 /** Guided-setup preset slice (app data; snake_case API fields map app-side). */
 export interface ProviderSetupFormPreset {
+  /** Preset key — renders the provider mark beside the name (same
+   * `ProviderLogo` the tiles use; omit for keyless/manual entries). */
+  key?: string
   name: string
   keyUrl?: string
   steps?: string[]
@@ -70,9 +74,11 @@ export interface ProviderSetupFormProps
   /** Translated error copy per §15 code (`{vendor}` interpolates in the hint). */
   errorLabels?: Partial<Record<string, string>>
   suspectedVendorHint?: string
-  /** Notified when a checklist step is copied (Electron apps mirror the copy
-   * through their IPC clipboard; the browser write always happens). */
-  onCopyStep?: (step: string) => void
+  /** Notified when a checklist step's command is copied — the copyable unit
+   * is the `run: <command>` tail, not the whole prose line (Electron apps
+   * mirror the copy through their IPC clipboard; the browser write always
+   * happens). */
+  onCopyStep?: (command: string) => void
   /** Opens the key page — render an anchor by default; Electron apps pass
    * their `openExternal` bridge to get a button instead. */
   onOpenKeyUrl?: (url: string) => void
@@ -153,25 +159,48 @@ export const ProviderSetupForm = React.forwardRef<
       }}
       {...props}
     >
-      <h3 className="text-sm font-semibold text-[var(--as-fg)]">{preset.name}</h3>
+      <div className="flex items-center gap-2">
+        {preset.key ? <ProviderLogo preset={preset.key} /> : null}
+        <h3 className="text-sm font-semibold text-[var(--as-fg)]">{preset.name}</h3>
+      </div>
 
       {preset.steps && preset.steps.length > 0 ? (
         <ol
           aria-label={checklistLabel}
           className="list-inside list-decimal space-y-1 text-sm text-[var(--as-muted-fg)]"
         >
-          {preset.steps.map((step, index) => (
-            <li key={index} className="flex items-start justify-between gap-2">
-              <span>{stepText(step)}</span>
-              <CopyButton
-                value={step}
-                label={copyLabel}
-                size={14}
-                className="mt-0.5 size-6 shrink-0"
-                onClick={() => onCopyStep?.(step)}
-              />
-            </li>
-          ))}
+          {preset.steps.map((step, index) => {
+            const text = stepText(step)
+            // the "run: <command>" tail is the copyable unit — the prose
+            // around it is guidance the user doesn't need in their shell
+            const runMatch = text.match(/^(.*\brun:\s*)(.+)$/)
+            const command = runMatch?.[2]
+            return (
+              <li key={index} className="flex items-start justify-between gap-2">
+                <span>
+                  {command ? (
+                    <>
+                      {runMatch![1]}
+                      <code className="rounded-[var(--as-radius-sm)] bg-[var(--as-muted)] px-1 py-0.5 font-mono text-xs text-[var(--as-fg)]">
+                        {command}
+                      </code>
+                    </>
+                  ) : (
+                    text
+                  )}
+                </span>
+                {command ? (
+                  <CopyButton
+                    value={command}
+                    label={copyLabel}
+                    size={14}
+                    className="mt-0.5 size-6 shrink-0"
+                    onClick={() => onCopyStep?.(command)}
+                  />
+                ) : null}
+              </li>
+            )
+          })}
         </ol>
       ) : null}
 
