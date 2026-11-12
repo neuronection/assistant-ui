@@ -1,7 +1,8 @@
-import type { Preview } from '@ladle/react'
+import type { GlobalProvider } from '@ladle/react'
 import '../dist/styles.css'
+import './reset.css'
 
-export const Preview: Preview = ({ children }) => (
+export const Provider: GlobalProvider = ({ children }) => (
   <div
     style={{
       minHeight: '100vh',

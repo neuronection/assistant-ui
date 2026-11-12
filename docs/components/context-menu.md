@@ -3,12 +3,18 @@
 Coordinate-anchored menu: render it with `{x, y}` (pointer position) and an
 item list; it opens when `items` is non-empty and reports `onClose`.
 `modal={false}` under the hood so it layers safely next to other overlays.
-Disabled items render inert with an optional `hint` tooltip.
+Disabled items render inert with an optional `hint` tooltip. Items may be
+plain actions or `{ key, separator: true }` entries — a non-focusable divider
+that groups related actions (e.g. filter actions above navigation).
 
 ## import
 
 ```ts
-import { ContextMenu, type ContextMenuItem } from '@neuronection/assistant-ui/context-menu'
+import {
+  ContextMenu,
+  type ContextMenuEntry,
+  type ContextMenuItem,
+} from '@neuronection/assistant-ui/context-menu'
 ```
 
 ## props
@@ -17,7 +23,7 @@ import { ContextMenu, type ContextMenuItem } from '@neuronection/assistant-ui/co
 |---|---|---|---|
 | `x` | `number` | — | viewport X for the anchor |
 | `y` | `number` | — | viewport Y for the anchor |
-| `items` | `ContextMenuItem[]` | — | `{ key, label, icon?, onSelect?, danger?, disabled?, hint? }` |
+| `items` | `ContextMenuEntry[]` | — | action: `{ key, label, icon?, onSelect?, danger?, disabled?, hint? }` · divider: `{ key, separator: true }` |
 | `onClose` | `() => void` | — | called on select and on dismiss |
 | `className` | `string` | — | merges onto the content panel |
 
@@ -46,7 +52,7 @@ minimal:
 />
 ```
 
-realistic (per-item actions with hints, study pattern):
+realistic (grouped entity menu — filter actions above a navigation group):
 
 ```tsx
 <div
@@ -59,8 +65,10 @@ realistic (per-item actions with hints, study pattern):
     x={menu.x}
     y={menu.y}
     items={[
-      { key: 'rename', label: t('common.rename'), icon: Pencil, onSelect: rename },
-      { key: 'delete', label: t('common.delete'), icon: Trash2, danger: true, onSelect: remove },
+      { key: 'include', label: t('filters.menu.include', { value }), onSelect: include },
+      { key: 'exclude', label: t('filters.menu.exclude', { value }), danger: true, onSelect: exclude },
+      { key: 'sep', separator: true },
+      { key: 'page', label: t('filters.menu.openPage'), icon: ExternalLink, onSelect: openPage },
     ]}
     onClose={() => setMenu(null)}
   />

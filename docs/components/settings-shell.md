@@ -16,7 +16,7 @@ import { SettingsShell, type SettingsNavItem } from '@neuronection/assistant-ui/
 
 | prop | type | default | notes |
 |---|---|---|---|
-| `nav` | `SettingsNavItem[]` | — | `{ id, label, description?, icon?, trailing? }` |
+| `nav` | `SettingsNavItem[]` | — | `{ id, label, description?, icon?, trailing?, section? }` |
 | `active` | `string` | — | active nav id |
 | `onNavigate` | `(id: string) => void` | — | |
 | `header` | `{ icon?: LucideIcon; title: string }` | — | small header above the nav (rail mode only) |
@@ -28,6 +28,12 @@ import { SettingsShell, type SettingsNavItem } from '@neuronection/assistant-ui/
 status dots, counts or badges that belong to the nav entry itself rather
 than its description. In chip mode the trailing node sits right after the
 label; in rail mode it is pushed to the row edge.
+
+`section` renders a group label before the **first** entry carrying it
+(SidebarNav's `section` idiom): a muted uppercase divider in rail mode,
+hidden in chip mode so the chips keep flowing. Keep entries in contiguous
+runs per section — the divider derives from item order, and empty groups
+(items filtered out app-side) render nothing.
 
 ## layout & theming
 
@@ -92,11 +98,31 @@ realistic (study `SettingsPage.tsx` shape):
 </SettingsShell>
 ```
 
+sectioned (career's settings rail shape):
+
+```tsx
+<SettingsShell
+  nav={[
+    { id: 'account', label: t('nav.account'), section: t('nav.personal') },
+    { id: 'notifications', label: t('nav.notifications'), section: t('nav.personal') },
+    { id: 'ai', label: t('nav.ai'), section: t('nav.aiAndTools') },
+    { id: 'users', label: t('nav.users'), section: t('nav.administration') },
+  ]}
+  active={tab}
+  onNavigate={setTab}
+  header={{ title: t('nav.settings') }}
+>
+  {content}
+</SettingsShell>
+```
+
 ## accessibility
 
 See [accessibility.md](../accessibility.md#navigation--structure):
 `<nav aria-label="Settings sections">`, active entry `aria-current="page"`,
-nav entries are native buttons.
+nav entries are native buttons. Section labels are `role="presentation"`
+dividers (same as `SidebarNav`) — they do not introduce list semantics;
+the entries' own names carry the structure.
 
 ## related
 

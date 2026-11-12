@@ -60,7 +60,7 @@ Two glue rules:
    utilities app-owned. Tailwind 4 apps are layered, so the order is less
    strict there — keep the same order anyway so the recipe is identical.
 3. Vite: exclude the package from dep pre-bundling, or Vite serves a stale
-   snapshot (this bites during linked local development):
+   snapshot (this bites during linked dev):
 
    ```ts
    export default defineConfig({
@@ -125,7 +125,7 @@ Example: target a failing connection row without knowing class names:
 }
 ```
 
-## local development loop
+## dev loop
 
 `node scripts/dev-link.mjs link <app-dir>` wires an app to this checkout
 (dev server only; pnpm copies `file:` deps, so the script uses `link:`

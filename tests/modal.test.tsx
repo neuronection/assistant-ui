@@ -76,7 +76,7 @@ describe('Modal', () => {
     expect(await axe(container)).toHaveNoViolations()
   })
 
-  it('ModalBody renders a padded body region and merges className', async () => {
+  it('ModalBody renders a neutral body region and merges className', async () => {
     render(
       <Modal open onOpenChange={() => {}}>
         <ModalContent>
@@ -92,10 +92,43 @@ describe('Modal', () => {
     await screen.findByRole('dialog')
     const body = screen.getByTestId('body')
     expect(body).toHaveAttribute('data-as', 'modal-body')
-    expect(body).toHaveClass('px-6')
-    expect(body).toHaveClass('pb-6')
     expect(body).toHaveClass('grid')
     expect(screen.getByText('Body content')).toBeInTheDocument()
+  })
+
+  it('ModalContent is padded by default and the parts carry no padding', async () => {
+    render(
+      <Modal open onOpenChange={() => {}}>
+        <ModalContent data-testid="content">
+          <ModalHeader data-testid="header">
+            <ModalTitle>T</ModalTitle>
+          </ModalHeader>
+          <ModalBody data-testid="body">b</ModalBody>
+          <ModalFooter data-testid="footer">f</ModalFooter>
+        </ModalContent>
+      </Modal>,
+    )
+    await screen.findByRole('dialog')
+    const content = screen.getByTestId('content')
+    expect(content).toHaveClass('p-6')
+    expect(content).toHaveClass('gap-4')
+    expect(screen.getByTestId('header').className).not.toMatch(/p-6|px-6|pb-4/)
+    expect(screen.getByTestId('body').className).not.toMatch(/p-6|px-6|pb-6/)
+    expect(screen.getByTestId('footer').className).not.toMatch(/p-6|pt-0/)
+  })
+
+  it('padding="none" opts out for full-bleed dialogs', async () => {
+    render(
+      <Modal open onOpenChange={() => {}}>
+        <ModalContent padding="none" data-testid="content">
+          <p>Full-bleed</p>
+        </ModalContent>
+      </Modal>,
+    )
+    await screen.findByRole('dialog')
+    const content = screen.getByTestId('content')
+    expect(content).not.toHaveClass('p-6')
+    expect(content).not.toHaveClass('gap-4')
   })
 })
 
@@ -122,6 +155,68 @@ describe('PanelModal', () => {
     await screen.findByRole('dialog')
     expect(screen.queryByText('Hidden')).not.toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Close' })).toBeInTheDocument()
+  })
+
+  it('renders a description and wires it as the dialog description', async () => {
+    render(
+      <PanelModal open onOpenChange={() => {}} title="Record" description="Clinical patient records">
+        <p>Body</p>
+      </PanelModal>,
+    )
+    const dialog = await screen.findByRole('dialog')
+    const description = screen.getByText('Clinical patient records')
+    expect(description).toHaveAttribute('data-as', 'modal-description')
+    expect(dialog).toHaveAttribute('aria-describedby', description.id)
+  })
+
+  it('leaves aria-describedby unset when there is no description', async () => {
+    render(
+      <PanelModal open onOpenChange={() => {}} title="No description">
+        <p>Body</p>
+      </PanelModal>,
+    )
+    const dialog = await screen.findByRole('dialog')
+    expect(dialog).not.toHaveAttribute('aria-describedby')
+  })
+
+  it('renders exactly one close control with a header', async () => {
+    render(
+      <PanelModal open onOpenChange={() => {}} title="One close">
+        <p>Body</p>
+      </PanelModal>,
+    )
+    await screen.findByRole('dialog')
+    expect(screen.getAllByRole('button', { name: 'Close' })).toHaveLength(1)
+  })
+
+  it('bodyFill makes the body the fill region above the footer', async () => {
+    render(
+      <PanelModal
+        open
+        onOpenChange={() => {}}
+        title="Fill"
+        bodyFill
+        bodyClassName="p-0"
+        footer={<button>Save</button>}
+      >
+        <div data-testid="child">Form</div>
+      </PanelModal>,
+    )
+    await screen.findByRole('dialog')
+    const body = screen.getByTestId('child').parentElement!
+    expect(body).toHaveClass('min-h-0', 'flex-1', 'flex', 'flex-col', 'overflow-hidden', 'p-0')
+    expect(body).not.toHaveClass('pt-10')
+    expect(screen.getByRole('button', { name: 'Save' })).toBeInTheDocument()
+  })
+
+  it('keeps the hideHeader top reserve unless bodyFill is used', async () => {
+    render(
+      <PanelModal open onOpenChange={() => {}} title="Reserve" hideHeader>
+        <div data-testid="child">Body</div>
+      </PanelModal>,
+    )
+    await screen.findByRole('dialog')
+    expect(screen.getByTestId('child').parentElement).toHaveClass('pt-10')
   })
 
   it('Escape closes via onOpenChange (keyboard)', async () => {
