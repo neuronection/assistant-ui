@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { axe } from 'jest-axe'
 
@@ -23,11 +23,53 @@ describe('ChatReasoning', () => {
   })
 
   it('honors controlled open and announces streaming', () => {
-    const { rerender } = render(<ChatReasoning text="live" open={false} streaming />)
-    expect(screen.queryByText('live')).not.toBeInTheDocument()
+    const { container, rerender } = render(<ChatReasoning text="live" open={false} streaming />)
+    const region = () => container.querySelector('.as-collapse')
+    expect(region()).toHaveAttribute('data-open', 'false')
+    expect(container.querySelector('[data-as="chat-reasoning"]')).toHaveAttribute('data-streaming', 'true')
     expect(screen.getByRole('status')).toBeInTheDocument()
     rerender(<ChatReasoning text="live" open />)
+    expect(region()).toHaveAttribute('data-open', 'true')
     expect(screen.getByText('live')).toBeInTheDocument()
+  })
+
+  it('auto-collapses when an uncontrolled live stream finishes', () => {
+    const onOpenChange = vi.fn()
+    const { container, rerender } = render(
+      <ChatReasoning text="live" streaming onOpenChange={onOpenChange} />,
+    )
+    const region = () => container.querySelector('.as-collapse')
+    expect(region()).toHaveAttribute('data-open', 'true')
+    rerender(<ChatReasoning text="live" onOpenChange={onOpenChange} />)
+    expect(region()).toHaveAttribute('data-open', 'false')
+    expect(onOpenChange).toHaveBeenLastCalledWith(false)
+  })
+
+  it('never auto-collapses a controlled open', () => {
+    const { container, rerender } = render(<ChatReasoning text="live" open streaming />)
+    rerender(<ChatReasoning text="live" open />)
+    expect(container.querySelector('.as-collapse')).toHaveAttribute('data-open', 'true')
+  })
+
+  it('keeps the block open after a finished stream when autoCollapse is off', () => {
+    const { container, rerender } = render(
+      <ChatReasoning text="live" streaming autoCollapse={false} />,
+    )
+    rerender(<ChatReasoning text="live" autoCollapse={false} />)
+    expect(container.querySelector('.as-collapse')).toHaveAttribute('data-open', 'true')
+  })
+
+  it('does not collapse a block that never streamed', () => {
+    const { container, rerender } = render(<ChatReasoning text="notes" />)
+    rerender(<ChatReasoning text="notes" />)
+    expect(container.querySelector('.as-collapse')).toHaveAttribute('data-open', 'true')
+  })
+
+  it('carries the AI accent edge only while streaming', () => {
+    const { container, rerender } = render(<ChatReasoning text="live" streaming />)
+    expect(container.querySelector('[data-as="chat-reasoning"]')?.className).toContain('--as-ai')
+    rerender(<ChatReasoning text="live" />)
+    expect(container.querySelector('[data-as="chat-reasoning"]')?.className).not.toContain('--as-ai')
   })
 
   it('passes axe collapsed and streaming', async () => {
@@ -147,6 +189,42 @@ describe('ChatToolCard', () => {
       <ChatToolCard name="search_jobs" status="done" args="{}" result="ok" defaultOpen />,
     )
     expect(await axe(container)).toHaveNoViolations()
+  })
+
+  it('draws the completion check and crossfades the status cell', () => {
+    const { container, rerender } = render(<ChatToolCard name="search" status="running" />)
+    expect(container.querySelector('.as-anim-check-draw')).toBeNull()
+    rerender(<ChatToolCard name="search" status="done" />)
+    const path = container.querySelector('.as-anim-check-draw')
+    expect(path).not.toBeNull()
+    expect(path).toHaveAttribute('pathLength', '1')
+    const statusCell = path?.closest('span')
+    expect(statusCell).toHaveClass('as-anim-fade-swap')
+    expect(statusCell?.className).toContain('--as-success')
+  })
+
+  it('reveals details through the animated collapse via keyboard', async () => {
+    const user = userEvent.setup()
+    const { container } = render(
+      <ChatToolCard name="search" status="done" args="{}" result="ok" />,
+    )
+    const region = () => container.querySelector('.as-collapse')
+    const toggle = screen.getByRole('button')
+    expect(region()).toHaveAttribute('data-open', 'false')
+    toggle.focus()
+    await user.keyboard('{Enter}')
+    expect(region()).toHaveAttribute('data-open', 'true')
+    expect(toggle).toHaveAttribute('aria-expanded', 'true')
+    await user.keyboard(' ')
+    expect(region()).toHaveAttribute('data-open', 'false')
+    expect(toggle).toHaveAttribute('aria-expanded', 'false')
+  })
+
+  it('carries the AI accent edge only while running', () => {
+    const { container, rerender } = render(<ChatToolCard name="search" status="running" />)
+    expect(container.querySelector('[data-as="chat-tool-card"]')?.className).toContain('--as-ai')
+    rerender(<ChatToolCard name="search" status="done" />)
+    expect(container.querySelector('[data-as="chat-tool-card"]')?.className).not.toContain('--as-ai')
   })
 })
 
@@ -297,12 +375,104 @@ describe('ChatMessage', () => {
     expect(onSubmit).toHaveBeenCalledTimes(1)
   })
 
-  it('keeps action row keyboard-reachable (focus-within reveals it)', () => {
+  it('keeps action row keyboard-reachable via the reveal hook (CSS-owned reveal)', () => {
     render(<ChatMessage role="assistant" content="answer" actions={{ onCopy: () => {} }} />)
     const row = screen.getByRole('button', { name: 'Copy' }).parentElement!
-    expect(row).toHaveClass('opacity-0')
-    fireEvent.focus(screen.getByRole('button', { name: 'Copy' }))
-    expect(row).toHaveClass('focus-within:opacity-100')
+    expect(row).toHaveAttribute('data-as', 'chat-message-actions')
+    expect(row.className).not.toContain('opacity-0')
+  })
+
+  it('animates the message entrance on mount', () => {
+    const { container } = render(<ChatMessage role="user" content="hello" />)
+    expect(container.querySelector('[data-as="chat-message"]')).toHaveClass('as-anim-message-in')
+  })
+
+  it('slides in the interrupted chip with a single amber pulse', () => {
+    render(<ChatMessage role="assistant" content="partial" status="interrupted" />)
+    const chip = screen.getByText('Stopped')
+    expect(chip).toHaveClass('as-anim-slide-up')
+    expect(chip).toHaveClass('as-anim-pulse-once')
+    expect(chip.className).toContain('--as-pulse-color')
+    expect(chip.className).toContain('--as-warning')
+  })
+
+  it('slides in the error card', () => {
+    render(
+      <ChatMessage
+        role="assistant"
+        content="partial"
+        status="error"
+        error={{ code: 'rate_limit', message: 'slow down', retryable: false }}
+      />,
+    )
+    expect(screen.getByRole('alert')).toHaveClass('as-anim-slide-up')
+  })
+
+  it('morphs copy into a success check and reverts after the feedback window', async () => {
+    vi.useFakeTimers()
+    try {
+      const onCopy = vi.fn()
+      render(<ChatMessage role="assistant" content="answer" actions={{ onCopy }} />)
+      fireEvent.click(screen.getByRole('button', { name: 'Copy' }))
+      expect(onCopy).toHaveBeenCalledTimes(1)
+      const copiedButton = screen.getByRole('button', { name: 'Copied' })
+      expect(copiedButton.querySelector('.as-anim-fade-swap')?.tagName).toBe('svg')
+      expect(copiedButton.querySelector('svg')?.getAttribute('class')).toContain('--as-success')
+      act(() => {
+        vi.advanceTimersByTime(1600)
+      })
+      expect(screen.getByRole('button', { name: 'Copy' })).toBeInTheDocument()
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  it('honors the controlled copied state without the internal timer', () => {
+    const onCopy = vi.fn()
+    const { rerender } = render(
+      <ChatMessage role="assistant" content="answer" actions={{ onCopy, copied: true }} />,
+    )
+    fireEvent.click(screen.getByRole('button', { name: 'Copied' }))
+    rerender(<ChatMessage role="assistant" content="answer" actions={{ onCopy, copied: false }} />)
+    expect(screen.getByRole('button', { name: 'Copy' })).toBeInTheDocument()
+  })
+
+  it('crossfades content variants only for branched messages', () => {
+    const variants = { index: 1, count: 2, siblingIds: ['a', 'b'] }
+    const { rerender, container } = render(
+      <ChatMessage role="assistant" content="v1" variants={variants} />,
+    )
+    const wrapper = () => container.querySelector('[data-as="chat-message"] .min-w-0')
+    expect(wrapper()).toHaveClass('as-anim-fade-swap')
+    rerender(<ChatMessage role="assistant" content="only" />)
+    expect(wrapper()).not.toHaveClass('as-anim-fade-swap')
+  })
+
+  it('renders flat assistant prose on the panel surface', () => {
+    const { container } = render(<ChatMessage role="assistant" content="prose" design="flat" />)
+    const root = container.querySelector('[data-as="chat-message"]')
+    expect(root).toHaveAttribute('data-design', 'flat')
+    const bubble = root?.querySelector(':scope > div > div, :scope > div')
+    expect(bubble?.className).toContain('bg-transparent')
+    expect(bubble?.className).not.toContain('bg-[var(--as-muted)]')
+  })
+
+  it('keeps the user bubble in flat design', () => {
+    const { container } = render(<ChatMessage role="user" content="question" design="flat" />)
+    const bubble = container.querySelector('[data-as="chat-message"] > div')
+    expect(bubble).toHaveClass('bg-[var(--as-primary)]')
+  })
+
+  it('renders the avatar leading for assistants and trailing for users', () => {
+    const { container, rerender } = render(
+      <ChatMessage role="assistant" content="answer" avatar={<span>bot</span>} />,
+    )
+    const avatar = container.querySelector('[data-as="chat-message-avatar"]')
+    expect(avatar).not.toBeNull()
+    expect(avatar).toHaveTextContent('bot')
+    expect(avatar?.parentElement).not.toHaveClass('flex-row-reverse')
+    rerender(<ChatMessage role="user" content="question" avatar={<span>me</span>} />)
+    expect(container.querySelector('[data-as="chat-message-avatar"]')?.parentElement).toHaveClass('flex-row-reverse')
   })
 
   it('passes axe across key states', async () => {
@@ -343,5 +513,13 @@ describe('ChatMessageEditor', () => {
     expect(onSubmit).toHaveBeenCalledTimes(1)
     await user.type(textarea, '{Escape}')
     expect(onCancel).toHaveBeenCalledTimes(1)
+  })
+
+  it('reveals with the slide-up animation and focuses the textarea on mount', () => {
+    const { container } = render(
+      <ChatMessageEditor value="text" onValueChange={() => {}} onSubmit={() => {}} onCancel={() => {}} />,
+    )
+    expect(container.querySelector('[data-as="chat-message-editor"]')).toHaveClass('as-anim-slide-up')
+    expect(screen.getByRole('textbox')).toHaveFocus()
   })
 })

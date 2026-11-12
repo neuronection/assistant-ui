@@ -12,3 +12,11 @@ build/
 test-results/
 playwright-report/
 catalogs-export/
+
+# secrets (never commit; document variables in .env.example)
+.env
+.env.*.local
+!.env.example
+
+# Python tooling (docs scripts)
+.venv/

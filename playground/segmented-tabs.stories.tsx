@@ -37,6 +37,30 @@ export const ManyTabs = () => {
   )
 }
 
+export const WrappedTabs = () => {
+  const [value, setValue] = useState('retrieval')
+  return (
+    <div style={{ maxWidth: 560 }}>
+      <SegmentedTabs
+        items={[
+          { value: 'overview', label: 'Overview' },
+          { value: 'ai', label: 'AI activity' },
+          { value: 'usage', label: 'Usage & throughput' },
+          { value: 'security', label: 'Security & access' },
+          { value: 'jobs', label: 'Jobs & runs' },
+          { value: 'failures', label: 'Failures' },
+          { value: 'changes', label: 'Data changes' },
+          { value: 'retrieval', label: 'Retrieval' },
+        ]}
+        value={value}
+        onValueChange={setValue}
+        ariaLabel="Audit views"
+        wrap
+      />
+    </div>
+  )
+}
+
 export const WithDisabled = () => {
   const [value, setValue] = useState('design')
   return (

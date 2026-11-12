@@ -1,0 +1,45 @@
+/*
+ * Gallery-only baseline. Apps load a Tailwind preflight (their compiled
+ * app CSS comes after `styles.css` — docs/adoption.md), so form controls
+ * are reset before any component renders. The Ladle gallery loads
+ * dist/styles.css alone, so native UA widget styling leaks into stories:
+ * bare textareas keep their black border, monospace font and even the
+ * OS dark-theme widget colors (the library ships light tokens only).
+ * This file mirrors the small slice of preflight the components rely
+ * on. Never import it from src/ — apps keep owning their preflight.
+ */
+
+:root {
+  color-scheme: light;
+}
+
+/* Overlay surfaces (launcher panels, drawers, modals) portal to
+   document.body, so the token font/color must live on body — exactly
+   what an app's base CSS provides. */
+body {
+  font-family: var(--as-font-sans);
+  color: var(--as-fg);
+}
+
+button,
+input,
+optgroup,
+select,
+textarea {
+  font-family: inherit;
+  font-feature-settings: inherit;
+  font-variation-settings: inherit;
+  font-size: 100%;
+  font-weight: inherit;
+  line-height: inherit;
+  letter-spacing: inherit;
+  color: inherit;
+  margin: 0;
+  padding: 0;
+  background-color: transparent;
+  border: 0;
+}
+
+button:disabled {
+  cursor: default;
+}

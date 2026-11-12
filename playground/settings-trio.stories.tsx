@@ -46,6 +46,47 @@ export const SettingsShellNarrowStory = () => {
   )
 }
 
+const groupedNav: SettingsNavItem[] = [
+  { id: 'account', label: 'Account', section: 'Personal' },
+  { id: 'radar', label: 'Job radar', description: 'Saved search + digest', section: 'Personal' },
+  { id: 'notifications', label: 'Notifications', section: 'Personal' },
+  { id: 'ai', label: 'AI Configuration', section: 'AI & tools' },
+  { id: 'tools', label: 'Tools', section: 'AI & tools' },
+  { id: 'automations', label: 'Automations', section: 'Automation' },
+  { id: 'users', label: 'Users', section: 'Administration' },
+  { id: 'audit', label: 'AI Audit', section: 'Administration' },
+]
+
+export const SettingsShellGroupedStory = () => {
+  const [active, setActive] = useState('account')
+  return (
+    <SettingsShell
+      nav={groupedNav}
+      active={active}
+      onNavigate={setActive}
+      header={{ icon: KeyRound, title: 'Settings' }}
+    >
+      <p style={{ fontSize: 14 }}>Section: {active}</p>
+    </SettingsShell>
+  )
+}
+
+export const SettingsShellGroupedNarrowStory = () => {
+  const [active, setActive] = useState('account')
+  return (
+    <div style={{ width: 420 }}>
+      <SettingsShell
+        nav={groupedNav}
+        active={active}
+        onNavigate={setActive}
+        header={{ icon: KeyRound, title: 'Settings' }}
+      >
+        <p style={{ fontSize: 14 }}>Section: {active}</p>
+      </SettingsShell>
+    </div>
+  )
+}
+
 export const ProviderFormStory = () => {
   const [name, setName] = useState('OpenRouter')
   const [baseUrl, setBaseUrl] = useState('https://openrouter.ai/v1')

@@ -3,8 +3,8 @@ import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { axe } from 'jest-axe'
 import { ActionMenu, Menu, MenuContent, MenuItem, MenuTrigger } from '../src/components/menu/Menu'
-import { ContextMenu } from '../src/components/context-menu/ContextMenu'
-import { Trash2 } from 'lucide-react'
+import { ContextMenu, type ContextMenuEntry } from '../src/components/context-menu/ContextMenu'
+import { Trash2, EllipsisVertical } from 'lucide-react'
 import { Button } from '../src/components/button/Button'
 
 describe('Menu / ActionMenu', () => {
@@ -144,5 +144,119 @@ describe('ContextMenu', () => {
     )
     await screen.findByRole('menuitem', { name: 'Act' })
     expect(await axe(container)).toHaveNoViolations()
+  })
+
+  it('separator entries render a non-focusable divider between item groups', async () => {
+    const user = userEvent.setup()
+    const onExclude = vi.fn()
+    const onOpenPage = vi.fn()
+    const items: ContextMenuEntry[] = [
+      { key: 'inc', label: 'Include', onSelect: () => {} },
+      { key: 'exc', label: 'Exclude', onSelect: onExclude },
+      { key: 'sep', separator: true },
+      { key: 'details', label: 'Details', onSelect: () => {} },
+      { key: 'page', label: 'Open page', onSelect: onOpenPage },
+    ]
+    const { rerender } = render(
+      <ContextMenu x={10} y={10} items={items} onClose={() => {}} />,
+    )
+    await screen.findByRole('menuitem', { name: 'Include' })
+    const sep = screen.getByRole('separator')
+    const exclude = screen.getByRole('menuitem', { name: 'Exclude' })
+    const page = screen.getByRole('menuitem', { name: 'Open page' })
+    expect(sep).not.toHaveAttribute('tabindex')
+    expect(screen.getAllByRole('menuitem')).toHaveLength(4)
+    const order = [exclude, sep, page].map((el) => el.compareDocumentPosition(sep) & Node.DOCUMENT_POSITION_FOLLOWING)
+    expect(order[0]).toBeTruthy()
+    expect(order[2]).toBeFalsy()
+
+    page.focus()
+    await user.keyboard('{Enter}')
+    expect(onOpenPage).toHaveBeenCalledOnce()
+    expect(onExclude).not.toHaveBeenCalled()
+
+    rerender(<ContextMenu x={10} y={10} items={[]} onClose={() => {}} />)
+    expect(screen.queryAllByRole('menuitem')).toHaveLength(0)
+    expect(screen.queryByRole('separator')).not.toBeInTheDocument()
+  })
+
+  it('grouped menu has no axe violations', async () => {
+    const { container } = render(
+      <ContextMenu
+        x={10}
+        y={10}
+        items={[
+          { key: 'a', label: 'Act', onSelect: () => {} },
+          { key: 'sep', separator: true },
+          { key: 'b', label: 'Navigate', onSelect: () => {} },
+        ]}
+        onClose={() => {}}
+      />,
+    )
+    await screen.findByRole('menuitem', { name: 'Act' })
+    expect(await axe(container)).toHaveNoViolations()
+  })
+
+  it('item clicks do not bubble to the host the menu overlays (plan 188)', async () => {
+    const user = userEvent.setup()
+    const onHostClick = vi.fn()
+    render(
+      <div onClick={onHostClick}>
+        <ContextMenu
+          x={10}
+          y={10}
+          items={[{ key: 'a', label: 'Act', onSelect: () => {} }]}
+          onClose={() => {}}
+        />
+      </div>,
+    )
+    await user.click(await screen.findByRole('menuitem', { name: 'Act' }))
+    expect(onHostClick).not.toHaveBeenCalled()
+  })
+})
+
+describe('ActionMenu / MenuItem highlight', () => {
+  const renderMenu = () => {
+    const onEdit = vi.fn()
+    const onDelete = vi.fn()
+    render(
+      <ActionMenu
+        label="Actions for Org OpenAI"
+        trigger={<EllipsisVertical aria-hidden />}
+        items={[
+          { key: 'edit', label: 'Edit', onSelect: onEdit },
+          { key: 'delete', label: 'Delete', danger: true, onSelect: onDelete },
+        ]}
+      />,
+    )
+    return { onEdit, onDelete }
+  }
+
+  it('pointer hover sets data-highlighted — the hover tint fires', async () => {
+    const user = userEvent.setup()
+    renderMenu()
+    await user.click(screen.getByRole('button', { name: /actions for/i }))
+    const item = await screen.findByRole('menuitem', { name: 'Edit' })
+    expect(item).not.toHaveAttribute('data-highlighted')
+    await user.hover(item)
+    expect(item).toHaveAttribute('data-highlighted')
+  })
+
+  it('the danger item tints its own danger highlight on hover', async () => {
+    const user = userEvent.setup()
+    renderMenu()
+    await user.click(screen.getByRole('button', { name: /actions for/i }))
+    const item = await screen.findByRole('menuitem', { name: 'Delete' })
+    await user.hover(item)
+    expect(item).toHaveAttribute('data-highlighted')
+    expect(item.className).toContain('data-[highlighted]:bg-[var(--as-danger)]/10')
+  })
+
+  it('has no accessibility violations while open', async () => {
+    const user = userEvent.setup()
+    renderMenu()
+    await user.click(screen.getByRole('button', { name: /actions for/i }))
+    const menu = await screen.findByRole('menu')
+    expect(await axe(menu)).toHaveNoViolations()
   })
 })

@@ -8,10 +8,15 @@ export type ConnectionTestStatus = 'idle' | 'testing' | 'ok' | 'fail'
 export interface ConnectionTestRowProps {
   status: ConnectionTestStatus
   latencyMs?: number | null
+  /** Optional row label ("Connection") — omit it on cards where the
+   * status line speaks for itself; nothing renders when unset. */
   label?: string
   testLabel?: string
   okLabel?: string
   failLabel?: string
+  /** Text for the never-tested state ("Not tested") — the row shows no
+   * status text when idle unless this is set. */
+  idleLabel?: string
   latencyLabel?: string
   errorMessage?: string | null
   onTest?: () => void
@@ -34,10 +39,11 @@ export const ConnectionTestRow = React.forwardRef<
   {
     status,
     latencyMs,
-    label = 'Connection',
+    label,
     testLabel = 'Test',
     okLabel = 'Connected',
     failLabel = 'Failed',
+    idleLabel,
     latencyLabel = 'ms',
     errorMessage,
     onTest,
@@ -73,7 +79,9 @@ export const ConnectionTestRow = React.forwardRef<
       )}
     >
       <div className="flex min-w-0 items-center gap-2 text-sm">
-        <span className="font-medium text-[var(--as-fg)]">{label}</span>
+        {label ? (
+          <span className="font-medium text-[var(--as-fg)]">{label}</span>
+        ) : null}
         {status === 'testing' ? (
           <span className="flex items-center gap-1.5 text-[var(--as-muted-fg)]" role="status">
             <Spinner size="sm" />
@@ -89,6 +97,10 @@ export const ConnectionTestRow = React.forwardRef<
                 {latencyLabel}
               </span>
             ) : null}
+          </span>
+        ) : status === 'idle' && idleLabel ? (
+          <span className="flex items-center gap-1 font-medium text-[var(--as-muted-fg)]">
+            {idleLabel}
           </span>
         ) : null}
         {status === 'fail' && errorMessage ? (

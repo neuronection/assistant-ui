@@ -73,3 +73,37 @@ export const ContextMenuStory = () => {
     </div>
   )
 }
+
+export const ContextMenuSeparatorStory = () => {
+  const [point, setPoint] = useState<{ x: number; y: number } | null>(null)
+  return (
+    <div
+      onContextMenu={(event) => {
+        event.preventDefault()
+        setPoint({ x: event.clientX, y: event.clientY })
+      }}
+      style={{
+        padding: 32,
+        border: '1px dashed var(--as-border)',
+        borderRadius: 8,
+        maxWidth: 420,
+      }}
+    >
+      <p className="text-sm">Right-click for a grouped menu (filter actions + navigation).</p>
+      {point !== null ? (
+        <ContextMenu
+          x={point.x}
+          y={point.y}
+          items={[
+            { key: 'include', label: 'Include “Python”', onSelect: () => {} },
+            { key: 'exclude', label: 'Exclude “Python”', danger: true, onSelect: () => {} },
+            { key: 'sep', separator: true },
+            { key: 'details', label: 'Skill details', onSelect: () => {} },
+            { key: 'page', label: 'Open skill page', onSelect: () => {} },
+          ]}
+          onClose={() => setPoint(null)}
+        />
+      ) : null}
+    </div>
+  )
+}

@@ -3,7 +3,7 @@ name: Gallery
 on:
   push:
     branches: [main]
-    paths: ['src/**', 'playground/**', 'themes/**']
+    paths: ['src/**', 'playground/**', 'themes/**', '.ladle/**']
   workflow_dispatch:
 
 permissions:
