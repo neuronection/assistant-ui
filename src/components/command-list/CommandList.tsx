@@ -281,7 +281,7 @@ export const CommandList = React.forwardRef<HTMLInputElement, CommandListProps>(
         <div
           id={listId}
           role="listbox"
-          aria-label={merged.listLabel}
+          aria-label={labels?.title ? undefined : merged.listLabel}
           aria-labelledby={labels?.title ? titleId : undefined}
           data-as="command-list-listbox"
           className="max-h-80 overflow-y-auto p-1"
@@ -348,7 +348,7 @@ export const CommandList = React.forwardRef<HTMLInputElement, CommandListProps>(
                           </span>
                         ) : null}
                         {item.disabled && item.disabledReason ? (
-                          <span className="truncate text-xs text-[var(--as-warning)]">
+                          <span className="truncate text-xs text-[color-mix(in_srgb,var(--as-warning)_72%,var(--as-fg))]">
                             {item.disabledReason}
                           </span>
                         ) : null}

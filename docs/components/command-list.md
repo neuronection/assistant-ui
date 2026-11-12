@@ -90,8 +90,8 @@ call site. The docs accessibility row is the tested contract.
   `aria-activedescendant` there.
 - Disabled items stay visible (with their `disabledReason`) but are skipped by
   keyboard navigation and never fire `onSelect`.
-- `Enter` is always consumed by the list, so an empty or all-disabled result
-  set cannot accidentally submit a surrounding form.
+- `Enter` is consumed by the list outside IME composition, so an empty or
+  all-disabled result set cannot accidentally submit a surrounding form.
 
 ## examples
 

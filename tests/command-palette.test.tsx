@@ -103,24 +103,28 @@ describe('CommandPalette', () => {
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
   })
 
-  it('closes via the close button', async () => {
+  it('closes via the close button and restores focus to the trigger', async () => {
     const user = userEvent.setup()
     render(<Harness />)
-    await user.click(screen.getByRole('button', { name: 'Open palette' }))
+    const trigger = screen.getByRole('button', { name: 'Open palette' })
+    await user.click(trigger)
     await screen.findByRole('dialog')
     await user.click(screen.getByRole('button', { name: 'Close' }))
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
+    await waitFor(() => expect(trigger).toHaveFocus())
   })
 
-  it('closes on an overlay click', async () => {
+  it('closes on an overlay click and restores focus to the trigger', async () => {
     const user = userEvent.setup()
     render(<Harness />)
-    await user.click(screen.getByRole('button', { name: 'Open palette' }))
+    const trigger = screen.getByRole('button', { name: 'Open palette' })
+    await user.click(trigger)
     await screen.findByRole('dialog')
     const overlay = document.body.querySelector('[data-as="modal-overlay"]')
     expect(overlay).toBeInstanceOf(HTMLElement)
     await user.click(overlay as HTMLElement)
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
+    await waitFor(() => expect(trigger).toHaveFocus())
   })
 
   it('does not select on Tab in the modal focus mode and traps focus in the dialog', async () => {
