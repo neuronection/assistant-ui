@@ -1,5 +1,13 @@
 # @neuronection/assistant-ui
 
+## 0.84.0
+
+### Minor Changes
+
+- Add `ImportReviewCard`: a presentational review-first import surface with a
+  file picker, mapped/dropped/warnings/conflicts report and one explicit apply.
+  Apps own parsing and the API; the card owns no fetch, store or write.
+
 ## 0.83.0
 
 ### Minor Changes
