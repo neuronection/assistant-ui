@@ -231,6 +231,18 @@
       "types": "./dist/combobox.d.ts",
       "import": "./dist/combobox.js"
     },
+    "./command-list": {
+      "types": "./dist/command-list.d.ts",
+      "import": "./dist/command-list.js"
+    },
+    "./command-palette": {
+      "types": "./dist/command-palette.d.ts",
+      "import": "./dist/command-palette.js"
+    },
+    "./shortcut-list": {
+      "types": "./dist/shortcut-list.d.ts",
+      "import": "./dist/shortcut-list.js"
+    },
     "./confirmation-modal": {
       "types": "./dist/confirmation-modal.d.ts",
       "import": "./dist/confirmation-modal.js"

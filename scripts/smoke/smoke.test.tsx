@@ -5,6 +5,11 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { Button } from '@neuronection/assistant-ui'
 import { ThemeScope } from '@neuronection/assistant-ui'
+import {
+  CommandList,
+  CommandPalette,
+  ShortcutList,
+} from '@neuronection/assistant-ui'
 
 const css = readFileSync(
   'node_modules/@neuronection/assistant-ui/dist/styles.css',
@@ -50,5 +55,38 @@ describe('theme contract', () => {
   it('button utilities consume the tokens (var() references in CSS)', () => {
     expect(css).toMatch(/bg-\\\[var\\\(--as-primary\\\)/)
     expect(css).toMatch(/outline-\\\[var\\\(--as-focus-ring\\\)/)
+  })
+})
+
+describe('command surfaces', () => {
+  it('renders CommandList in this React version', () => {
+    render(
+      <CommandList
+        query=""
+        onQueryChange={() => {}}
+        groups={[{ id: 'g', label: 'Group', items: [{ id: 'a', label: 'Alpha' }] }]}
+        onSelect={() => {}}
+      />,
+    )
+    expect(screen.getByRole('option', { name: 'Alpha' })).toBeTruthy()
+  })
+
+  it('renders ShortcutList in this React version', () => {
+    render(
+      <ShortcutList
+        groups={[
+          {
+            id: 'global',
+            label: 'Global',
+            entries: [{ id: 'palette', label: 'Command palette', keys: 'Ctrl K' }],
+          },
+        ]}
+      />,
+    )
+    expect(screen.getByText('Ctrl K')).toBeTruthy()
+  })
+
+  it('exports CommandPalette', () => {
+    expect(CommandPalette).toBeTruthy()
   })
 })
