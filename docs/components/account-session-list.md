@@ -17,7 +17,7 @@ import { AccountSessionList } from '@neuronection/assistant-ui/account-session-l
 | --- | --- | --- | --- |
 | `rows` | `AccountSessionRow[]` | — | One row per session: `{ id, current?, label, details, icon?, badges? }`. |
 | `onRevoke` | `(id: string) => void` | — | Called with the row id from its revoke button. |
-| `busyId` | `string` | — | Row whose revoke is in flight: its button is disabled, `aria-busy`, and labelled `labels.revoking`; every other row stays enabled. |
+| `busyId` | `string` | — | Row whose revoke is in flight: its button is disabled, `aria-busy`, and its visible text becomes `labels.revoking`; every other row stays enabled. |
 | `labels` | `{ current: string; revoke: string; revoking: string; empty?: string }` | — | All strings app-owned; `empty` defaults to “No active sessions”. |
 | `headerAction` | `ReactNode` | — | Slot above the list (e.g. “sign out other sessions”); app-owned. |
 | `className` | `string` | — | Merges. |
@@ -101,9 +101,15 @@ realistic (device icon, badge, header action, empty copy):
 ## accessibility
 
 `<ul>`/`<li>` rows, `aria-current="true"` on the current session, and real
-`<button>` revoke controls (native Enter/Space). The busy row is `disabled`
-and `aria-busy`, so it drops out of the tab order until the request settles
-while sibling rows keep working. `data-as="account-session-list"`,
+`<button>` revoke controls (native Enter/Space). Every per-row action includes
+its row label in the accessible name — `labels.revoke` (or `labels.revoking`
+while busy) plus ` — ` and `row.label`, e.g. *Revoke — Pixel 9* — so the
+buttons stay distinguishable in a screen reader's button list while the
+visible text remains the short label. The busy row is `disabled` and
+`aria-busy`, so it drops out of the tab order until the request settles while
+sibling rows keep working; where focus lands afterwards is app-owned (return
+it to a stable target such as the section heading once the in-flight row is no
+longer focusable). `data-as="account-session-list"`,
 `data-as="account-session-row"` (+ `data-current`),
 `data-as="account-session-current"` and `data-as="account-session-revoke"`
 (+ `data-revoking`) are the styling hooks. The header slot is app markup and

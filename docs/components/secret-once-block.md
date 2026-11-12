@@ -30,7 +30,9 @@ host's overlay. Clipboard writes go through `navigator.clipboard.writeText`
 with the same `execCommand` textarea fallback as `CopyButton`. The copied
 state is internal and controlled by the component; `onCopied` is the only
 event out. The block never stores, logs, masks or fetches the secret, and
-failed writes keep the copy label (no error event).
+failed writes keep the copy label (no error event). Changing `secret` clears
+the copied state (and its pending reset timer), so a second reveal never
+inherits the first one's feedback.
 
 ## labels & i18n
 
@@ -72,7 +74,7 @@ The secret is a `<code>` block (`whitespace-pre-wrap` + `break-all`, so long
 values wrap instead of overflowing), the warning is plain text with a
 decorative icon, and copy is a native `<button>` whose visible label carries
 the accessible name. Enter/Space copy; the label flips to `copiedLabel` and
-back. Styling hooks: `data-as="secret-once-block"` (+ `data-copied`),
+back. Changing `secret` resets the label to `copyLabel`. Styling hooks: `data-as="secret-once-block"` (+ `data-copied`),
 `data-as="secret-once-value"`, `data-as="secret-once-warning"`,
 `data-as="secret-once-copy"`.
 
