@@ -50,19 +50,29 @@ function DictationDemo() {
 
 export const Dictation = () => <DictationDemo />
 
-export const Unavailable = () => (
-  <div style={{ display: 'flex', flexDirection: 'column', gap: 12, maxWidth: 480 }}>
-    <DictationUnavailable
-      label="Dictation unavailable"
-      detail="No speech-to-text model is assigned."
-      action={{ label: 'Open voice settings', onClick: () => undefined }}
-    />
-    <DictationUnavailable
-      label="Dictation unavailable"
-      detail="No speech-to-text model is assigned."
-    />
-  </div>
-)
+function UnavailableDemo() {
+  const [actionFired, setActionFired] = useState(false)
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, maxWidth: 480 }}>
+      <DictationUnavailable
+        label="Dictation unavailable"
+        detail="No speech-to-text model is assigned."
+        action={{ label: 'Open voice settings', onClick: () => setActionFired(true) }}
+      />
+      {actionFired ? (
+        <p role="status" style={{ fontSize: 13 }}>
+          Action fired: open voice settings
+        </p>
+      ) : null}
+      <DictationUnavailable
+        label="Dictation unavailable"
+        detail="No speech-to-text model is assigned."
+      />
+    </div>
+  )
+}
+
+export const Unavailable = () => <UnavailableDemo />
 
 const fakeTransport: AiTextTransformTransport = {
   start: async () => 'demo',

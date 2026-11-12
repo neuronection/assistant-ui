@@ -230,6 +230,8 @@ describe('DictationUnavailable', () => {
     expect(screen.getByRole('note')).toHaveTextContent(
       'Dictation unavailable No speech-to-text model is assigned.',
     )
+    expect(screen.getByRole('note')).toHaveAttribute('aria-live', 'polite')
+    expect(screen.getByRole('note')).toHaveAttribute('aria-atomic', 'true')
     expect(screen.queryByRole('button')).toBeNull()
   })
 
@@ -253,9 +255,24 @@ describe('DictationUnavailable', () => {
     render(
       <DictationUnavailable
         label="Dictation unavailable"
+        detail="No speech-to-text model is assigned."
         action={{ label: 'Open voice settings' } as never}
       />,
     )
+    expect(screen.getByRole('note')).toHaveTextContent(
+      'Dictation unavailable No speech-to-text model is assigned.',
+    )
+    expect(screen.queryByRole('button')).toBeNull()
+  })
+
+  it('never renders an unnamed control for a blank action label', () => {
+    render(
+      <DictationUnavailable
+        label="Dictation unavailable"
+        action={{ label: '   ', onClick: () => {} }}
+      />,
+    )
+    expect(screen.getByRole('note')).toHaveTextContent('Dictation unavailable')
     expect(screen.queryByRole('button')).toBeNull()
   })
 

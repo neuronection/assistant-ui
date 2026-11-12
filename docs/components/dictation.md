@@ -60,7 +60,7 @@ without re-renders). Unmount while recording tears the stream down.
 | --- | --- | --- | --- |
 | `label` | `string` | — (required) | Short reason shown first, e.g. *Dictation unavailable*. |
 | `detail` | `string` | — | Optional explanation (the app's assignment/configuration state). |
-| `action` | `{ label: string; onClick: () => void }` | — | Optional follow-up (e.g. open voice settings). Both fields are required; without a handler no control is rendered. |
+| `action` | `{ label: string; onClick: () => void }` | — | Optional follow-up (e.g. open voice settings). Both fields are required; without a handler or with a blank label, no control is rendered. |
 | `className` | `string` | — | Merged onto the root. |
 
 ## controlled contract
@@ -71,13 +71,23 @@ and an `role="alert"` row while an error is set.
 
 `DictationUnavailable` is fully presentational: `label`/`detail`/`action` are
 the app's resolved capability state. It renders a `role="note"` row and a
-native button only when an action handler exists — never a disabled or
-handler-less control. The app decides between it and `DictationButton`; the
-mic button is not overloaded with an `unavailable` status.
+native button only when an action handler exists — never a disabled,
+handler-less or blank-labelled control. The app decides between it and
+`DictationButton`; the mic button is not overloaded with an `unavailable`
+status.
+
+The row is a polite live region (`aria-live="polite"`, `aria-atomic="true"`),
+so a gate that resolves after mount (the normal async assignment check) is
+announced when it replaces the mic. Apps that resolve capability before first
+paint still get the reason in reading order; the live attribute is harmless.
 
 ## label/i18n contract
 
-All strings are props with English defaults; apps translate at call sites.
+`label` is required app copy — it has no English default. `detail` and
+`action.label` are app copy too. The recording/strip labels (`recording`,
+`transcribing`, `stop`, `cancel`, `dismissError`, and the error reasons) have
+English defaults and can be overridden through `labels`. Apps translate every
+string at call sites.
 
 ## example (realistic)
 
@@ -114,8 +124,10 @@ See [accessibility.md](../accessibility.md#inputs): labelled mic toggle with
 `aria-pressed` while recording; strip is `role="status"` while recording /
 transcribing and `role="alert"` for errors; Stop/Cancel/Dismiss are labelled
 buttons. `DictationUnavailable` is a `role="note"` row with its reason as
-text; the optional action is a native button reached by Tab and activated by
-Enter/Space, and an action label without a handler is never rendered.
+text and `aria-live="polite"`/`aria-atomic="true"` so an async capability
+gate is announced when it replaces the mic; the optional action is a native
+button reached by Tab and activated by Enter/Space, and an action label
+without a handler (or with a blank label) is never rendered.
 
 ## related
 

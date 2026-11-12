@@ -8,7 +8,7 @@ export interface DictationUnavailableProps {
   label: string
   /** Optional explanation, e.g. the app's assignment state. */
   detail?: string
-  /** App-supplied follow-up. A label without a handler renders nothing. */
+  /** App-supplied follow-up. A label without a handler or with a blank label renders nothing. */
   action?: { label: string; onClick: () => void }
   className?: string
 }
@@ -21,6 +21,8 @@ export const DictationUnavailable = React.forwardRef<
     <div
       ref={ref}
       role="note"
+      aria-live="polite"
+      aria-atomic="true"
       data-as="dictation-unavailable"
       className={cn(
         'flex items-center gap-2 rounded-[var(--as-radius)] border border-dashed border-[var(--as-border)] bg-[var(--as-surface)] px-2.5 py-1.5 text-xs',
@@ -31,10 +33,12 @@ export const DictationUnavailable = React.forwardRef<
       <span className="min-w-0 flex-1">
         <span className="font-medium text-[var(--as-fg)]">{label}</span>
         {detail ? (
-          <span className="text-[var(--as-muted-fg)]"> {detail}</span>
+          <span className="break-words text-[var(--as-muted-fg)]"> {detail}</span>
         ) : null}
       </span>
-      {action && typeof action.onClick === 'function' ? (
+      {action &&
+      typeof action.onClick === 'function' &&
+      action.label.trim() !== '' ? (
         <button
           type="button"
           className="shrink-0 rounded-[var(--as-radius-sm)] px-2 py-1 font-medium text-[var(--as-primary)] hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--as-focus-ring)]"
