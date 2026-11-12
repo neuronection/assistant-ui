@@ -44,6 +44,8 @@ export interface HitlProposalCardLabels {
   reverted: string
   /** Hint under a conflict status. */
   conflictHint: string
+  /** Approve label when the proposal conflicts and re-applies the diff. */
+  reapply: string
   /** Compact-density expander, `{count}` replaced with the row total. */
   showAll: string
   /** Compact-density collapse label. */
@@ -63,6 +65,7 @@ const DEFAULT_LABELS: HitlProposalCardLabels = {
   expired: 'Expired',
   reverted: 'Reverted',
   conflictHint: 'The data changed — review the diff and ask again if still wanted.',
+  reapply: 'Approve refreshed',
   showAll: 'Show all {count} fields',
   showFewer: 'Show fewer',
 }
@@ -86,6 +89,12 @@ export interface HitlProposalCardProps {
   /** Testid override for the preview button (app convention
    * `hitl-preview-{id}`). */
   previewTestId?: string
+  /** App-owned conflict detail (e.g. the server's drift reason); replaces
+   * the default conflict hint when given. */
+  conflictNote?: string
+  /** App-owned body slot: target/edit summaries, rendered diffs, previews.
+   * Rendered between the field rows and the resolve actions. */
+  children?: React.ReactNode
   /** Resolve in flight — disables the action buttons. */
   busy?: boolean
   /** Resolve error text (e.g. a failed apply). */
@@ -114,6 +123,8 @@ export function HitlProposalCard({
   onReject,
   onPreview,
   previewTestId = 'hitl-preview-button',
+  conflictNote,
+  children,
   busy = false,
   error,
   labels,
@@ -129,8 +140,16 @@ export function HitlProposalCard({
     }
   }, [status])
 
-  const approveLabel = destructive && armed ? text.confirm : text.approve
-  const actionable = status === 'pending' && !busy
+  const approveLabel =
+    destructive && armed
+      ? text.confirm
+      : status === 'conflict'
+        ? text.reapply
+        : text.approve
+  const resolvable =
+    status === 'pending' ||
+    (status === 'conflict' && (onApprove !== undefined || onReject !== undefined))
+  const actionable = resolvable && !busy
 
   const handleApprove = () => {
     if (destructive && !armed) {
@@ -188,7 +207,9 @@ export function HitlProposalCard({
             ) : null}
           </p>
           {status === 'conflict' ? (
-            <p className="mt-0.5 text-[var(--as-muted-fg)]">{text.conflictHint}</p>
+            <p className="mt-0.5 text-[var(--as-muted-fg)]">
+              {conflictNote ?? text.conflictHint}
+            </p>
           ) : null}
         </div>
       </div>
@@ -214,13 +235,19 @@ export function HitlProposalCard({
         </div>
       ) : null}
 
+      {children ? (
+        <div data-as="hitl-proposal-body" className="border-t border-[var(--as-border)]">
+          {children}
+        </div>
+      ) : null}
+
       {error ? (
         <p role="alert" className="border-t border-[var(--as-border)] px-2.5 py-1.5 text-[var(--as-danger)]">
           {error}
         </p>
       ) : null}
 
-      {status === 'pending' ? (
+      {resolvable ? (
         <div className="flex items-center gap-2 border-t border-[var(--as-border)] px-2.5 py-2">
           {onPreview ? (
             <button

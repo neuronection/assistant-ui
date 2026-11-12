@@ -11,6 +11,8 @@ export interface ComboboxOption {
   description?: string
   group?: string
   badge?: string
+  /** Trailing secondary text, e.g. an effective price or origin. */
+  meta?: string
   disabled?: boolean
 }
 
@@ -129,6 +131,11 @@ function ComboboxList({
           {option.badge ? (
             <span className="shrink-0 rounded-full bg-[var(--as-secondary)] px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[var(--as-secondary-fg)]">
               {option.badge}
+            </span>
+          ) : null}
+          {option.meta ? (
+            <span className="shrink-0 text-xs text-[var(--as-muted-fg)]">
+              {option.meta}
             </span>
           ) : null}
         </span>

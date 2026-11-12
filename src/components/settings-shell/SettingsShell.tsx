@@ -9,6 +9,10 @@ export interface SettingsNavItem {
   icon?: LucideIcon
   /** Optional trailing node (status dot, count, badge) at the row edge. */
   trailing?: React.ReactNode
+  /** Visual group label rendered before the first item carrying it
+   * (SidebarNav's `section` idiom). Hidden in the narrow chip-row mode;
+   * apps keep nav items in contiguous section runs. */
+  section?: string
 }
 
 export interface SettingsShellProps {
@@ -69,46 +73,57 @@ export const SettingsShell = React.forwardRef<HTMLDivElement, SettingsShellProps
                   </span>
                 </div>
               ) : null}
-              {nav.map(({ id, label, description, icon: Icon, trailing }) => {
+              {nav.map(({ id, label, description, icon: Icon, trailing, section }, index) => {
                 const isActive = id === active
+                const sectionLabel =
+                  section !== undefined &&
+                  nav.findIndex((item) => item.section === section) === index
+                    ? section
+                    : null
                 return (
-                  <button
-                    key={id}
-                    type="button"
-                    data-as="settings-shell-navitem"
-                    aria-current={isActive ? 'page' : undefined}
-                    onClick={() => onNavigate(id)}
-                    className={cn(
-                      'cursor-pointer px-3 py-2.5 text-left text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[var(--as-focus-ring)]',
-                      isActive
-                        ? 'bg-[color-mix(in_srgb,var(--as-primary)_12%,transparent)] font-bold text-[var(--as-primary)]'
-                        : 'font-medium text-[var(--as-fg)] hover:bg-[var(--as-muted)]',
-                    )}
-                  >
-                    {Icon ? (
-                      <Icon
-                        data-as="settings-shell-navicon"
-                        className="size-4 shrink-0"
-                        aria-hidden
-                      />
+                  <React.Fragment key={id}>
+                    {sectionLabel ? (
+                      <div data-as="settings-shell-navsection" role="presentation">
+                        {sectionLabel}
+                      </div>
                     ) : null}
-                    <span className="flex min-w-0 flex-col">
-                      <span className="truncate">{label}</span>
-                      {description ? (
-                        <span
-                          data-as="settings-shell-navdesc"
-                          className="text-[11px] font-normal text-[var(--as-muted-fg)]"
-                        >
-                          {description}
+                    <button
+                      type="button"
+                      data-as="settings-shell-navitem"
+                      aria-current={isActive ? 'page' : undefined}
+                      onClick={() => onNavigate(id)}
+                      className={cn(
+                        'cursor-pointer px-3 py-2.5 text-left text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[var(--as-focus-ring)]',
+                        isActive
+                          ? 'bg-[color-mix(in_srgb,var(--as-primary)_12%,transparent)] font-bold text-[var(--as-primary)]'
+                          : 'font-medium text-[var(--as-fg)] hover:bg-[var(--as-muted)]',
+                      )}
+                    >
+                      {Icon ? (
+                        <Icon
+                          data-as="settings-shell-navicon"
+                          className="size-4 shrink-0"
+                          aria-hidden
+                        />
+                      ) : null}
+                      <span className="flex min-w-0 flex-col">
+                        <span className="truncate">{label}</span>
+                        {description ? (
+                          <span
+                            data-as="settings-shell-navdesc"
+                            className="text-[11px] font-normal text-[var(--as-muted-fg)]"
+                          >
+                            {description}
+                          </span>
+                        ) : null}
+                      </span>
+                      {trailing ? (
+                        <span data-as="settings-shell-navtrailing" className="flex items-center self-center">
+                          {trailing}
                         </span>
                       ) : null}
-                    </span>
-                    {trailing ? (
-                      <span data-as="settings-shell-navtrailing" className="flex items-center self-center">
-                        {trailing}
-                      </span>
-                    ) : null}
-                  </button>
+                    </button>
+                  </React.Fragment>
                 )
               })}
             </div>

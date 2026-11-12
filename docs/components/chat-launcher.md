@@ -3,7 +3,10 @@
 The floating chat bubble (career's `ChatWidget` launcher, family
 standard): fixed launcher button opening an anchored, non-modal panel
 (`role="complementary"`), with badge support and Escape-to-close while
-focus is inside the panel.
+focus is inside the panel. The panel springs in from the launcher corner
+(`--as-ease-spring`, `--as-duration-spring`), the launcher icon ↔ close
+icon morphs on toggle (never on first mount), and the badge pulses once
+per unread change — all disabled under `prefers-reduced-motion`.
 
 ## import
 
@@ -19,7 +22,7 @@ import { ChatLauncher } from '@neuronection/assistant-ui/chat-launcher'
 | `open` / `defaultOpen` / `onOpenChange` | | Controlled-first visibility. |
 | `position` | `'bottom-right' \| 'bottom-left'` | Default bottom-right. |
 | `label` / `closeLabel` | `string` | Launcher accessible names. |
-| `badge` | `number \| string` | Unread/activity pill (hidden for 0/empty). |
+| `badge` | `number \| string` | Unread/activity pill (hidden for 0/empty); pulses once on every change. |
 | `icon` / `closeIcon` | `LucideIcon` | Defaults MessageCircle / X. |
 | `showClose` | `boolean` | Overlay close pinned to the panel's top-right (default `true`). Set `false` when the panel body renders its own header actions — the overlay intercepts clicks meant for top-right buttons; compose the close into those actions calling `onOpenChange(false)`. |
 | `container` | `HTMLElement \| null` | Portal target. |

@@ -74,7 +74,7 @@ export const ChatTurnStatus = React.forwardRef<HTMLDivElement, ChatTurnStatusPro
             />
           ))}
         </span>
-        <span className="text-xs">{label}</span>
+        <span key={label} className="as-anim-fade-swap text-xs">{label}</span>
         {elapsed !== null ? (
           <span aria-hidden className="font-mono text-[10px] tabular-nums">
             {formatElapsed(elapsed)}

@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Check, ChevronDown, TriangleAlert, Wrench } from 'lucide-react'
+import { ChevronDown, TriangleAlert, Wrench } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 
 import { cn } from '../../lib/utils'
@@ -115,7 +115,8 @@ export const ChatToolCard = React.forwardRef<HTMLDivElement, ChatToolCardProps>(
         data-as="chat-tool-card"
         data-status={status}
         className={cn(
-          'rounded-[var(--as-radius)] border border-[var(--as-border)] bg-[var(--as-surface)] text-xs',
+          'rounded-[var(--as-radius)] border border-[var(--as-border)] bg-[var(--as-surface)] text-xs transition-shadow',
+          status === 'running' && 'shadow-[inset_2px_0_0_var(--as-ai)]',
           className,
         )}
       >
@@ -132,9 +133,10 @@ export const ChatToolCard = React.forwardRef<HTMLDivElement, ChatToolCardProps>(
             <span className="shrink-0 tabular-nums text-[var(--as-muted-fg)]">{formatDuration(durationMs)}</span>
           ) : null}
           <span
+            key={status}
             role={status === 'running' ? 'status' : undefined}
             className={cn(
-              'flex shrink-0 items-center gap-1',
+              'as-anim-fade-swap flex shrink-0 items-center gap-1',
               status === 'done' && 'text-[var(--as-success)]',
               status === 'failed' && 'text-[var(--as-danger)]',
               status === 'running' && 'text-[var(--as-muted-fg)]',
@@ -143,34 +145,46 @@ export const ChatToolCard = React.forwardRef<HTMLDivElement, ChatToolCardProps>(
             {status === 'running' ? (
               <Spinner size="sm" />
             ) : status === 'done' ? (
-              <Check className="size-3.5" aria-hidden />
+              <svg viewBox="0 0 24 24" aria-hidden className="size-3.5" fill="none">
+                <path
+                  d="M20 6 9 17l-5-5"
+                  pathLength={1}
+                  className="as-anim-check-draw"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
             ) : (
               <TriangleAlert className="size-3.5" aria-hidden />
             )}
             <span className="sr-only">{statusLabel}</span>
           </span>
           {expandable ? (
-            <ChevronDown className={cn('size-3.5 shrink-0 text-[var(--as-muted-fg)] transition-transform', open && 'rotate-180')} aria-hidden />
+            <ChevronDown className={cn('size-3.5 shrink-0 text-[var(--as-muted-fg)] transition-transform duration-[var(--as-duration-base)] ease-[var(--as-ease-out)]', open && 'rotate-180')} aria-hidden />
           ) : null}
         </Header>
-        {expandable && open ? (
-          <div id={regionId} className="flex flex-col gap-2 border-t border-[var(--as-border)] px-2.5 py-2">
-            {args ? (
-              <div>
-                <p className="mb-1 font-medium uppercase tracking-wide text-[var(--as-muted-fg)]">{labels?.args ?? 'Arguments'}</p>
-                <DetailValue text={args} />
-              </div>
-            ) : null}
-            {result || renderResult ? (
-              <div>
-                <p className="mb-1 font-medium uppercase tracking-wide text-[var(--as-muted-fg)]">{labels?.result ?? 'Result'}</p>
-                {renderResult ? (
-                  renderResult(result ?? '')
-                ) : (
-                  <DetailValue text={result ?? ''} />
-                )}
-              </div>
-            ) : null}
+        {expandable ? (
+          <div id={regionId} data-open={open} className="as-collapse">
+            <div className="as-collapse-inner flex flex-col gap-2 border-t border-[var(--as-border)] px-2.5 py-2">
+              {args ? (
+                <div>
+                  <p className="mb-1 font-medium uppercase tracking-wide text-[var(--as-muted-fg)]">{labels?.args ?? 'Arguments'}</p>
+                  <DetailValue text={args} />
+                </div>
+              ) : null}
+              {result || renderResult ? (
+                <div>
+                  <p className="mb-1 font-medium uppercase tracking-wide text-[var(--as-muted-fg)]">{labels?.result ?? 'Result'}</p>
+                  {renderResult ? (
+                    renderResult(result ?? '')
+                  ) : (
+                    <DetailValue text={result ?? ''} />
+                  )}
+                </div>
+              ) : null}
+            </div>
           </div>
         ) : null}
       </div>

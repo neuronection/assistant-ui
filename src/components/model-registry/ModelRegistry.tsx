@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Check, ChevronDown, ChevronRight, ChevronUp, Pencil, Plus, X } from 'lucide-react'
+import { Check, ChevronDown, ChevronRight, ChevronUp, Library, Pencil, PenLine, Plus, X } from 'lucide-react'
 import { cn } from '../../lib/utils'
 import { Button } from '../button'
 import { CapabilityChips, type CapabilityDescriptor } from '../capability-chips'
@@ -27,6 +27,9 @@ export interface ModelRegistryModel {
   reasoningEffort?: string
   temperature?: number | null
   maxTokens?: number | null
+  /** The model's decision transport (e.g. `systemone`) — set when `caps`
+   * carries the app's decision capability. */
+  decisionTransport?: string
   /** App-defined extra fields (see `extraFields`), carried verbatim. */
   extra?: Record<string, string>
   missing?: boolean
@@ -44,6 +47,7 @@ export interface ModelRegistryDraft {
   reasoningEffort?: string
   temperature?: number | null
   maxTokens?: number | null
+  decisionTransport?: string
   extra?: Record<string, string>
 }
 
@@ -53,6 +57,7 @@ export interface ModelRegistryPatch {
   reasoningEffort?: string
   temperature?: number | null
   maxTokens?: number | null
+  decisionTransport?: string
   extra?: Record<string, string>
 }
 
@@ -93,12 +98,50 @@ export interface ModelRegistryProps {
   editTitle?: string
   selectModelLabel?: string
   manualIdToggleLabel?: string
+  /** Shown on the manual↔catalog toggle when manual entry is active
+   * (returning to the catalog picker). */
+  useCatalogLabel?: string
+  /** Visually-hidden prefix for the provider context banner. */
+  providerContextLabel?: string
   editLabel?: string
   removeLabel?: string
   missingLabel?: string
   capsLabel?: string
   /** Muted explainer under the capability chips (what they gate). */
   capsHint?: string
+  /** Capability values that are standalone kinds (e.g. decision, stt, tts,
+   * embeddings): selecting one makes the model exactly that kind — the
+   * chat-family caps combine, standalone kinds replace everything (the
+   * family's slot-separation law, D4, expressed in the form). */
+  standaloneCaps?: string[]
+  /** Label for the standalone-kinds cluster (`standaloneCaps`). */
+  standaloneLabel?: string
+  /** Selection implications between combinable caps (e.g.
+   * `{ vision: ['text'], tools: ['text'] }` — every vision/tool-capable
+   * model is a text model too): selecting a key auto-enables its values,
+   * and deselecting a value deselects everything that implies it. */
+  capImplications?: Record<string, string[]>
+  /** Initial capability selection for the add modal (e.g.
+   * `['text', 'vision', 'tools']` for providers whose models usually
+   * carry the whole chat family, `['decision']` for decision-only
+   * presets). A function form decides per provider; returning undefined
+   * falls back to the first combinable cap. Values are normalized through
+   * the same rules as a catalog pick (`standaloneCaps` exclusivity +
+   * `capImplications` closure); when unset the form opens on the first
+   * combinable cap, as before. */
+  defaultCaps?: string[] | ((provider: ModelRegistryProvider) => string[] | undefined)
+  /** Label for the nested modifier-cap row — the `capImplications` keys
+   * (e.g. vision, tools) render under their base cap while it is
+   * selected, expressing that they exist only as its modifiers. */
+  modifiersLabel?: string
+  /** Step-1 heading of the kind-picker wizard (rendered when the app
+   * declares `standaloneCaps`): pick the model's kind before the details. */
+  kindStepLabel?: string
+  /** Label of the step-2 control that returns to the kind cards. */
+  changeKindLabel?: string
+  /** One-line description per kind, rendered under the card title
+   * (e.g. `{ text: 'Chat & reasoning — usually with vision and tools' }`). */
+  kindDescriptions?: Partial<Record<string, string>>
   searchPlaceholder?: string
   searchLabel?: string
   emptyProviderLabel?: string
@@ -109,14 +152,79 @@ export interface ModelRegistryProps {
   customOptionLabel?: string
   temperatureLabel?: string
   maxTokensLabel?: string
+  /** Collapsed-by-default disclosure wrapping the tuning fields
+   * (reasoning effort, temperature, max tokens) in the add/edit modal. */
+  advancedLabel?: string
   labelLabel?: string
   reasoningEffortLabel?: string
+  /** The app's shipping decision transport (e.g. `systemone`): when set,
+   * models with the decision capability render a read-only transport row
+   * and carry the value on Draft/Patch. */
+  decisionTransport?: string
+  decisionTransportLabel?: string
   saveLabel?: string
   cancelLabel?: string
   addDraftLabel?: string
   providersEmptyLabel?: string
   emptyAction?: React.ReactNode
   className?: string
+}
+
+/**
+ * Capabilities whose models take generation-side parameters (temperature,
+ * max tokens, reasoning effort). Other capabilities (stt/tts/embeddings/
+ * decision) render without those sections — plan 26 follow-up: options
+ * are shown per capability, never always.
+ */
+const PARAMETRIC_CAPS = new Set(['text', 'vision', 'tools'])
+
+/** Whether any selected capability takes generation-side parameters. */
+const hasParametricCaps = (caps: string[]): boolean =>
+  caps.some((cap) => PARAMETRIC_CAPS.has(cap))
+
+/**
+ * Catalog normalization for `standaloneCaps` (remote model pick): a caps
+ * set may carry either one standalone kind (alone) or any combination of
+ * the chat-family caps — never both, never two standalone kinds.
+ */
+const normalizeCaps = (next: string[], standalone: ReadonlySet<string>): string[] => {
+  const standaloneHit = next.find((cap) => standalone.has(cap))
+  return standaloneHit ? [standaloneHit] : next
+}
+
+/**
+ * `capImplications` closure over a selection toggle: selecting a cap
+ * enables its implications (vision → text); deselecting a cap drops
+ * everything that implies it (text off → vision + tools off). Idempotent
+ * for caps the implications do not mention.
+ */
+const applyImplications = (
+  next: string[],
+  implications: Record<string, string[]>,
+  toggled: string,
+  selected: boolean,
+): string[] => {
+  if (Object.keys(implications).length === 0) return next
+  if (selected) {
+    const implied = implications[toggled] ?? []
+    return [...next, ...implied.filter((cap) => !next.includes(cap))]
+  }
+  const dependents = Object.entries(implications)
+    .filter(([, values]) => values.includes(toggled))
+    .map(([cap]) => cap)
+  return dependents.length === 0 ? next : next.filter((cap) => cap !== toggled && !dependents.includes(cap))
+}
+
+/** ON-implications folded over a whole caps set (catalog picks). */
+const withImplications = (
+  caps: string[],
+  implications: Record<string, string[]>,
+): string[] => {
+  let out = [...caps]
+  for (const cap of caps) {
+    out = applyImplications(out, implications, cap, true)
+  }
+  return out
 }
 
 const CUSTOM = '__custom__'
@@ -199,13 +307,24 @@ interface ModalState {
   externalId: string
   label: string
   caps: string[]
+  /** Wizard position when the app declares standalone kinds: 'kind' picks
+   * the model's kind (cards), 'details' is the rest of the form. Edit mode
+   * opens on 'details' — the kind is already known. */
+  step: 'kind' | 'details'
   reasoningEffort: string
   reasoningCustom: boolean
   temperature: string
   maxTokens: string
+  decisionTransport: string
   extra: Record<string, string>
   extraTouched: boolean
   labelTouched: boolean
+  /** The user explicitly declared the kind this modal session (kind card,
+   * or a standalone chip toggle): a catalog pick then fills only the
+   * id/label and never re-classifies the caps. Catalog classification
+   * still corrects an undeclared or text-kind draft (llava → vision,
+   * whisper → stt). */
+  kindExplicit: boolean
   model?: ModelRegistryModel
   manual: boolean
 }
@@ -236,11 +355,21 @@ export const ModelRegistry = React.forwardRef<HTMLDivElement, ModelRegistryProps
       editTitle = 'Edit model',
       selectModelLabel = 'Model',
       manualIdToggleLabel = 'Enter the model id manually',
+      useCatalogLabel = 'Pick from the catalog',
+      providerContextLabel = 'Provider',
       editLabel = 'Edit',
       removeLabel = 'Remove',
       missingLabel = 'Missing',
       capsLabel = 'Capabilities',
       capsHint,
+      standaloneCaps,
+      standaloneLabel = 'Standalone',
+      capImplications,
+      defaultCaps,
+      modifiersLabel,
+      kindStepLabel = 'What kind of model is this?',
+      changeKindLabel = 'Change type',
+      kindDescriptions,
       searchPlaceholder = 'Search models…',
       searchLabel = 'Search models',
       emptyProviderLabel = 'No models yet — use Add model to pick from the live catalog.',
@@ -251,8 +380,11 @@ export const ModelRegistry = React.forwardRef<HTMLDivElement, ModelRegistryProps
       customOptionLabel = 'Custom…',
       temperatureLabel = 'Temperature',
       maxTokensLabel = 'Max tokens',
+      advancedLabel = 'Advanced',
       labelLabel = 'Display label',
       reasoningEffortLabel = 'Reasoning effort',
+      decisionTransport,
+      decisionTransportLabel = 'Transport',
       saveLabel = 'Save',
       cancelLabel = 'Cancel',
       addDraftLabel = 'Add model',
@@ -264,6 +396,70 @@ export const ModelRegistry = React.forwardRef<HTMLDivElement, ModelRegistryProps
   ) {
     const [modal, setModal] = React.useState<ModalState | null>(null)
     const [draftError, setDraftError] = React.useState<string | null>(null)
+
+    const standaloneSet = React.useMemo(
+      () => new Set(standaloneCaps ?? []),
+      [standaloneCaps],
+    )
+    const combinableCaps = React.useMemo(
+      () => caps.filter((cap) => !standaloneSet.has(cap.value)),
+      [caps, standaloneSet],
+    )
+    const standaloneDescriptors = React.useMemo(
+      () => caps.filter((cap) => standaloneSet.has(cap.value)),
+      [caps, standaloneSet],
+    )
+    /** `capImplications` keys (e.g. vision, tools) — caps that exist only
+     * as modifiers of their base, rendered in a nested row instead of the
+     * primary one. */
+    const modifierKeys = React.useMemo(
+      () => Object.keys(capImplications ?? {}).filter((key) => !standaloneSet.has(key)),
+      [capImplications, standaloneSet],
+    )
+    const primaryCaps = React.useMemo(
+      () => caps.filter((cap) => !standaloneSet.has(cap.value) && !modifierKeys.includes(cap.value)),
+      [caps, standaloneSet, modifierKeys],
+    )
+    /** Modifiers whose implied bases are all selected in the draft — the
+     * nested row renders exactly these. */
+    const activeModifiers = React.useMemo(() => {
+      if (modifierKeys.length === 0 || !modal) return []
+      return modifierKeys.filter((key) =>
+        (capImplications?.[key] ?? []).every((base) => modal.caps.includes(base)),
+      )
+    }, [modal, modifierKeys, capImplications])
+    /** Wizard kinds: the LLM (text) base card plus one card per standalone
+     * kind. The wizard activates only when the app declares standalones —
+     * otherwise the flat chips render, as before. */
+    const kindDescriptors = React.useMemo(
+      () => [...caps.filter((cap) => cap.value === 'text'), ...standaloneDescriptors],
+      [caps, standaloneDescriptors],
+    )
+    const wizard = kindDescriptors.length > 1
+    /** The kind a caps set represents: its standalone kind if present, else
+     * the LLM (text) base. Derived, never stored — `caps` stays the single
+     * source of truth (catalog picks can flip the kind implicitly). */
+    const kindFromCaps = React.useCallback(
+      (of: string[]) => of.find((cap) => standaloneSet.has(cap)) ?? 'text',
+      [standaloneSet],
+    )
+    /** Caps a kind choice seeds: standalone kinds are exact; the LLM kind
+     * rides the app's `defaultCaps` (normalized like a catalog pick). */
+    const kindSeed = React.useCallback(
+      (kind: string, providerId: string): string[] => {
+        if (standaloneSet.has(kind)) return [kind]
+        const provider = providers.find((entry) => entry.id === providerId)
+        const declared =
+          typeof defaultCaps === 'function'
+            ? defaultCaps(provider ?? { id: providerId, name: '' })
+            : defaultCaps
+        if (declared && declared.length > 0) {
+          return withImplications(normalizeCaps(declared, standaloneSet), capImplications ?? {})
+        }
+        return [kind]
+      },
+      [providers, defaultCaps, standaloneSet, capImplications],
+    )
 
     const descriptorFor = React.useCallback(
       (value: string): CapabilityDescriptor =>
@@ -281,19 +477,37 @@ export const ModelRegistry = React.forwardRef<HTMLDivElement, ModelRegistryProps
     }
 
     const openAddModal = (providerId: string) => {
+      const firstCap = combinableCaps[0] ?? caps[0]
+      // App-declared defaults win — normalized through the same rules as a
+      // catalog pick (standalone exclusivity, then the ON-implications so a
+      // modifier default carries its base). Without them, the first
+      // combinable cap, as before.
+      const provider = providers.find((entry) => entry.id === providerId)
+      const declared =
+        typeof defaultCaps === 'function'
+          ? defaultCaps(provider ?? { id: providerId, name: '' })
+          : defaultCaps
+      const seededCaps = declared
+        ? withImplications(normalizeCaps(declared, standaloneSet), capImplications ?? {})
+        : firstCap
+          ? [firstCap.value]
+          : []
       setModal({
         mode: 'add',
         providerId,
         externalId: '',
         label: '',
-        caps: caps[0] ? [caps[0].value] : [],
+        caps: seededCaps,
+        step: 'kind',
         reasoningEffort: '',
         reasoningCustom: false,
         temperature: '',
         maxTokens: '',
+        decisionTransport: seededCaps.includes('decision') ? (decisionTransport ?? '') : '',
         extra: {},
         extraTouched: false,
         labelTouched: false,
+        kindExplicit: false,
         manual: false,
       })
       setDraftError(null)
@@ -306,6 +520,7 @@ export const ModelRegistry = React.forwardRef<HTMLDivElement, ModelRegistryProps
         externalId: model.externalId,
         label: model.label ?? '',
         caps: [...model.caps],
+        step: 'details',
         labelTouched: true,
         reasoningEffort: model.reasoningEffort ?? '',
         reasoningCustom:
@@ -314,8 +529,10 @@ export const ModelRegistry = React.forwardRef<HTMLDivElement, ModelRegistryProps
           !(reasoningEffortOptions ?? []).includes(model.reasoningEffort),
         temperature: model.temperature != null ? String(model.temperature) : '',
         maxTokens: model.maxTokens != null ? String(model.maxTokens) : '',
+        decisionTransport: model.decisionTransport ?? '',
         extra: { ...(model.extra ?? {}) },
         extraTouched: false,
+        kindExplicit: false,
         model,
         manual: false,
       })
@@ -332,29 +549,78 @@ export const ModelRegistry = React.forwardRef<HTMLDivElement, ModelRegistryProps
 
     const selectRemote = (remoteId: string) => {
       const remote = (remoteModels ?? []).find((entry) => entry.id === remoteId)
-      setModal((current) =>
-        current
-          ? {
-              ...current,
-              externalId: remoteId,
-              caps: remote ? [...remote.caps] : current.caps,
-              label: current.labelTouched ? current.label : beautifyId(remoteId),
-            }
-          : current,
-      )
+      setModal((current) => {
+        if (!current) return current
+        // An explicitly declared standalone kind is user intent — the pick
+        // fills the id/label and never re-classifies the caps. Otherwise
+        // catalog caps classify the pick ("cap correction": llava →
+        // vision, whisper → stt; a chat-kind draft may flip to a
+        // standalone kind the catalog implies).
+        const kindDeclared =
+          current.kindExplicit && kindFromCaps(current.caps) !== 'text'
+        const normalized = remote ? normalizeCaps([...remote.caps], standaloneSet) : current.caps
+        // catalog caps pass through the ON-implications (a vision/tool
+        // catalog entry carries its text base)
+        const nextCaps = kindDeclared ? current.caps : withImplications(normalized, capImplications ?? {})
+        return {
+          ...current,
+          externalId: remoteId,
+          caps: nextCaps,
+          decisionTransport: nextCaps.includes('decision')
+            ? (decisionTransport ?? current.decisionTransport ?? '')
+            : '',
+          label: current.labelTouched ? current.label : beautifyId(remoteId),
+        }
+      })
     }
 
+    const chooseKind = (kind: string) => {
+      setModal((current) => {
+        if (!current) return current
+        const caps = kindSeed(kind, current.providerId)
+        return {
+          ...current,
+          caps,
+          kindExplicit: true,
+          step: 'details',
+          // the decision capability stamps the app's shipping transport
+          decisionTransport: caps.includes('decision')
+            ? (decisionTransport ?? current.decisionTransport ?? '')
+            : '',
+        }
+      })
+      setDraftError(null)
+    }
+    const goToKindStep = () =>
+      setModal((current) => (current ? { ...current, step: 'kind' } : current))
+
     const toggleDraftCap = (value: string) => {
-      setModal((current) =>
-        current
-          ? {
-              ...current,
-              caps: current.caps.includes(value)
-                ? current.caps.filter((entry) => entry !== value)
-                : [...current.caps, value],
-            }
-          : current,
-      )
+      setModal((current) => {
+        if (!current) return current
+        const isStandalone = standaloneSet.has(value)
+        const raw = isStandalone
+          ? // a standalone kind replaces everything (or clears when toggled off)
+            current.caps.includes(value)
+            ? current.caps.filter((entry) => entry !== value)
+            : [value]
+          : current.caps.includes(value)
+            ? current.caps.filter((entry) => entry !== value)
+            : [...current.caps.filter((entry) => !standaloneSet.has(entry)), value]
+        const nextCaps = isStandalone
+          ? raw
+          : applyImplications(raw, capImplications ?? {}, value, !current.caps.includes(value))
+        return {
+          ...current,
+          caps: nextCaps,
+          // a standalone chip toggle is an explicit kind declaration too
+          kindExplicit: current.kindExplicit || isStandalone,
+          // The decision capability stamps the app's shipping transport;
+          // without it there is no transport to carry.
+          decisionTransport: nextCaps.includes('decision')
+            ? (decisionTransport ?? current.decisionTransport ?? '')
+            : '',
+        }
+      })
     }
 
     const patchField = (field: keyof ModalState, value: string) => {
@@ -379,6 +645,7 @@ export const ModelRegistry = React.forwardRef<HTMLDivElement, ModelRegistryProps
         modal.extraTouched || Object.values(modal.extra).some((value) => value.trim() !== '')
           ? { ...modal.extra }
           : undefined
+      const isDecision = modal.caps.includes('decision')
       const payload: ModelRegistryDraft = {
         externalId,
         label: modal.label.trim() || undefined,
@@ -386,12 +653,21 @@ export const ModelRegistry = React.forwardRef<HTMLDivElement, ModelRegistryProps
         reasoningEffort: modal.reasoningEffort.trim(),
         temperature: numberOr(modal.temperature),
         maxTokens: numberOr(modal.maxTokens),
+        ...(isDecision && modal.decisionTransport
+          ? { decisionTransport: modal.decisionTransport }
+          : {}),
         ...(extra !== undefined ? { extra } : {}),
       }
       if (modal.mode === 'add') {
         onAddModel(modal.providerId, payload)
       } else if (modal.model) {
-        onUpdateModel(modal.model, payload)
+        const patch: ModelRegistryPatch = { ...payload }
+        if (isDecision) {
+          patch.decisionTransport = modal.decisionTransport || decisionTransport
+        } else {
+          patch.decisionTransport = undefined
+        }
+        onUpdateModel(modal.model, patch)
       }
       resetModal()
     }
@@ -431,8 +707,84 @@ export const ModelRegistry = React.forwardRef<HTMLDivElement, ModelRegistryProps
               </ModalTitle>
             </ModalHeader>
             <div className="flex flex-col gap-4 p-4">
-              {modal.mode === 'add' ? (
-                remoteState === 'loading' ? (
+              {provider ? (
+                <div
+                  data-as="model-registry-provider-context"
+                  className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1 text-xs text-[var(--as-muted-fg)]"
+                >
+                  <span className="sr-only">{providerContextLabel}:</span>
+                  <span
+                    className="shrink-0 truncate text-xs font-semibold text-[var(--as-fg)]"
+                    title={provider.baseUrl}
+                  >
+                    {provider.name}
+                  </span>
+                  {wizard && modal.step !== 'kind' ? (
+                    <>
+                      <span aria-hidden className="text-[var(--as-border)]">
+                        ·
+                      </span>
+                      <span
+                        title={kindDescriptions?.[kindFromCaps(modal.caps)]}
+                        className="rounded-full border border-[var(--as-border)] px-2 py-0.5 text-[11px] font-medium text-[var(--as-fg)]"
+                      >
+                        {descriptorFor(kindFromCaps(modal.caps)).label}
+                      </span>
+                      <button
+                        type="button"
+                        data-as="model-registry-change-kind"
+                        onClick={goToKindStep}
+                        className="cursor-pointer rounded-[var(--as-radius-sm)] text-[11px] text-[var(--as-muted-fg)] underline-offset-2 transition-colors hover:text-[var(--as-fg)] hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--as-focus-ring)]"
+                      >
+                        {changeKindLabel}
+                      </button>
+                    </>
+                  ) : null}
+                </div>
+              ) : null}
+              {wizard && modal.step === 'kind' ? (
+                <div className="space-y-3">
+                  <p className="text-sm text-[var(--as-muted-fg)]">{kindStepLabel}</p>
+                  <div
+                    role="group"
+                    aria-label={kindStepLabel}
+                    data-as="model-kind-cards"
+                    className="grid grid-cols-2 gap-2 sm:grid-cols-3"
+                  >
+                    {kindDescriptors.map((kind) => {
+                      const pressed = kindFromCaps(modal.caps) === kind.value
+                      const Icon = kind.icon
+                      const description = kindDescriptions?.[kind.value]
+                      return (
+                        <button
+                          key={kind.value}
+                          type="button"
+                          data-kind={kind.value}
+                          aria-pressed={pressed}
+                          onClick={() => chooseKind(kind.value)}
+                          className={cn(
+                            'flex h-auto cursor-pointer flex-col items-center gap-2 rounded-[var(--as-radius)] border px-3 py-4 text-sm font-medium text-[var(--as-fg)] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--as-focus-ring)]',
+                            pressed
+                              ? 'border-[var(--as-focus-ring)] bg-[var(--as-muted)]'
+                              : 'border-[var(--as-border)] bg-[var(--as-surface)] hover:bg-[var(--as-muted)]',
+                          )}
+                        >
+                          {Icon ? <Icon className="size-5" aria-hidden /> : null}
+                          <span className="w-full truncate text-center">{kind.label}</span>
+                          {description ? (
+                            <span className="text-xs font-normal leading-snug text-[var(--as-muted-fg)]">
+                              {description}
+                            </span>
+                          ) : null}
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+              ) : (
+                <>
+                  {modal.mode === 'add' ? (
+                    remoteState === 'loading' ? (
                   <p className="flex items-center justify-center gap-2 py-4 text-xs text-[var(--as-muted-fg)]">
                     <Spinner size="sm" />
                     {remoteLoadingLabel}
@@ -462,9 +814,11 @@ export const ModelRegistry = React.forwardRef<HTMLDivElement, ModelRegistryProps
                     ) : (
                       <button
                         type="button"
-                        className="cursor-pointer self-start text-xs text-[var(--as-muted-fg)] underline-offset-2 hover:text-[var(--as-fg)] hover:underline"
+                        data-as="model-registry-manual-toggle"
+                        className="inline-flex cursor-pointer items-center gap-1.5 self-end rounded-[var(--as-radius)] border border-[var(--as-border)] bg-transparent px-2.5 py-1 text-xs text-[var(--as-muted-fg)] transition-colors hover:bg-[var(--as-muted)] hover:text-[var(--as-fg)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--as-focus-ring)]"
                         onClick={() => setModal((c) => (c ? { ...c, manual: true } : c))}
                       >
+                        <PenLine className="size-3.5" aria-hidden />
                         {manualIdToggleLabel}
                       </button>
                     )}
@@ -496,107 +850,194 @@ export const ModelRegistry = React.forwardRef<HTMLDivElement, ModelRegistryProps
                     )}
                     <button
                       type="button"
-                      className="cursor-pointer self-start text-xs text-[var(--as-muted-fg)] underline-offset-2 hover:text-[var(--as-fg)] hover:underline"
+                      data-as="model-registry-manual-toggle"
+                      className="inline-flex cursor-pointer items-center gap-1.5 self-end rounded-[var(--as-radius)] border border-[var(--as-border)] bg-transparent px-2.5 py-1 text-xs text-[var(--as-muted-fg)] transition-colors hover:bg-[var(--as-muted)] hover:text-[var(--as-fg)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--as-focus-ring)]"
                       onClick={() => setModal((c) => (c ? { ...c, manual: !c.manual } : c))}
                     >
-                      {manualIdToggleLabel}
+                      {modal.manual ? (
+                        <>
+                          <Library className="size-3.5" aria-hidden />
+                          {useCatalogLabel}
+                        </>
+                      ) : (
+                        <>
+                          <PenLine className="size-3.5" aria-hidden />
+                          {manualIdToggleLabel}
+                        </>
+                      )}
                     </button>
                   </>
                 )
               ) : (
                 <p className="font-mono text-sm text-[var(--as-fg)]">{modal.externalId}</p>
               )}
-              <label className="block space-y-1 text-sm">
-                <span className="text-sm font-medium text-[var(--as-fg)]">{labelLabel}</span>
-                <input
-                  type="text"
-                  value={modal.label}
-                  onChange={(event) =>
-                    setModal((current) =>
-                      current
-                        ? { ...current, label: event.target.value, labelTouched: true }
-                        : current,
-                    )
-                  }
-                  className="w-full rounded-[var(--as-radius)] border border-[var(--as-border)] bg-[var(--as-surface)] px-3 py-2 text-sm text-[var(--as-fg)]"
-                />
-              </label>
               <div className="space-y-1">
-                <span className="text-sm font-medium text-[var(--as-fg)]">{capsLabel}</span>
-                <CapabilityChips
-                  caps={caps}
-                  selected={modal.caps}
-                  onToggle={toggleDraftCap}
-                  ariaLabel={capsLabel}
-                />
+                {!(wizard && kindFromCaps(modal.caps) !== 'text') ? (
+                  <span className="text-sm font-medium text-[var(--as-fg)]">{capsLabel}</span>
+                ) : null}
+                {wizard ? (
+                  kindFromCaps(modal.caps) === 'text' && activeModifiers.length > 0 ? (
+                    <div className="space-y-1">
+                      {modifiersLabel ? (
+                        <p className="text-[10px] font-semibold uppercase tracking-wide text-[var(--as-muted-fg)]">
+                          {modifiersLabel}
+                        </p>
+                      ) : null}
+                      <CapabilityChips
+                        caps={activeModifiers.map((value) => descriptorFor(value))}
+                        selected={modal.caps}
+                        onToggle={toggleDraftCap}
+                        ariaLabel={modifiersLabel ?? capsLabel}
+                      />
+                    </div>
+                  ) : null
+                ) : (
+                  <>
+                    <CapabilityChips
+                      caps={primaryCaps}
+                      selected={modal.caps}
+                      onToggle={toggleDraftCap}
+                      ariaLabel={capsLabel}
+                    />
+                    {activeModifiers.length > 0 ? (
+                      <div className="space-y-1 pt-1">
+                        {modifiersLabel ? (
+                          <p className="text-[10px] font-semibold uppercase tracking-wide text-[var(--as-muted-fg)]">
+                            {modifiersLabel}
+                          </p>
+                        ) : null}
+                        <CapabilityChips
+                          caps={activeModifiers.map((value) => descriptorFor(value))}
+                          selected={modal.caps}
+                          onToggle={toggleDraftCap}
+                          ariaLabel={modifiersLabel ?? capsLabel}
+                        />
+                      </div>
+                    ) : null}
+                    {standaloneDescriptors.length > 0 ? (
+                      <>
+                        <p className="flex items-center gap-2 pt-1 text-[10px] font-semibold uppercase tracking-wide text-[var(--as-muted-fg)]">
+                          <span className="h-px flex-1 bg-[var(--as-border)]" aria-hidden />
+                          {standaloneLabel}
+                          <span className="h-px flex-1 bg-[var(--as-border)]" aria-hidden />
+                        </p>
+                        <CapabilityChips
+                          caps={standaloneDescriptors}
+                          selected={modal.caps}
+                          onToggle={toggleDraftCap}
+                          ariaLabel={standaloneLabel}
+                        />
+                      </>
+                    ) : null}
+                  </>
+                )}
+                {modal.caps.includes('decision') && decisionTransport ? (
+                  <p className="flex items-center gap-1.5 text-xs text-[var(--as-muted-fg)]">
+                    <span>{decisionTransportLabel}:</span>
+                    <code className="rounded-[var(--as-radius-sm)] bg-[var(--as-muted)] px-1.5 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wide text-[var(--as-fg)]">
+                      {decisionTransport}
+                    </code>
+                  </p>
+                ) : null}
                 {capsHint ? (
                   <p className="text-xs text-[var(--as-muted-fg)]">{capsHint}</p>
                 ) : null}
               </div>
-              {reasoningEffortOptions ? (
-                <label className="block space-y-1 text-sm">
-                  <span className="text-sm font-medium text-[var(--as-fg)]">
-                    {reasoningEffortLabel}
-                  </span>
-                  <div className="flex flex-col gap-2 sm:flex-row">
-                    {modal.reasoningCustom ? (
+              <details
+                data-as="model-registry-advanced"
+                className="group rounded-[var(--as-radius)] border border-[var(--as-border)] bg-[var(--as-surface)]"
+              >
+                  <summary className="flex cursor-pointer list-none items-center gap-1.5 rounded-[var(--as-radius)] px-3 py-2 text-sm text-[var(--as-muted-fg)] transition-colors hover:bg-[var(--as-muted)] hover:text-[var(--as-fg)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--as-focus-ring)] [&::-webkit-details-marker]:hidden">
+                    <ChevronRight
+                      className="size-3.5 shrink-0 transition-transform group-open:rotate-90"
+                      aria-hidden
+                    />
+                    {advancedLabel}
+                  </summary>
+                  <div className="flex flex-col gap-4 border-t border-[var(--as-border)] p-3">
+                    <label className="block space-y-1 text-sm">
+                      <span className="text-sm font-medium text-[var(--as-fg)]">{labelLabel}</span>
                       <input
                         type="text"
-                        value={modal.reasoningEffort}
-                        placeholder={customOptionLabel}
-                        onChange={(event) => patchField('reasoningEffort', event.target.value)}
-                        className="w-full rounded-[var(--as-radius)] border border-[var(--as-border)] bg-[var(--as-surface)] px-3 py-2 font-mono text-sm text-[var(--as-fg)] sm:flex-1"
-                      />
-                    ) : (
-                      <select
-                        value={modal.reasoningCustom ? CUSTOM : modal.reasoningEffort}
+                        value={modal.label}
                         onChange={(event) =>
                           setModal((current) =>
                             current
-                              ? {
-                                  ...current,
-                                  reasoningCustom: event.target.value === CUSTOM,
-                                  reasoningEffort:
-                                    event.target.value === CUSTOM
-                                      ? current.reasoningEffort
-                                      : event.target.value,
-                                }
+                              ? { ...current, label: event.target.value, labelTouched: true }
                               : current,
                           )
                         }
-                        className="w-full rounded-[var(--as-radius)] border border-[var(--as-border)] bg-[var(--as-surface)] px-3 py-2 text-sm text-[var(--as-fg)] sm:w-40"
-                      >
-                        <option value="">—</option>
-                        {reasoningEffortOptions.map((option) => (
-                          <option key={option} value={option}>
-                            {option}
-                          </option>
-                        ))}
-                        <option value={CUSTOM}>{customOptionLabel}</option>
-                      </select>
-                    )}
+                        className="w-full rounded-[var(--as-radius)] border border-[var(--as-border)] bg-[var(--as-surface)] px-3 py-2 text-sm text-[var(--as-fg)]"
+                      />
+                    </label>
+                    {reasoningEffortOptions && hasParametricCaps(modal.caps) ? (
+                      <label className="block space-y-1 text-sm">
+                        <span className="text-sm font-medium text-[var(--as-fg)]">
+                          {reasoningEffortLabel}
+                        </span>
+                        <div className="flex flex-col gap-2 sm:flex-row">
+                          {modal.reasoningCustom ? (
+                            <input
+                              type="text"
+                              value={modal.reasoningEffort}
+                              placeholder={customOptionLabel}
+                              onChange={(event) => patchField('reasoningEffort', event.target.value)}
+                              className="w-full rounded-[var(--as-radius)] border border-[var(--as-border)] bg-[var(--as-surface)] px-3 py-2 font-mono text-sm text-[var(--as-fg)] sm:flex-1"
+                            />
+                          ) : (
+                            <select
+                              value={modal.reasoningCustom ? CUSTOM : modal.reasoningEffort}
+                              onChange={(event) =>
+                                setModal((current) =>
+                                  current
+                                    ? {
+                                        ...current,
+                                        reasoningCustom: event.target.value === CUSTOM,
+                                        reasoningEffort:
+                                          event.target.value === CUSTOM
+                                            ? current.reasoningEffort
+                                            : event.target.value,
+                                      }
+                                    : current,
+                                )
+                              }
+                              className="w-full rounded-[var(--as-radius)] border border-[var(--as-border)] bg-[var(--as-surface)] px-3 py-2 text-sm text-[var(--as-fg)] sm:w-40"
+                            >
+                              <option value="">—</option>
+                              {reasoningEffortOptions.map((option) => (
+                                <option key={option} value={option}>
+                                  {option}
+                                </option>
+                              ))}
+                              <option value={CUSTOM}>{customOptionLabel}</option>
+                            </select>
+                          )}
+                        </div>
+                      </label>
+                    ) : null}
+                    {hasParametricCaps(modal.caps) ? (
+                      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                        <NumberField
+                          label={temperatureLabel}
+                          value={modal.temperature}
+                          onChange={(value) => patchField('temperature', value)}
+                          onClear={() => patchField('temperature', '')}
+                          step="0.1"
+                          min="0"
+                          max="2"
+                        />
+                        <NumberField
+                          label={maxTokensLabel}
+                          value={modal.maxTokens}
+                          onChange={(value) => patchField('maxTokens', value)}
+                          onClear={() => patchField('maxTokens', '')}
+                          step="256"
+                          min="1"
+                        />
+                      </div>
+                    ) : null}
                   </div>
-                </label>
-              ) : null}
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                <NumberField
-                  label={temperatureLabel}
-                  value={modal.temperature}
-                  onChange={(value) => patchField('temperature', value)}
-                  onClear={() => patchField('temperature', '')}
-                  step="0.1"
-                  min="0"
-                  max="2"
-                />
-                <NumberField
-                  label={maxTokensLabel}
-                  value={modal.maxTokens}
-                  onChange={(value) => patchField('maxTokens', value)}
-                  onClear={() => patchField('maxTokens', '')}
-                  step="256"
-                  min="1"
-                />
-              </div>
+                </details>
               {(extraFields ?? []).map((field) => {
                 const value = modal.extra[field.key] ?? ''
                 const common =
@@ -629,9 +1070,11 @@ export const ModelRegistry = React.forwardRef<HTMLDivElement, ModelRegistryProps
                   {draftError}
                 </p>
               ) : null}
+                </>
+              )}
             </div>
             <ModalFooter>
-              {modal.mode === 'add' && onAddAll ? (
+              {modal.mode === 'add' && onAddAll && !(wizard && modal.step === 'kind') ? (
                 <Button
                   variant="outline"
                   size="sm"
@@ -666,10 +1109,12 @@ export const ModelRegistry = React.forwardRef<HTMLDivElement, ModelRegistryProps
               <Button variant="ghost" size="sm" onClick={resetModal}>
                 {cancelLabel}
               </Button>
-              <Button size="sm" onClick={submitModal}>
-                <Check aria-hidden />
-                {modal.mode === 'add' ? addDraftLabel : saveLabel}
-              </Button>
+              {!(wizard && modal.step === 'kind') ? (
+                <Button size="sm" onClick={submitModal}>
+                  <Check aria-hidden />
+                  {modal.mode === 'add' ? addDraftLabel : saveLabel}
+                </Button>
+              ) : null}
             </ModalFooter>
           </ModalContent>
         </Modal>

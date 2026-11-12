@@ -55,3 +55,37 @@ export const Sending = () => <ComposerStory sending onStop={() => {}} />
 export const Multiline = () => (
   <ComposerStory initialValue={'Paste a long text here —\nthe row exposes data-multiline\nonce the textarea grows past one line.'} />
 )
+
+const commandItems = [
+  { id: 'plan', label: 'Plan my revision', hint: 'calendar' },
+  { id: 'quiz', label: 'Quiz me', hint: 'flashcards' },
+  { id: 'summarize', label: 'Summarize notes', hint: 'markdown' },
+  { id: 'search', label: 'Search the catalog', hint: 'courses' },
+]
+
+export const SlashCommands = () => {
+  const [value, setValue] = useState('')
+  const [sent, setSent] = useState<string[]>([])
+  return (
+    <div style={{ maxWidth: 520 }}>
+      <p style={{ fontSize: 12, color: 'var(--as-muted-fg)', marginBottom: 8 }}>
+        Type <code>/</code> to open the palette — Enter selects, Escape dismisses. Clear the draft and press ArrowUp to recall.
+      </p>
+      <ChatComposer
+        value={value}
+        onValueChange={setValue}
+        onSubmit={() => {
+          setSent((entries) => [...entries, value])
+          setValue('')
+        }}
+        commands={{
+          trigger: '/',
+          items: commandItems,
+          onSelect: (id, token) =>
+            setValue((draft) => `${draft.slice(0, token.start)}/${id} `),
+        }}
+        history={sent}
+      />
+    </div>
+  )
+}
