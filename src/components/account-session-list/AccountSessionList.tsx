@@ -30,8 +30,10 @@ export interface AccountSessionListProps {
 /**
  * Presentational account-session list (plan 60 D5): one row per active
  * session with a preformatted detail line, optional device icon and badge
- * slot, a current-session badge and a per-row revoke button. Session
- * policies, date formatting and the surrounding summary stay app-side.
+ * slot, a current-session badge and a per-row revoke button whose accessible
+ * name carries the row label (`<revoke label> — <row label>`) while the
+ * visible text stays the label. Session policies, date formatting and the
+ * surrounding summary stay app-side.
  */
 export const AccountSessionList = React.forwardRef<HTMLDivElement, AccountSessionListProps>(
   function AccountSessionList(
@@ -124,6 +126,7 @@ export const AccountSessionList = React.forwardRef<HTMLDivElement, AccountSessio
                     data-revoking={isBusy || undefined}
                     disabled={isBusy}
                     aria-busy={isBusy || undefined}
+                    aria-label={`${isBusy ? labels.revoking : labels.revoke} — ${row.label}`}
                     onClick={() => onRevoke(row.id)}
                     className="shrink-0 cursor-pointer rounded-[var(--as-radius-sm)] border border-[var(--as-border)] px-2 py-1 text-xs font-medium text-[var(--as-fg)] transition-colors hover:border-[var(--as-danger)] hover:text-[var(--as-danger)] focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[var(--as-focus-ring)] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:border-[var(--as-border)] disabled:hover:text-[var(--as-fg)]"
                   >

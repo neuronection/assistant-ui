@@ -71,8 +71,23 @@ describe('AccountSessionList', () => {
     )
 
     const secondRow = rowElements(container)[1] as HTMLElement
-    await user.click(within(secondRow).getByRole('button', { name: 'Revoke' }))
+    await user.click(within(secondRow).getByRole('button', { name: 'Revoke — Pixel 9' }))
     expect(onRevoke).toHaveBeenCalledWith('session-2')
+  })
+
+  it('names each revoke button with its row label', () => {
+    const { container } = render(
+      <AccountSessionList rows={rows} onRevoke={vi.fn()} labels={labels} />,
+    )
+
+    const buttons = screen.getAllByRole('button', { name: /^Revoke — / }) as HTMLElement[]
+    const names = buttons.map((button) => button.getAttribute('aria-label'))
+    expect(names).toEqual(['Revoke — Chrome on Linux', 'Revoke — Pixel 9'])
+    expect(new Set(names).size).toBe(buttons.length)
+    for (const button of buttons) {
+      expect(button).toHaveTextContent('Revoke')
+    }
+    expect(within(rowElements(container)[0] as HTMLElement).getByText('Revoke')).toBeInTheDocument()
   })
 
   it('disables only the busy row and shows the revoking label', () => {
@@ -86,11 +101,14 @@ describe('AccountSessionList', () => {
     )
 
     const [busyRow, idleRow] = rowElements(container) as [HTMLElement, HTMLElement]
-    const busyButton = within(busyRow).getByRole('button', { name: 'Revoking…' })
+    const busyButton = within(busyRow).getByRole('button', {
+      name: 'Revoking… — Chrome on Linux',
+    })
     expect(busyButton).toBeDisabled()
     expect(busyButton).toHaveAttribute('aria-busy', 'true')
     expect(busyButton).toHaveAttribute('data-revoking')
-    const idleButton = within(idleRow).getByRole('button', { name: 'Revoke' })
+    expect(busyButton).toHaveTextContent('Revoking…')
+    const idleButton = within(idleRow).getByRole('button', { name: 'Revoke — Pixel 9' })
     expect(idleButton).toBeEnabled()
     expect(idleButton).not.toHaveAttribute('aria-busy')
   })
@@ -127,11 +145,13 @@ describe('AccountSessionList', () => {
     const onRevoke = vi.fn()
     render(<AccountSessionList rows={rows} onRevoke={onRevoke} labels={labels} />)
 
-    const buttons = screen.getAllByRole('button', { name: 'Revoke' }) as HTMLElement[]
+    const buttons = screen.getAllByRole('button', { name: /^Revoke — / }) as HTMLElement[]
     await user.tab()
     expect(buttons[0]).toHaveFocus()
     await user.tab()
     expect(buttons[1]).toHaveFocus()
+    expect(buttons[0]).toHaveAccessibleName('Revoke — Chrome on Linux')
+    expect(buttons[1]).toHaveAccessibleName('Revoke — Pixel 9')
 
     await user.keyboard('{Enter}')
     expect(onRevoke).toHaveBeenLastCalledWith('session-2')

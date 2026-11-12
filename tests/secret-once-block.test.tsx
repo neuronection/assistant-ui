@@ -113,6 +113,27 @@ describe('SecretOnceBlock', () => {
     expect(screen.getByRole('button', { name: 'Copy' })).toBeInTheDocument()
   })
 
+  it('resets the copied state when the secret changes', async () => {
+    const user = userEvent.setup()
+    withClipboard(Promise.resolve())
+    const { container, rerender } = render(
+      <SecretOnceBlock secret="first-secret" warning="Shown once." />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Copy' }))
+    expect(await screen.findByRole('button', { name: 'Copied' })).toBeInTheDocument()
+
+    rerender(<SecretOnceBlock secret="second-secret" warning="Shown once." />)
+    expect(screen.getByRole('button', { name: 'Copy' })).toBeInTheDocument()
+    expect(screen.getByText('second-secret')).toBeInTheDocument()
+    expect(container.querySelector('[data-as="secret-once-block"]')).not.toHaveAttribute(
+      'data-copied',
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Copy' }))
+    expect(navigator.clipboard.writeText).toHaveBeenLastCalledWith('second-secret')
+  })
+
   it('applies testId to the root element', () => {
     const { container } = render(
       <SecretOnceBlock secret={secret} warning="Shown once." testId="reveal-secret" />,

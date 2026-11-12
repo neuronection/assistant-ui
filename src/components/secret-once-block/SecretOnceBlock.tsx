@@ -39,8 +39,8 @@ function writeClipboard(value: string): Promise<void> {
 /**
  * Presentational secret-once body (plan 60 D5): the shown-once value in a
  * breaking monospace block, the host's warning copy and a real copy button
- * with transient copied feedback. Modal chrome, secret minting and storage
- * stay app-side.
+ * with transient copied feedback (reset when the shown secret changes).
+ * Modal chrome, secret minting and storage stay app-side.
  */
 export const SecretOnceBlock = React.forwardRef<HTMLDivElement, SecretOnceBlockProps>(
   function SecretOnceBlock(
@@ -64,6 +64,14 @@ export const SecretOnceBlock = React.forwardRef<HTMLDivElement, SecretOnceBlockP
       },
       [],
     )
+
+    React.useEffect(() => {
+      if (timer.current) {
+        clearTimeout(timer.current)
+        timer.current = null
+      }
+      setCopied(false)
+    }, [secret])
 
     const handleCopy = () => {
       writeClipboard(secret).then(
