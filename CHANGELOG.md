@@ -1,5 +1,21 @@
 # @neuronection/assistant-ui
 
+## 0.85.0
+
+### Minor Changes
+
+- [`31fe752`](https://github.com/neuronection/assistant-ui/commit/31fe752d2e8bb94f5ab13c44d3f45803c85784f4) Thanks [@constLiakos](https://github.com/constLiakos)! - Add `CommandList` — an inline, controlled command listbox with grouped items, per-group fuzzy or app-owned filtering, keyword search, disabled semantics, an IME-safe keyboard contract, active-item reset on filtering and result-count/empty live regions.
+
+- [`31fe752`](https://github.com/neuronection/assistant-ui/commit/31fe752d2e8bb94f5ab13c44d3f45803c85784f4) Thanks [@constLiakos](https://github.com/constLiakos)! - Add `CommandPalette` — a controlled modal command surface built on the library `Modal`, rendering `CommandList` with focus in the search field, focus restore on close and Escape/overlay dismissal.
+
+- [`5c95d31`](https://github.com/neuronection/assistant-ui/commit/5c95d31edaedb087453c95d743d69d6494b8cafe) Thanks [@constLiakos](https://github.com/constLiakos)! - Add `DictationUnavailable`, the presentational sibling state for
+  speech-to-text capability gates: an app-resolved reason plus an optional
+  settings action (a label without a handler renders nothing). `DictationButton`
+  and its props are unchanged; apps choose between the mic and the unavailable
+  surface.
+
+- [`31fe752`](https://github.com/neuronection/assistant-ui/commit/31fe752d2e8bb94f5ab13c44d3f45803c85784f4) Thanks [@constLiakos](https://github.com/constLiakos)! - Add `ShortcutList` — a presentational grouped shortcut list with section headings, `<kbd>` keycaps and disabled entries; the app keeps the shell, platform chords and actions.
+
 ## 0.84.0
 
 ### Minor Changes
