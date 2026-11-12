@@ -65,6 +65,7 @@ const LIBRARY_COMPONENTS = [
   'RichTextEditor',
   'DictationButton',
   'DictationStrip',
+  'DictationUnavailable',
   'TextDiffView',
   'MarkdownDiffView',
   'ComboboxMulti',

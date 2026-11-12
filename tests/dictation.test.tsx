@@ -6,6 +6,7 @@ import { axe } from 'jest-axe'
 import {
   DictationButton,
   DictationStrip,
+  DictationUnavailable,
   useDictation,
 } from '../src/components/dictation'
 
@@ -215,6 +216,63 @@ describe('DictationStrip', () => {
       />,
     )
     expect((await axe(failure.container)).violations).toEqual([])
+  })
+})
+
+describe('DictationUnavailable', () => {
+  it('renders the reason and detail without an action', () => {
+    render(
+      <DictationUnavailable
+        label="Dictation unavailable"
+        detail="No speech-to-text model is assigned."
+      />,
+    )
+    expect(screen.getByRole('note')).toHaveTextContent(
+      'Dictation unavailable No speech-to-text model is assigned.',
+    )
+    expect(screen.queryByRole('button')).toBeNull()
+  })
+
+  it('runs the app action from the keyboard', async () => {
+    const user = userEvent.setup()
+    const onClick = vi.fn()
+    render(
+      <DictationUnavailable
+        label="Dictation unavailable"
+        action={{ label: 'Open voice settings', onClick }}
+      />,
+    )
+    await user.tab()
+    expect(screen.getByRole('button', { name: 'Open voice settings' })).toHaveFocus()
+    await user.keyboard('{Enter}')
+    await user.keyboard(' ')
+    expect(onClick).toHaveBeenCalledTimes(2)
+  })
+
+  it('never renders a dead control for a label without a handler', () => {
+    render(
+      <DictationUnavailable
+        label="Dictation unavailable"
+        action={{ label: 'Open voice settings' } as never}
+      />,
+    )
+    expect(screen.queryByRole('button')).toBeNull()
+  })
+
+  it('has no axe violations with and without an action', async () => {
+    const withAction = render(
+      <DictationUnavailable
+        label="Dictation unavailable"
+        detail="No speech-to-text model is assigned."
+        action={{ label: 'Open voice settings', onClick: () => {} }}
+      />,
+    )
+    expect((await axe(withAction.container)).violations).toEqual([])
+    withAction.unmount()
+    const withoutAction = render(
+      <DictationUnavailable label="Dictation unavailable" />,
+    )
+    expect((await axe(withoutAction.container)).violations).toEqual([])
   })
 })
 

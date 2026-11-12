@@ -6,6 +6,10 @@ export {
   type DictationStripLabels,
 } from './DictationButton'
 export {
+  DictationUnavailable,
+  type DictationUnavailableProps,
+} from './DictationUnavailable'
+export {
   useDictation,
   type UseDictationOptions,
   type DictationStatus,

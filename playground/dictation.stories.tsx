@@ -1,5 +1,10 @@
 import { useState } from 'react'
-import { DictationButton, DictationStrip, useDictation } from '../src/components/dictation'
+import {
+  DictationButton,
+  DictationStrip,
+  DictationUnavailable,
+  useDictation,
+} from '../src/components/dictation'
 import {
   useAiTextTransform,
   type AiTextTransformTransport,
@@ -44,6 +49,20 @@ function DictationDemo() {
 }
 
 export const Dictation = () => <DictationDemo />
+
+export const Unavailable = () => (
+  <div style={{ display: 'flex', flexDirection: 'column', gap: 12, maxWidth: 480 }}>
+    <DictationUnavailable
+      label="Dictation unavailable"
+      detail="No speech-to-text model is assigned."
+      action={{ label: 'Open voice settings', onClick: () => undefined }}
+    />
+    <DictationUnavailable
+      label="Dictation unavailable"
+      detail="No speech-to-text model is assigned."
+    />
+  </div>
+)
 
 const fakeTransport: AiTextTransformTransport = {
   start: async () => 'demo',
