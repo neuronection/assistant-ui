@@ -293,4 +293,83 @@ describe('IntegrationConfigForm — schema hints (x-choices / x-presets / x-sect
     expect(screen.getByText('Advanced')).toBeTruthy()
     expect(screen.getByText('Pause')).toBeTruthy()
   })
+
+  it('bounded numeric fields gain a Custom entry that swaps to a bounded input', async () => {
+    const user = userEvent.setup()
+    const CUSTOM_SCHEMA: IntegrationConfigSchema = {
+      type: 'object',
+      properties: {
+        pages: {
+          type: 'number',
+          title: 'Pages',
+          minimum: 1,
+          maximum: 10,
+          'x-choices': [
+            { value: '1', label: '1' },
+            { value: '2', label: '2' },
+          ],
+          'x-custom-label': 'Custom…',
+        },
+      },
+    }
+    const fields = parseIntegrationConfigSchema(CUSTOM_SCHEMA)
+
+    function Harness() {
+      const [values, setValues] = React.useState<IntegrationConfigValues>({})
+      return (
+        <IntegrationConfigForm
+          fields={fields}
+          values={values}
+          onValuesChange={setValues}
+          onSave={() => {}}
+        />
+      )
+    }
+    render(<Harness />)
+
+    // the custom entry renders as a trailing chip
+    await user.click(screen.getByTestId('integration-config-pages-custom'))
+    const input = screen.getByTestId('integration-config-pages-custom-input')
+    expect(input).toHaveAttribute('type', 'number')
+
+    // typing emits the numeric value
+    await user.type(input, '4')
+    expect(screen.getByTestId('integration-config-pages-custom-input')).toHaveValue(4)
+
+    // picking a preset again returns to the chips
+    await user.click(screen.getByRole('button', { name: '2' }))
+    expect(screen.queryByTestId('integration-config-pages-custom-input')).toBeNull()
+  })
+
+  it('a stored value outside the presets opens the custom input prefilled', () => {
+    render(
+      <IntegrationConfigForm
+        fields={parseIntegrationConfigSchema({
+          type: 'object',
+          properties: {
+            pages: {
+              type: 'number',
+              title: 'Pages',
+              minimum: 1,
+              maximum: 10,
+              'x-choices': [
+                { value: '1', label: '1' },
+                { value: '2', label: '2' },
+              ],
+              'x-custom-label': 'Custom…',
+            },
+          },
+        })}
+        values={{ pages: '7' }}
+        onValuesChange={() => {}}
+        onSave={() => {}}
+      />,
+    )
+    expect(screen.getByTestId('integration-config-pages-custom')).toBeInTheDocument()
+    // string-typed host values (the career app keeps options as strings)
+    // still prefill the input
+    expect(
+      (screen.getByTestId('integration-config-pages-custom-input') as HTMLInputElement).value,
+    ).toBe('7')
+  })
 })

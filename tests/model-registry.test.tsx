@@ -798,6 +798,55 @@ describe('ModelRegistry extra fields and enable toggle', () => {
     )
   })
 
+  it('a catalog pick keeps an explicitly chosen standalone kind (id-based caps never re-classify it)', async () => {
+    const user = userEvent.setup()
+    const onAddModel = vi.fn()
+    render(
+      <RegistryDemo
+        onAddModel={onAddModel}
+        standaloneCaps={['embeddings', 'audio', 'decision']}
+      />,
+    )
+    const dialog = await openAddModal(user)
+    // the user declares the model is an audio (tts/stt) model — ids like
+    // `lfm3-audio` carry no classifier token, so catalog inference alone
+    // would misclassify it
+    await user.click(within(dialog).getByRole('button', { name: 'Audio' }))
+    await user.click(within(dialog).getByRole('combobox', { name: 'Model' }))
+    await user.click(screen.getByRole('option', { name: 'llava' }))
+    await user.click(within(dialog).getByRole('button', { name: 'Add model' }))
+    expect(onAddModel).toHaveBeenCalledWith('p1', {
+      externalId: 'llava',
+      label: 'Llava',
+      caps: ['audio'],
+      reasoningEffort: '',
+      temperature: null,
+      maxTokens: null,
+    })
+  })
+
+  it('a catalog pick still corrects an undeclared or text-kind draft (llava → vision)', async () => {
+    const user = userEvent.setup()
+    const onAddModel = vi.fn()
+    render(
+      <RegistryDemo
+        onAddModel={onAddModel}
+        standaloneCaps={['embeddings', 'audio', 'decision']}
+      />,
+    )
+    const dialog = await openAddModal(user)
+    // explicit LLM (text) kind — the catalog entry's caps still classify
+    // the pick
+    await user.click(within(dialog).getByRole('button', { name: 'Text' }))
+    await user.click(within(dialog).getByRole('combobox', { name: 'Model' }))
+    await user.click(screen.getByRole('option', { name: 'llava' }))
+    await user.click(within(dialog).getByRole('button', { name: 'Add model' }))
+    expect(onAddModel).toHaveBeenCalledWith(
+      'p1',
+      expect.objectContaining({ externalId: 'llava', caps: ['text', 'vision'] }),
+    )
+  })
+
   it('generation options render per capability: hidden for standalone-only, shown for chat caps', async () => {
     const user = userEvent.setup()
     render(

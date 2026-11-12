@@ -75,3 +75,8 @@ Manifests can drive richer field rendering without app code:
   (`integrationConfigPresets(schema)`).
 
 Fields without hints render exactly as before — the hints are additive.
+
+
+## Custom numeric entry (plan 154 sources)
+
+Bounded numeric fields with `x-choices` also render a trailing **Custom…** entry (label via the optional `customLabel` / schema `x-custom-label`): picking it swaps the chips for a bounded number input, and a stored value outside the presets opens the custom input prefilled — presets stay one click away. The numeric bounds drive the input's clamp; values out of bounds surface through the host's validation display.

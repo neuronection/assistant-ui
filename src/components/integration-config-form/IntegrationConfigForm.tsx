@@ -114,6 +114,8 @@ export const IntegrationConfigForm = React.forwardRef<
   )
 
   const [secrets, setSecrets] = React.useState<Record<string, string>>({})
+  /** Numeric-choice fields with the Custom entry active (field name -> true). */
+  const [customNumeric, setCustomNumeric] = React.useState<Record<string, boolean>>({})
 
   const setValue = (name: string, value: IntegrationConfigValues[string]) => {
     onValuesChange({ ...values, [name]: value })
@@ -263,6 +265,16 @@ export const IntegrationConfigForm = React.forwardRef<
         }
         setValue(field.name, selected.includes(value) ? null : value)
       }
+
+      // Numeric bounded fields gain a trailing "Custom…" entry: picking it
+      // swaps the chips for a bounded number input, so operators can leave
+      // the presets without losing them (plan 154). The preset row returns
+      // as soon as a preset is picked again.
+      const numericCustom =
+        field.type === 'number' && field.minimum != null && field.maximum != null
+      const outsidePresets =
+        !field.csv && current !== '' && !choices.some((choice) => choice.value === current)
+      const customShown = numericCustom && (customNumeric[field.name] || outsidePresets)
       return (
         <div key={field.name} className="space-y-1">
           {label}
@@ -271,10 +283,13 @@ export const IntegrationConfigForm = React.forwardRef<
               <button
                 key={choice.value}
                 type="button"
-                aria-pressed={selected.includes(choice.value)}
-                onClick={() => toggle(choice.value)}
+                aria-pressed={selected.includes(choice.value) && !customShown}
+                onClick={() => {
+                  setCustomNumeric((prev) => ({ ...prev, [field.name]: false }))
+                  toggle(choice.value)
+                }}
                 className={`rounded-full border px-3 py-1 text-sm transition-colors ${
-                  selected.includes(choice.value)
+                  selected.includes(choice.value) && !customShown
                     ? 'border-[var(--as-focus-ring)] bg-[var(--as-surface-raised)] font-medium'
                     : 'border-[var(--as-border)] bg-[var(--as-surface)] hover:bg-[var(--as-muted)]'
                 }`}
@@ -282,7 +297,40 @@ export const IntegrationConfigForm = React.forwardRef<
                 {choice.label}
               </button>
             ))}
+            {numericCustom ? (
+              <button
+                type="button"
+                aria-pressed={customShown}
+                onClick={() => setCustomNumeric((prev) => ({ ...prev, [field.name]: true }))}
+                className={`rounded-full border px-3 py-1 text-sm transition-colors ${
+                  customShown
+                    ? 'border-[var(--as-focus-ring)] bg-[var(--as-surface-raised)] font-medium'
+                    : 'border-[var(--as-border)] bg-[var(--as-surface)] hover:bg-[var(--as-muted)]'
+                }`}
+                data-testid={`integration-config-${field.name}-custom`}
+              >
+                {field.customLabel ?? 'Custom…'}
+              </button>
+            ) : null}
           </div>
+          {customShown ? (
+            <input
+              type="number"
+              className={inputClass}
+              value={
+                values[field.name] == null || values[field.name] === ''
+                  ? ''
+                  : String(values[field.name])
+              }
+              min={field.minimum ?? undefined}
+              max={field.maximum ?? undefined}
+              aria-label={field.title ?? field.name}
+              data-testid={`integration-config-${field.name}-custom-input`}
+              onChange={(event) =>
+                setValue(field.name, event.target.value === '' ? null : Number(event.target.value))
+              }
+            />
+          ) : null}
           {field.description ? (
             <p className="text-xs text-[var(--as-muted-fg)]">{field.description}</p>
           ) : null}
