@@ -48,8 +48,9 @@ export const MenuItem = React.forwardRef<
       disabled={disabled || pending}
       aria-busy={pending || undefined}
       className={cn(
-        'flex w-full cursor-pointer select-none items-center gap-2 rounded-[calc(var(--as-radius-sm)-2px)] px-2 py-1.5 text-left text-sm outline-none transition-colors focus:bg-[var(--as-secondary)] data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg]:size-4 [&_svg]:shrink-0',
-        danger && 'text-[var(--as-danger)] focus:bg-[var(--as-danger)]/10',
+        'flex w-full cursor-pointer select-none items-center gap-2 rounded-[calc(var(--as-radius-sm)-2px)] px-2 py-1.5 text-left text-sm outline-none transition-colors focus:bg-[var(--as-secondary)] data-[highlighted]:bg-[var(--as-secondary)] data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg]:size-4 [&_svg]:shrink-0',
+        danger &&
+          'text-[var(--as-danger)] focus:bg-[var(--as-danger)]/10 data-[highlighted]:bg-[var(--as-danger)]/10',
         className,
       )}
       {...props}

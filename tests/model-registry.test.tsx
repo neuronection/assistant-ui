@@ -20,6 +20,7 @@ const caps: CapabilityDescriptor[] = [
   { value: 'tools', label: 'Tools' },
   { value: 'embeddings', label: 'Embeddings' },
   { value: 'audio', label: 'Audio' },
+  { value: 'decision', label: 'Decision' },
 ]
 
 describe('CapabilityChips', () => {
@@ -88,6 +89,14 @@ const models: ModelRegistryModel[] = [
     reasoningEffort: 'medium',
     temperature: 0.4,
   },
+  {
+    id: 'm2',
+    providerId: 'p1',
+    externalId: 'jev-latest',
+    label: 'Jev (latest)',
+    caps: ['decision'],
+    enabled: true,
+  },
 ]
 
 const remote: ModelRegistryRemoteModel[] = [
@@ -145,6 +154,19 @@ async function openAddModal(user: ReturnType<typeof userEvent.setup>) {
 }
 
 describe('ModelRegistry', () => {
+  it('renders a decision-capable model with the decision chip (plan 26 / ADR-0032)', () => {
+    render(<RegistryDemo />)
+    const id = screen.getByText('jev-latest')
+    const row = id.closest('div')
+    expect(row).not.toBeNull()
+    // the decision model carries the decision chip and no text chip
+    expect(within(row as HTMLElement).getByText('Decision')).toBeInTheDocument()
+    expect(within(row as HTMLElement).queryByText('Text')).not.toBeInTheDocument()
+    // the text/vision model keeps its own chips — decision never leaks there
+    const textRow = screen.getByText('qwen2.5-vl').closest('div')
+    expect(within(textRow as HTMLElement).queryByText('Decision')).not.toBeInTheDocument()
+  })
+
   it('expands and collapses a provider via its header', async () => {
     const user = userEvent.setup()
     render(<RegistryDemo />)
@@ -195,6 +217,7 @@ describe('ModelRegistry', () => {
     const dialog = await openAddModal(user)
     await user.click(within(dialog).getByRole('combobox', { name: 'Model' }))
     await user.click(screen.getByRole('option', { name: 'gpt-4o-mini' }))
+    await user.click(within(dialog).getByText('Advanced'))
     expect(within(dialog).getByLabelText('Display label')).toHaveValue('GPT 4o Mini')
     await user.type(within(dialog).getByLabelText('Display label'), '!')
     await user.click(within(dialog).getByRole('button', { name: 'Add model' }))
@@ -225,6 +248,7 @@ describe('ModelRegistry', () => {
     const dialog = await openAddModal(user)
     await user.click(within(dialog).getByRole('combobox', { name: 'Model' }))
     await user.click(screen.getByRole('option', { name: 'llava' }))
+    await user.click(within(dialog).getByText('Advanced'))
     await user.selectOptions(within(dialog).getByLabelText('Reasoning effort'), 'high')
     await user.click(within(dialog).getByRole('button', { name: 'Add model' }))
     expect(onAddModel).toHaveBeenCalledWith(
@@ -241,6 +265,7 @@ describe('ModelRegistry', () => {
     const dialog = await openAddModal(user)
     await user.click(within(dialog).getByRole('combobox', { name: 'Model' }))
     await user.click(screen.getByRole('option', { name: 'llava' }))
+    await user.click(within(dialog).getByText('Advanced'))
     await user.selectOptions(within(dialog).getByLabelText('Reasoning effort'), '__custom__')
     await user.type(within(dialog).getByLabelText('Reasoning effort'), 'wizard')
     await user.click(within(dialog).getByRole('button', { name: 'Add model' }))
@@ -250,6 +275,29 @@ describe('ModelRegistry', () => {
     )
   })
 
+  it('hides the label and tuning fields under a collapsed Advanced disclosure', async () => {
+    const user = userEvent.setup()
+    render(<RegistryDemo />)
+    const dialog = await openAddModal(user)
+    await user.click(within(dialog).getByRole('combobox', { name: 'Model' }))
+    await user.click(screen.getByRole('option', { name: 'llava' }))
+    const advanced = within(dialog).getByText('Advanced').closest('details')
+    expect(advanced).not.toBeNull()
+    expect(advanced).not.toHaveAttribute('open')
+    await user.click(within(dialog).getByText('Advanced'))
+    expect(advanced).toHaveAttribute('open')
+    expect(within(dialog).getByLabelText('Display label')).toBeInTheDocument()
+    expect(within(dialog).getByLabelText('Temperature')).toBeInTheDocument()
+    expect(within(dialog).getByLabelText('Reasoning effort')).toBeInTheDocument()
+  })
+
+  it('labels the advanced disclosure via advancedLabel', async () => {
+    const user = userEvent.setup()
+    render(<RegistryDemo advancedLabel="More settings" />)
+    const dialog = await openAddModal(user)
+    expect(within(dialog).getByText('More settings')).toBeInTheDocument()
+  })
+
   it('sets and clears temperature and max tokens', async () => {
     const user = userEvent.setup()
     const onAddModel = vi.fn()
@@ -257,6 +305,7 @@ describe('ModelRegistry', () => {
     const dialog = await openAddModal(user)
     await user.click(within(dialog).getByRole('combobox', { name: 'Model' }))
     await user.click(screen.getByRole('option', { name: 'llava' }))
+    await user.click(within(dialog).getByText('Advanced'))
     await user.type(within(dialog).getByLabelText('Temperature'), '0.7')
     await user.type(within(dialog).getByLabelText('Max tokens'), '4096')
     await user.click(within(dialog).getByRole('button', { name: 'Add model' }))
@@ -274,6 +323,7 @@ describe('ModelRegistry', () => {
     const dialog = await openAddModal(user)
     await user.click(within(dialog).getByRole('combobox', { name: 'Model' }))
     await user.click(screen.getByRole('option', { name: 'llava' }))
+    await user.click(within(dialog).getByText('Advanced'))
     await user.type(within(dialog).getByLabelText('Temperature'), '0.9')
     await user.click(within(dialog).getByRole('button', { name: 'Temperature clear' }))
     await user.click(within(dialog).getByRole('button', { name: 'Add model' }))
@@ -283,6 +333,31 @@ describe('ModelRegistry', () => {
     )
   })
 
+  it('renders a compact context line with the kind chip on the details step (wizard)', async () => {
+    const user = userEvent.setup()
+    render(<RegistryDemo standaloneCaps={['embeddings', 'decision']} />)
+    const dialog = await openAddModal(user)
+    await user.click(within(dialog).getByRole('button', { name: 'Text' }))
+    const context = dialog.querySelector('[data-as="model-registry-provider-context"]')
+    expect(context).not.toBeNull()
+    expect(context).toHaveTextContent('Ollama (local)')
+    expect(context).toHaveTextContent('Text')
+    const change = within(context as HTMLElement).getByRole('button', { name: 'Change type' })
+    await user.click(change)
+    expect(
+      within(dialog).getByRole('group', { name: 'What kind of model is this?' }),
+    ).toBeInTheDocument()
+  })
+
+  it('has no axe violations with the wizard context line and the advanced disclosure open', async () => {
+    const user = userEvent.setup()
+    render(<RegistryDemo standaloneCaps={['embeddings', 'decision']} />)
+    const dialog = await openAddModal(user)
+    await user.click(within(dialog).getByRole('button', { name: 'Text' }))
+    await user.click(within(dialog).getByText('Advanced'))
+    expect(await axe(document.body)).toHaveNoViolations()
+  })
+
   it('edits an existing model through the same modal', async () => {
     const user = userEvent.setup()
     const onUpdateModel = vi.fn()
@@ -290,6 +365,7 @@ describe('ModelRegistry', () => {
     await user.click(await screen.findByRole('button', { name: 'Edit qwen2.5-vl' }))
     const dialog = await screen.findByRole('dialog')
     expect(within(dialog).getByText('qwen2.5-vl')).toBeInTheDocument()
+    await user.click(within(dialog).getByText('Advanced'))
     await user.type(within(dialog).getByLabelText('Display label'), '2')
     await user.clear(within(dialog).getByLabelText('Temperature'))
     await user.type(within(dialog).getByLabelText('Temperature'), '0.9')
@@ -502,5 +578,341 @@ describe('ModelRegistry extra fields and enable toggle', () => {
       <RegistryDemo onToggleEnabled={vi.fn()} extraFields={extraFields} />,
     )
     expect(await axe(container)).toHaveNoViolations()
+  })
+
+  it('shows the provider context (name + base URL on hover) at the top of the add modal', async () => {
+    const user = userEvent.setup()
+    render(<RegistryDemo />)
+    const dialog = await openAddModal(user)
+    const context = within(dialog).getByText('Ollama (local)')
+    expect(context).toBeInTheDocument()
+    expect(context).toHaveAttribute('title', 'http://localhost:11434/v1')
+  })
+
+  it('manual toggle is a labelled ghost control and swaps direction copy', async () => {
+    const user = userEvent.setup()
+    render(<RegistryDemo />)
+    const dialog = await openAddModal(user)
+    const manual = within(dialog).getByRole('button', { name: /enter the model id manually/i })
+    expect(manual).toHaveAttribute('data-as', 'model-registry-manual-toggle')
+    await user.click(manual)
+    expect(within(dialog).getByLabelText('Model')).toBeInTheDocument()
+    expect(
+      within(dialog).getByRole('button', { name: /pick from the catalog/i }),
+    ).toBeInTheDocument()
+  })
+
+  it('capImplications: vision/tools imply text; deselecting text drops its dependents', async () => {
+    const user = userEvent.setup()
+    const onAddModel = vi.fn()
+    render(
+      <RegistryDemo
+        onAddModel={onAddModel}
+        capImplications={{ vision: ['text'], tools: ['text'] }}
+      />,
+    )
+    const dialog = await openAddModal(user)
+    await user.click(within(dialog).getByRole('button', { name: /manual/i }))
+    await user.type(within(dialog).getByLabelText('Model'), 'qwen3-vl')
+    // selecting a modifier auto-enables its text base
+    await user.click(within(dialog).getByRole('button', { name: 'Vision' }))
+    expect(within(dialog).getByRole('button', { name: 'Text' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    )
+    await user.click(within(dialog).getByRole('button', { name: 'Tools' }))
+    expect(within(dialog).getByRole('button', { name: 'Tools' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    )
+    // deselecting the base drops everything that implies it — the modifier
+    // row itself disappears with it
+    await user.click(within(dialog).getByRole('button', { name: 'Text' }))
+    expect(within(dialog).getByRole('button', { name: 'Text' })).toHaveAttribute(
+      'aria-pressed',
+      'false',
+    )
+    expect(within(dialog).queryByRole('button', { name: 'Vision' })).toBeNull()
+    expect(within(dialog).queryByRole('button', { name: 'Tools' })).toBeNull()
+    await user.click(within(dialog).getByRole('button', { name: 'Add model' }))
+    expect(onAddModel).toHaveBeenCalledWith(
+      'p1',
+      expect.objectContaining({ externalId: 'qwen3-vl', caps: [] }),
+    )
+  })
+
+  it('defaultCaps seeds the add modal with the app-declared chat family', async () => {
+    const user = userEvent.setup()
+    const onAddModel = vi.fn()
+    render(
+      <RegistryDemo
+        onAddModel={onAddModel}
+        capImplications={{ vision: ['text'], tools: ['text'] }}
+        defaultCaps={['text', 'vision', 'tools']}
+      />,
+    )
+    const dialog = await openAddModal(user)
+    for (const cap of ['Text', 'Vision', 'Tools']) {
+      expect(within(dialog).getByRole('button', { name: cap })).toHaveAttribute(
+        'aria-pressed',
+        'true',
+      )
+    }
+    await user.click(within(dialog).getByRole('button', { name: /manual/i }))
+    await user.type(within(dialog).getByLabelText('Model'), 'qwen3-vl')
+    await user.click(within(dialog).getByRole('button', { name: 'Add model' }))
+    expect(onAddModel).toHaveBeenCalledWith(
+      'p1',
+      expect.objectContaining({ externalId: 'qwen3-vl', caps: ['text', 'vision', 'tools'] }),
+    )
+  })
+
+  it('defaultCaps normalizes a standalone default and stamps the decision transport', async () => {
+    const user = userEvent.setup()
+    const onAddModel = vi.fn()
+    render(
+      <RegistryDemo
+        onAddModel={onAddModel}
+        standaloneCaps={['embeddings', 'audio', 'decision']}
+        defaultCaps={['decision']}
+        decisionTransport="systemone"
+        decisionTransportLabel="Transport"
+      />,
+    )
+    const dialog = await openAddModal(user)
+    // step 1 — the decision card is pre-pressed from defaultCaps
+    expect(within(dialog).getByRole('button', { name: 'Decision' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    )
+    await user.click(within(dialog).getByRole('button', { name: 'Decision' }))
+    // step 2 — the transport row rides the seeded kind
+    expect(within(dialog).getByText('Transport:')).toBeInTheDocument()
+    expect(within(dialog).getByText('systemone')).toBeInTheDocument()
+    await user.click(within(dialog).getByRole('button', { name: /manual/i }))
+    await user.type(within(dialog).getByLabelText('Model'), 'nimble')
+    await user.click(within(dialog).getByRole('button', { name: 'Add model' }))
+    expect(onAddModel).toHaveBeenCalledWith(
+      'p1',
+      expect.objectContaining({ externalId: 'nimble', caps: ['decision'], decisionTransport: 'systemone' }),
+    )
+  })
+
+  it('defaultCaps as a function decides per provider', async () => {
+    const user = userEvent.setup()
+    const onAddModel = vi.fn()
+    const first = render(
+      <RegistryDemo
+        onAddModel={onAddModel}
+        capImplications={{ vision: ['text'], tools: ['text'] }}
+        defaultCaps={(provider) =>
+          provider.type === 'decision' ? ['decision'] : ['text', 'vision', 'tools']
+        }
+      />,
+    )
+    const dialog = await openAddModal(user)
+    for (const cap of ['Text', 'Vision', 'Tools']) {
+      expect(within(dialog).getByRole('button', { name: cap })).toHaveAttribute(
+        'aria-pressed',
+        'true',
+      )
+    }
+    first.unmount()
+    // returning undefined falls back to the first combinable cap
+    render(
+      <RegistryDemo
+        onAddModel={vi.fn()}
+        defaultCaps={() => undefined}
+      />,
+    )
+    const fallbackDialog = await openAddModal(user)
+    expect(within(fallbackDialog).getByRole('button', { name: 'Text' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    )
+    // the nested row is visible (base selected) but nothing extra is pressed
+    expect(within(fallbackDialog).getByRole('button', { name: 'Vision' })).toHaveAttribute(
+      'aria-pressed',
+      'false',
+    )
+  })
+
+  it('modifier caps render in a nested row only while their base is selected', async () => {
+    const user = userEvent.setup()
+    render(
+      <RegistryDemo
+        capImplications={{ vision: ['text'], tools: ['text'] }}
+        modifiersLabel="Also supports"
+      />,
+    )
+    const dialog = await openAddModal(user)
+    // text is the seeded base — the modifier row is visible under it
+    expect(within(dialog).getByText('Also supports')).toBeTruthy()
+    expect(within(dialog).getByRole('button', { name: 'Vision' })).toBeTruthy()
+    // deselecting the base hides the modifier row entirely
+    await user.click(within(dialog).getByRole('button', { name: 'Text' }))
+    expect(within(dialog).queryByText('Also supports')).toBeNull()
+    expect(within(dialog).queryByRole('button', { name: 'Vision' })).toBeNull()
+    expect(within(dialog).queryByRole('button', { name: 'Tools' })).toBeNull()
+    // re-selecting the base brings the row back
+    await user.click(within(dialog).getByRole('button', { name: 'Text' }))
+    expect(within(dialog).getByRole('button', { name: 'Vision' })).toBeTruthy()
+    expect(within(dialog).getByRole('button', { name: 'Tools' })).toBeTruthy()
+  })
+
+  it('kind cards pick the kind; change type returns with the typed input preserved', async () => {
+    const user = userEvent.setup()
+    const onAddModel = vi.fn()
+    render(
+      <RegistryDemo
+        onAddModel={onAddModel}
+        standaloneCaps={['embeddings', 'audio', 'decision']}
+        standaloneLabel="Standalone kind"
+      />,
+    )
+    const dialog = await openAddModal(user)
+    // step 1 — the LLM card is pressed from the seeded text base
+    expect(within(dialog).getByRole('button', { name: 'Text' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    )
+    // choosing a kind advances straight to the details step
+    await user.click(within(dialog).getByRole('button', { name: 'Decision' }))
+    expect(within(dialog).queryByText('Transport:')).not.toBeInTheDocument()
+    await user.click(within(dialog).getByRole('button', { name: /manual/i }))
+    await user.type(within(dialog).getByLabelText('Model'), 'custom-jev')
+    // change type returns to the cards, typed id preserved
+    await user.click(within(dialog).getByRole('button', { name: 'Change type' }))
+    const cards = within(dialog).getByRole('group', { name: 'What kind of model is this?' })
+    expect(within(cards).getByRole('button', { name: 'Decision' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    )
+    // a different kind re-seeds the caps exactly
+    await user.click(within(cards).getByRole('button', { name: 'Embeddings' }))
+    expect(within(dialog).getByLabelText('Model')).toHaveValue('custom-jev')
+    await user.click(within(dialog).getByRole('button', { name: 'Add model' }))
+    expect(onAddModel).toHaveBeenCalledWith(
+      'p1',
+      expect.objectContaining({ externalId: 'custom-jev', caps: ['embeddings'] }),
+    )
+  })
+
+  it('a catalog pick keeps an explicitly chosen standalone kind (id-based caps never re-classify it)', async () => {
+    const user = userEvent.setup()
+    const onAddModel = vi.fn()
+    render(
+      <RegistryDemo
+        onAddModel={onAddModel}
+        standaloneCaps={['embeddings', 'audio', 'decision']}
+      />,
+    )
+    const dialog = await openAddModal(user)
+    // the user declares the model is an audio (tts/stt) model — ids like
+    // `lfm3-audio` carry no classifier token, so catalog inference alone
+    // would misclassify it
+    await user.click(within(dialog).getByRole('button', { name: 'Audio' }))
+    await user.click(within(dialog).getByRole('combobox', { name: 'Model' }))
+    await user.click(screen.getByRole('option', { name: 'llava' }))
+    await user.click(within(dialog).getByRole('button', { name: 'Add model' }))
+    expect(onAddModel).toHaveBeenCalledWith('p1', {
+      externalId: 'llava',
+      label: 'Llava',
+      caps: ['audio'],
+      reasoningEffort: '',
+      temperature: null,
+      maxTokens: null,
+    })
+  })
+
+  it('a catalog pick still corrects an undeclared or text-kind draft (llava → vision)', async () => {
+    const user = userEvent.setup()
+    const onAddModel = vi.fn()
+    render(
+      <RegistryDemo
+        onAddModel={onAddModel}
+        standaloneCaps={['embeddings', 'audio', 'decision']}
+      />,
+    )
+    const dialog = await openAddModal(user)
+    // explicit LLM (text) kind — the catalog entry's caps still classify
+    // the pick
+    await user.click(within(dialog).getByRole('button', { name: 'Text' }))
+    await user.click(within(dialog).getByRole('combobox', { name: 'Model' }))
+    await user.click(screen.getByRole('option', { name: 'llava' }))
+    await user.click(within(dialog).getByRole('button', { name: 'Add model' }))
+    expect(onAddModel).toHaveBeenCalledWith(
+      'p1',
+      expect.objectContaining({ externalId: 'llava', caps: ['text', 'vision'] }),
+    )
+  })
+
+  it('generation options render per capability: hidden for standalone-only, shown for chat caps', async () => {
+    const user = userEvent.setup()
+    render(
+      <RegistryDemo
+        standaloneCaps={['embeddings', 'audio', 'decision']}
+        reasoningEffortOptions={['low', 'medium', 'high']}
+      />,
+    )
+    const dialog = await openAddModal(user)
+    await user.click(within(dialog).getByRole('button', { name: 'Text' }))
+    // LLM kind → parametric fields visible
+    expect(within(dialog).getByLabelText('Temperature')).toBeInTheDocument()
+    expect(within(dialog).getByLabelText('Max tokens')).toBeInTheDocument()
+    expect(within(dialog).getByLabelText('Reasoning effort')).toBeInTheDocument()
+    // switching to a standalone kind hides them
+    await user.click(within(dialog).getByRole('button', { name: 'Change type' }))
+    await user.click(within(dialog).getByRole('button', { name: 'Embeddings' }))
+    expect(within(dialog).queryByLabelText('Temperature')).not.toBeInTheDocument()
+    expect(within(dialog).queryByLabelText('Max tokens')).not.toBeInTheDocument()
+    expect(within(dialog).queryByLabelText('Reasoning effort')).not.toBeInTheDocument()
+  })
+
+  it('decision selection stamps the transport, shows it read-only, and carries it on the draft', async () => {
+    const user = userEvent.setup()
+    const onAddModel = vi.fn()
+    render(
+      <RegistryDemo
+        onAddModel={onAddModel}
+        standaloneCaps={['embeddings', 'audio', 'decision']}
+        decisionTransport="systemone"
+        decisionTransportLabel="Transport"
+      />,
+    )
+    const dialog = await openAddModal(user)
+    await user.click(within(dialog).getByRole('button', { name: 'Decision' }))
+    await user.click(within(dialog).getByRole('button', { name: 'Enter the model id manually' }))
+    await user.type(within(dialog).getByLabelText('Model'), 'custom-jev')
+    expect(within(dialog).getByText('Transport:')).toBeInTheDocument()
+    expect(within(dialog).getByText('systemone')).toBeInTheDocument()
+    await user.click(within(dialog).getByRole('button', { name: 'Add model' }))
+    expect(onAddModel).toHaveBeenCalledWith(
+      'p1',
+      expect.objectContaining({ externalId: 'custom-jev', caps: ['decision'], decisionTransport: 'systemone' }),
+    )
+  })
+
+  it('edit round-trips a decision model transport and clears it when the kind changes', async () => {
+    const user = userEvent.setup()
+    const onUpdateModel = vi.fn()
+    render(
+      <RegistryDemo
+        onUpdateModel={onUpdateModel}
+        standaloneCaps={['embeddings', 'audio', 'decision']}
+        decisionTransport="systemone"
+      />,
+    )
+    await user.click(await screen.findByRole('button', { name: 'Edit jev-latest' }))
+    const dialog = await screen.findByRole('dialog')
+    // edit opens on the details step — the kind is already known
+    expect(within(dialog).getByText('systemone')).toBeInTheDocument()
+    await user.click(within(dialog).getByRole('button', { name: 'Change type' }))
+    await user.click(within(dialog).getByRole('button', { name: 'Text' }))
+    await user.click(within(dialog).getByRole('button', { name: 'Save' }))
+    expect(onUpdateModel).toHaveBeenCalledWith(
+      expect.objectContaining({ externalId: 'jev-latest' }),
+      expect.objectContaining({ caps: ['text'], decisionTransport: undefined }),
+    )
   })
 })
