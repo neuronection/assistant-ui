@@ -319,6 +319,12 @@ interface ModalState {
   extra: Record<string, string>
   extraTouched: boolean
   labelTouched: boolean
+  /** The user explicitly declared the kind this modal session (kind card,
+   * or a standalone chip toggle): a catalog pick then fills only the
+   * id/label and never re-classifies the caps. Catalog classification
+   * still corrects an undeclared or text-kind draft (llava → vision,
+   * whisper → stt). */
+  kindExplicit: boolean
   model?: ModelRegistryModel
   manual: boolean
 }
@@ -501,6 +507,7 @@ export const ModelRegistry = React.forwardRef<HTMLDivElement, ModelRegistryProps
         extra: {},
         extraTouched: false,
         labelTouched: false,
+        kindExplicit: false,
         manual: false,
       })
       setDraftError(null)
@@ -525,6 +532,7 @@ export const ModelRegistry = React.forwardRef<HTMLDivElement, ModelRegistryProps
         decisionTransport: model.decisionTransport ?? '',
         extra: { ...(model.extra ?? {}) },
         extraTouched: false,
+        kindExplicit: false,
         model,
         manual: false,
       })
@@ -543,10 +551,17 @@ export const ModelRegistry = React.forwardRef<HTMLDivElement, ModelRegistryProps
       const remote = (remoteModels ?? []).find((entry) => entry.id === remoteId)
       setModal((current) => {
         if (!current) return current
+        // An explicitly declared standalone kind is user intent — the pick
+        // fills the id/label and never re-classifies the caps. Otherwise
+        // catalog caps classify the pick ("cap correction": llava →
+        // vision, whisper → stt; a chat-kind draft may flip to a
+        // standalone kind the catalog implies).
+        const kindDeclared =
+          current.kindExplicit && kindFromCaps(current.caps) !== 'text'
         const normalized = remote ? normalizeCaps([...remote.caps], standaloneSet) : current.caps
         // catalog caps pass through the ON-implications (a vision/tool
         // catalog entry carries its text base)
-        const nextCaps = withImplications(normalized, capImplications ?? {})
+        const nextCaps = kindDeclared ? current.caps : withImplications(normalized, capImplications ?? {})
         return {
           ...current,
           externalId: remoteId,
@@ -566,6 +581,7 @@ export const ModelRegistry = React.forwardRef<HTMLDivElement, ModelRegistryProps
         return {
           ...current,
           caps,
+          kindExplicit: true,
           step: 'details',
           // the decision capability stamps the app's shipping transport
           decisionTransport: caps.includes('decision')
@@ -596,6 +612,8 @@ export const ModelRegistry = React.forwardRef<HTMLDivElement, ModelRegistryProps
         return {
           ...current,
           caps: nextCaps,
+          // a standalone chip toggle is an explicit kind declaration too
+          kindExplicit: current.kindExplicit || isStandalone,
           // The decision capability stamps the app's shipping transport;
           // without it there is no transport to carry.
           decisionTransport: nextCaps.includes('decision')

@@ -26,7 +26,7 @@ test where noted.
 | `UndoNotice` | `role="status"` live region | Enter on *Undo* fires `onUndo`; auto-dismiss via `duration` | clean |
 | `SelectionBar` | bar with *Clear selection* button | Enter clears; renders nothing at `count={0}` | clean |
 | `CheckIndicator` | `role="checkbox"`, `aria-checked` incl. `mixed` | Enter and Space toggle | clean |
-| `SegmentedTabs` | `role="tablist"`+`tab`, `aria-selected`, roving tabIndex, thumb `aria-hidden` | Arrow/Home/End move selection (wrap, skips disabled), selection follows focus | clean |
+| `SegmentedTabs` | `role="tablist"`+`tab`, `aria-selected`, roving tabIndex, thumb `aria-hidden` (measured in `wrap` mode) | Arrow/Home/End move selection (wrap, skips disabled), selection follows focus | clean |
 | `ViewToggle` | buttons with `aria-pressed` | Enter switches views | clean |
 
 ## Overlays
@@ -37,7 +37,7 @@ behavior and focus restoration are listed **only where asserted**.
 | Module | ARIA pattern | Keyboard (asserted) | axe |
 | --- | --- | --- | --- |
 | `Modal` | `role="dialog"`, labelled title/description; `ModalBody` is a plain padded `div` (no controls) | Escape closes **and restores focus to the trigger**; built-in close button | clean (open) |
-| `PanelModal` | `role="dialog"` side panel | Escape reports `onOpenChange(false)` | clean (open) |
+| `PanelModal` | `role="dialog"` side panel, labelled title; `description` becomes the dialog description (`aria-describedby`) | Escape reports `onOpenChange(false)`; built-in close button | clean (open) |
 | `ConfirmationModal` | `Modal` + confirm/cancel buttons | Enter on confirm fires `onConfirm`; Escape reports `onOpenChange(false)`; busy disables both actions | clean (open) |
 | `FormModal` | `Modal` + form | Enter inside a field submits; `disabled` submit blocks submission | clean (open) |
 | `Popover` | Radix popover | Escape closes and restores focus to the trigger | clean (open) |
@@ -47,7 +47,7 @@ behavior and focus restoration are listed **only where asserted**.
 | `Tooltip` | Radix tooltip (`role="tooltip"`) | **focus** (Tab) shows the tooltip — not hover-only | clean |
 | `InfoTooltip` | trigger with default accessible label; `mode="click"` becomes a popover | focus/click per mode | clean |
 | `Menu` / `ActionMenu` | `role="menu"` / `menuitem` | ArrowDown moves focus between items; Enter selects; Escape closes; `disabled` items carry `data-disabled` and are not selectable | clean (open) |
-| `ContextMenu` | `role="menu"` / `menuitem` at x/y | Enter selects and reports `onClose`; Escape closes | clean (open) |
+| `ContextMenu` | `role="menu"` / `menuitem` at x/y; `{ key, separator: true }` entries render a non-focusable `role="separator"` divider between groups | Enter selects and reports `onClose`; Escape closes; disabled items carry `data-disabled` and are not selectable | clean (open, grouped) |
 | `AiActionsDropdown` | `role="menu"` with action items; split mode adds primary + chevron `aria-expanded` buttons | Enter submits the custom prompt; Escape closes the menu; busy disables the trigger | clean (open) |
 
 ## Inputs
@@ -86,8 +86,9 @@ behavior and focus restoration are listed **only where asserted**.
 | Module | ARIA pattern | Keyboard (asserted) | axe |
 | --- | --- | --- | --- |
 | `Breadcrumbs` | `<nav>` + link list; current step as text; `linkComponent` for SPA routing | native link semantics | clean |
-| `SettingsShell` | `<nav aria-label="Settings sections">`; active entry `aria-current="page"` | nav buttons activate (native button semantics) | clean |
+| `SettingsShell` | `<nav aria-label="Settings sections">`; active entry `aria-current="page"`; optional `section` labels are `role="presentation"` | nav buttons activate (native button semantics) | clean |
 | `SidebarNav` | `<nav aria-label>`; active entry `aria-current="page"`; group triggers `aria-expanded` + `aria-controls`; rail flyout content labelled by its group | Tab traverses in order (main list, then pinned `secondaryItems`); Enter/Space activates (leaves navigate, groups toggle); ArrowUp/Down move between visible items across both regions; ArrowRight expands/enters a group; ArrowLeft collapses/returns to the trigger; Home/End jump; rail flyout: opens on hover/click/Enter, ArrowUp/Down within, Escape closes and focus returns to the trigger | clean (expanded, collapsed, flyout open, compact) |
+| `FamilyMenu` | trigger is a labelled button; Radix adds `aria-haspopup="dialog"` + `aria-expanded`; panel is a `role="dialog"` named by `title`; current row adds `(Current)` to its link name and shows a visible chip; close button is labelled | Enter/Space opens; Tab reaches the rows, close button and hub link; Escape closes **and returns focus to the trigger** (asserted); outside click closes | clean (closed and open) |
 | `UserMenu` | trigger `aria-haspopup="menu"` + label; panel `role="menu"` with identity header (role badge + status pill are presentational text); checkable entries `role="menuitemcheckbox"` + `aria-checked`; pending `aria-busy` blocks selection; typing targets inside the `switcher` slot are excluded from menu typeahead so embedded inputs keep text entry | Radix menu semantics: arrows, Home/End, typeahead, Escape closes, focus returns to the trigger on close | clean (closed and open); a `menu` expects `menuitem` descendants — app-owned interactive widgets in the `switcher` slot are the app's axe surface |
 | `ProfileSwitcher` | trigger `aria-haspopup="dialog"` + `labels.trigger` name; panel `role="dialog"` labelled by `labels.panelTitle`; rows mark the active profile with `aria-current`; icon-only rename/set-Default/delete actions named from label templates; errors `role="alert"` | Enter/Space opens and focus lands on the first row; Tab runs select → row actions → rows → create form; Enter selects a row, submits the rename draft and the create form (empty/blank names never fire); Escape cancels an inline rename without closing, a second Escape closes the panel and restores focus to the trigger | clean (closed and open) |
 | `AuthGate` | `<div data-as="auth-gate">` wrapper; default checking splash is a `role="status"` live region showing `labels.checking`; the login surface is the app's composition (shared `LoginForm`/`RegisterForm` carry their own contract) | while checking the splash renders no focusable content (asserted); once authenticated children render as plain DOM — first focusable reachable via Tab (asserted); all three states axe-clean | clean (checking, anonymous, authenticated) |
@@ -133,6 +134,7 @@ behavior and focus restoration are listed **only where asserted**.
 
 | Module | ARIA pattern | Keyboard (asserted) | axe |
 | --- | --- | --- | --- |
+| `ImportReviewCard` | heading + choose/apply buttons, hidden file input, report list | choose is a real button (Enter/Space); file input is `aria-hidden`/not tabbable; errors `role="alert"`; Apply disabled while busy; report reads in document order | clean |
 | `UploadDropzone` | labelled dropzone button ("click or drop") | click **and Enter from keyboard focus** open the OS file picker; drop accepted; suppressed while uploading/disabled | clean |
 | `FileCard` | remove button named "`<removeLabel> — <name>`"; include checkbox labelled per file; processing `role="status"`; failure state | remove/include via native controls | clean |
 | `FileQueue` | list of `FileCard`s + aggregate summary; empty state text | remove via card buttons; reorder intent reported on drop | clean |
@@ -143,6 +145,8 @@ behavior and focus restoration are listed **only where asserted**.
 | --- | --- | --- | --- |
 | `ModelPicker` | `Combobox` with grouped provider→model options and capability badges | keyboard contract inherited from `Combobox` (asserted there) | clean (closed) |
 | `TaskAssignmentPicker` | task rows (flat or in `sections`) with per-row `ModelPicker` (accessible name = the task label) + row-level clear button; optional fallback picker (name `Fallback — <task>`, `secondaryLabel`-prefixed); `secondaryOnly` rows render the fallback picker alone | clear buttons empty exactly their own assignment (`Clear assignment — <task>`, fallback: `Clear assignment — <fallback> <task>`); pickers inherit the `Combobox` keyboard contract | clean || `CapabilityChips` | `role="group"` of `aria-pressed` toggle buttons (badge variant renders non-interactive spans) | chips are buttons; below `minSelected` the last chip disables instead of silently refusing | clean |
+| `ModelPriceMeta` | effective-price text line; Prices is a native button; stale is text, not colour alone | Prices button is keyboard-reachable | clean |
+| `ModelPriceTable` | native table with column headers; indexed field names (`Input $/1M 1`); reset named (`Reset <model>`) | native inputs/selects and reset buttons in DOM order | clean |
 | `ModelRegistry` | provider headers are disclosure buttons (`aria-expanded`); rows carry labelled icon-only controls (`Add/Edit/Remove — <id>`, `Enabled — <id>`); modal inputs are labelled | header Enter toggles the provider; row enable checkbox is a native input (`Enabled — <id>`); modal inputs are labelled | clean |
 | `ConnectionTestRow` | status text (`role="status"` while testing); error message; `variant="inline"` drops the card chrome | Enter on *Test* fires `onTest` | clean |
 | `ProviderSetupTiles` | `role="group"` of preset tiles (`aria-label`ed); tiles are native buttons with `ProviderLogo` (decorative); capability chips are text labels in the tile's accessible name (neutral — they describe, never rank); disabled tiles render inert with their reason; `configured`/`suggestedKey` states carry text (`Set up` badge, sr-only suggested note), never color alone | Tab walks the tiles in order; Enter selects and reports `onSelect(key)`; disabled tiles never fire | clean |

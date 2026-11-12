@@ -12,6 +12,8 @@ export interface ModelPickerModel {
   capability?: string
   /** Full capability set, matched by TaskAssignmentPicker `requires`. */
   capabilities?: string[]
+  /** Trailing secondary text in the option row (e.g. effective price). */
+  meta?: string
 }
 
 export interface ModelPickerProvider {
@@ -92,6 +94,7 @@ export const ModelPicker = React.forwardRef<HTMLButtonElement, ModelPickerProps>
             label: model.name,
             group: provider.name,
             badge: model.capability,
+            meta: model.meta,
           })),
         )
         // The inherit state leads the list (ADR-0036 §4): no group of its

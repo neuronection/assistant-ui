@@ -12,6 +12,9 @@ export interface SwitchRowProps
   /** Sub-line under the label — apps pass the current value ("now: gpt-5"). */
   currentValue?: React.ReactNode
   disabled?: boolean
+  /** Knob-only rendering (dense grids): the label stays in the
+   * accessibility tree as visually-hidden text. */
+  hideLabel?: boolean
 }
 
 /** Labeled `role="switch"` row with an animated knob — the standalone
@@ -25,6 +28,7 @@ export const SwitchRow = React.forwardRef<HTMLButtonElement, SwitchRowProps>(
       onCheckedChange,
       currentValue,
       disabled = false,
+      hideLabel = false,
       className,
       onClick,
       ...props
@@ -52,7 +56,11 @@ export const SwitchRow = React.forwardRef<HTMLButtonElement, SwitchRowProps>(
         {...props}
       >
         <span className="flex min-w-0 flex-col gap-0.5">
-          <span className="truncate font-medium">{label}</span>
+          {hideLabel ? (
+            <span className="sr-only">{label}</span>
+          ) : (
+            <span className="truncate font-medium">{label}</span>
+          )}
           {currentValue != null && currentValue !== '' ? (
             <span className="truncate text-xs text-[var(--as-muted-fg)]">
               {currentValue}

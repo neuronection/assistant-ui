@@ -8,9 +8,8 @@ contribute markup (D17: raw HTML/JS from extensions is never rendered at
 any tier).
 
 Promoted from desktop-assistant's `PackReportRenderer`; career- and
-desktop-assistant are the two hosts, pinned by the shared fixture wall
-(`dev/contracts/surface-renderer.fixtures.json` — implementations may
-differ, outputs may not).
+desktop-assistant are the two hosts, pinned by the shared fixture wall (implementations may differ, outputs
+may not).
 
 ## Import
 

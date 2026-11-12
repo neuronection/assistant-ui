@@ -364,7 +364,20 @@ describe('SidebarNav (collapsed rail)', () => {
     await waitFor(() =>
       expect(screen.queryByRole('button', { name: 'Overview' })).toBeNull(),
     )
-    expect(trigger).toHaveFocus()
+    await waitFor(() => expect(trigger).toHaveFocus())
+  })
+
+  it('a pending hover-open timer cannot ghost-reopen a flyout closed by Escape', async () => {
+    const user = userEvent.setup()
+    render(<GroupDemo collapsed collapsible />)
+    await user.click(screen.getByRole('button', { name: 'Open Patient record menu' }))
+    expect(screen.getByRole('button', { name: 'Overview' })).toBeInTheDocument()
+    await user.keyboard('{Escape}')
+    await waitFor(() =>
+      expect(screen.queryByRole('button', { name: 'Overview' })).toBeNull(),
+    )
+    await new Promise((resolve) => setTimeout(resolve, 200))
+    expect(screen.queryByRole('button', { name: 'Overview' })).toBeNull()
   })
 
   it('flyout arrows move focus between children', async () => {

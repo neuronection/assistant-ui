@@ -1,5 +1,168 @@
 # @neuronection/assistant-ui
 
+## 0.84.0
+
+### Minor Changes
+
+- Add `ImportReviewCard`: a presentational review-first import surface with a
+  file picker, mapped/dropped/warnings/conflicts report and one explicit apply.
+  Apps own parsing and the API; the card owns no fetch, store or write.
+
+## 0.83.0
+
+### Minor Changes
+
+- [`c959eae`](https://github.com/neuronection/assistant-ui/commit/c959eaef742e9103756cd4e1623eef5e44a70bd6) Thanks [@constLiakos](https://github.com/constLiakos)! - Add presentational model-pricing surfaces: `ModelPriceMeta`, `ModelPriceTable`
+  and the USD↔micros conversion helpers. `ModelPickerModel` also gained an
+  optional `meta` slot for effective-price text in the option row.
+
+## 0.82.0
+
+### Minor Changes
+
+- [`3ca5a6d`](https://github.com/neuronection/assistant-ui/commit/3ca5a6dd4744cf83d72017e7ad89e81a65ed2df0) Thanks [@constLiakos](https://github.com/constLiakos)! - `PanelModal` gains a `description` slot (rendered under the title and wired as
+  the dialog description, so screen readers announce it) and an opt-in `bodyFill`
+  that makes the body the fill region above the sticky footer, letting a child
+  flex column — a form with its own scrolling field area — own scrolling. Both are
+  additive; existing panels render unchanged apart from one wrapper element around
+  the title.
+
+## 0.81.0
+
+### Minor Changes
+
+- [`764119a`](https://github.com/neuronection/assistant-ui/commit/764119a2d6ffcf2ce7a1559b436e662738819570) Thanks [@constLiakos](https://github.com/constLiakos)! - `FamilyMenu`: the sidebar family switcher. A compact trigger (app-drawer
+  glyph + label, default “Explore”) opens a portaled menu with the family
+  products — the blue lowercase Neuronection wordmark, tinted marks, two-line
+  descriptions, a current-app chip, close button, and a hub link with
+  optional version. Presentational: projects,
+  labels and links are props; Radix Popover owns focus, Escape and
+  outside-click behavior.
+
+## 0.80.0
+
+### Minor Changes
+
+- [`88622fe`](https://github.com/neuronection/assistant-ui/commit/88622fea22606ab6e1914a380c6dcc583287b4f9) Thanks [@constLiakos](https://github.com/constLiakos)! - SegmentedTabs: new opt-in `wrap` prop — long tab sets flow onto multiple rows
+  instead of overflowing or needing a horizontal scroll wrapper, and the sliding
+  thumb switches from single-row percentage math to measured geometry so it
+  follows the selection across rows. Default single-row mode is unchanged.
+
+## 0.79.0
+
+### Minor Changes
+
+- [`917d87e`](https://github.com/neuronection/assistant-ui/commit/917d87e20cde01850097686a6cf558ef3e09510b) Thanks [@constLiakos](https://github.com/constLiakos)! - **ContextMenu supports grouped items.** `ContextMenuProps.items` widens from
+  `ContextMenuItem[]` to `ContextMenuEntry[]` — an entry is either an action or
+  `{ key, separator: true }`, which renders a non-focusable divider between item
+  groups (filter actions above navigation is the motivating shape).
+
+  **Migration (all apps):** none — plain `ContextMenuItem[]` arrays type-check
+  unchanged; existing menus render identically. To group, interleave
+  `{ key: 'sep', separator: true }` entries. Item clicks no longer bubble
+  through the React tree to host handlers (a coordinate-anchored menu may
+  overlay clickable cards — the menu consumes its own clicks). New exports:
+  `ContextMenuEntry`, `ContextMenuSeparator`. Docs: `context-menu.md` props
+  table + grouped example; story `menu--context-menu-separator-story`.
+
+### Patch Changes
+
+- [`ebab19b`](https://github.com/neuronection/assistant-ui/commit/ebab19b764e28c8abd013d5fdeb1e6f050e4885f) Thanks [@constLiakos](https://github.com/constLiakos)! - SidebarNav: closing a rail flyout now cancels the pending hover-open timer, so
+  leaving and immediately returning cannot reopen a flyout that was just
+  dismissed.
+
+## 0.78.0
+
+### Minor Changes
+
+- [`6927077`](https://github.com/neuronection/assistant-ui/commit/69270771076b1958df57badc8c0126bf96643217) Thanks [@constLiakos](https://github.com/constLiakos)! - IntegrationConfigForm: bounded numeric fields with `x-choices` gain a trailing "Custom…" entry (optional `customLabel` / schema `x-custom-label`) — picking it swaps the chips for a bounded number input, and a stored value outside the presets opens the custom input prefilled (plan 154 source knobs: pages per sync, budgets).
+
+- [`b40e777`](https://github.com/neuronection/assistant-ui/commit/b40e77730e498062e4ca6529c498d8cf9a09db78) Thanks [@constLiakos](https://github.com/constLiakos)! - **ModalContent owns popup padding by default.** `ModalContent` gains a
+  `padding` variant — `'padded'` (default) renders a `p-6` frame with
+  `gap-4` between sections; `'none'` opts out for full-bleed dialogs
+  (command palettes, media, self-chromed editors). `ModalHeader`,
+  `ModalBody` and `ModalFooter` are now layout-only — their padding moved
+  into the frame.
+
+  **Migration (all apps):** delete hand-rolled `px-6 pb-6` body wrappers
+  and `p-6`-family padding on composed dialogs — the frame provides them;
+  double padding is the failure mode. Full-bleed dialogs move `p-0` /
+  `gap-0` overrides to `padding="none"` (existing explicit classes keep
+  winning via twMerge, but prefer the prop). `PanelModal` is unchanged
+  (it already defaulted its body padding). Docs: `modal.md` → "spacing
+  rhythm".
+
+### Patch Changes
+
+- [`494c6dc`](https://github.com/neuronection/assistant-ui/commit/494c6dc1f092eadf2ac61ae408fcbbf9a62c854e) Thanks [@constLiakos](https://github.com/constLiakos)! - ModelRegistry: a catalog pick no longer re-classifies an explicitly declared kind — choosing a standalone kind card (or standalone chip) then picking from the live catalog keeps the declared caps (Speech stays `tts` on `lfm3-audio`) and only fills the id/label; undeclared and text-kind drafts keep the catalog cap correction (llava → vision, whisper → stt)
+
+## 0.77.0
+
+### Minor Changes
+
+- [`721a19c`](https://github.com/neuronection/assistant-ui/commit/721a19c759bc46d16890a39425f7977c943eb56e) Thanks [@constLiakos](https://github.com/constLiakos)! - SettingsShell: optional `section` group labels on nav items — a muted uppercase divider renders before the first entry carrying it in rail mode (hidden in the narrow chip-row mode, SidebarNav's `section` idiom)
+
+- [`64fbc8e`](https://github.com/neuronection/assistant-ui/commit/64fbc8e81ff292f21c1e5ad102f403d7e552f460) Thanks [@constLiakos](https://github.com/constLiakos)! - SwitchRow: `hideLabel` knob-only variant — the label renders visually hidden so dense grids (routing matrices) keep named switches
+
+## 0.76.0
+
+### Minor Changes
+
+- [`d57c159`](https://github.com/neuronection/assistant-ui/commit/d57c1594969388285d1a35bc14689564b77a5108) Thanks [@constLiakos](https://github.com/constLiakos)! - New `concept-graph` module — the generic node-graph visualizer promoted
+  from health-assistant's catalog ontology graph (second consumer:
+  career-assistant's taxonomy graph). `ConceptGraphView` renders
+  nodes/edges on a React Flow canvas with two synchronous layouts —
+  force (d3-force) and hierarchy (dagre, relation-aware via
+  `hierarchyReversedRelations`) — plus search-to-dim with Enter-to-center,
+  hover quick-preview, collapsible legend, MiniMap, PNG export, and
+  consumer-rendered detail cards / context menus through render props.
+  Domain vocabularies stay app-side: node/edge colors arrive as
+  `kindColors`/`relationColors`, every chrome string is overridable
+  through `labels`, toolbar icons through `icons`; chrome colors come from
+  `--as-*` tokens and React Flow's stylesheet ships inside `dist/styles.css`.
+  `DynamicIcon` (lucide-by-name or DOMPurify-sanitized custom SVG) and the
+  hierarchy direction helper ride along.
+
+- [`8865815`](https://github.com/neuronection/assistant-ui/commit/8865815e47859688123ba46badc3afd44c0d9cc0) Thanks [@constLiakos](https://github.com/constLiakos)! - `multi-select-picker` host slots (additive) — the browse/selection chrome
+  hosts need now rides props instead of forks: `MultiSelectPicker` gains
+  `renderChipExtra` (per-chip leading content, e.g. a relation select),
+  `showChips` (host renders selections itself) and `browseModalProps`
+  (forwards the modal's props/slots to the internal `PickerBrowseModal`);
+  `PickerBrowseModal` gains controlled `category`/`onCategoryChange`,
+  `filterOption` (host row predicate that leaves pagination alone),
+  `renderRowContent` (rich row text with the live `{ search, category }` ctx;
+  the named Add/Added toggle stays), `reloadKey` (re-runs the current search
+  when a host-side server filter changes), `hasMore` (host-declared
+  pagination state for the _Load more_ button) and `renderBody` (body composition via `PickerBrowseBodyCtx` — default
+  filter/search/category/list nodes plus `isSelected`/`toggle` so alternate
+  surfaces like a graph feed the same controlled selection).
+
+- [`afc59a5`](https://github.com/neuronection/assistant-ui/commit/afc59a578d09df9462a7c094ff5875d18e03c13c) Thanks [@constLiakos](https://github.com/constLiakos)! - New `multi-select-picker` module — the "two discovery paths" picker
+  promoted from career-assistant's `SkillPicker` and health-assistant's
+  `CatalogItemPicker`, made generic and data-agnostic (no fetching inside):
+  `MultiSelectPicker` (inline debounced type-ahead + in-input browse button,
+  selection chips, single/multi modes, full combobox ARIA + keyboard nav)
+  and `PickerBrowseModal` (standalone browse half on `PanelModal`: search,
+  optional category filter, per-row Add/Added toggles, Load more
+  pagination, live selected count). Data flows in through either a plain
+  `options` list (client filtering) or `onSearch`/`onLoadMore` callbacks
+  (server search); every string is overridable through `labels`.
+
+- [`f7227c9`](https://github.com/neuronection/assistant-ui/commit/f7227c96c89a0b346f5c793e424567dee2752a40) Thanks [@constLiakos](https://github.com/constLiakos)! - AddIntegrationSourceDialog: additive `kind` mode ('chooser' shows two
+  source-kind cards first — the Add-provider tile pattern — 'git'/'local'
+  pin one kind's fields; choosing local prefills branch/main) and `initial`
+  for edit-flow prefill. IntegrationSourcesList: additive `onEditSource`
+  affordance (+ `editSourceLabel`/`editSourceAriaLabel`). Back-compat:
+  props omitted = the previous behavior everywhere.
+
+  Also: one uniform popup rhythm across the dialog family — content
+  regions `px-6 pb-6` with `space-y-4` blocks / `space-y-3` fields,
+  meta grids `gap-x-6 gap-y-3`, inset blocks `p-3`, and the consent
+  disclosure padded (`py-1 pl-3 pr-2`). ConsentDialog and
+  ActionResultDialog no longer add ad-hoc `gap-3` (the section rhythm
+  owns spacing), FormModal's body matches the ModalBody standard, and
+  consent titles no longer duplicate the extension id.
+
 ## 0.75.0
 
 ### Minor Changes
@@ -182,7 +345,7 @@
   summaries in an evidence disclosure; unknown node/action ids never render;
   raw markup from an extension never mounts (D17). Promoted from desktop's
   PackReportRenderer — career + desktop are the two hosts, pinned by the
-  family fixture wall (`dev/contracts/surface-renderer.fixtures.json`).
+  family fixture wall (`the family contract canonical/surface-renderer.fixtures.json`).
   Also adds the previously missing subpath export entry for
   `extension-sources` (the panel's module was staged without it).
 
@@ -950,7 +1113,7 @@ anonymous` boot machine and its rendering, the app owns the endpoints —
   attach/equation/dictation controls, attachment rail and suggestion strip
   slots, and drag-drop + paste file wiring behind `onAttachFiles`.
 
-- [`062fca5`](https://github.com/neuronection/assistant-ui/commit/062fca561466dd9d2985fc2ea7a3d9e751e3cab9) Thanks [@constLiakos](https://github.com/constLiakos)! - chat-core — the headless core of the shared chat layer (plan dev/plans/11,
+- [`062fca5`](https://github.com/neuronection/assistant-ui/commit/062fca561466dd9d2985fc2ea7a3d9e751e3cab9) Thanks [@constLiakos](https://github.com/constLiakos)! - chat-core — the headless core of the shared chat layer (plan local planning notes/11,
   ADR-0009): `useChatStream`, a transport-injected live-turn state machine
   (send → pending → streaming → done/error/interrupted) with coalesced
   text/reasoning deltas, tool-call observations, HITL interrupts (resumable)

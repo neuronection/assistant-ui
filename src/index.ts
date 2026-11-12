@@ -23,6 +23,16 @@ export {
 } from './components/file-queue'
 export { Portal, type PortalProps } from './components/portal'
 export {
+  ImportReviewCard,
+  type ImportReviewCardProps,
+  type ImportReviewConflict,
+  type ImportReviewGroup,
+  type ImportReviewLabels,
+  type ImportReviewReport,
+  type ImportReviewStatus,
+} from './components/import-review-card'
+
+export {
   UploadDropzone,
   type UploadDropzoneProps,
 } from './components/upload-dropzone'
@@ -66,6 +76,13 @@ export {
   type SponsorCardProps,
   type SponsorChannel,
 } from './components/about'
+
+export {
+  FamilyMenu,
+  defaultFamilyProjects,
+  type FamilyMenuProps,
+  type FamilyProject,
+} from './components/family-menu'
 
 export {
   AiActionsDropdown,
@@ -369,7 +386,13 @@ export {
   type ConfirmationModalProps,
 } from './components/confirmation-modal'
 export { CopyButton, type CopyButtonProps } from './components/copy-button'
-export { ContextMenu, type ContextMenuProps, type ContextMenuItem } from './components/context-menu'
+export {
+  ContextMenu,
+  type ContextMenuProps,
+  type ContextMenuItem,
+  type ContextMenuSeparator,
+  type ContextMenuEntry,
+} from './components/context-menu'
 export {
   DatePicker,
   type DatePickerProps,
@@ -489,6 +512,21 @@ export {
   type ScaleSliderProps,
 } from './components/scale-slider'
 export { SearchInput, type SearchInputProps } from './components/search-input'
+export {
+  ModelPriceMeta,
+  type ModelPriceMetaLabels,
+  type ModelPriceMetaProps,
+  type ModelPriceOrigin,
+} from './components/model-price-meta'
+export {
+  ModelPriceTable,
+  microsToUsdPerMillion,
+  usdPerMillionToMicros,
+  type ModelPriceRow,
+  type ModelPriceTableLabels,
+  type ModelPriceTableProps,
+  type PriceMatch,
+} from './components/model-price-table'
 export {
   ModelPicker,
   type ModelPickerModel,
