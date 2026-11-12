@@ -405,6 +405,13 @@ export {
 } from './components/confirmation-modal'
 export { CopyButton, type CopyButtonProps } from './components/copy-button'
 export {
+  AccountSessionList,
+  type AccountSessionListLabels,
+  type AccountSessionListProps,
+  type AccountSessionRow,
+} from './components/account-session-list'
+export { SecretOnceBlock, type SecretOnceBlockProps } from './components/secret-once-block'
+export {
   ContextMenu,
   type ContextMenuProps,
   type ContextMenuItem,
