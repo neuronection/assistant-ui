@@ -35,6 +35,9 @@ type ShortcutGroup = {
 
 `keys` is a display string the app has already formatted for its platform
 (`"Ctrl K"`, `"⌘K"`, `"?"`); the library never parses or remaps chords.
+Groups with no entries are omitted. Disabled entries stay visible and keep
+their keycap; they carry `aria-disabled="true"` and muted text rather than
+being removed.
 
 ## props — ShortcutList
 

@@ -34,6 +34,8 @@ const groups: CommandGroup[] = [
   },
 ]
 
+const withoutAsync: CommandGroup[] = [groups[0]!]
+
 function Harness({
   onSelect = () => {},
   initialQuery = '',
@@ -71,14 +73,20 @@ function option(label: string): HTMLElement {
 }
 
 describe('CommandList', () => {
-  it('renders groups, items and the result count', () => {
+  it('renders groups, items and the result count with the documented ARIA wiring', () => {
     render(<Harness />)
-    expect(screen.getByText('Actions')).toBeInTheDocument()
-    expect(screen.getByText('Recent')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Commands', level: 2 })).toBeInTheDocument()
+    expect(screen.getByRole('group', { name: 'Actions' })).toBeInTheDocument()
+    expect(screen.getByRole('group', { name: 'Recent' })).toBeInTheDocument()
     expect(screen.getByText('New note')).toBeInTheDocument()
-    expect(screen.getByText('3 results')).toBeInTheDocument()
-    expect(screen.getByRole('combobox', { name: 'Commands' })).toBeInTheDocument()
-    expect(screen.getByRole('listbox', { name: 'Commands' })).toBeInTheDocument()
+    expect(screen.getByRole('status')).toHaveTextContent('3 results')
+
+    const input = screen.getByRole('combobox', { name: 'Commands' })
+    const listbox = screen.getByRole('listbox', { name: 'Commands' })
+    expect(input).toHaveAttribute('aria-controls', listbox.id)
+    expect(input).toHaveAttribute('aria-autocomplete', 'list')
+    expect(input).toHaveAttribute('aria-expanded', 'true')
+    expect(input).toHaveAttribute('aria-haspopup', 'listbox')
   })
 
   it('filters by label, hint and keywords, keeping app-ordered groups untouched', async () => {
@@ -90,7 +98,17 @@ describe('CommandList', () => {
     expect(screen.getByText('New note')).toBeInTheDocument()
     expect(screen.queryByText('Import material')).not.toBeInTheDocument()
     expect(screen.getByText('Algebra notes')).toBeInTheDocument()
-    expect(screen.getByText('2 results')).toBeInTheDocument()
+    expect(screen.getByRole('status')).toHaveTextContent('2 results')
+
+    await user.clear(input)
+    await user.type(input, 'capture')
+    expect(screen.getByText('New note')).toBeInTheDocument()
+    expect(screen.queryByText('Import material')).not.toBeInTheDocument()
+
+    await user.clear(input)
+    await user.type(input, 'pdf')
+    expect(screen.getByText('Import material')).toBeInTheDocument()
+    expect(screen.queryByText('New note')).not.toBeInTheDocument()
 
     await user.clear(input)
     await user.type(input, 'upload')
@@ -101,12 +119,11 @@ describe('CommandList', () => {
     await user.type(input, 'zzzz')
     expect(screen.queryByText('New note')).not.toBeInTheDocument()
     expect(screen.getByText('Algebra notes')).toBeInTheDocument()
-    expect(screen.getByText('1 results')).toBeInTheDocument()
+    expect(screen.getByRole('status')).toHaveTextContent('1 results')
   })
 
-  it('renders the empty state and a zero result count', async () => {
+  it('renders only the empty-state live region when nothing matches', async () => {
     const user = userEvent.setup()
-    const withoutAsync: CommandGroup[] = [groups[0]!]
     function EmptyHarness() {
       const [query, setQuery] = React.useState('')
       return (
@@ -121,9 +138,46 @@ describe('CommandList', () => {
     }
     render(<EmptyHarness />)
     await user.type(screen.getByRole('combobox'), 'zzzz')
-    expect(screen.getByText('Nothing here')).toBeInTheDocument()
-    expect(screen.getByText('0 results')).toBeInTheDocument()
+    expect(screen.getAllByRole('status')).toHaveLength(1)
+    expect(screen.getByRole('status')).toHaveTextContent('Nothing here')
+    expect(screen.queryByText('0 results')).not.toBeInTheDocument()
     expect(screen.queryAllByRole('option')).toHaveLength(0)
+  })
+
+  it('falls back to defaults when labels are explicitly undefined', async () => {
+    const user = userEvent.setup()
+    function UndefinedLabelsHarness() {
+      const [query, setQuery] = React.useState('')
+      return (
+        <CommandList
+          query={query}
+          onQueryChange={setQuery}
+          groups={withoutAsync}
+          onSelect={() => {}}
+          labels={{ placeholder: undefined, empty: undefined, results: undefined }}
+        />
+      )
+    }
+    render(<UndefinedLabelsHarness />)
+    const input = screen.getByRole('combobox')
+    expect(input).toHaveAttribute('placeholder', 'Search commands…')
+    expect(screen.getByRole('status')).toHaveTextContent('2 results')
+
+    await user.type(input, 'zzzz')
+    expect(screen.getByRole('status')).toHaveTextContent('No matching commands.')
+  })
+
+  it('uses listLabel for the listbox accessible name', () => {
+    render(
+      <CommandList
+        query=""
+        onQueryChange={() => {}}
+        groups={groups}
+        onSelect={() => {}}
+        labels={{ listLabel: 'Befehle' }}
+      />,
+    )
+    expect(screen.getByRole('listbox', { name: 'Befehle' })).toBeInTheDocument()
   })
 
   it('exposes disabled items but never selects them', async () => {
@@ -166,6 +220,42 @@ describe('CommandList', () => {
       expect.objectContaining({ id: 'open' }),
       { groupId: 'actions', query: '' },
     )
+
+    await user.keyboard('{ArrowDown}')
+    expect(option('Open action')).toHaveAttribute('data-active')
+    await user.keyboard('{ArrowUp}')
+    expect(option('Open action')).toHaveAttribute('data-active')
+    expect(locked).not.toHaveAttribute('data-active')
+  })
+
+  it('prevents form submission when Enter has no active item', async () => {
+    const user = userEvent.setup()
+    const onSubmit = vi.fn((event: React.FormEvent<HTMLFormElement>) => {
+      event.preventDefault()
+    })
+    function FormHarness() {
+      const [query, setQuery] = React.useState('')
+      return (
+        <form onSubmit={onSubmit}>
+          <CommandList
+            query={query}
+            onQueryChange={setQuery}
+            groups={[
+              {
+                id: 'actions',
+                label: 'Actions',
+                items: [{ id: 'locked', label: 'Locked action', disabled: true }],
+              },
+            ]}
+            onSelect={() => {}}
+          />
+        </form>
+      )
+    }
+    render(<FormHarness />)
+    await user.click(screen.getByRole('combobox'))
+    await user.keyboard('{Enter}')
+    expect(onSubmit).not.toHaveBeenCalled()
   })
 
   it('moves the active item with arrows, Home/End and wraps across enabled options', async () => {
@@ -217,23 +307,41 @@ describe('CommandList', () => {
     )
   })
 
-  it('selects on Tab only in select mode', async () => {
+  it('selects on Tab in select mode and leaves focus in focus mode', async () => {
     const user = userEvent.setup()
     const onSelect = vi.fn()
     const { unmount } = render(<Harness onSelect={onSelect} />)
-    await user.click(screen.getByRole('combobox'))
+    const input = screen.getByRole('combobox')
+    await user.click(input)
     await user.tab()
     expect(onSelect).toHaveBeenCalledWith(
       expect.objectContaining({ id: 'new-note' }),
       { groupId: 'actions', query: '' },
     )
+    expect(input).toHaveFocus()
     unmount()
 
     const focusSelect = vi.fn()
-    render(<Harness onSelect={focusSelect} tabBehavior="focus" />)
+    function FocusHarness() {
+      const [query, setQuery] = React.useState('')
+      return (
+        <>
+          <CommandList
+            query={query}
+            onQueryChange={setQuery}
+            groups={groups}
+            onSelect={focusSelect}
+            tabBehavior="focus"
+          />
+          <button type="button">After list</button>
+        </>
+      )
+    }
+    render(<FocusHarness />)
     await user.click(screen.getByRole('combobox'))
     await user.tab()
     expect(focusSelect).not.toHaveBeenCalled()
+    expect(screen.getByRole('button', { name: 'After list' })).toHaveFocus()
   })
 
   it('ignores Enter while an IME composition is active', async () => {

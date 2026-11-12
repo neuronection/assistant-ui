@@ -35,6 +35,8 @@ export interface CommandListLabels {
   empty?: string
   /** `{count}` is replaced with the visible item count. */
   results?: string
+  /** Accessible name for the listbox when no `title` is rendered. */
+  listLabel?: string
 }
 
 export interface CommandListProps {
@@ -50,10 +52,13 @@ export interface CommandListProps {
   className?: string
 }
 
-const DEFAULT_LABELS: Required<Pick<CommandListLabels, 'placeholder' | 'empty' | 'results'>> = {
+const DEFAULT_LABELS: Required<
+  Pick<CommandListLabels, 'placeholder' | 'empty' | 'results' | 'listLabel'>
+> = {
   placeholder: 'Search commands…',
   empty: 'No matching commands.',
   results: '{count} results',
+  listLabel: 'Commands',
 }
 
 function isIMEComposition(
@@ -100,7 +105,12 @@ export const CommandList = React.forwardRef<HTMLInputElement, CommandListProps>(
     const activeId = isControlled ? activeIdProp : internalActiveId
     const composingRef = React.useRef(false)
 
-    const merged = { ...DEFAULT_LABELS, ...labels }
+    const merged = {
+      placeholder: labels?.placeholder ?? DEFAULT_LABELS.placeholder,
+      empty: labels?.empty ?? DEFAULT_LABELS.empty,
+      results: labels?.results ?? DEFAULT_LABELS.results,
+      listLabel: labels?.listLabel ?? DEFAULT_LABELS.listLabel,
+    }
 
     const updateActiveId = React.useCallback(
       (id: string) => {
@@ -207,9 +217,8 @@ export const CommandList = React.forwardRef<HTMLInputElement, CommandListProps>(
           updateActiveId(enabledEntries[enabledEntries.length - 1]!.item.id)
         }
       } else if (event.key === 'Enter') {
-        if (selectActive()) {
-          event.preventDefault()
-        }
+        event.preventDefault()
+        selectActive()
       } else if (event.key === 'Tab' && tabBehavior === 'select') {
         if (selectActive()) {
           event.preventDefault()
@@ -232,13 +241,18 @@ export const CommandList = React.forwardRef<HTMLInputElement, CommandListProps>(
         {labels?.title ? (
           <div
             id={titleId}
+            role="heading"
+            aria-level={2}
             data-as="command-list-title"
             className="px-3 pt-3 text-sm font-semibold text-[var(--as-fg)]"
           >
             {labels.title}
           </div>
         ) : null}
-        <div className="flex items-center gap-2 border-b border-[var(--as-border)] px-3">
+        <div
+          data-as="command-list-search"
+          className="flex items-center gap-2 border-b border-[var(--as-border)] px-3"
+        >
           <Search className="size-4 shrink-0 text-[var(--as-muted-fg)]" aria-hidden />
           <input
             ref={ref}
@@ -267,13 +281,13 @@ export const CommandList = React.forwardRef<HTMLInputElement, CommandListProps>(
         <div
           id={listId}
           role="listbox"
-          aria-label={labels?.title ? undefined : 'Commands'}
+          aria-label={merged.listLabel}
           aria-labelledby={labels?.title ? titleId : undefined}
           data-as="command-list-listbox"
           className="max-h-80 overflow-y-auto p-1"
         >
-          {filteredGroups.map((group) => {
-            const headingId = `${autoId}-group-${group.id}`
+          {filteredGroups.map((group, groupIndex) => {
+            const headingId = `${autoId}-group-${groupIndex}`
             return (
               <div
                 key={group.id}
@@ -307,7 +321,7 @@ export const CommandList = React.forwardRef<HTMLInputElement, CommandListProps>(
                       className={cn(
                         'flex cursor-pointer items-center gap-2 rounded-[calc(var(--as-radius-sm)-2px)] px-2 py-1.5 text-sm text-[var(--as-fg)] outline-none',
                         isActive && 'bg-[var(--as-secondary)]',
-                        item.disabled && 'cursor-not-allowed opacity-60',
+                        item.disabled && 'cursor-not-allowed',
                       )}
                       onMouseMove={item.disabled ? undefined : () => updateActiveId(item.id)}
                       onClick={() => {
@@ -320,7 +334,14 @@ export const CommandList = React.forwardRef<HTMLInputElement, CommandListProps>(
                         <Icon className="size-4 shrink-0 text-[var(--as-muted-fg)]" aria-hidden />
                       ) : null}
                       <span className="flex min-w-0 flex-1 flex-col text-left">
-                        <span className="truncate">{item.label}</span>
+                        <span
+                          className={cn(
+                            'truncate',
+                            item.disabled && 'text-[var(--as-muted-fg)]',
+                          )}
+                        >
+                          {item.label}
+                        </span>
                         {item.hint ? (
                           <span className="truncate text-xs text-[var(--as-muted-fg)]">
                             {item.hint}
@@ -352,15 +373,16 @@ export const CommandList = React.forwardRef<HTMLInputElement, CommandListProps>(
           >
             {merged.empty}
           </div>
-        ) : null}
-        <div
-          role="status"
-          aria-live="polite"
-          data-as="command-list-results"
-          className="sr-only"
-        >
-          {resultsText}
-        </div>
+        ) : (
+          <div
+            role="status"
+            aria-live="polite"
+            data-as="command-list-results"
+            className="sr-only"
+          >
+            {resultsText}
+          </div>
+        )}
       </div>
     )
   },

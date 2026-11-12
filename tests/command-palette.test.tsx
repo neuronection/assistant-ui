@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { describe, expect, it, vi } from 'vitest'
-import { render, screen, waitFor } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { axe } from 'jest-axe'
 
@@ -58,12 +58,13 @@ describe('CommandPalette', () => {
     await waitFor(() => expect(screen.getByRole('combobox')).toHaveFocus())
   })
 
-  it('selects the active command and closes', async () => {
+  it('selects the active command, closes and restores focus to the trigger', async () => {
     const user = userEvent.setup()
     const onSelect = vi.fn()
     const onOpenChange = vi.fn()
     render(<Harness onSelect={onSelect} onOpenChange={onOpenChange} />)
-    await user.click(screen.getByRole('button', { name: 'Open palette' }))
+    const trigger = screen.getByRole('button', { name: 'Open palette' })
+    await user.click(trigger)
     await screen.findByRole('dialog')
     await user.keyboard('{Enter}')
     expect(onSelect).toHaveBeenCalledWith(
@@ -72,6 +73,7 @@ describe('CommandPalette', () => {
     )
     expect(onOpenChange).toHaveBeenCalledWith(false)
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
+    await waitFor(() => expect(trigger).toHaveFocus())
   })
 
   it('Escape closes and restores focus to the trigger', async () => {
@@ -85,15 +87,57 @@ describe('CommandPalette', () => {
     expect(trigger).toHaveFocus()
   })
 
-  it('does not select on Tab in the modal focus mode', async () => {
+  it('ignores Escape while an IME composition is active', async () => {
+    const user = userEvent.setup()
+    render(<Harness />)
+    await user.click(screen.getByRole('button', { name: 'Open palette' }))
+    await screen.findByRole('dialog')
+    const input = screen.getByRole('combobox')
+
+    fireEvent.compositionStart(input)
+    await user.keyboard('{Escape}')
+    expect(screen.getByRole('dialog')).toBeInTheDocument()
+
+    fireEvent.compositionEnd(input)
+    await user.keyboard('{Escape}')
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
+  })
+
+  it('closes via the close button', async () => {
+    const user = userEvent.setup()
+    render(<Harness />)
+    await user.click(screen.getByRole('button', { name: 'Open palette' }))
+    await screen.findByRole('dialog')
+    await user.click(screen.getByRole('button', { name: 'Close' }))
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
+  })
+
+  it('closes on an overlay click', async () => {
+    const user = userEvent.setup()
+    render(<Harness />)
+    await user.click(screen.getByRole('button', { name: 'Open palette' }))
+    await screen.findByRole('dialog')
+    const overlay = document.body.querySelector('[data-as="modal-overlay"]')
+    expect(overlay).toBeInstanceOf(HTMLElement)
+    await user.click(overlay as HTMLElement)
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
+  })
+
+  it('does not select on Tab in the modal focus mode and traps focus in the dialog', async () => {
     const user = userEvent.setup()
     const onSelect = vi.fn()
     render(<Harness onSelect={onSelect} />)
     await user.click(screen.getByRole('button', { name: 'Open palette' }))
     await screen.findByRole('dialog')
-    await waitFor(() => expect(screen.getByRole('combobox')).toHaveFocus())
+    const input = screen.getByRole('combobox')
+    await waitFor(() => expect(input).toHaveFocus())
+
     await user.tab()
     expect(onSelect).not.toHaveBeenCalled()
+    expect(screen.getByRole('button', { name: 'Close' })).toHaveFocus()
+
+    await user.tab()
+    expect(input).toHaveFocus()
   })
 
   it('has no axe violations when open', async () => {

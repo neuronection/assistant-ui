@@ -32,6 +32,16 @@ describe('ShortcutList', () => {
     expect(screen.getByText('Ctrl K').tagName).toBe('KBD')
     expect(screen.getByText('Ctrl S').tagName).toBe('KBD')
     expect(screen.getAllByRole('listitem')).toHaveLength(4)
+    expect(screen.getAllByRole('list')[0]).toHaveClass('m-0', 'list-none', 'p-0')
+  })
+
+  it('omits empty groups', () => {
+    render(
+      <ShortcutList
+        groups={[...groups, { id: 'empty', label: 'Empty group', entries: [] }]}
+      />,
+    )
+    expect(screen.queryByRole('heading', { name: 'Empty group' })).not.toBeInTheDocument()
   })
 
   it('marks disabled entries without removing them', () => {

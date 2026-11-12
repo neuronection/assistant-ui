@@ -56,7 +56,7 @@ string already formatted by the app (the library does not parse chords).
 | `onQueryChange` | `(query: string) => void` | — | fires per keystroke |
 | `groups` | `CommandGroup[]` | — | app-ordered groups; empty groups are hidden |
 | `onSelect` | `(item, context: { groupId, query }) => void` | — | fires for enabled items only (Enter, Tab in `select` mode, click) |
-| `labels` | `CommandListLabels` | — | `{ title?, placeholder?, empty?, results? }` |
+| `labels` | `CommandListLabels` | — | `{ title?, placeholder?, empty?, results?, listLabel? }` |
 | `activeId` | `string` | — | controlled active item; omit for internal state |
 | `onActiveIdChange` | `(id: string) => void` | — | reports arrow/Home/End moves and filter resets |
 | `tabBehavior` | `'select' \| 'focus'` | `'select'` | inline `select` picks the active item on Tab; modal wrappers pass `focus` |
@@ -66,10 +66,14 @@ string already formatted by the app (the library does not parse chords).
 
 | label | default | notes |
 |---|---|---|
-| `title` | — | optional inline heading; also the search field's accessible name |
+| `title` | — | optional inline heading (level 2); also the search field's accessible name |
 | `placeholder` | `'Search commands…'` | search field placeholder |
-| `empty` | `'No matching commands.'` | shown when nothing matches |
-| `results` | `'{count} results'` | live-region text; `{count}` is replaced with the visible count |
+| `empty` | `'No matching commands.'` | shown in a `role="status"` region when nothing matches |
+| `results` | `'{count} results'` | live-region text; `{count}` is replaced with the visible count; rendered only when the count is above zero |
+| `listLabel` | `'Commands'` | listbox accessible name when no `title` is rendered |
+
+Explicitly passing `undefined` for `placeholder`, `empty` or `results` keeps
+the English default (the merge is nullish, not a spread).
 
 All strings are props with English defaults — pass translated labels at the
 call site. The docs accessibility row is the tested contract.
@@ -86,6 +90,8 @@ call site. The docs accessibility row is the tested contract.
   `aria-activedescendant` there.
 - Disabled items stay visible (with their `disabledReason`) but are skipped by
   keyboard navigation and never fire `onSelect`.
+- `Enter` is always consumed by the list, so an empty or all-disabled result
+  set cannot accidentally submit a surrounding form.
 
 ## examples
 
@@ -156,8 +162,10 @@ const featureMap: CommandGroup[] = [
 See [accessibility.md](../accessibility.md#composite-widgets): combobox +
 listbox + option + group roles, `aria-controls`, `aria-activedescendant`,
 `aria-autocomplete="list"`, ArrowUp/Down (wrap, skipping disabled), Home/End,
-Enter, Tab per `tabBehavior`, IME composition guard, result-count and
-empty-state live regions.
+Enter, Tab per `tabBehavior`, IME composition guard, and exactly one live
+region (result count when items exist, empty state when none do). The title
+renders as a level-2 heading; `listLabel` names the listbox when no title is
+shown.
 
 ## related
 

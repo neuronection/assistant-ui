@@ -35,6 +35,7 @@ export const CommandPalette = React.forwardRef<HTMLInputElement, CommandPaletteP
     const inputRef = React.useRef<HTMLInputElement | null>(null)
     const previouslyFocusedRef = React.useRef<HTMLElement | null>(null)
     const restoreTimerRef = React.useRef<number | null>(null)
+    const composingRef = React.useRef(false)
 
     const setRefs = React.useCallback(
       (node: HTMLInputElement | null) => {
@@ -65,6 +66,17 @@ export const CommandPalette = React.forwardRef<HTMLInputElement, CommandPaletteP
           closeLabel={closeLabel}
           aria-describedby={undefined}
           className="overflow-hidden"
+          onCompositionStart={() => {
+            composingRef.current = true
+          }}
+          onCompositionEnd={() => {
+            composingRef.current = false
+          }}
+          onEscapeKeyDown={(event) => {
+            if (composingRef.current || event.isComposing || event.keyCode === 229) {
+              event.preventDefault()
+            }
+          }}
           onOpenAutoFocus={(event) => {
             event.preventDefault()
             if (restoreTimerRef.current !== null) {
@@ -84,13 +96,19 @@ export const CommandPalette = React.forwardRef<HTMLInputElement, CommandPaletteP
             if (target) {
               restoreTimerRef.current = window.setTimeout(() => {
                 restoreTimerRef.current = null
-                target.focus()
+                target.focus({ preventScroll: true })
               }, 0)
             }
           }}
         >
           <ModalTitle className="sr-only">{ariaLabel}</ModalTitle>
-          <div data-as="command-palette" className={cn('flex min-h-0 flex-col', className)}>
+          <div
+            data-as="command-palette"
+            className={cn(
+              'flex min-h-0 flex-col [&_[data-as=command-list-search]]:pr-12',
+              className,
+            )}
+          >
             <CommandList
               ref={setRefs}
               query={query}

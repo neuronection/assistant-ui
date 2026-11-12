@@ -39,11 +39,14 @@ import type { CommandGroup, CommandItem } from '@neuronection/assistant-ui/comma
   shortcut and any permission filtering.
 - `query` and `activeId` are controlled exactly as in `CommandList`; the
   palette does not reset them on close.
-- Focus lands in the search field on open. Escape and the × close the dialog
-  and restore focus to the element that was focused before opening (works
-  for a `Ctrl/Cmd+K` open with no trigger button).
-- Selecting an enabled item calls `onSelect` and then closes the palette.
-  Disabled items never select.
+- Focus lands in the search field on open. Escape, the × and an overlay click
+  close the dialog and restore focus to the element that was focused before
+  opening (works for a `Ctrl/Cmd+K` open with no trigger button). Escape is
+  ignored while an IME composition is active.
+- Focus is trapped inside the dialog; Tab moves from the search field to the
+  close button and loops back.
+- Selecting an enabled item calls `onSelect`, closes the palette and restores
+  the pre-open focus. Disabled items never select.
 
 ## examples
 
@@ -77,9 +80,10 @@ useEffect(() => {
 ## accessibility
 
 See [accessibility.md](../accessibility.md#composite-widgets): `role="dialog"`
-named by `ariaLabel`, focus trapped and restored, Escape closes, the inner
-`CommandList` keeps the combobox/listbox contract. `tabBehavior` defaults to
-`'focus'` in the modal.
+named by `ariaLabel`, focus trapped in the dialog and restored to the
+pre-open element, Escape/×/overlay close, Escape ignored during IME
+composition, the inner `CommandList` keeps the combobox/listbox contract.
+`tabBehavior` defaults to `'focus'` in the modal.
 
 ## related
 
