@@ -335,7 +335,9 @@ describe('SidebarNav (collapsed rail)', () => {
     expect(overview).toBeInTheDocument()
     await user.click(overview)
     expect(onNavigate).toHaveBeenCalledWith('overview')
-    expect(screen.queryByRole('button', { name: 'Overview' })).toBeNull()
+    await waitFor(() =>
+      expect(screen.queryByRole('button', { name: 'Overview' })).toBeNull(),
+    )
   })
 
   it('group flyout opens on hover after the debounce and closes on Escape', async () => {
@@ -347,7 +349,9 @@ describe('SidebarNav (collapsed rail)', () => {
       expect(screen.getByRole('button', { name: 'Overview' })).toBeInTheDocument(),
     )
     await user.keyboard('{Escape}')
-    expect(screen.queryByRole('button', { name: 'Overview' })).toBeNull()
+    await waitFor(() =>
+      expect(screen.queryByRole('button', { name: 'Overview' })).toBeNull(),
+    )
   })
 
   it('keyboard Escape from a click-opened flyout returns focus to the trigger', async () => {
@@ -357,8 +361,23 @@ describe('SidebarNav (collapsed rail)', () => {
     await user.click(trigger)
     expect(screen.getByRole('button', { name: 'Overview' })).toBeInTheDocument()
     await user.keyboard('{Escape}')
+    await waitFor(() =>
+      expect(screen.queryByRole('button', { name: 'Overview' })).toBeNull(),
+    )
+    await waitFor(() => expect(trigger).toHaveFocus())
+  })
+
+  it('a pending hover-open timer cannot ghost-reopen a flyout closed by Escape', async () => {
+    const user = userEvent.setup()
+    render(<GroupDemo collapsed collapsible />)
+    await user.click(screen.getByRole('button', { name: 'Open Patient record menu' }))
+    expect(screen.getByRole('button', { name: 'Overview' })).toBeInTheDocument()
+    await user.keyboard('{Escape}')
+    await waitFor(() =>
+      expect(screen.queryByRole('button', { name: 'Overview' })).toBeNull(),
+    )
+    await new Promise((resolve) => setTimeout(resolve, 200))
     expect(screen.queryByRole('button', { name: 'Overview' })).toBeNull()
-    expect(trigger).toHaveFocus()
   })
 
   it('flyout arrows move focus between children', async () => {

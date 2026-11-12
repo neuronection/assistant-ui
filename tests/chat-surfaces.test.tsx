@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import React from 'react'
 import { act, fireEvent, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { axe } from 'jest-axe'
@@ -69,6 +70,311 @@ describe('ChatTranscript', () => {
     expect(screen.getByText('custom:a1')).toBeInTheDocument()
   })
 
+  it('passes axe with items and live tail', async () => {
+    const { container } = render(
+      <ChatTranscript items={messages} live={<div>typing…</div>} />,
+    )
+    expect(await axe(container)).toHaveNoViolations()
+  })
+
+  it('counts unread replies while scrolled away and resets on return', async () => {
+    const utils = render(<ChatTranscript items={messages} live={<div>streaming</div>} />)
+    const log = screen.getByRole('log')
+    const overflow = { scrollHeight: 600, clientHeight: 400 }
+    const bottom = overflow.scrollHeight - overflow.clientHeight
+    const writes: number[] = []
+    let scrollTop = 0
+    Object.defineProperty(log, 'scrollHeight', { configurable: true, get: () => overflow.scrollHeight })
+    Object.defineProperty(log, 'clientHeight', { configurable: true, get: () => overflow.clientHeight })
+    Object.defineProperty(log, 'scrollTop', {
+      configurable: true,
+      get: () => scrollTop,
+      set: (value: number) => {
+        scrollTop = Math.max(0, Math.min(value, bottom))
+        writes.push(scrollTop)
+      },
+    })
+    log.scrollTo = vi.fn()
+    await vi.waitFor(() => expect(writes).toContain(bottom))
+    fireEvent.scroll(log)
+
+    fireEvent.wheel(log, { deltaY: -10 })
+    scrollTop = 100
+    fireEvent.scroll(log)
+    utils.rerender(
+      <ChatTranscript
+        items={[...messages, { id: 'a2', role: 'assistant', content: 'missed reply', status: 'done' }]}
+        live={<div>streaming</div>}
+      />,
+    )
+    expect(screen.getByRole('button', { name: 'Scroll to latest — 1 new messages' })).toBeInTheDocument()
+
+    scrollTop = bottom
+    fireEvent.scroll(log)
+    expect(screen.queryByRole('button', { name: /new messages/ })).not.toBeInTheDocument()
+
+    scrollTop = 100
+    fireEvent.scroll(log)
+    utils.rerender(
+      <ChatTranscript
+        items={[...messages, { id: 'a2', role: 'assistant', content: 'missed reply', status: 'done' }, { id: 'a3', role: 'assistant', content: 'another missed', status: 'done' }]}
+        live={<div>streaming</div>}
+      />,
+    )
+    expect(screen.getByRole('button', { name: 'Scroll to latest — 1 new messages' })).toBeInTheDocument()
+  })
+
+  it('resets the unread count when the jump pill is clicked', () => {
+    const utils = render(<ChatTranscript items={messages} />)
+    const log = screen.getByRole('log')
+    const overflow = { scrollHeight: 900, clientHeight: 300 }
+    const bottom = overflow.scrollHeight - overflow.clientHeight
+    let scrollTop = 0
+    Object.defineProperty(log, 'scrollHeight', { configurable: true, get: () => overflow.scrollHeight })
+    Object.defineProperty(log, 'clientHeight', { configurable: true, get: () => overflow.clientHeight })
+    Object.defineProperty(log, 'scrollTop', {
+      configurable: true,
+      get: () => scrollTop,
+      set: (value: number) => {
+        scrollTop = Math.max(0, Math.min(value, bottom))
+      },
+    })
+    log.scrollTo = vi.fn()
+    fireEvent.wheel(log, { deltaY: -10 })
+    utils.rerender(
+      <ChatTranscript
+        items={[...messages, { id: 'a2', role: 'assistant', content: 'missed', status: 'done' }]}
+      />,
+    )
+    expect(screen.getByRole('button', { name: 'Scroll to latest — 1 new messages' })).toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('button', { name: /Scroll to latest/ }))
+    utils.rerender(
+      <ChatTranscript
+        items={[...messages, { id: 'a2', role: 'assistant', content: 'missed', status: 'done' }, { id: 'a3', role: 'assistant', content: 'another', status: 'done' }]}
+      />,
+    )
+    expect(screen.getByRole('button', { name: 'Scroll to latest — 1 new messages' })).toBeInTheDocument()
+  })
+
+  it('groups consecutive same-role messages with position hooks and tighter spacing', () => {
+    const grouped: ChatMessageView[] = [
+      { id: 'u1', role: 'user', content: 'q1', status: 'done' },
+      { id: 'a1', role: 'assistant', content: 'r1', status: 'done' },
+      { id: 'a2', role: 'assistant', content: 'r2', status: 'done' },
+      { id: 'a3', role: 'assistant', content: 'r3', status: 'done' },
+      { id: 'u2', role: 'user', content: 'q2', status: 'done' },
+    ]
+    const { container } = render(<ChatTranscript items={grouped} groupConsecutive />)
+    const positions = Array.from(container.querySelectorAll('[data-group-pos]')).map(
+      (row) => row.getAttribute('data-group-pos'),
+    )
+    expect(positions).toEqual(['single', 'start', 'mid', 'end', 'single'])
+    const rows = container.querySelectorAll('[data-group-pos]')
+    expect(rows[2]).toHaveClass('-mt-2')
+    expect(rows[3]).toHaveClass('-mt-2')
+    expect(rows[0]).not.toHaveClass('-mt-2')
+  })
+
+  it('hands the group position to a custom renderItem', () => {
+    const seen: (string | undefined)[] = []
+    render(
+      <ChatTranscript
+        items={[
+          { id: 'a1', role: 'assistant', content: 'r1', status: 'done' },
+          { id: 'a2', role: 'assistant', content: 'r2', status: 'done' },
+        ]}
+        groupConsecutive
+        renderItem={(message, _index, groupPos) => {
+          seen.push(groupPos)
+          return <p key={message.id}>{message.content}</p>
+        }}
+      />,
+    )
+    expect(seen).toEqual(['start', 'end'])
+  })
+
+  it('renders the default renderer in the requested design', () => {
+    const { container } = render(
+      <ChatTranscript
+        items={[{ id: 'a1', role: 'assistant', content: 'flat reply', status: 'done' }]}
+        design="flat"
+      />,
+    )
+    expect(container.querySelector('[data-as="chat-message"]')).toHaveAttribute('data-design', 'flat')
+  })
+
+  it('searches the conversation: field, match count, highlight and jump flash', async () => {
+    const user = userEvent.setup()
+    const scrollIntoView = vi.fn()
+    Element.prototype.scrollIntoView = scrollIntoView
+    const searchable: ChatMessageView[] = [
+      { id: 'u1', role: 'user', content: 'what is a limit?', status: 'done' },
+      { id: 'a1', role: 'assistant', content: 'a limit is a value', status: 'done' },
+      { id: 'u2', role: 'user', content: 'unrelated', status: 'done' },
+      { id: 'a2', role: 'assistant', content: 'the limit exists', status: 'done' },
+    ]
+    function SearchHarness() {
+      const [query, setQuery] = React.useState('')
+      return <ChatTranscript items={searchable} search={{ query, onQueryChange: setQuery }} />
+    }
+    render(<SearchHarness />)
+    const field = screen.getByRole('textbox', { name: 'Search conversation' })
+    expect(screen.getByText('0')).toBeInTheDocument()
+    await user.type(field, 'limit')
+    expect(screen.getByText('1/3')).toBeInTheDocument()
+    expect(document.querySelectorAll('mark[data-as="chat-search-match"]').length).toBeGreaterThan(0)
+    expect(row('u1')).toHaveAttribute('data-search-flash', 'true')
+
+    await user.click(screen.getByRole('button', { name: 'Next match' }))
+    expect(screen.getByText('2/3')).toBeInTheDocument()
+    expect(row('a1')).toHaveAttribute('data-search-flash', 'true')
+
+    await user.click(screen.getByRole('button', { name: 'Previous match' }))
+    expect(screen.getByText('1/3')).toBeInTheDocument()
+    expect(scrollIntoView).toHaveBeenCalled()
+
+    function row(id: string) {
+      return document.querySelector(`[data-message-id="${id}"]`)!
+    }
+  })
+
+  it('hands the active query to a custom renderItem', () => {
+    const seen: (string | undefined)[] = []
+    render(
+      <ChatTranscript
+        items={[{ id: 'a1', role: 'assistant', content: 'hello limit', status: 'done' }]}
+        search={{ query: 'limit', onQueryChange: () => {} }}
+        renderItem={(message, _index, _groupPos, query) => {
+          seen.push(query)
+          return <p key={message.id}>{query ? `q:${query}` : message.content}</p>
+        }}
+      />,
+    )
+    expect(seen[0]).toBe('limit')
+    expect(seen.every((entry) => entry === 'limit')).toBe(true)
+    expect(screen.getByText('q:limit')).toBeInTheDocument()
+  })
+
+  it('clears the query from the field with Escape', async () => {
+    const user = userEvent.setup()
+    const onQueryChange = vi.fn()
+    render(
+      <ChatTranscript
+        items={[{ id: 'a1', role: 'assistant', content: 'needle here', status: 'done' }]}
+        search={{ query: 'needle', onQueryChange }}
+      />,
+    )
+    await user.type(screen.getByRole('textbox', { name: 'Search conversation' }), '{Escape}')
+    expect(onQueryChange).toHaveBeenLastCalledWith('')
+  })
+
+  it('passes axe with the search field and marks', async () => {
+    const { container } = render(
+      <ChatTranscript
+        items={[{ id: 'a1', role: 'assistant', content: 'needle here', status: 'done' }]}
+        search={{ query: 'needle', onQueryChange: () => {} }}
+      />,
+    )
+    expect(await axe(container)).toHaveNoViolations()
+  })
+
+  it('separates day groups with Today/Yesterday/date chips', () => {
+    const now = Date.now()
+    const day = 86_400_000
+    const { container } = render(
+      <ChatTranscript
+        showDateSeparators
+        items={[
+          { id: 'u0', role: 'user', content: 'old', status: 'done', createdAt: new Date(now - 5 * day).toISOString() },
+          { id: 'u1', role: 'user', content: 'yesterday question', status: 'done', createdAt: new Date(now - day).toISOString() },
+          { id: 'a1', role: 'assistant', content: 'yesterday answer', status: 'done', createdAt: new Date(now - day).toISOString() },
+          { id: 'u2', role: 'user', content: 'today question', status: 'done', createdAt: new Date(now).toISOString() },
+        ]}
+      />,
+    )
+    const separators = container.querySelectorAll('[data-as="chat-date-separator"]')
+    expect(separators).toHaveLength(2)
+    expect(separators[0]).toHaveAttribute('aria-label', 'Yesterday')
+    expect(separators[1]).toHaveAttribute('aria-label', 'Today')
+  })
+
+  it('honors a custom date formatter for older days', () => {
+    const { container } = render(
+      <ChatTranscript
+        showDateSeparators
+        formatDate={(date) => `day ${date.getDate()}`}
+        items={[
+          { id: 'u0', role: 'user', content: 'old', status: 'done', createdAt: new Date(2026, 0, 2).toISOString() },
+          { id: 'u1', role: 'user', content: 'older', status: 'done', createdAt: new Date(2026, 0, 1).toISOString() },
+        ]}
+      />,
+    )
+    const separators = container.querySelectorAll('[data-as="chat-date-separator"]')
+    expect(separators).toHaveLength(1)
+    expect(separators[0]).toHaveAttribute('aria-label', 'day 1')
+  })
+
+  it('scrolls to and flashes the focused message', () => {
+    const scrollIntoView = vi.fn()
+    Element.prototype.scrollIntoView = scrollIntoView
+    const { rerender } = render(
+      <ChatTranscript
+        items={[
+          { id: 'u1', role: 'user', content: 'one', status: 'done' },
+          { id: 'a1', role: 'assistant', content: 'two', status: 'done' },
+        ]}
+        focusMessageId={null}
+      />,
+    )
+    rerender(
+      <ChatTranscript
+        items={[
+          { id: 'u1', role: 'user', content: 'one', status: 'done' },
+          { id: 'a1', role: 'assistant', content: 'two', status: 'done' },
+        ]}
+        focusMessageId="a1"
+      />,
+    )
+    const row = document.querySelector('[data-message-id="a1"]')!
+    expect(row).toHaveAttribute('data-search-flash', 'true')
+    expect(scrollIntoView).toHaveBeenCalled()
+  })
+
+  it('shows a floating stop pill while streaming away from the bottom', async () => {
+    const onStop = vi.fn()
+    const utils = render(
+      <ChatTranscript
+        items={messages}
+        live={<div>streaming</div>}
+        onStop={onStop}
+      />,
+    )
+    const log = screen.getByRole('log')
+    const overflow = { scrollHeight: 900, clientHeight: 300 }
+    const bottom = overflow.scrollHeight - overflow.clientHeight
+    let scrollTop = 0
+    Object.defineProperty(log, 'scrollHeight', { configurable: true, get: () => overflow.scrollHeight })
+    Object.defineProperty(log, 'clientHeight', { configurable: true, get: () => overflow.clientHeight })
+    Object.defineProperty(log, 'scrollTop', {
+      configurable: true,
+      get: () => scrollTop,
+      set: (value: number) => {
+        scrollTop = Math.max(0, Math.min(value, bottom))
+      },
+    })
+    log.scrollTo = vi.fn()
+    await vi.waitFor(() => expect(scrollTop).toBe(bottom))
+    expect(screen.queryByRole('button', { name: 'Stop generating' })).not.toBeInTheDocument()
+
+    fireEvent.wheel(log, { deltaY: -10 })
+    const stopPill = screen.getByRole('button', { name: 'Stop generating' })
+    expect(stopPill).toBeInTheDocument()
+    fireEvent.click(stopPill)
+    expect(onStop).toHaveBeenCalledTimes(1)
+    void utils
+  })
+
   it('virtualizes long transcripts without losing messages', () => {
     const many: ChatMessageView[] = Array.from({ length: 50 }, (_, i) => ({
       id: `m${i}`,
@@ -83,13 +389,6 @@ describe('ChatTranscript', () => {
     expect(virtualizedTexts(rows)).toEqual(
       expect.arrayContaining([expect.stringMatching(/^message \d+$/)]),
     )
-  })
-
-  it('passes axe with items and live tail', async () => {
-    const { container } = render(
-      <ChatTranscript items={messages} live={<div>typing…</div>} />,
-    )
-    expect(await axe(container)).toHaveNoViolations()
   })
 })
 

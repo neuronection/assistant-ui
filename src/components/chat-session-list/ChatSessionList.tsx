@@ -18,6 +18,7 @@ export interface ChatSessionListLabels {
   searchPlaceholder: string
   newChat: string
   rename: string
+  renameInput: string
   delete: string
   export: string
   today: string
@@ -40,6 +41,12 @@ export interface ChatSessionListProps {
   onSelect: (id: string) => void
   onNew?: () => void
   onRename?: (id: string) => void
+  /**
+   * Inline rename: when provided, the rename action edits the title in
+   * place (Enter/blur commits, Escape cancels) instead of invoking
+   * `onRename` — keep `onRename` for dialog-based flows only.
+   */
+  onRenameCommit?: (id: string, title: string) => void
   onDelete?: (id: string) => void
   onExport?: (id: string) => void
   searchable?: boolean
@@ -89,6 +96,7 @@ export const ChatSessionList = React.forwardRef<HTMLDivElement, ChatSessionListP
       onSelect,
       onNew,
       onRename,
+      onRenameCommit,
       onDelete,
       onExport,
       searchable = true,
@@ -100,6 +108,8 @@ export const ChatSessionList = React.forwardRef<HTMLDivElement, ChatSessionListP
     ref,
   ) {
     const [query, setQuery] = React.useState('')
+    const [editingId, setEditingId] = React.useState<string | null>(null)
+    const [draftTitle, setDraftTitle] = React.useState('')
     const NewIcon = icons?.newChat ?? MessageSquarePlus
     const RenameIcon = icons?.rename ?? Pencil
     const DeleteIcon = icons?.delete ?? Trash2
@@ -187,7 +197,7 @@ export const ChatSessionList = React.forwardRef<HTMLDivElement, ChatSessionListP
         ) : filtered.length === 0 ? (
           <p className="px-2 py-3 text-xs text-[var(--as-muted-fg)]">{labels?.noResults ?? 'No matches'}</p>
         ) : (
-          <div role="list" aria-label={labels?.search ?? 'Conversations'} className="min-h-0 flex-1 overflow-y-auto">
+          <div role="list" aria-label={labels?.search ?? 'Conversations'} data-as="chat-session-rows" className="min-h-0 flex-1 overflow-y-auto">
             {groups.map((group) => (
               <div key={group.key} className="mb-2">
                 {group.label ? (
@@ -198,15 +208,29 @@ export const ChatSessionList = React.forwardRef<HTMLDivElement, ChatSessionListP
                 {group.sessions.map((session) => {
                   const isActive = session.id === activeId
                   const date = toDate(session.updatedAt)
+                  const isEditing = editingId === session.id
+                  const commitRename = () => {
+                    if (editingId !== null && draftTitle.trim() !== '') {
+                      onRenameCommit?.(editingId, draftTitle.trim())
+                    }
+                    setEditingId(null)
+                  }
                   const actions =
-                    onRename || onDelete || onExport
+                    onRename || onRenameCommit || onDelete || onExport
                       ? [
-                          onRename
+                          onRename || onRenameCommit
                             ? {
                                 key: 'rename',
                                 label: labels?.rename ?? 'Rename',
                                 icon: <RenameIcon className="size-3.5" aria-hidden />,
-                                onSelect: () => onRename(session.id),
+                                onSelect: () => {
+                                  if (onRenameCommit !== undefined) {
+                                    setEditingId(session.id)
+                                    setDraftTitle(session.title)
+                                  } else {
+                                    onRename?.(session.id)
+                                  }
+                                },
                               }
                             : null,
                           onExport
@@ -247,7 +271,29 @@ export const ChatSessionList = React.forwardRef<HTMLDivElement, ChatSessionListP
                       }}
                       tabIndex={0}
                     >
-                      <span className="line-clamp-2 min-w-0 flex-1 text-[var(--as-fg)]">{session.title}</span>
+                      {isEditing ? (
+                        <input
+                          autoFocus
+                          value={draftTitle}
+                          aria-label={labels?.renameInput ?? 'Conversation title'}
+                          onChange={(event) => setDraftTitle(event.target.value)}
+                          onClick={(event) => event.stopPropagation()}
+                          onKeyDown={(event) => {
+                            event.stopPropagation()
+                            if (event.key === 'Enter') {
+                              event.preventDefault()
+                              commitRename()
+                            } else if (event.key === 'Escape') {
+                              event.preventDefault()
+                              setEditingId(null)
+                            }
+                          }}
+                          onBlur={commitRename}
+                          className="min-w-0 flex-1 rounded-[var(--as-radius-sm)] border border-[var(--as-primary)] bg-[var(--as-surface)] px-1.5 py-0.5 text-xs text-[var(--as-fg)] focus-visible:outline-none"
+                        />
+                      ) : (
+                        <span className="line-clamp-2 min-w-0 flex-1 text-[var(--as-fg)]">{session.title}</span>
+                      )}
                       {date ? (
                         <span className="shrink-0 text-[10px] text-[var(--as-muted-fg)]">
                           {formatDistanceToNow(date, { addSuffix: true })}

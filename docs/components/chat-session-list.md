@@ -20,6 +20,7 @@ import { ChatSessionList } from '@neuronection/assistant-ui/chat-session-list'
 | `activeId` | `string \| null` | Marks `aria-current`. |
 | `onSelect` | `(id) => void` | Row click / Enter. |
 | `onNew` / `onRename` / `onDelete` / `onExport` | `(id?) => void` | Optional actions; absent handlers render nothing. |
+| `onRenameCommit` | `(id, title) => void` | Inline rename: when provided, the rename action edits the title in place (Enter/blur commits, Escape cancels) instead of invoking `onRename` — keep `onRename` for dialog-based flows. |
 | `searchable` / `groupByDate` | `boolean` | Both default `true`. |
 | `labels` / `icons` | | All strings; icon overrides. |
 

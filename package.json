@@ -1,6 +1,6 @@
 {
   "name": "@neuronection/assistant-ui",
-  "version": "0.51.0",
+  "version": "0.84.0",
   "description": "Shared React component library for the Assistant family (career-, study-, health-, desktop-assistant). Family look by default, app-flavored via CSS-variable tokens.",
   "type": "module",
   "packageManager": "pnpm@11.22.0",
@@ -79,6 +79,18 @@
       "types": "./dist/chat-panel.d.ts",
       "import": "./dist/chat-panel.js"
     },
+    "./chat-pending": {
+      "types": "./dist/chat-pending.d.ts",
+      "import": "./dist/chat-pending.js"
+    },
+    "./chat-welcome": {
+      "types": "./dist/chat-welcome.d.ts",
+      "import": "./dist/chat-welcome.js"
+    },
+    "./chat-suggestion-card": {
+      "types": "./dist/chat-suggestion-card.d.ts",
+      "import": "./dist/chat-suggestion-card.js"
+    },
     "./chat-transcript": {
       "types": "./dist/chat-transcript.d.ts",
       "import": "./dist/chat-transcript.js"
@@ -90,6 +102,10 @@
     "./chat-branch-tree": {
       "types": "./dist/chat-branch-tree.d.ts",
       "import": "./dist/chat-branch-tree.js"
+    },
+    "./concept-graph": {
+      "types": "./dist/concept-graph.d.ts",
+      "import": "./dist/concept-graph.js"
     },
     "./chat-drawer": {
       "types": "./dist/chat-drawer.d.ts",
@@ -142,6 +158,62 @@
     "./connection-test-row": {
       "types": "./dist/connection-test-row.d.ts",
       "import": "./dist/connection-test-row.js"
+    },
+    "./web-search-providers": {
+      "types": "./dist/web-search-providers.d.ts",
+      "import": "./dist/web-search-providers.js"
+    },
+    "./translation-providers": {
+      "types": "./dist/translation-providers.d.ts",
+      "import": "./dist/translation-providers.js"
+    },
+    "./integration-contracts": {
+      "types": "./dist/integration-contracts.d.ts",
+      "import": "./dist/integration-contracts.js"
+    },
+    "./integration-atoms": {
+      "types": "./dist/integration-atoms.d.ts",
+      "import": "./dist/integration-atoms.js"
+    },
+    "./integration-card": {
+      "types": "./dist/integration-card.d.ts",
+      "import": "./dist/integration-card.js"
+    },
+    "./integration-catalog-grid": {
+      "types": "./dist/integration-catalog-grid.d.ts",
+      "import": "./dist/integration-catalog-grid.js"
+    },
+    "./integration-instances-list": {
+      "types": "./dist/integration-instances-list.d.ts",
+      "import": "./dist/integration-instances-list.js"
+    },
+    "./integration-sources-list": {
+      "types": "./dist/integration-sources-list.d.ts",
+      "import": "./dist/integration-sources-list.js"
+    },
+    "./add-integration-source-dialog": {
+      "types": "./dist/add-integration-source-dialog.d.ts",
+      "import": "./dist/add-integration-source-dialog.js"
+    },
+    "./consent-dialog": {
+      "types": "./dist/consent-dialog.d.ts",
+      "import": "./dist/consent-dialog.js"
+    },
+    "./integration-config-form": {
+      "types": "./dist/integration-config-form.d.ts",
+      "import": "./dist/integration-config-form.js"
+    },
+    "./integration-action-result-dialog": {
+      "types": "./dist/integration-action-result-dialog.d.ts",
+      "import": "./dist/integration-action-result-dialog.js"
+    },
+    "./integration-docs-dialog": {
+      "types": "./dist/integration-docs-dialog.d.ts",
+      "import": "./dist/integration-docs-dialog.js"
+    },
+    "./surface-renderer": {
+      "types": "./dist/surface-renderer.d.ts",
+      "import": "./dist/surface-renderer.js"
     },
     "./check-indicator": {
       "types": "./dist/check-indicator.d.ts",
@@ -247,6 +319,14 @@
       "types": "./dist/modal.d.ts",
       "import": "./dist/modal.js"
     },
+    "./model-price-meta": {
+      "types": "./dist/model-price-meta.d.ts",
+      "import": "./dist/model-price-meta.js"
+    },
+    "./model-price-table": {
+      "types": "./dist/model-price-table.d.ts",
+      "import": "./dist/model-price-table.js"
+    },
     "./model-picker": {
       "types": "./dist/model-picker.d.ts",
       "import": "./dist/model-picker.js"
@@ -258,6 +338,10 @@
     "./model-registry": {
       "types": "./dist/model-registry.d.ts",
       "import": "./dist/model-registry.js"
+    },
+    "./multi-select-picker": {
+      "types": "./dist/multi-select-picker.d.ts",
+      "import": "./dist/multi-select-picker.js"
     },
     "./task-assignment-picker": {
       "types": "./dist/task-assignment-picker.d.ts",
@@ -278,6 +362,42 @@
     "./provider-form": {
       "types": "./dist/provider-form.d.ts",
       "import": "./dist/provider-form.js"
+    },
+    "./provider-logo": {
+      "types": "./dist/provider-logo.d.ts",
+      "import": "./dist/provider-logo.js"
+    },
+    "./provider-setup-form": {
+      "types": "./dist/provider-setup-form.d.ts",
+      "import": "./dist/provider-setup-form.js"
+    },
+    "./provider-setup-tiles": {
+      "types": "./dist/provider-setup-tiles.d.ts",
+      "import": "./dist/provider-setup-tiles.js"
+    },
+    "./setup-first-run-card": {
+      "types": "./dist/setup-first-run-card.d.ts",
+      "import": "./dist/setup-first-run-card.js"
+    },
+    "./setup-review": {
+      "types": "./dist/setup-review.d.ts",
+      "import": "./dist/setup-review.js"
+    },
+    "./setup-steps": {
+      "types": "./dist/setup-steps.d.ts",
+      "import": "./dist/setup-steps.js"
+    },
+    "./setup-assignments": {
+      "types": "./dist/setup-assignments.d.ts",
+      "import": "./dist/setup-assignments.js"
+    },
+    "./provider-card": {
+      "types": "./dist/provider-card.d.ts",
+      "import": "./dist/provider-card.js"
+    },
+    "./switch-row": {
+      "types": "./dist/switch-row.d.ts",
+      "import": "./dist/switch-row.js"
     },
     "./portal": {
       "types": "./dist/portal.d.ts",
@@ -347,6 +467,10 @@
       "types": "./dist/sidebar-nav.d.ts",
       "import": "./dist/sidebar-nav.js"
     },
+    "./family-menu": {
+      "types": "./dist/family-menu.d.ts",
+      "import": "./dist/family-menu.js"
+    },
     "./user-menu": {
       "types": "./dist/user-menu.d.ts",
       "import": "./dist/user-menu.js"
@@ -374,6 +498,10 @@
     "./undo-notice": {
       "types": "./dist/undo-notice.d.ts",
       "import": "./dist/undo-notice.js"
+    },
+    "./import-review-card": {
+      "types": "./dist/import-review-card.d.ts",
+      "import": "./dist/import-review-card.js"
     },
     "./upload-dropzone": {
       "types": "./dist/upload-dropzone.d.ts",
@@ -440,10 +568,15 @@
     "@tiptap/starter-kit": "^3.31.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "d3-force": "^3.0.0",
+    "dagre": "^0.8.5",
+    "dompurify": "^3.2.7",
     "date-fns": "^4.4.0",
+    "html-to-image": "^1.11.13",
     "katex": "^0.19.0",
     "mermaid": "^11.17.2",
     "react-markdown": "^10.1.0",
+    "reactflow": "^11.11.4",
     "rehype-katex": "^7.0.1",
     "remark-gfm": "^4.0.1",
     "remark-math": "^6.0.0",
@@ -460,6 +593,8 @@
     "@testing-library/jest-dom": "^7.0.1",
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^14.6.1",
+    "@types/d3-force": "^3.0.10",
+    "@types/dagre": "^0.7.54",
     "@types/node": "^26.2.0",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",

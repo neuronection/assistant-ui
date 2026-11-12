@@ -2,8 +2,8 @@
 
 Shared React component library for the Assistant family (career-, study-,
 health-, desktop-assistant). Published as `@neuronection/assistant-ui` on npm.
-Strategy lives in `dev/plans/` (local-only, gitignored — keep your own
-backups). In-repo docs: `docs/` is the source of truth for workflows.
+Longer-range planning notes are local-only; the tracked `docs/` are the
+source of truth for workflows.
 
 ## Non-negotiable rules
 
@@ -36,6 +36,13 @@ pnpm test:visual                          # Playwright screenshots of every Ladl
 
 ## Gotchas learned the hard way
 
+- `pnpm dev` (its `watch:css`) rewrites `dist/styles.css` — unminified, in a
+  loop — for as long as Ladle runs, and the test suite reads
+  `dist/styles.css` from the PREVIOUS build (`verify` runs tests before
+  build). Verifying while a Ladle session is live, or right after killing
+  one, fails `tests/styles.test.ts` on the minified-CSS assertion through no
+  fault of the change. Never overlap `pnpm dev` with `pnpm verify`; run
+  `pnpm build` once after killing Ladle before re-verifying.
 - `pnpm test:visual -- --update-snapshots` **doesn't work** — pnpm mangles
   the flag; use `pnpm exec playwright test --update-snapshots`.
 - `dist/styles.css` must ship **without `@layer`s** (TW3 preflight is
