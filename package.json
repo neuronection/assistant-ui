@@ -27,6 +27,10 @@
       "types": "./dist/about.d.ts",
       "import": "./dist/about.js"
     },
+    "./account-session-list": {
+      "types": "./dist/account-session-list.d.ts",
+      "import": "./dist/account-session-list.js"
+    },
     "./admin-user-table": {
       "types": "./dist/admin-user-table.d.ts",
       "import": "./dist/admin-user-table.js"
@@ -426,6 +430,10 @@
     "./search-input": {
       "types": "./dist/search-input.d.ts",
       "import": "./dist/search-input.js"
+    },
+    "./secret-once-block": {
+      "types": "./dist/secret-once-block.d.ts",
+      "import": "./dist/secret-once-block.js"
     },
     "./segmented-tabs": {
       "types": "./dist/segmented-tabs.d.ts",

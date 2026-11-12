@@ -4,6 +4,7 @@ import { join, basename } from 'node:path'
 const LIBRARY_COMPONENTS = [
   'AboutCard',
   'AdminUserTable',
+  'AccountSessionList',
   'InstanceModeControl',
   'AuthGate',
   'AboutLinkList',
@@ -156,6 +157,7 @@ const LIBRARY_COMPONENTS = [
   'ScaleSlider',
   'scaleColorForValue',
   'SearchInput',
+  'SecretOnceBlock',
   'SegmentedTabs',
   'SelectionBar',
   'SettingsShell',
