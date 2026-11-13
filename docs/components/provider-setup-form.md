@@ -43,12 +43,15 @@ Extends `React.ComponentProps<'form'>` (spread onto the root form).
 | `copyLabel` | `string` | `'Copy'` | copy button name |
 | `getKeyLabel` | `string` | `'Get an API key'` | link/button label |
 | `nameLabel` / `apiKeyLabel` / `keyPlaceholder` | `string` | `'Connection name'` / `'API key'` / `'sk-…'` | field labels |
+| `hideName` | `boolean` | `false` | omit the connection-name input; `value.name` still round-trips (apps that derive the name from the preset leave it empty) |
 | `noKeyLabel` | `string` | `'Runs on your machine — no API key needed.'` | shown for `local` presets |
 | `advancedLabel` / `baseUrlLabel` / `baseUrlHint` | `string` | `'Advanced'` / `'API base URL'` / — | disclosure + base-URL field (hint renders only when the base is editable) |
 | `submitLabel` / `cancelLabel` | `string` | `'Connect'` / `'Back'` | action row |
 
 The submit button disables while `testing` or — for non-local presets —
-while the key field is empty.
+while the key field is empty. `hideName` is for app surfaces that treat the
+preset name as the connection name (for example a first-run wizard); the
+controlled value still carries whatever `name` the app supplies.
 
 ## controlled contract
 

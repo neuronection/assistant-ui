@@ -89,6 +89,9 @@ export interface ProviderSetupFormProps
   copyLabel?: string
   getKeyLabel?: string
   nameLabel?: string
+  /** Omit the connection-name input (the app derives the name from the
+   * preset); the controlled `value.name` still round-trips unchanged. */
+  hideName?: boolean
   apiKeyLabel?: string
   keyPlaceholder?: string
   noKeyLabel?: string
@@ -125,6 +128,7 @@ export const ProviderSetupForm = React.forwardRef<
     copyLabel = 'Copy',
     getKeyLabel = 'Get an API key',
     nameLabel = 'Connection name',
+    hideName = false,
     apiKeyLabel = 'API key',
     keyPlaceholder = 'sk-…',
     noKeyLabel = 'Runs on your machine — no API key needed.',
@@ -232,12 +236,14 @@ export const ProviderSetupForm = React.forwardRef<
         <p className="text-xs text-[var(--as-muted-fg)]">{preset.freeTierNote}</p>
       ) : null}
 
-      <Input
-        label={nameLabel}
-        value={value.name}
-        placeholder={preset.name}
-        onChange={(event) => onChange({ ...value, name: event.target.value })}
-      />
+      {hideName ? null : (
+        <Input
+          label={nameLabel}
+          value={value.name}
+          placeholder={preset.name}
+          onChange={(event) => onChange({ ...value, name: event.target.value })}
+        />
+      )}
 
       {preset.local ? (
         <p className="text-sm text-[var(--as-muted-fg)]">{noKeyLabel}</p>

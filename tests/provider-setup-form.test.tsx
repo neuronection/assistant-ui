@@ -27,12 +27,14 @@ function FormDemo({
   preset: presetProp = preset,
   initialValue,
   error,
+  hideName,
   onValueChange,
   onCopyStep,
 }: {
   preset?: ProviderSetupFormPreset
   initialValue?: Partial<ProviderSetupFormValue>
   error?: ProviderSetupFormError | null
+  hideName?: boolean
   onValueChange?: Change
   onCopyStep?: (command: string) => void
 }) {
@@ -54,6 +56,7 @@ function FormDemo({
       onSubmit={() => {}}
       onCancel={() => {}}
       error={error}
+      hideName={hideName}
       onCopyStep={onCopyStep}
     />
   )
@@ -104,6 +107,36 @@ describe('ProviderSetupForm', () => {
     expect(copyButtons).toHaveLength(1)
     await user.click(copyButtons[0]!)
     expect(onCopyStep).toHaveBeenCalledWith('ollama pull gpt-9-turbo')
+  })
+
+  it('hideName omits the connection-name input but keeps value.name controlled', async () => {
+    const user = userEvent.setup()
+    const onSubmit = vi.fn()
+    function HiddenNameDemo() {
+      const [value, setValue] = React.useState<ProviderSetupFormValue>({
+        name: 'OpenAI',
+        apiKey: '',
+        baseUrl: 'https://api.openai.com/v1',
+      })
+      return (
+        <ProviderSetupForm
+          preset={preset}
+          value={value}
+          onChange={setValue}
+          onSubmit={onSubmit}
+          hideName
+        />
+      )
+    }
+    render(<HiddenNameDemo />)
+    expect(screen.queryByLabelText('Connection name')).not.toBeInTheDocument()
+    await user.type(screen.getByLabelText('API key'), 'sk-test')
+    await user.click(screen.getByRole('button', { name: 'Connect' }))
+    expect(onSubmit).toHaveBeenCalledWith({
+      name: 'OpenAI',
+      apiKey: 'sk-test',
+      baseUrl: 'https://api.openai.com/v1',
+    })
   })
 
   it('key field is write-only: password + autoComplete new-password', () => {
@@ -218,6 +251,13 @@ describe('ProviderSetupForm', () => {
   it('has no axe violations', async () => {
     const { container } = render(
       <FormDemo error={{ code: 'timeout' }} initialValue={{ apiKey: 'sk-x' }} />,
+    )
+    expect(await axe(container)).toHaveNoViolations()
+  })
+
+  it('has no axe violations with the name field hidden', async () => {
+    const { container } = render(
+      <FormDemo hideName initialValue={{ apiKey: 'sk-x' }} />,
     )
     expect(await axe(container)).toHaveNoViolations()
   })

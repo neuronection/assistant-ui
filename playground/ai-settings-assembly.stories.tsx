@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { HardDriveDownload } from 'lucide-react'
 import {
   ProviderSetupTiles,
   ProviderSetupManualTile,
@@ -98,6 +99,12 @@ export const AiSettingsSetupTilesStory = () => {
         <ProviderSetupManualTile onClick={() => setSelected('custom')}>
           Manual setup
         </ProviderSetupManualTile>
+        <ProviderSetupManualTile
+          icon={HardDriveDownload}
+          onClick={() => setSelected('local')}
+        >
+          Local engines
+        </ProviderSetupManualTile>
       </ProviderSetupTiles>
       <p style={{ marginTop: 8, fontSize: 12 }}>selected: {selected ?? '—'}</p>
     </div>
@@ -137,6 +144,33 @@ const reviewModels = [
   { id: 'jev-latest', name: 'jev-latest', caps: ['decision'], selected: true },
   { id: 'openrouter.jev-latest', name: 'openrouter.jev-latest', caps: ['decision'], selected: false },
 ]
+
+export const AiSettingsSetupFormNoNameStory = () => {
+  const [value, setValue] = useState<ProviderSetupFormValue>({
+    name: 'OpenAI',
+    apiKey: '',
+    baseUrl: 'https://api.openai.com/v1',
+  })
+  return (
+    <div style={{ maxWidth: 460 }}>
+      <ProviderSetupForm
+        preset={{
+          key: 'openai',
+          name: 'OpenAI',
+          keyUrl: 'https://platform.openai.com/api-keys',
+          steps: ['Open {url}', 'Create a key', 'Paste it below'],
+          fixedBase: false,
+          baseUrl: 'https://api.openai.com/v1',
+        }}
+        value={value}
+        onChange={setValue}
+        onSubmit={() => {}}
+        onCancel={() => {}}
+        hideName
+      />
+    </div>
+  )
+}
 
 export const AiSettingsReviewStory = () => {
   const [options, setOptions] = useState<SetupReviewOptions>({
