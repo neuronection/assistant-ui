@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from 'vitest'
 import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { axe } from 'jest-axe'
+import { HardDriveDownload } from 'lucide-react'
 import {
   ProviderSetupTiles,
   ProviderSetupManualTile,
@@ -89,6 +90,26 @@ describe('ProviderSetupTiles', () => {
     expect(onManual).toHaveBeenCalledOnce()
   })
 
+  it('manual tile keeps the settings glyph by default and accepts an icon override', () => {
+    const { container: base } = render(
+      <ProviderSetupTiles presets={presets} onSelect={() => {}}>
+        <ProviderSetupManualTile>Manual setup</ProviderSetupManualTile>
+      </ProviderSetupTiles>,
+    )
+    const baseManual = screen.getByRole('button', { name: /manual setup/i })
+    expect(baseManual.querySelector('svg[class*="settings-2"]')).toBeInTheDocument()
+    expect(base.querySelector('svg[class*="hard-drive-download"]')).toBeNull()
+
+    render(
+      <ProviderSetupTiles presets={presets} onSelect={() => {}}>
+        <ProviderSetupManualTile icon={HardDriveDownload}>Local engines</ProviderSetupManualTile>
+      </ProviderSetupTiles>,
+    )
+    const local = screen.getByRole('button', { name: /local engines/i })
+    expect(local.querySelector('svg[class*="hard-drive-download"]')).toBeInTheDocument()
+    expect(local.querySelector('svg[class*="settings-2"]')).toBeNull()
+  })
+
   it('renders per-tile capability chips in the given order, neutral (equal weight)', async () => {
     const user = userEvent.setup()
     const onSelect = vi.fn()
@@ -127,7 +148,9 @@ describe('ProviderSetupTiles', () => {
         ]}
         configured={['openai']}
         onSelect={() => {}}
-      />,
+      >
+        <ProviderSetupManualTile icon={HardDriveDownload}>Local engines</ProviderSetupManualTile>
+      </ProviderSetupTiles>,
     )
     expect(await axe(container)).toHaveNoViolations()
   })

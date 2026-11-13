@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Check, Settings2 } from 'lucide-react'
+import { Check, Settings2, type LucideIcon } from 'lucide-react'
 import { cn } from '../../lib/utils'
 import { CapabilityChips } from '../capability-chips/CapabilityChips'
 import { ProviderLogo } from '../provider-logo/ProviderLogo'
@@ -146,9 +146,9 @@ export const ProviderSetupTiles = React.forwardRef<
 /** The "manual / custom" tile apps append as `children` of the grid. */
 export const ProviderSetupManualTile = React.forwardRef<
   HTMLButtonElement,
-  React.ComponentProps<'button'>
+  React.ComponentProps<'button'> & { icon?: LucideIcon }
 >(function ProviderSetupManualTile(
-  { children, className, ...props },
+  { children, className, icon: Icon = Settings2, ...props },
   ref,
 ) {
   return (
@@ -163,7 +163,7 @@ export const ProviderSetupManualTile = React.forwardRef<
       {...props}
     >
       <span className="inline-flex size-5 shrink-0 items-center justify-center text-[var(--as-muted-fg)]">
-        <Settings2 className="size-5" aria-hidden />
+        <Icon className="size-5" aria-hidden />
       </span>
       {children}
     </button>
