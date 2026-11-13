@@ -41,7 +41,13 @@ import { AccountSessionList } from '@neuronection/assistant-ui/account-session-l
 
 Data in, events out. The component renders `rows` as given — no fetching, no
 store, no session policy, no “current” inference, no sorting, no summary or
-confirmation. `busyId` is host state: set it while the revoke request is in
+confirmation. `revoked` and `revocable` are presentation flags only: the app
+still owns the server response and the confirmation. When migrating from an
+app-rendered “Signed out” chip in `badges`, remove that chip and set
+`revoked: true` instead — otherwise the list renders two badges. If a
+successful revoke flips a row to `revoked`, the focused button unmounts; move
+focus to a stable target and announce the result app-side (the list has no
+live region). `busyId` is host state: set it while the revoke request is in
 flight and clear it when it settles. The revoke button only calls
 `onRevoke(id)`; confirmation dialogs, notices and “sign out everywhere”
 flows stay app-side.

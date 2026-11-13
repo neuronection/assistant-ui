@@ -95,7 +95,7 @@ export const Revoked = () => (
   <div className="max-w-2xl">
     <AccountSessionList
       rows={[currentRow, revokedRow, managedRow]}
-      labels={{ ...labels, revoked: 'Signed out' }}
+      labels={{ ...labels, revoked: 'Signed out on another device' }}
       onRevoke={(id) => action('onRevoke')(id)}
     />
   </div>
