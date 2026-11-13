@@ -508,8 +508,10 @@ export {
 export {
   MultiSelectPicker,
   PickerBrowseModal,
+  PickerBulkSelect,
   type MultiSelectPickerProps,
   type PickerBrowseModalProps,
+  type PickerBulkSelectProps,
   type PickerLabels,
   type PickerMode,
   type PickerOption,

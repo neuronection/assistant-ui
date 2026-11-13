@@ -4,6 +4,7 @@ import { cn } from '../../lib/utils'
 import { Button } from '../button/Button'
 import { PanelModal } from '../modal/PanelModal'
 import { Spinner } from '../spinner/Spinner'
+import { PickerBulkSelect } from './PickerBulkSelect'
 import {
   optionMatchesQuery,
   resolvePickerLabels,
@@ -36,6 +37,11 @@ export interface PickerBrowseModalProps {
   debounceMs?: number
   title?: string
   labels?: PickerLabels
+  /** Opt-in bulk select (`multi` mode): one tri-state control that selects
+   * every option matching the active search/category/host filter, and
+   * deselects exactly those again. Off by default — a catalog where "all"
+   * is a footgun (thousands of skills) simply never turns it on. */
+  selectAll?: boolean
   filterOption?: (option: PickerOption) => boolean
   renderRowContent?: (
     option: PickerOption,
@@ -68,6 +74,7 @@ export const PickerBrowseModal = React.forwardRef<
     debounceMs = 250,
     title,
     labels,
+    selectAll = false,
     filterOption,
     renderRowContent,
     renderBody,
@@ -151,9 +158,15 @@ export const PickerBrowseModal = React.forwardRef<
   )
 
   const matchesHost = (option: PickerOption) => filterOptionRef.current?.(option) ?? true
+  const matching = (isServer ? results : filtered).filter(matchesHost)
   const shown = (isServer ? results : filtered.slice(0, visible)).filter(matchesHost)
   const isSelected = (option: PickerOption) =>
     value.some((entry) => entry.value === option.value)
+  const pickedCount = matching.filter(isSelected).length
+  const allPicked = matching.length > 0 && pickedCount === matching.length
+  const selectAllLabel = allPicked
+    ? resolved.clearSelectionLabel
+    : `${resolved.selectAllLabel} (${matching.length})`
 
   const setSearchQuery = (next: string) => {
     setSearch(next)
@@ -171,6 +184,16 @@ export const PickerBrowseModal = React.forwardRef<
         ? value.filter((entry) => entry.value !== option.value)
         : [...value, option],
     )
+  }
+
+  const toggleAll = () => {
+    if (mode !== 'multi' || matching.length === 0) return
+    if (allPicked) {
+      onChange(value.filter((entry) => !matching.some((option) => option.value === entry.value)))
+      return
+    }
+    const missing = matching.filter((option) => !isSelected(option))
+    onChange([...value, ...missing])
   }
 
   const loadMore = async () => {
@@ -242,6 +265,17 @@ export const PickerBrowseModal = React.forwardRef<
       {categorySelectNode}
     </div>
   )
+
+  const selectAllNode =
+    selectAll && mode === 'multi' && matching.length > 0 ? (
+      <PickerBulkSelect
+        count={matching.length}
+        pickedCount={pickedCount}
+        label={selectAllLabel}
+        clearLabel={resolved.clearSelectionLabel}
+        onToggle={toggleAll}
+      />
+    ) : null
 
   const listNode = (
     <div
@@ -325,10 +359,13 @@ export const PickerBrowseModal = React.forwardRef<
         filters: filtersNode,
         searchInput: searchInputNode,
         categorySelect: categorySelectNode,
+        selectAll: selectAllNode,
         list: listNode,
         value,
+        matching,
         isSelected,
         toggle,
+        toggleAll,
       })
     : null
 
@@ -357,6 +394,7 @@ export const PickerBrowseModal = React.forwardRef<
       {body || (
         <>
           {filtersNode}
+          {selectAllNode}
           {listNode}
         </>
       )}

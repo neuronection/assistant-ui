@@ -5,6 +5,7 @@ import userEvent from '@testing-library/user-event'
 import { axe } from 'jest-axe'
 import {
   MultiSelectPicker,
+  PickerBulkSelect,
   type MultiSelectPickerProps,
   type PickerOption,
   type PickerSelection,
@@ -444,6 +445,201 @@ describe('PickerBrowseModal slots', () => {
     )
     await user.click(screen.getByRole('button', { name: 'Browse' }))
     await screen.findByRole('dialog')
+    expect(
+      await axe(document.body, { rules: { region: { enabled: false } } }),
+    ).toHaveNoViolations()
+  })
+})
+
+describe('PickerBrowseModal bulk select', () => {
+  it('is opt-in: no bulk control unless selectAll is set', async () => {
+    const user = userEvent.setup()
+    render(<Demo />)
+    await user.click(screen.getByRole('button', { name: 'Browse' }))
+    const dialog = await screen.findByRole('dialog')
+    expect(within(dialog).queryByRole('checkbox')).not.toBeInTheDocument()
+  })
+
+  it('selects every matching option, reports the count and flips to clear', async () => {
+    const user = userEvent.setup()
+    const onChange = vi.fn()
+    render(<Demo onChange={onChange} browseModalProps={{ selectAll: true }} />)
+    await user.click(screen.getByRole('button', { name: 'Browse' }))
+    const dialog = await screen.findByRole('dialog')
+    const control = within(dialog).getByRole('checkbox', { name: 'Select all (4)' })
+    expect(control).toHaveAttribute('aria-checked', 'false')
+    await user.click(control)
+    expect(onChange).toHaveBeenLastCalledWith(options)
+    expect(within(dialog).getByText('4 selected')).toBeInTheDocument()
+    expect(
+      within(dialog).getByRole('checkbox', { name: 'Clear selection' }),
+    ).toHaveAttribute('aria-checked', 'true')
+    expect(within(dialog).getByRole('button', { name: 'Added Python' })).toBeInTheDocument()
+  })
+
+  it('unchecking clears only the matching options, never the rest', async () => {
+    const user = userEvent.setup()
+    const onChange = vi.fn()
+    render(
+      <Demo
+        value={[python]}
+        onChange={onChange}
+        browseModalProps={{ selectAll: true }}
+      />,
+    )
+    await user.click(screen.getByRole('button', { name: 'Browse' }))
+    const dialog = await screen.findByRole('dialog')
+    await user.selectOptions(within(dialog).getByRole('combobox', { name: 'Category' }), 'Office')
+    await user.click(within(dialog).getByRole('checkbox', { name: 'Select all (1)' }))
+    expect(onChange).toHaveBeenLastCalledWith([python, options[2]])
+    await user.click(within(dialog).getByRole('checkbox', { name: 'Clear selection' }))
+    expect(onChange).toHaveBeenLastCalledWith([python])
+  })
+
+  it('scopes the bulk action to the active search and shows the mixed state', async () => {
+    const user = userEvent.setup()
+    render(<Demo value={[python]} browseModalProps={{ selectAll: true }} />)
+    await user.click(screen.getByRole('button', { name: 'Browse' }))
+    const dialog = await screen.findByRole('dialog')
+    expect(
+      within(dialog).getByRole('checkbox', { name: 'Select all (4)' }),
+    ).toHaveAttribute('aria-checked', 'mixed')
+    await user.type(within(dialog).getByRole('searchbox'), 'script')
+    expect(
+      within(dialog).getByRole('checkbox', { name: 'Select all (1)' }),
+    ).toHaveAttribute('aria-checked', 'false')
+    await user.click(within(dialog).getByRole('checkbox', { name: 'Select all (1)' }))
+    expect(within(dialog).getByRole('button', { name: 'Added TypeScript' })).toBeInTheDocument()
+    expect(within(dialog).getByText('2 selected')).toBeInTheDocument()
+    await user.clear(within(dialog).getByRole('searchbox'))
+    expect(within(dialog).getByRole('button', { name: 'Added Python' })).toBeInTheDocument()
+  })
+
+  it('records the whole matching page beyond pagination in server mode', async () => {
+    const user = userEvent.setup()
+    const onChange = vi.fn()
+    render(
+      <Demo
+        pageSize={1}
+        onChange={onChange}
+        browseModalProps={{ selectAll: true }}
+      />,
+    )
+    await user.click(screen.getByRole('button', { name: 'Browse' }))
+    const dialog = await screen.findByRole('dialog')
+    expect(within(dialog).queryByRole('button', { name: 'Add Nursing' })).not.toBeInTheDocument()
+    await user.click(within(dialog).getByRole('checkbox', { name: 'Select all (4)' }))
+    expect(onChange).toHaveBeenLastCalledWith(options)
+  })
+
+  it('exposes selectAll + matching + toggleAll to renderBody hosts', async () => {
+    const user = userEvent.setup()
+    render(
+      <Demo
+        browseModalProps={{
+          selectAll: true,
+          renderBody: (ctx) => (
+            <div>
+              <p data-testid="matching-count">{ctx.matching.length}</p>
+              <button type="button" onClick={ctx.toggleAll}>
+                host bulk
+              </button>
+              {ctx.filters}
+              {ctx.list}
+            </div>
+          ),
+        }}
+      />,
+    )
+    await user.click(screen.getByRole('button', { name: 'Browse' }))
+    const dialog = await screen.findByRole('dialog')
+    expect(within(dialog).getByTestId('matching-count')).toHaveTextContent('4')
+    await user.click(within(dialog).getByRole('button', { name: 'host bulk' }))
+    expect(within(dialog).getByText('4 selected')).toBeInTheDocument()
+    expect(
+      within(dialog).queryByRole('checkbox', { name: /Select all/ }),
+    ).not.toBeInTheDocument()
+  })
+
+  it('keeps labels overridable and has no axe violations', async () => {
+    const user = userEvent.setup()
+    render(
+      <Demo
+        browseModalProps={{
+          selectAll: true,
+          labels: {
+            selectAllLabel: 'Alle auswählen',
+            clearSelectionLabel: 'Auswahl aufheben',
+          },
+        }}
+      />,
+    )
+    await user.click(screen.getByRole('button', { name: 'Browse' }))
+    const dialog = await screen.findByRole('dialog')
+    await user.click(within(dialog).getByRole('checkbox', { name: 'Alle auswählen (4)' }))
+    expect(
+      within(dialog).getByRole('checkbox', { name: 'Auswahl aufheben' }),
+    ).toBeInTheDocument()
+    expect(
+      await axe(document.body, { rules: { region: { enabled: false } } }),
+    ).toHaveNoViolations()
+  })
+})
+
+describe('PickerBulkSelect (standalone)', () => {
+  function Harness({
+    count,
+    pickedCount,
+    onToggle,
+  }: {
+    count: number
+    pickedCount: number
+    onToggle: () => void
+  }) {
+    return (
+      <PickerBulkSelect
+        count={count}
+        pickedCount={pickedCount}
+        label={`Select all (${count})`}
+        clearLabel="Clear selection"
+        onToggle={onToggle}
+      />
+    )
+  }
+
+  it('renders nothing for an empty scope', () => {
+    const { container } = render(<Harness count={0} pickedCount={0} onToggle={() => {}} />)
+    expect(container).toBeEmptyDOMElement()
+  })
+
+  it('drives the tri-state from the counts and reports the toggle', async () => {
+    const user = userEvent.setup()
+    const onToggle = vi.fn()
+    const { rerender } = render(<Harness count={5} pickedCount={0} onToggle={onToggle} />)
+    expect(screen.getByRole('checkbox', { name: 'Select all (5)' })).toHaveAttribute(
+      'aria-checked',
+      'false',
+    )
+    rerender(<Harness count={5} pickedCount={2} onToggle={onToggle} />)
+    expect(screen.getByRole('checkbox', { name: 'Select all (5)' })).toHaveAttribute(
+      'aria-checked',
+      'mixed',
+    )
+    rerender(<Harness count={5} pickedCount={5} onToggle={onToggle} />)
+    const all = screen.getByRole('checkbox', { name: 'Clear selection' })
+    expect(all).toHaveAttribute('aria-checked', 'true')
+    await user.click(all)
+    expect(onToggle).toHaveBeenCalledTimes(1)
+  })
+
+  it('is keyboard-operable as a checkbox and has no axe violations', async () => {
+    const user = userEvent.setup()
+    const onToggle = vi.fn()
+    render(<Harness count={3} pickedCount={1} onToggle={onToggle} />)
+    const control = screen.getByRole('checkbox', { name: 'Select all (3)' })
+    control.focus()
+    await user.keyboard('{Enter}')
+    expect(onToggle).toHaveBeenCalledTimes(1)
     expect(
       await axe(document.body, { rules: { region: { enabled: false } } }),
     ).toHaveNoViolations()

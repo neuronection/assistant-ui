@@ -81,6 +81,25 @@ export const ServerSearch = () => {
   )
 }
 
+export const BulkSelect = () => {
+  const [value, setValue] = useState<PickerSelection[]>([])
+  return (
+    <div style={{ maxWidth: 420 }}>
+      <MultiSelectPicker
+        options={skills}
+        value={value}
+        onChange={setValue}
+        placeholder="Search skills…"
+        browseModalProps={{ selectAll: true }}
+      />
+      <p className="text-xs" style={{ marginTop: 8 }}>
+        Open the browse modal: the tri-state control under the filters selects
+        (or clears) everything matching the current search + category.
+      </p>
+    </div>
+  )
+}
+
 export const Slotted = () => {
   const [value, setValue] = useState<PickerSelection[]>(skills.slice(0, 1))
   return (
