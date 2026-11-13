@@ -1,5 +1,11 @@
 # @neuronection/assistant-ui
 
+## 0.87.0
+
+### Minor Changes
+
+- [#128](https://github.com/neuronection/assistant-ui/pull/128) [`1887075`](https://github.com/neuronection/assistant-ui/commit/18870753494cfba7075652432d8c590d3b217dc5) Thanks [@constLiakos](https://github.com/constLiakos)! - Add two additive provider-setup affordances: `ProviderSetupForm.hideName` omits the connection-name input while keeping the controlled value intact, and `ProviderSetupManualTile.icon` lets a companion grid tile (for example local-engine detection) render a distinct Lucide icon without forking the component. Existing callers render unchanged.
+
 ## 0.86.0
 
 ### Minor Changes
