@@ -173,4 +173,177 @@ describe('AccountSessionList', () => {
     )
     expect(await axe(container)).toHaveNoViolations()
   })
+
+  it('renders a revoked row with the signed-out badge and no revoke button', () => {
+    const { container } = render(
+      <AccountSessionList
+        rows={[
+          { id: 'session-1', label: 'Chrome on Linux', details: [], revoked: true },
+          { id: 'session-2', label: 'Pixel 9', details: [] },
+        ]}
+        onRevoke={vi.fn()}
+        labels={labels}
+      />,
+    )
+
+    const [revokedRow, activeRow] = rowElements(container) as [HTMLElement, HTMLElement]
+    expect(revokedRow).toHaveAttribute('data-revoked')
+    expect(revokedRow).toHaveAttribute('data-revocable', 'false')
+    expect(within(revokedRow).getByText('Signed out')).toBeInTheDocument()
+    expect(
+      revokedRow.querySelector('[data-as="account-session-revoked"]'),
+    ).toHaveTextContent('Signed out')
+    expect(within(revokedRow).queryByRole('button')).toBeNull()
+
+    expect(activeRow).not.toHaveAttribute('data-revoked')
+    expect(activeRow).not.toHaveAttribute('data-revocable')
+    expect(within(activeRow).queryByText('Signed out')).toBeNull()
+    expect(within(activeRow).getByRole('button', { name: 'Revoke — Pixel 9' })).toBeInTheDocument()
+  })
+
+  it('keeps revoking the remaining rows when another is revoked', async () => {
+    const user = userEvent.setup()
+    const onRevoke = vi.fn()
+    const { container } = render(
+      <AccountSessionList
+        rows={[
+          { id: 'session-1', label: 'Chrome on Linux', details: [], revoked: true },
+          { id: 'session-2', label: 'Pixel 9', details: [] },
+          { id: 'session-3', label: 'Safari on macOS', details: [] },
+        ]}
+        onRevoke={onRevoke}
+        labels={labels}
+      />,
+    )
+
+    expect(screen.getAllByRole('button')).toHaveLength(2)
+    const thirdRow = rowElements(container)[2] as HTMLElement
+    await user.click(within(thirdRow).getByRole('button', { name: 'Revoke — Safari on macOS' }))
+    expect(onRevoke).toHaveBeenCalledWith('session-3')
+    expect(onRevoke).toHaveBeenCalledTimes(1)
+  })
+
+  it('overrides the signed-out badge through labels.revoked', () => {
+    render(
+      <AccountSessionList
+        rows={[{ id: 'session-1', label: 'Pixel 9', details: [], revoked: true }]}
+        onRevoke={vi.fn()}
+        labels={{ ...labels, revoked: 'Abgemeldet' }}
+      />,
+    )
+
+    expect(screen.getByText('Abgemeldet')).toBeInTheDocument()
+    expect(screen.queryByText('Signed out')).toBeNull()
+  })
+
+  it('hides only the non-revocable row action and keeps the row visible', () => {
+    const { container } = render(
+      <AccountSessionList
+        rows={[
+          { id: 'session-1', label: 'Chrome on Linux', details: ['Last seen 2026-11-13'] },
+          { id: 'session-2', label: 'Pixel 9', details: [], revocable: false },
+        ]}
+        onRevoke={vi.fn()}
+        labels={labels}
+      />,
+    )
+
+    const [revocableRow, lockedRow] = rowElements(container) as [HTMLElement, HTMLElement]
+    expect(revocableRow).not.toHaveAttribute('data-revocable')
+    expect(within(revocableRow).getByRole('button', { name: 'Revoke — Chrome on Linux' })).toBeInTheDocument()
+
+    expect(lockedRow).toHaveAttribute('data-revocable', 'false')
+    expect(lockedRow).not.toHaveAttribute('data-revoked')
+    expect(within(lockedRow).getByText('Pixel 9')).toBeInTheDocument()
+    expect(within(lockedRow).queryByText('Signed out')).toBeNull()
+    expect(within(lockedRow).queryByRole('button')).toBeNull()
+    expect(screen.getAllByRole('button', { name: /^Revoke — / })).toHaveLength(1)
+  })
+
+  it('lets revoked win over revocable', () => {
+    const { container } = render(
+      <AccountSessionList
+        rows={[
+          { id: 'session-1', label: 'Chrome on Linux', details: [], revoked: true, revocable: true },
+          { id: 'session-2', label: 'Pixel 9', details: [], revoked: true, revocable: false },
+        ]}
+        onRevoke={vi.fn()}
+        labels={labels}
+      />,
+    )
+
+    for (const row of rowElements(container) as HTMLElement[]) {
+      expect(row).toHaveAttribute('data-revoked')
+      expect(row).toHaveAttribute('data-revocable', 'false')
+      expect(row.querySelector('[data-as="account-session-revoked"]')).toHaveTextContent('Signed out')
+      expect(within(row).queryByRole('button')).toBeNull()
+    }
+    expect(screen.queryAllByRole('button', { name: /^Revoke — / })).toHaveLength(0)
+  })
+
+  it('shows both the current and signed-out badges when a row is current and revoked', () => {
+    const { container } = render(
+      <AccountSessionList
+        rows={[
+          { id: 'session-1', current: true, label: 'Chrome on Linux', details: [], revoked: true },
+        ]}
+        onRevoke={vi.fn()}
+        labels={labels}
+      />,
+    )
+
+    const row = rowElements(container)[0] as HTMLElement
+    expect(row).toHaveAttribute('aria-current', 'true')
+    expect(within(row).getByText('This device')).toBeInTheDocument()
+    expect(
+      row.querySelector('[data-as="account-session-revoked"]'),
+    ).toHaveTextContent('Signed out')
+    expect(within(row).queryByRole('button')).toBeNull()
+  })
+
+  it('keeps keyboard revocation working when rows are revoked or non-revocable', async () => {
+    const user = userEvent.setup()
+    const onRevoke = vi.fn()
+    render(
+      <AccountSessionList
+        rows={[
+          { id: 'session-1', label: 'Chrome on Linux', details: [], revoked: true },
+          { id: 'session-2', label: 'Pixel 9', details: [], revocable: false },
+          { id: 'session-3', label: 'Safari on macOS', details: [] },
+        ]}
+        onRevoke={onRevoke}
+        labels={labels}
+      />,
+    )
+
+    const buttons = screen.getAllByRole('button') as HTMLElement[]
+    expect(buttons).toHaveLength(1)
+    await user.tab()
+    expect(buttons[0]).toHaveFocus()
+    expect(buttons[0]).toHaveAccessibleName('Revoke — Safari on macOS')
+
+    await user.keyboard('{Enter}')
+    expect(onRevoke).toHaveBeenLastCalledWith('session-3')
+
+    await user.keyboard(' ')
+    expect(onRevoke).toHaveBeenLastCalledWith('session-3')
+    expect(onRevoke).toHaveBeenCalledTimes(2)
+  })
+
+  it('has no axe violations with revoked and non-revocable rows', async () => {
+    const { container } = render(
+      <AccountSessionList
+        rows={[
+          { id: 'session-1', current: true, label: 'Chrome on Linux', details: [], revoked: true },
+          { id: 'session-2', label: 'Pixel 9', details: [], revocable: false },
+          { id: 'session-3', label: 'Safari on macOS', details: [] },
+        ]}
+        onRevoke={vi.fn()}
+        busyId="session-3"
+        labels={labels}
+        headerAction={<button type="button">Sign out other sessions</button>}
+      />,
+    )
+    expect(await axe(container)).toHaveNoViolations()
+  })
 })

@@ -12,19 +12,21 @@ const labels = {
   revoking: 'Revoking…',
 }
 
+const currentRow: AccountSessionRow = {
+  id: 'session-1',
+  current: true,
+  label: 'Chrome on Linux',
+  details: ['Created 2026-11-01 09:12', 'Last seen 2026-11-13 00:04', '203.0.113.7'],
+  icon: <Laptop className="size-4" aria-hidden />,
+  badges: (
+    <span className="rounded-full bg-[var(--as-muted)] px-2 py-0.5 text-[10px] text-[var(--as-muted-fg)]">
+      2FA
+    </span>
+  ),
+}
+
 const rows: AccountSessionRow[] = [
-  {
-    id: 'session-1',
-    current: true,
-    label: 'Chrome on Linux',
-    details: ['Created 2026-11-01 09:12', 'Last seen 2026-11-13 00:04', '203.0.113.7'],
-    icon: <Laptop className="size-4" aria-hidden />,
-    badges: (
-      <span className="rounded-full bg-[var(--as-muted)] px-2 py-0.5 text-[10px] text-[var(--as-muted-fg)]">
-        2FA
-      </span>
-    ),
-  },
+  currentRow,
   {
     id: 'session-2',
     label: 'Pixel 9',
@@ -71,5 +73,40 @@ export const Busy = () => (
 export const Empty = () => (
   <div className="max-w-2xl">
     <AccountSessionList rows={[]} labels={labels} onRevoke={(id) => action('onRevoke')(id)} />
+  </div>
+)
+
+const revokedRow: AccountSessionRow = {
+  id: 'session-4',
+  label: 'Firefox on Windows',
+  details: ['Created 2026-10-30 11:05', 'Signed out 2026-11-02 19:41'],
+  revoked: true,
+}
+
+const managedRow: AccountSessionRow = {
+  id: 'session-5',
+  label: 'Pixel 9 (managed device)',
+  details: ['Created 2026-09-14 08:00', 'Last seen 2026-11-13 00:00', 'Policy: sign out disabled'],
+  icon: <Smartphone className="size-4" aria-hidden />,
+  revocable: false,
+}
+
+export const Revoked = () => (
+  <div className="max-w-2xl">
+    <AccountSessionList
+      rows={[currentRow, revokedRow, managedRow]}
+      labels={{ ...labels, revoked: 'Signed out on another device' }}
+      onRevoke={(id) => action('onRevoke')(id)}
+    />
+  </div>
+)
+
+export const Unrevocable = () => (
+  <div className="max-w-2xl">
+    <AccountSessionList
+      rows={[revokedRow, managedRow]}
+      labels={labels}
+      onRevoke={(id) => action('onRevoke')(id)}
+    />
   </div>
 )

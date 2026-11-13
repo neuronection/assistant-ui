@@ -9,12 +9,15 @@ export interface AccountSessionRow {
   details: string[]
   icon?: React.ReactNode
   badges?: React.ReactNode
+  revoked?: boolean
+  revocable?: boolean
 }
 
 export interface AccountSessionListLabels {
   current: string
   revoke: string
   revoking: string
+  revoked?: string
   empty?: string
 }
 
@@ -32,8 +35,10 @@ export interface AccountSessionListProps {
  * session with a preformatted detail line, optional device icon and badge
  * slot, a current-session badge and a per-row revoke button whose accessible
  * name carries the row label (`<revoke label> — <row label>`) while the
- * visible text stays the label. Session policies, date formatting and the
- * surrounding summary stay app-side.
+ * visible text stays the label. A row can be marked `revoked` (library-owned
+ * “Signed out” badge, no action) or `revocable: false` (kept visible without
+ * an action); `revoked` wins over `revocable`. Session policies, date
+ * formatting and the surrounding summary stay app-side.
  */
 export const AccountSessionList = React.forwardRef<HTMLDivElement, AccountSessionListProps>(
   function AccountSessionList(
@@ -64,12 +69,16 @@ export const AccountSessionList = React.forwardRef<HTMLDivElement, AccountSessio
         ) : (
           <ul data-as="account-session-rows" className="m-0 flex list-none flex-col gap-1.5 p-0">
             {rows.map((row) => {
+              const isRevoked = row.revoked === true
+              const canRevoke = !isRevoked && row.revocable !== false
               const isBusy = busyId === row.id
               return (
                 <li
                   key={row.id}
                   data-as="account-session-row"
                   data-current={row.current || undefined}
+                  data-revoked={isRevoked || undefined}
+                  data-revocable={canRevoke ? undefined : 'false'}
                   aria-current={row.current ? 'true' : undefined}
                   className={cn(
                     'flex items-start gap-2 rounded-[var(--as-radius)] border border-[var(--as-border)] bg-[var(--as-surface-raised)] px-3 py-2',
@@ -100,6 +109,14 @@ export const AccountSessionList = React.forwardRef<HTMLDivElement, AccountSessio
                           {labels.current}
                         </span>
                       ) : null}
+                      {isRevoked ? (
+                        <span
+                          data-as="account-session-revoked"
+                          className="inline-flex items-center rounded-full bg-[var(--as-muted)] px-2 py-0.5 text-[10px] font-medium text-[var(--as-muted-fg)]"
+                        >
+                          {labels.revoked ?? 'Signed out'}
+                        </span>
+                      ) : null}
                       {row.badges ? (
                         <span
                           data-as="account-session-badges"
@@ -120,18 +137,20 @@ export const AccountSessionList = React.forwardRef<HTMLDivElement, AccountSessio
                       </ul>
                     ) : null}
                   </div>
-                  <button
-                    type="button"
-                    data-as="account-session-revoke"
-                    data-revoking={isBusy || undefined}
-                    disabled={isBusy}
-                    aria-busy={isBusy || undefined}
-                    aria-label={`${isBusy ? labels.revoking : labels.revoke} — ${row.label}`}
-                    onClick={() => onRevoke(row.id)}
-                    className="shrink-0 cursor-pointer rounded-[var(--as-radius-sm)] border border-[var(--as-border)] px-2 py-1 text-xs font-medium text-[var(--as-fg)] transition-colors hover:border-[var(--as-danger)] hover:text-[var(--as-danger)] focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[var(--as-focus-ring)] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:border-[var(--as-border)] disabled:hover:text-[var(--as-fg)]"
-                  >
-                    {isBusy ? labels.revoking : labels.revoke}
-                  </button>
+                  {canRevoke ? (
+                    <button
+                      type="button"
+                      data-as="account-session-revoke"
+                      data-revoking={isBusy || undefined}
+                      disabled={isBusy}
+                      aria-busy={isBusy || undefined}
+                      aria-label={`${isBusy ? labels.revoking : labels.revoke} — ${row.label}`}
+                      onClick={() => onRevoke(row.id)}
+                      className="shrink-0 cursor-pointer rounded-[var(--as-radius-sm)] border border-[var(--as-border)] px-2 py-1 text-xs font-medium text-[var(--as-fg)] transition-colors hover:border-[var(--as-danger)] hover:text-[var(--as-danger)] focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[var(--as-focus-ring)] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:border-[var(--as-border)] disabled:hover:text-[var(--as-fg)]"
+                    >
+                      {isBusy ? labels.revoking : labels.revoke}
+                    </button>
+                  ) : null}
                 </li>
               )
             })}
