@@ -1,5 +1,11 @@
 # @neuronection/assistant-ui
 
+## 0.88.0
+
+### Minor Changes
+
+- [#130](https://github.com/neuronection/assistant-ui/pull/130) [`9ef0a26`](https://github.com/neuronection/assistant-ui/commit/9ef0a26938970d5b873e9e34443600a1cdb71d20) Thanks [@constLiakos](https://github.com/constLiakos)! - Add revoked/revocable row flags to AccountSessionList
+
 ## 0.87.0
 
 ### Minor Changes
