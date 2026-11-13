@@ -4,7 +4,8 @@ Family-standard registration form (identity-auth §12): labelled email +
 password + confirm-password fields (mismatch error), an optional
 full-name field behind `showFullName`, a min-length hint, submit button,
 mapped error slot and an optional login link. Presentational +
-controlled (ADR-006): the account-creation call is the app's.
+controlled:
+the account-creation call is the app's.
 Pair it with [`LoginForm`](./login-form.md) inside the app's card /
 overlay shell.
 

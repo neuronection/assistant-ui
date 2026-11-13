@@ -4,7 +4,7 @@ Internal building block for parsed detail payloads (used by
 `chat-tool-card` and `chat-trace-timeline` — import via those modules):
 JSON strings render as a **structured pane** — objects as `key: value`
 rows, arrays as value chips, non-JSON payloads as preformatted text.
-Display-only (ADR-006): the text in, this view out.
+Display-only: the text in, this view out.
 
 ## wiring
 

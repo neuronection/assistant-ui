@@ -1,6 +1,6 @@
 # ChatPending
 
-The first-token latency placeholder (plan 100 S2): the assistant-aligned
+The first-token latency placeholder: the assistant-aligned
 shimmer bubble rendered as the transcript's `live` tail between send and
 the first delta. A narrated phase row (dots + optional elapsed timer via
 `ChatTurnStatus`) plus placeholder lines shimmering in the `--as-ai`

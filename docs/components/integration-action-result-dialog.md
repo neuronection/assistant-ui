@@ -1,6 +1,6 @@
 # ActionResultDialog
 
-The declarative action-result dialog (plan 33 G3 / ADR-0040 clause 16):
+The declarative action-result dialog:
 HOSTS the family [SurfaceRenderer](./surface-renderer.md) for extensions'
 declarative result payloads — compose, never reinvent. Loading, error (with
 detail + optional retry) and ready states ride props; typed `run:*` /

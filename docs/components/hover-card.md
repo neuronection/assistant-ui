@@ -3,7 +3,7 @@
 Rich preview surfaced by hover or keyboard-focus intent, with grace delays so
 accidental pointer passes don't fire. The trigger is focusable (Tab opens the
 card); Escape or blur closes it. Pair with the app's data layer for preview
-content — the primitive has no data concerns (ADR-006).
+content — the primitive has no data concerns.
 
 ## import
 

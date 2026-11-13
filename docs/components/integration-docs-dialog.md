@@ -1,6 +1,6 @@
 # DocsDialog
 
-The bundle-docs viewer (plan 33 G4): bundles carry docs; this is the
+The bundle-docs viewer: bundles carry docs; this is the
 family's lightweight answer so no product re-invents it — a tree navigation
 with a content SLOT. The docs tree and each node's content are app-fetched
 data; the dialog renders navigation + selection + the app's content. All

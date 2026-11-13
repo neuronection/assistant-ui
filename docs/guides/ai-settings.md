@@ -3,8 +3,8 @@
 The settings stack the family uses to wire up AI: **first-run setup**
 (one-click provider wizard), **providers** (credentials), **models**
 (registered models + remote catalog), **tasks** (task → model assignments,
-including the decision default + kinds). Every component is presentational
-(ADR-006): the catalog, the API calls and the persistence are app-side; data
+including the decision default + kinds). Every component is presentational:
+the catalog, the API calls and the persistence are app-side; data
 comes in via props and actions go out via events.
 
 | component | module | role |
@@ -26,7 +26,7 @@ The reference implementation is study-assistant
 `ProviderFormDialog.tsx`, `ProviderCreateFields.tsx`, `ModelsTab.tsx`,
 `TasksTab.tsx`. The snippets below are copied from there.
 
-## 0. The family assembly (plan 26 §6)
+## 0. The family assembly
 
 One experience across every app — **first-run card → setup wizard →
 defaults-first list → re-configure**. The app owns the wizard's phase
@@ -448,7 +448,7 @@ const sections: TaskAssignmentSection[] = [
   secondaryLabel={t('settings.defaultFallbackLabel')}
 ```
 
-### Decision default + kinds (plan 29 / ADR-0036, uniform ruling)
+### Decision default + kinds (uniform ruling)
 
 Decision models are ordinary catalog rows whose `capabilities` include
 `decision`; slot separation stays enforced for free by the picker's
@@ -461,7 +461,7 @@ defaults-first flow — **no standalone card**:
 
 1. **The default row rides the uniform `Default models` section** like
    every capability default: id `default:decision`, `requires:
-   'decision'`, **single-slot per ADR-0037** (one picker, no fallback —
+   'decision'`, **single-slot** (one picker, no fallback —
    a default *is* the fallback; only specialist assignments — task rows
    and the kind rows below — carry fallbacks). The backend row
    is the ordinary defaults mechanic (study: `DefaultTaskAssignment` on
@@ -479,7 +479,7 @@ defaults-first flow — **no standalone card**:
    labeled null entry ("Inherits — {resolved default model}", bare
    "Inherits" when nothing resolves; chosen = `null` = the inherit
    state). Kind rows keep per-assignment fallbacks where the product
-   supports them (ADR-0036 rule 2; the default row does not — 0037):
+   supports them; the default row does not (it is single-slot):
 
 ```tsx
 {

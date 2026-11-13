@@ -6,7 +6,7 @@ Local/Cloud hosting toggle and country picker (the country field renders the
 library `Combobox` — searchable and clearable over the shared catalog, so
 full-ISO lists (~250 entries) stay usable; the `countryOptions` contract is
 unchanged and all call sites get search for free). The library never renders a
-stored key — keyring/storage is the app's business (ADR-006). The preset
+stored key — keyring/storage is the app's business. The preset
 catalog itself is app data (each backend ships its own); the form only
 renders the picker and reports the selected key.
 

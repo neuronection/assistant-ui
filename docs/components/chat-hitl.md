@@ -1,6 +1,6 @@
 # chat-hitl
 
-Human-in-the-loop proposal card (family plan 77): a persisted mutation
+Human-in-the-loop proposal card: a persisted mutation
 the user resolves. The chatbot (or any proposing surface) lands typed ops
 as cards; the card shows a field-level before/after diff and Approve /
 Reject actions. Presentational + controlled — status is a prop and
@@ -19,11 +19,11 @@ import { HitlProposalCard } from '@neuronection/assistant-ui'
 | Prop | Type | Description |
 | --- | --- | --- |
 | `title` | `string` | Card headline, e.g. `Update experience · Siemens internship`. |
-| `status` | `'pending' \| 'approved' \| 'rejected' \| 'conflict' \| 'expired' \| 'reverted'` | `pending` and `conflict` render resolve actions (a conflict re-applies the refreshed diff under the `reapply` label); `reverted` is the terminal state of an undone approved card (plan 99). |
-| `diff` | `FieldDiffValue[]` | Field rows `{ field, label?, before?, after? }`. Values render three ways: long text (either side > 80 chars) through `TextDiffView`, structured collections (`isStructuredList` — lists of plain objects, plan 99's skills/achievements/links rows) as chip rows with the entry's label + role/level suffix, scalars inline or as parsed chips for string arrays. |
+| `status` | `'pending' \| 'approved' \| 'rejected' \| 'conflict' \| 'expired' \| 'reverted'` | `pending` and `conflict` render resolve actions (a conflict re-applies the refreshed diff under the `reapply` label); `reverted` is the terminal state of an undone approved card. |
+| `diff` | `FieldDiffValue[]` | Field rows `{ field, label?, before?, after? }`. Values render three ways: long text (either side > 80 chars) through `TextDiffView`, structured collections (`isStructuredList` — lists of plain objects, skills/achievements/links rows) as chip rows with the entry's label + role/level suffix, scalars inline or as parsed chips for string arrays. |
 | `action` | `'create' \| 'update' \| 'delete'` | Proposal mutation kind. `create` renders the rows through `FieldSummary` instead of a before→after diff — empty values are skipped, fields render as label/value rows and long text as a plain prose block (a create has no before-state to diff against). Update/delete keep the classic diff; omitted → legacy diff behavior. |
 | `destructive` | `boolean` | Destructive ops arm a two-step confirm (Approve → Confirm delete / Cancel) before `onApprove` fires. |
-| `onApprove` / `onReject` / `onPreview` | `() => void` | Resolve events. `onReject` absent → no reject button (e.g. read-only history). `onPreview` (plan 99) renders a Preview button on pending AND approved/reverted cards — a tier-3 slot: the library owns the button + a11y, the app owns what a preview is (before/after modal, highlighting). Omitted → no button. |
+| `onApprove` / `onReject` / `onPreview` | `() => void` | Resolve events. `onReject` absent → no reject button (e.g. read-only history). `onPreview` renders a Preview button on pending AND approved/reverted cards — a tier-3 slot: the library owns the button + a11y, the app owns what a preview is (before/after modal, highlighting). Omitted → no button. |
 | `busy` | `boolean` | Resolve in flight — disables actions, shows a spinner on the primary. |
 | `conflictNote` | `string` | App-owned conflict detail (the server's drift reason); replaces the default `conflictHint` when given. |
 | `children` | `ReactNode` | App-owned body slot rendered between the field rows and the resolve actions (target/edit summaries, rendered diffs, previews) — tier-3 composition, the card keeps the chrome + actions. |

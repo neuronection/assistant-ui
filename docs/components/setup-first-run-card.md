@@ -1,7 +1,7 @@
 # SetupFirstRunCard
 
 Empty-state CTA for the AI-settings surface when **no provider is
-configured** (plan 26 §6) — the entry point of the setup flow. Title, body,
+configured** — the entry point of the setup flow. Title, body,
 an optional local-engine probe status, and Set up / Dismiss actions; apps
 pass a detected-local banner as `children`. Chat empty states deep-link to
 the settings surface that renders this card.

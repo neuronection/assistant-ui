@@ -88,7 +88,7 @@ click-outside close, focus is trapped and restored.
 
 The interactive core (type-ahead, chips, `Add/Added` rows, pagination,
 count footer) is the library's; **host chrome rides slots** (no fetching
-inside the module — ADR-006):
+inside the module):
 
 - `renderChipExtra` — leading chip content (a relation select, a type
   badge). The chip's label and per-chip remove stay built-in.

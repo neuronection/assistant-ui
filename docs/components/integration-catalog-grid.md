@@ -1,6 +1,6 @@
 # IntegrationCatalogGrid
 
-The Available surface of the one registry view (plan 33 / ADR-0040 D25):
+The Available surface of the one registry view:
 entries grouped by the charter's closed category vocabulary, controlled
 search, install affordances with host-compatibility results (self-disable
 reasons render verbatim), `listed` entries from added sources. Loading,

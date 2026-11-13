@@ -9,7 +9,7 @@ source of truth for workflows.
 
 1. **Never commit untested code.** `pnpm verify` (lint + typecheck + test +
    build) before every commit.
-2. **Boundary (ADR-006):** presentational + controlled components only — no
+2. **Boundary:** presentational + controlled components only — no
    fetching, stores, router, i18n engine, or secrets. Data in, events out.
 3. **React 18 + 19, Tailwind 3 + 4 are the compatibility contract.** No
    React-19-only APIs (lint bans them; CI typechecks both majors).

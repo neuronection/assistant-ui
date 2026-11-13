@@ -6,7 +6,7 @@ Checklist for landing a new component in the library.
 
 - **Two-app rule**: is it needed by ≥2 family apps? If it exists in only one
   app, it belongs on the "decide-and-record" list until a second app needs it.
-- **Boundary (ADR-006)**: presentational + controlled only. No fetching, no
+- **Boundary**: presentational + controlled only. No fetching, no
   stores, no router, no i18n engine, no API keys. Data in, events out.
 - **React 18 + Tailwind 3/4 compatibility**: no React-19-only APIs (banned by
   lint), no assumptions about the app's Tailwind.
@@ -105,7 +105,7 @@ exists, not that it matches the code:
   contract, and snippets **in the same PR**. Derive the table from the
   component's Props interface — never hand-patch stale rows.
 - If the component's purpose or scope shifts (what it is for, when to use
-  it, what the ADR-006 boundary keeps out), update the page's purpose and
+  it, what the presentational boundary keeps out), update the page's purpose and
   related-modules sections too.
 - Visual changes: refresh the story baselines in the same PR
   (`pnpm exec playwright test --update-snapshots`).

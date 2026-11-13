@@ -1,7 +1,7 @@
 # Integration contracts
 
-The integration kit's generated vocabulary + app-side mapping target (plan
-33 / ADR-0040 D11): the charter vocabularies (origin classes, categories,
+The integration kit's generated vocabulary + app-side mapping target: the
+charter vocabularies (origin classes, categories,
 status, lifecycle, tiers, capability ids, risk classes, error codes, ref
 strategies, surfaces, the verbatim consent disclosures) are GENERATED from
 the vendored `contracts/extension-charter.json` — ids and shapes can never

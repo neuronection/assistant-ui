@@ -1,11 +1,11 @@
 # ProviderSetupTiles
 
 Neutral, equal-weight provider picker grid — step one of the family's
-one-click setup (plan 26 §6). Tiles render **in the order given** (the app's
+one-click setup. Tiles render **in the order given** (the app's
 family preset order), with no "recommended" anywhere: same size, same
 weight, local presets visible with their `Local` caption, disabled presets
 render inert with their reason (health's overlay disablement). The catalog
-is app data (ADR-006) — the tiles only render it and report the picked key.
+is app data — the tiles only render it and report the picked key.
 
 ## import
 
@@ -34,7 +34,7 @@ Extends `React.ComponentProps<'div'>` (spread onto the group).
 
 `ProviderSetupTileChip` is `{ key: string; label: string }` — capability
 chips rendered on the tile with the `CapabilityChips` badge pattern
-(neutral styling: chips describe, they never rank — plan 26 follow-up).
+(neutral styling: chips describe, they never rank).
 The app derives chips from its preset data (wire type → chat/vision/stt,
 `decision_models` → decision, keyless-local → local) and supplies the
 translated `label` per the i18n rule; chips carry text (never color

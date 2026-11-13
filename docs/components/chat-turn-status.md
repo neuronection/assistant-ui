@@ -1,7 +1,7 @@
 # ChatTurnStatus
 
 Live pre-text turn status (study's `TurnTraceStatus` + `ThinkingDots`,
-generalized for family plan 12 L1): animated dots + the current phase
+generalized for the family): animated dots + the current phase
 label, with an optional elapsed timer fed by the turn's start timestamp.
 Presentational and controlled — the turn state lives in `useChatStream`;
 this only narrates it. `variant="row"` is the inline pre-text line;

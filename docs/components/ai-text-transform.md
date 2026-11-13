@@ -4,7 +4,7 @@ Streaming AI text-transform **state machine** (idle → running → done /
 error / cancelled): delta coalescing, event subscription, optional status
 polling and a hard timeout. The app injects the transport — start /
 subscribe / cancel / poll closures over its own gateway. No fetching, keys
-or i18n engine inside the library (ADR-006). Render progress with
+or i18n engine inside the library. Render progress with
 [`FlowStatusCard`](./flow-status.md) (family AI rule: never hand-rolled).
 
 ## import

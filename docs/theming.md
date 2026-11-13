@@ -31,7 +31,7 @@ Key semantic tokens: `--as-primary(-fg)`, `--as-secondary(-fg)`,
 them in `theme.css` when your app chrome sits above the default 50),
 `--as-radius(-sm/-lg)`, `--as-font-sans/mono`, `--as-shadow-1/2/3`.
 
-## Motion tokens (ADR-012)
+## Motion tokens
 
 All library animation is CSS, token-timed, compositor-only, and guarded
 by `prefers-reduced-motion: reduce` (a static test enforces the guard
@@ -56,7 +56,7 @@ component code changes. Utilities (`.as-anim-message-in`, `.as-anim-slide-up`,
 height reveal) are the shipped vocabulary; the `--as-ai` accent is the
 "model at work" identity (streaming caret, pending shimmer, reasoning
 and running-tool edges). A runtime animation library was deliberately
-rejected (ADR-012) — bundle weight and a forced peer dep for every app.
+rejected — bundle weight and a forced peer dep for every app.
 
 
 ## App integration

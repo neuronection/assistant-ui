@@ -2,8 +2,8 @@
 
 The composed chat host — the one uniform surface assembly behind the
 family's three shapes. Owns layout only (header / banner / transcript /
-composer / footer); every feature is an app-composed slot (ADR-006
-tier 3, the `RichTextEditor` precedent).
+composer / footer); every feature is an app-composed slot (tier 3, the
+`RichTextEditor` precedent).
 
 ## import
 

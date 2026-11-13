@@ -4,7 +4,7 @@ Speech-to-text dictation: the library owns the **recording state machine**
 (MediaRecorder negotiation, timer, level metering, cancel, teardown) and the
 **UI** (mic button + recording/transcribing/error strip); the app injects the
 **transport** — one `transcribe(blob)` closure that calls its own gateway.
-No fetching, keys or i18n engine inside the library (ADR-006).
+No fetching, keys or i18n engine inside the library.
 
 `DictationUnavailable` is the sibling capability state: the app resolves
 whether speech-to-text is assigned and renders either `DictationButton` or

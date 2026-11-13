@@ -7,7 +7,7 @@ not a general-purpose design system.
 
 ## Ground rules
 
-- **Boundary (ADR-006):** presentational, controlled components only. No
+- **Boundary:** presentational, controlled components only. No
   fetching, no stores, no router, no i18n engine, no API keys. Data in,
   events out — no exceptions, or the boundary dissolves.
 - **Two-app rule:** a component graduates into the library only when at least

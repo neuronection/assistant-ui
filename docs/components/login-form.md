@@ -2,8 +2,8 @@
 
 Family-standard sign-in form (identity-auth §12): labelled email +
 password fields with a visibility toggle, submit button, mapped error
-slot and optional register/forgot links. Presentational + controlled
-(ADR-006): submission is an event out — no fetching, no stores, no
+slot and optional register/forgot links. Presentational + controlled:
+submission is an event out — no fetching, no stores, no
 session handling. Pair it with [`RegisterForm`](./register-form.md) for
 the two-mode login surfaces apps wrap in their own card/overlay shell.
 

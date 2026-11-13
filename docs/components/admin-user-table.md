@@ -6,7 +6,7 @@ count, role, status and the per-row actions — promote/demote,
 activate/deactivate, password reset (inline panel with a minimum-length
 gate) and force logout. Guard-rail 403 rejections (self-demotion,
 last-admin) surface as friendly, label-driven messages. Presentational +
-controlled (ADR-06): the app fetches the list, persists the actions and
+controlled: the app fetches the list, persists the actions and
 re-supplies `users`; nothing here talks to a network, store or router.
 Study is the first consumer (just-in-time exception, plan §5.10); career
 adopts in Phase 3.

@@ -1,7 +1,7 @@
 # AddIntegrationSourceDialog
 
 ONE add-source flow for https git sources and the dev/test local-path
-variant (plan 33 / ADR-0040 D13; the sources-schema kinds — no zip-bundle
+variant (the sources-schema kinds — no zip-bundle
 invention): descriptor entry (URL / local path, ref strategy from the
 charter vocabulary, ref value, subpath, optional sealed credential slot),
 fetch/validate progress and error states. The draft is typed data out; apps
