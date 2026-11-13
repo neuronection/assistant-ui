@@ -40,8 +40,10 @@ The app derives chips from its preset data (wire type → chat/vision/stt,
 translated `label` per the i18n rule; chips carry text (never color
 alone) and become part of the tile's accessible name.
 
-`ProviderSetupManualTile` extends `React.ComponentProps<'button'>` — a
-matching grid cell for the app's manual/custom entry.
+`ProviderSetupManualTile` extends `React.ComponentProps<'button'>` and adds
+`icon?: LucideIcon` (default `Settings2`) — a matching grid cell for the
+app's manual/custom entry, or for a companion action such as local-engine
+detection.
 
 ## controlled contract
 
@@ -69,6 +71,9 @@ the app's synced catalog.
 >
   <ProviderSetupManualTile onClick={openManualForm}>
     {TEXT.SETUP_MANUAL_CARD}
+  </ProviderSetupManualTile>
+  <ProviderSetupManualTile icon={HardDriveDownload} onClick={openLocalEngines}>
+    {TEXT.SETUP_LOCAL_ENGINES}
   </ProviderSetupManualTile>
 </ProviderSetupTiles>
 ```
