@@ -142,6 +142,9 @@ export const SidebarNav = React.forwardRef<HTMLElement, SidebarNavProps>(
     const listRef = React.useRef<HTMLDivElement>(null)
     const secondaryRef = React.useRef<HTMLDivElement>(null)
     const flyoutTimer = React.useRef<ReturnType<typeof setTimeout> | null>(null)
+    const flyoutOpenRef = React.useRef<{ id: string; source: 'hover' | 'interaction' } | null>(
+      null,
+    )
     const [openFlyout, setOpenFlyout] = React.useState<string | null>(null)
     const [internalExpanded, setInternalExpanded] = React.useState<string[]>([])
 
@@ -188,9 +191,14 @@ export const SidebarNav = React.forwardRef<HTMLElement, SidebarNavProps>(
       }
     }, [])
 
+    const showFlyout = (id: string, source: 'hover' | 'interaction') => {
+      flyoutOpenRef.current = { id, source }
+      setOpenFlyout(id)
+    }
+
     const flyoutEnter = (id: string) => {
       if (flyoutTimer.current) clearTimeout(flyoutTimer.current)
-      flyoutTimer.current = setTimeout(() => setOpenFlyout(id), FLYOUT_DELAY_MS)
+      flyoutTimer.current = setTimeout(() => showFlyout(id, 'hover'), FLYOUT_DELAY_MS)
     }
     const flyoutLeave = () => {
       if (flyoutTimer.current) clearTimeout(flyoutTimer.current)
@@ -244,6 +252,9 @@ export const SidebarNav = React.forwardRef<HTMLElement, SidebarNavProps>(
       const step = e.key === 'ArrowDown' ? 1 : buttons.length - 1
       buttons[(index + step) % buttons.length]?.focus()
     }
+
+    const flyoutOpenedByHover = (id: string) =>
+      flyoutOpenRef.current?.id === id && flyoutOpenRef.current.source === 'hover'
 
     const groupTriggerFor = (id: string) =>
       navRegions()
@@ -364,11 +375,11 @@ export const SidebarNav = React.forwardRef<HTMLElement, SidebarNavProps>(
                   aria-label={labels?.openGroup ?? `Open ${item.label} menu`}
                   aria-haspopup="true"
                   aria-expanded={openFlyout === item.id}
-                  onClick={() => setOpenFlyout(item.id)}
+                  onClick={() => showFlyout(item.id, 'interaction')}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
                       e.preventDefault()
-                      setOpenFlyout(item.id)
+                      showFlyout(item.id, 'interaction')
                     }
                   }}
                   onMouseEnter={() => flyoutEnter(item.id)}
@@ -393,9 +404,18 @@ export const SidebarNav = React.forwardRef<HTMLElement, SidebarNavProps>(
                   side="right"
                   sideOffset={8}
                   aria-label={item.label}
+                  onOpenAutoFocus={(e) => {
+                    // Hover-opened flyouts must not move focus: the first
+                    // child would then hold a focus highlight the hovering
+                    // pointer cannot shift.
+                    if (flyoutOpenedByHover(item.id)) e.preventDefault()
+                  }}
                   onCloseAutoFocus={(e) => {
-                    // Menu-standard: focus returns to the trigger.
+                    // Menu-standard: focus returns to the trigger — only when
+                    // the flyout was opened deliberately (click/keyboard), so
+                    // that hovering past the rail never yanks focus around.
                     e.preventDefault()
+                    if (flyoutOpenedByHover(item.id)) return
                     groupTriggerFor(item.id)?.focus()
                   }}
                   onMouseEnter={flyoutEnterCancel}
@@ -414,7 +434,7 @@ export const SidebarNav = React.forwardRef<HTMLElement, SidebarNavProps>(
                           onClick={() => navigate(child.id)}
                           aria-current={child.id === activeId ? 'page' : undefined}
                           className={cn(
-                            'flex w-full cursor-pointer items-center gap-2 rounded-[calc(var(--as-radius-sm)-2px)] px-2 py-1.5 text-left text-sm outline-none transition-colors focus:bg-[var(--as-secondary)] disabled:pointer-events-none disabled:opacity-50',
+                            'flex w-full cursor-pointer items-center gap-2 rounded-[calc(var(--as-radius-sm)-2px)] px-2 py-1.5 text-left text-sm outline-none transition-colors hover:bg-[var(--as-secondary)] focus-visible:bg-[var(--as-secondary)] disabled:pointer-events-none disabled:opacity-50',
                             child.id === activeId && 'font-bold text-[var(--as-primary)]',
                           )}
                         >
