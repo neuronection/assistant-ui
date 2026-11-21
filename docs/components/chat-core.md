@@ -4,7 +4,7 @@ The chat layer's headless core: the normalized `ChatMessageView` contract,
 the family streaming-event vocabulary, the pure `liveTurnReducer` turn
 state machine, branch-tree utilities, and the transport-injected
 `useChatStream` hook. Every `chat-*` renderer speaks these shapes; apps
-keep transports, sessions and stores (ADR-006 tier 2).
+keep transports, sessions and stores (tier 2).
 
 ## import
 

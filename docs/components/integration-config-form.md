@@ -1,6 +1,6 @@
 # IntegrationConfigForm
 
-The schema-driven config form (plan 33 G2 / ADR-0040 secretLaw D19 + D21):
+The schema-driven config form:
 the charter's JSON-Schema-subset fields as inputs — string, number, boolean,
 array-of-string (chip input), enum selects, bounds + pattern UX — with
 `x-secret` fields as password inputs whose values never cross props (sealed
@@ -77,6 +77,6 @@ Manifests can drive richer field rendering without app code:
 Fields without hints render exactly as before — the hints are additive.
 
 
-## Custom numeric entry (plan 154 sources)
+## Custom numeric entry
 
 Bounded numeric fields with `x-choices` also render a trailing **Custom…** entry (label via the optional `customLabel` / schema `x-custom-label`): picking it swaps the chips for a bounded number input, and a stored value outside the presets opens the custom input prefilled — presets stay one click away. The numeric bounds drive the input's clamp; values out of bounds surface through the host's validation display.

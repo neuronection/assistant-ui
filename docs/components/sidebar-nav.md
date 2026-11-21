@@ -3,7 +3,7 @@
 Family-standard vertical navigation panel: items with icons and badges,
 one nesting level with section dividers, controlled active state, optional
 collapsed icon rail with hover flyouts, pinned secondary items, and
-header/footer slots. Fully presentational + controlled (ADR-006) — the
+header/footer slots. Fully presentational + controlled — the
 router, role filtering, i18n and drawer shells stay app-side.
 
 ## import
@@ -92,7 +92,7 @@ realistic (groups + sections + rail + pinned items + slots):
 short viewports (controlled `compact` + app-side footer hide):
 
 ```tsx
-// the app owns the trigger and what to hide (ADR-006) — the library only
+// the app owns the trigger and what to hide — the library only
 // renders the denser layout
 const short = useMediaQuery('(max-height: 720px)')
 
@@ -117,6 +117,12 @@ pinned `secondaryItems`); Enter/Space activates; ArrowUp/ArrowDown move
 items in visual order); ArrowRight expands (or enters) a group;
 ArrowLeft collapses (or returns to the trigger); Home/End jump; rail
 flyouts support arrows and Escape (focus returns to the trigger).
+
+Rail flyout focus policy: a flyout opened by **hover** never takes focus
+(the pointer owns the interaction; children highlight on hover), while a
+flyout opened by click or keyboard moves focus into its first child and
+returns it to the trigger on close. Children highlight with
+`hover`/`focus-visible`, so no "stuck" highlight follows the pointer.
 
 ## related
 

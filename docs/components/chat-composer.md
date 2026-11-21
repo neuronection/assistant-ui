@@ -26,7 +26,7 @@ import { ChatComposer } from '@neuronection/assistant-ui/chat-composer'
 | `commands` | `ChatComposerCommands` | Slash-command / mention palette: `{ trigger? ('/' default), items: { id, label, hint?, icon? }[], maxItems? (8), onSelect }`. Opens while the caret touches a trigger-started word; fuzzy-filtered (`searchScore`); ArrowUp/Down move, Enter/Tab select (never submit while open), Escape dismisses. `onSelect(id, token)` receives the draft offsets (`token.start/end/query`) — the app replaces that span with its insertion. The textarea wires `aria-controls` + `aria-autocomplete="list"` + `aria-activedescendant` into the `role="listbox"` palette. |
 | `history` | `string[]` | Previously sent prompts (oldest → newest). ArrowUp on an empty draft recalls the last one, ArrowUp/ArrowDown walk the stack, ArrowDown past the newest clears the draft. Editing a recalled draft exits the stack. |
 | `maxRows` | `number` | Auto-grow cap fallback (rows of 22px) when the textarea carries no CSS `max-h-*`; a `max-h-*` class always wins. Default `8`. |
-| `toolbarStart` / `toolbarEnd` | `ReactNode` | Inside the input row — attach menu, equation, draw, dictation… |
+| `toolbarStart` / `toolbarEnd` | `ReactNode` | Icon-scale slots inside the input row — attach menu, equation, draw, dictation… Never prose, notices or settings copy: put those in `suggestions` or the panel `banner`, where they can wrap. The textarea carries a `min-w-32` (8rem) floor so no slot can collapse the input. |
 | `attachments` | `ReactNode` | Rail above the input (`FileQueue`, image chips); slides up on mount. |
 | `suggestions` | `ReactNode` | Chips / context strip above everything; slides up on mount. |
 | `onAttachFiles` | `(files: File[]) => void` | Drag-drop + paste wiring (also enables the drop styling). |
@@ -42,6 +42,17 @@ import { ChatComposer } from '@neuronection/assistant-ui/chat-composer'
 | `[data-as="chat-composer-row"]` | The input row (toolbar slots + textarea + send/stop). Row motion is CSS-owned here: token-timed border/background/box-shadow transitions, a `--as-primary` focus glow on `:focus-within`, and a `1.4s` drop-zone pulse while `data-dragging` — all disabled under `prefers-reduced-motion`. |
 | `[data-as="chat-composer-row"][data-multiline]` | Present while the auto-growing textarea renders more than one line (same layout pass as the auto-grow height; absent in jsdom-style environments without layout). Apps use it to restructure the row — e.g. wrap the toolbars into a footer under a full-width textarea. Hysteretic by contract: once set it stays until the draft clears, because restructuring the row changes the textarea's width and a flag re-measured at the new width would flip itself every keystroke near the wrap threshold. |
 
+## layout contract
+
+The input row is a non-wrapping flex row: `toolbarStart`, the auto-growing
+textarea, `toolbarEnd`, then send/stop. The textarea keeps a minimum width
+(`min-w-32`) at the narrowest sanctioned rail (≥320 px). Toolbar slots are
+for icon-size controls only — a prose notice placed there has an intrinsic
+width and will squeeze the textarea or be clipped by the host panel. Render
+notices and capability errors in the full-width `suggestions` area above the
+input row (or the `ChatPanel` `banner` slot); a dismissible capability notice
+belongs there, not in `toolbarEnd`.
+
 ## example (realistic)
 
 ```tsx
@@ -53,6 +64,16 @@ import { ChatComposer } from '@neuronection/assistant-ui/chat-composer'
   onStop={() => void stream.stop()}
   toolbarStart={<AttachMenu courseId={courseId} />}
   toolbarEnd={<DictationButton onText={setDraft} />}
+  suggestions={
+    sttUnconfigured ? (
+      <DictationUnavailable
+        label={t('dictation.unavailable')}
+        detail={t('dictation.noModelAssigned')}
+        action={{ label: t('dictation.openSettings'), onClick: openVoiceSettings }}
+        onDismiss={dismissNotice}
+      />
+    ) : null
+  }
   attachments={pending.length > 0 ? <FileQueue items={pending} /> : null}
   onAttachFiles={(files) => upload(files)}
   canSubmit={draft.trim() !== '' || pending.some((file) => file.ready)}

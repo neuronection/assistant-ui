@@ -1,6 +1,6 @@
 # IntegrationSourcesList
 
-The import layer's source list (plan 33 G5 / ADR-0040 D13+D22): sources with
+The import layer's source list: sources with
 family status, check/remove affordances, pinned-ref short forms
 (`tag-pattern@v*`), GitOps desired-state indicators, discovered candidates
 (digest short form, verbatim compatibility reasons, install handing off to

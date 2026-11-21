@@ -1,6 +1,6 @@
 # Integration atoms
 
-The integration kit's shared vocabulary atoms (plan 33 / ADR-0040): the
+The integration kit's shared vocabulary atoms: the
 origin-class chip (D25 display law — an extension never renders as official
 unless `bundled`), the family status badge (`ok | degraded | failing | stale`),
 the tier badge (T0–T3) and risk-class-marked capability chips (D20 — every

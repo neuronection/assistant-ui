@@ -3,7 +3,7 @@
 Family-standard profile switcher (identity-auth §6 "switching is data-level
 UX"): current-profile trigger + panel listing the user's profiles with
 select, create, rename, set-Default and delete flows. Presentational +
-controlled (ADR-006): profiles in, events out — no fetching, no stores.
+controlled: profiles in, events out — no fetching, no stores.
 
 ## import
 

@@ -7,6 +7,7 @@ export {
   PickerBrowseModal,
   type PickerBrowseModalProps,
 } from './PickerBrowseModal'
+export { PickerBulkSelect, type PickerBulkSelectProps } from './PickerBulkSelect'
 export type {
   PickerBrowseBodyCtx,
   PickerLabels,

@@ -19,10 +19,18 @@ export interface PickerBrowseBodyCtx {
   filters: ReactNode
   searchInput: ReactNode
   categorySelect: ReactNode
+  /** The bulk-select control (`selectAll` mode only — `null` otherwise). */
+  selectAll: ReactNode
   list: ReactNode
   value: PickerSelection[]
+  /** Every option matching the current search/category/host filter — the
+   * scope a bulk select acts on (not the paginated `list` slice). */
+  matching: PickerOption[]
   isSelected: (option: PickerOption) => boolean
   toggle: (option: PickerOption) => void
+  /** Bulk toggle scoped to `matching`: selects all when any is missing,
+   * drops the `matching` ones only when every one of them is selected. */
+  toggleAll: () => void
 }
 
 export interface PickerLabels {
@@ -42,6 +50,10 @@ export interface PickerLabels {
   categoryLabel?: string
   allCategoriesLabel?: string
   selectedCountLabel?: (count: number) => string
+  /** Bulk-select control: the check action, labelled with the match count. */
+  selectAllLabel?: string
+  /** Bulk-select control: the uncheck action (every match already picked). */
+  clearSelectionLabel?: string
 }
 
 export type ResolvedPickerLabels = Required<PickerLabels>
@@ -64,6 +76,8 @@ export function resolvePickerLabels(labels?: PickerLabels): ResolvedPickerLabels
     categoryLabel: labels?.categoryLabel ?? 'Category',
     allCategoriesLabel: labels?.allCategoriesLabel ?? 'All categories',
     selectedCountLabel: labels?.selectedCountLabel ?? ((count) => `${count} selected`),
+    selectAllLabel: labels?.selectAllLabel ?? 'Select all',
+    clearSelectionLabel: labels?.clearSelectionLabel ?? 'Clear selection',
   }
 }
 

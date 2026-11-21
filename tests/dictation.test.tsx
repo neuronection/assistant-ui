@@ -276,12 +276,40 @@ describe('DictationUnavailable', () => {
     expect(screen.queryByRole('button')).toBeNull()
   })
 
+  it('renders a labelled dismiss control and calls onDismiss', async () => {
+    const user = userEvent.setup()
+    const onDismiss = vi.fn()
+    render(
+      <DictationUnavailable
+        label="Dictation unavailable"
+        detail="No speech-to-text model is assigned."
+        onDismiss={onDismiss}
+      />,
+    )
+    const dismiss = screen.getByRole('button', { name: 'Dismiss' })
+    expect(dismiss).toHaveAttribute('title', 'Dismiss')
+    await user.click(dismiss)
+    expect(onDismiss).toHaveBeenCalledTimes(1)
+  })
+
+  it('uses the app-supplied dismiss label', () => {
+    render(
+      <DictationUnavailable
+        label="Dictation unavailable"
+        onDismiss={() => {}}
+        dismissLabel="Notice dismissen"
+      />,
+    )
+    expect(screen.getByRole('button', { name: 'Notice dismissen' })).toBeInTheDocument()
+  })
+
   it('has no axe violations with and without an action', async () => {
     const withAction = render(
       <DictationUnavailable
         label="Dictation unavailable"
         detail="No speech-to-text model is assigned."
         action={{ label: 'Open voice settings', onClick: () => {} }}
+        onDismiss={() => {}}
       />,
     )
     expect((await axe(withAction.container)).violations).toEqual([])

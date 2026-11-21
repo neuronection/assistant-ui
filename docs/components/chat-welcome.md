@@ -1,6 +1,6 @@
 # ChatWelcome
 
-The chat empty-state kit (plan 100 S6): a breathing `--as-ai` identity
+The chat empty-state kit: a breathing `--as-ai` identity
 orb, greeting + subtitle, and staggered suggestion slots. Drop it into
 `ChatTranscript emptyState` (or render it app-side above the composer).
 Presentational — suggestion content and targets stay app-side.

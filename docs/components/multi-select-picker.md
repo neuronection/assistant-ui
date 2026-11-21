@@ -14,6 +14,7 @@ separately for hosts that need it standalone.
 import {
   MultiSelectPicker,
   PickerBrowseModal,
+  PickerBulkSelect,
   type PickerOption,
   type PickerSelection,
 } from '@neuronection/assistant-ui/multi-select-picker'
@@ -59,6 +60,7 @@ Same controlled contract (`value` + `onChange` + `mode` + the data props
 | `category` | `string` | — | **controlled** category selection (`''` = *All*); without it the modal keeps the category internally (reset to `''` on open) |
 | `onCategoryChange` | `(category: string) => void` | — | reports category changes (both controlled and uncontrolled) |
 | `reloadKey` | `unknown` | — | when this value changes, the modal re-runs its current search — the trigger for host-side **server** filters (e.g. a scope switch) that affect results but aren't the query/category. Comparison is identity-based: pass a primitive or a referentially stable value |
+| `selectAll` | `boolean` | `false` | **opt-in bulk select** (`multi` mode): one tri-state `role="checkbox"` control above the list that selects every option matching the active search/category/host filter, and deselects exactly those again. Off by default — turn it on only where "all" is a sensible action (a bounded curated catalog), never on an open-ended one (thousands of skills) |
 | `hasMore` | `boolean` | optimistic | server mode: host-declared pagination state — when set, it (not the optimistic default) decides whether *Load more* shows, so an exhausted list never renders a dead button |
 | `filterOption` | `(option: PickerOption) => boolean` | — | host predicate narrowing the **rendered** rows (e.g. client-side facet filters); pagination (*Load more*) stays driven by the raw pages |
 | `renderRowContent` | `(option, selected, ctx) => ReactNode` | — | replaces the row's text block (label + category); `ctx` carries the live `{ search, category }` (e.g. for match highlighting). The built-in `Add/Added <label>` toggle and row chrome stay in place |
@@ -67,6 +69,22 @@ Same controlled contract (`value` + `onChange` + `mode` + the data props
 
 The modal shell is [`PanelModal`](./modal.md) (Radix Dialog) — Escape and
 click-outside close, focus is trapped and restored.
+
+## props — PickerBulkSelect
+
+The bulk control `selectAll` renders, exported so a host with its own
+browsing body (a card gallery, a graph, a table) places the same semantics
+instead of hand-rolling them:
+
+| prop | type | default | notes |
+|---|---|---|---|
+| `count` | `number` | — | size of the host's matching scope; `0` renders nothing |
+| `pickedCount` | `number` | — | how many of the scope are already picked — drives `aria-checked` (`mixed` when partial) |
+| `label` | `string` | — | the check action's accessible name (host composes it, e.g. `Select all (12)`) |
+| `clearLabel` | `string` | — | the uncheck action's name, used instead of `label` once everything matches |
+| `onToggle` | `() => void` | — | one event; the host decides select-all vs clear depending on its own state |
+| `disabled` | `boolean` | `false` | inert while a bulk action is in flight |
+| `className` | `string` | — | on the button |
 
 ## controlled contract
 
@@ -88,7 +106,7 @@ click-outside close, focus is trapped and restored.
 
 The interactive core (type-ahead, chips, `Add/Added` rows, pagination,
 count footer) is the library's; **host chrome rides slots** (no fetching
-inside the module — ADR-006):
+inside the module):
 
 - `renderChipExtra` — leading chip content (a relation select, a type
   badge). The chip's label and per-chip remove stay built-in.
@@ -101,14 +119,24 @@ inside the module — ADR-006):
   filters). Load-more pagination keeps following the raw pages.
 - `reloadKey` — re-runs the current search when a host-side server filter
   (not the query/category) changes.
+- `selectAll` — the built-in bulk selector. Opt-in, and it never guesses:
+  its scope is `matching` (every option passing the current search, the
+  category and `filterOption`), so "select all" always means *all the rows
+  this filter shows*, not the whole catalog. Partial matches render
+  `aria-checked="mixed"`; clicking again removes only the matching options
+  and leaves the rest of the selection untouched. In server mode the scope
+  is what the loaded pages hold. The control is also exposed to hosts as
+  `ctx.selectAll` (node) and `ctx.matching` / `ctx.toggleAll` (data +
+  action), so a custom body places or re-labels it — `labels.selectAllLabel`
+  / `labels.clearSelectionLabel` carry the strings.
 - `renderBody` — full body composition. `PickerBrowseBodyCtx` exposes the
   current filter state (`search`, `onSearchChange`, `category`,
-  `onCategoryChange`, `categories`, `value`) plus the default pieces as
-  nodes (`filters` = the search + category row, `searchInput`,
-  `categorySelect`, `list` = rows + *Load more*) and the selection helpers
-  (`isSelected`, `toggle`) so an alternate surface (a graph, a tree) feeds
-  the same controlled selection. Return a falsy value for the default
-  body.
+  `onCategoryChange`, `categories`, `value`), the matching set
+  (`matching`), the default pieces as nodes (`filters` = the search +
+  category row, `searchInput`, `categorySelect`, `selectAll`, `list` =
+  rows + *Load more*) and the selection helpers (`isSelected`, `toggle`,
+  `toggleAll`) so an alternate surface (a graph, a tree) feeds the same
+  controlled selection. Return a falsy value for the default body.
 - `category` + `onCategoryChange` — lift the category filter into host
   state when host chrome (custom category controls, facet registries) needs
   it; without them the modal manages it internally.
@@ -123,9 +151,10 @@ All strings are props on `labels: PickerLabels` with English defaults:
 `placeholder`, `inputLabel`, `searchPlaceholder`, `browseLabel`,
 `browseTitle`, `removeLabel`, `addLabel`, `addedLabel`, `loadMoreLabel`,
 `doneLabel`, `closeLabel`, `emptyLabel`, `searchingLabel`, `categoryLabel`,
-`allCategoriesLabel`, `selectedCountLabel(count)`. Pass translated labels at
-the call site (tests query by accessible name — keep them unique per
-surface).
+`allCategoriesLabel`, `selectedCountLabel(count)`, `selectAllLabel`
+(composed as `Select all (N)`) and `clearSelectionLabel`. Pass translated
+labels at the call site (tests query by accessible name — keep them unique
+per surface).
 
 ## minimal
 
@@ -167,6 +196,7 @@ const [value, setValue] = useState<PickerSelection[]>([])
   )}
   showChips={display === 'chips'}
   browseModalProps={{
+    selectAll: true,
     category,
     onCategoryChange: setCategory,
     filterOption: (option) => facetFilter.passes(option),
@@ -178,10 +208,35 @@ const [value, setValue] = useState<PickerSelection[]>([])
         <>
           {ctx.filters}
           <FacetBar />
+          {ctx.selectAll}
           {ctx.list}
         </>
       ),
   }}
+/>
+```
+
+## host with its own browsing body
+
+When the host is itself a modal (a gallery, a full-page catalog) the browse
+modal is useless — take the bulk control alone and keep your own body:
+
+```tsx
+const matching = visible; // the host's filtered, unpaginated set
+const pickedHere = matching.filter((entry) => selected.has(entry.id)).length
+
+<PickerBulkSelect
+  count={matching.length}
+  pickedCount={pickedHere}
+  label={t('catalog.selectAll', { count: matching.length })}
+  clearLabel={t('catalog.clearSelection')}
+  onToggle={() =>
+    setSelected((current) =>
+      pickedHere === matching.length
+        ? new Set([...current].filter((id) => !matching.some((entry) => entry.id === id)))
+        : new Set([...current, ...matching.map((entry) => entry.id)]),
+    )
+  }
 />
 ```
 

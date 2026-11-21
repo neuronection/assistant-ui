@@ -1,11 +1,11 @@
 # ProviderSetupForm
 
-Guided one-click setup form (plan 26 §6): the selected provider's mark
+Guided one-click setup form: the selected provider's mark
 beside its name (`ProviderLogo`, keyed by `preset.key` — the same mark the
 tiles show), vendor checklist with copy buttons
 and a get-a-key link, factual free-tier note, connection name, a **write-only
 API key** (`type="password"` + `autoComplete="new-password"` — the library
-never renders a stored key, ADR-006), and an **Advanced disclosure** whose
+never renders a stored key), and an **Advanced disclosure** whose
 base-URL field is read-only for fixed-endpoint presets. Validation, secrets,
 IPC/REST are the app's business — the form reports `onSubmit(value)`;
 classified failures render copy keyed off the shared §15 error enum with

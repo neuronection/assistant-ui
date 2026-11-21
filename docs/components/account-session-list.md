@@ -1,7 +1,7 @@
 # AccountSessionList
 
 The active-sessions list shared by health's account settings, career's
-`SessionsCard` and study's session rows (plan 60 D5): one `<li>` per session
+`SessionsCard` and study's session rows: one `<li>` per session
 with a preformatted detail line, an optional device icon and badge slot, a
 current-session badge and a per-row revoke button that can show a busy state.
 Rows can also come back already signed out (`revoked`) or with no revoke

@@ -1,6 +1,6 @@
 # IntegrationInstancesList
 
-The Installed surface (plan 33 / ADR-0040 D19+D21): instance rows grouped
+The Installed surface: instance rows grouped
 under their extension (extension ≠ instance — one extension, N configured
 occurrences), status + conditions (`needs-config` / `needs-secret`) +
 `last_success_at` / `consecutive_failures`, origin chips, gitops indicators,

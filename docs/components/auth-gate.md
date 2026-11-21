@@ -3,7 +3,7 @@
 Session gate around the app (identity-auth §4): owns the
 `checking → authenticated | anonymous` boot machine and the rendering for
 each state, while the app owns everything endpoint-shaped. Presentational +
-controlled (ADR-006): the boot flow comes in as a function, the login and
+controlled: the boot flow comes in as a function, the login and
 splash surfaces come in as nodes, transitions go out as an event — no
 fetching, stores, or routing of its own. Pair it with
 [`LoginForm`](./login-form.md) / [`RegisterForm`](./register-form.md)

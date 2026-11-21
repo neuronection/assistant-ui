@@ -1,6 +1,6 @@
 # ConsentDialog
 
-The consent surface (plan 33 / ADR-0040 clause 21, D15+D22): renders the
+The consent surface: renders the
 charter's consent content VERBATIM — capabilities (risk-marked), tier +
 import class, provenance, the pinned digest and the law disclosure, all
 arriving as DATA in the payload. The library never words consent;

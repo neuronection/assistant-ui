@@ -1,6 +1,6 @@
 # IntegrationCard
 
-The registry card (plan 33 / ADR-0040 D25 — one registry view, origin-first):
+The registry card (one registry view, origin-first):
 identity (icon/name/version), provenance verbatim (author/license/repository),
 origin chip, tier badge, risk-marked capability chips, update states
 (available + re-consent, digest drift with `role="alert"`), and typed action

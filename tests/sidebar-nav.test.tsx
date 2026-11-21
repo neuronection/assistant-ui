@@ -380,6 +380,35 @@ describe('SidebarNav (collapsed rail)', () => {
     expect(screen.queryByRole('button', { name: 'Overview' })).toBeNull()
   })
 
+  it('flyout children carry a hover highlight, not a plain focus one', async () => {
+    const user = userEvent.setup()
+    render(<GroupDemo collapsed collapsible />)
+    await user.click(
+      screen.getByRole('button', { name: 'Open Patient record menu' }),
+    )
+    const overview = screen.getByRole('button', { name: 'Overview' })
+    expect(overview).toHaveClass('hover:bg-[var(--as-secondary)]')
+    expect(overview).toHaveClass('focus-visible:bg-[var(--as-secondary)]')
+    expect(overview).not.toHaveClass('focus:bg-[var(--as-secondary)]')
+  })
+
+  it('a hover-opened flyout does not pull focus into its first child', async () => {
+    render(<GroupDemo collapsed collapsible />)
+    const trigger = screen.getByRole('button', { name: 'Open Patient record menu' })
+    fireEvent.mouseEnter(trigger)
+    const overview = await screen.findByRole('button', { name: 'Overview' })
+    expect(overview).not.toHaveFocus()
+  })
+
+  it('a click-opened flyout moves focus into its first child', async () => {
+    const user = userEvent.setup()
+    render(<GroupDemo collapsed collapsible />)
+    await user.click(
+      screen.getByRole('button', { name: 'Open Patient record menu' }),
+    )
+    expect(screen.getByRole('button', { name: 'Overview' })).toHaveFocus()
+  })
+
   it('flyout arrows move focus between children', async () => {
     const user = userEvent.setup()
     render(<GroupDemo collapsed collapsible />)

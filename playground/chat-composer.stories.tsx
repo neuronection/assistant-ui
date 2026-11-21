@@ -52,6 +52,11 @@ function ComposerStory({
 
 export const Default = () => <ComposerStory />
 export const Sending = () => <ComposerStory sending onStop={() => {}} />
+export const Narrow = () => (
+  <div style={{ width: 320 }}>
+    <ComposerStory initialValue="" />
+  </div>
+)
 export const Multiline = () => (
   <ComposerStory initialValue={'Paste a long text here —\nthe row exposes data-multiline\nonce the textarea grows past one line.'} />
 )

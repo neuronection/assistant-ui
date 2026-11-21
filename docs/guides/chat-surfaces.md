@@ -1,6 +1,6 @@
 # Chat surfaces — the adoption recipe
 
-The shared chat layer (ADR-0009) serves all three
+The shared chat layer serves all three
 surfaces — **bubble, sidepanel, full page** — from the same modular
 pieces. This guide assembles them; per-module reference lives in
 [docs/components/](../components/chat-core.md).
@@ -13,7 +13,7 @@ pieces. This guide assembles them; per-module reference lives in
 | 1 — presentational | `chat-markdown`, `chat-message`, `chat-reasoning`, `chat-tool-card`, `chat-composer`, `chat-transcript`, `chat-branch-tree`, `chat-session-list` | everything users see and interact with |
 | 3 — surface hosts | `chat-panel`, `chat-drawer`, `chat-launcher` | the three surface shells |
 
-**Boundary (ADR-006):** transports (WS/SSE clients, auth), session stores,
+**Boundary:** transports (WS/SSE clients, auth), session stores,
 persistence and upload endpoints stay app-side. The hook owns the live
 turn only — after a terminal state the app refetches persisted messages
 and calls `reset()`.
@@ -89,7 +89,7 @@ as a rejected `send` — the hook already ignores it (user-stopped).
 />
 ```
 
-The pending → streaming handoff is the choreography seam (plan 100):
+The pending → streaming handoff is the choreography seam:
 `ChatPending` narrates the first-token latency (phase + AI-accented
 shimmer), then `MarkdownSurface`'s `streaming` caret takes over, and
 `ChatReasoning` folds itself when its stream ends.

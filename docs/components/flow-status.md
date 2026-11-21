@@ -3,7 +3,7 @@
 Renders a running/finished/failed/interrupted multi-step AI flow from the
 family event vocabulary (guidelines §5: `flow_started` / `node_started` /
 `node_finished` / `flow_finished` / `flow_failed` / `interrupt`). Purely
-presentational + controlled (library ADR-006): the app maps transport events
+presentational + controlled: the app maps transport events
 to props; the card never sees SSE/WS. Used for button-triggered flows and
 flows invoked from chat.
 

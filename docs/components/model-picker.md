@@ -43,7 +43,7 @@ import {
 Combobox's (synchronous). `capabilities` is not rendered — it exists for
 [`TaskAssignmentPicker`](./task-assignment-picker.md) `requires` matching.
 
-**Labeled null option (plan 29 / ADR-0036).** With `nullOption` set, the
+**Labeled null option.** With `nullOption` set, the
 entry the props name leads the option list (no group of its own — it
 renders above every provider group) and an empty `value` selects it, so
 the trigger names the inherit state. The label is app-composed copy —
@@ -82,7 +82,7 @@ realistic (per-task picker inside an assignment row, from study
 />
 ```
 
-inherit row (plan 29 / ADR-0036 — a Decision defaults card kind row; the
+inherit row (a Decision defaults card kind row; the
 list leads with "Inherits — {resolved default model}", choosing it
 assigns `null`):
 

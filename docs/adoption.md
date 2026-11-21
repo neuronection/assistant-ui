@@ -75,7 +75,7 @@ the library version in the same commit.** No wrappers, no `// TODO migrate`.
   sites (Phase 1 lesson from study).
 - Icons: passed as props (`icon={Loader2}`).
 
-### The Phase 1 pattern: shims + app-owned glue (ADR-006)
+### The Phase 1 pattern: shims + app-owned glue
 
 How study's `components/ui` became pure re-export shims:
 

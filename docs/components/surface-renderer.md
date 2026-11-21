@@ -1,7 +1,7 @@
 # surface-renderer
 
-The family **declarative-surface renderer** (plan 32 Phase 4 / ADR-0040
-clause 16): renders an extension surface — a report or page — from the
+The family **declarative-surface renderer**: renders an extension surface —
+a report or page — from the
 charter's closed component vocabulary. Data and labels in; typed actions
 out. The host binds the actions and resolves the labels; extensions never
 contribute markup (D17: raw HTML/JS from extensions is never rendered at
@@ -57,7 +57,7 @@ at the render seam — the manifest validator rejects them, the renderer
 ignores them). Unknown action ids never render. `evidence` has no visual
 node: rows carrying `evidence` (+ the optional host-resolved
 `evidenceSummary`) render a disclosure — evidence is mandatory wherever a
-recommendation renders (ADR-0029; the manifest validator enforces it).
+recommendation renders (the manifest validator enforces it).
 
 ## The label contract
 
@@ -129,5 +129,5 @@ const view: SurfaceView = {
 
 ## Related
 
-- [`add-integration-source-dialog`](./add-integration-source-dialog.md) / [`consent-dialog`](./consent-dialog.md) — the ADR-0040 import/consent flow this renderer's mini-apps install through; [`ActionResultDialog`](./integration-action-result-dialog.md) hosts this renderer for action results
+- [`add-integration-source-dialog`](./add-integration-source-dialog.md) / [`consent-dialog`](./consent-dialog.md) — the import/consent flow this renderer's mini-apps install through; [`ActionResultDialog`](./integration-action-result-dialog.md) hosts this renderer for action results
 - [`badge`](./badge.md) / [`button`](./button.md) — the primitives the renderer composes

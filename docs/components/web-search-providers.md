@@ -1,6 +1,6 @@
 # web-search-providers
 
-The family's web-search settings surface (ADR-0035 / plan 28), rendered in
+The family's web-search settings surface, rendered in
 the AI-providers UI pattern: configured providers as **ProviderCards** with
 a `⋯` management menu, and an add flow that starts from **provider tiles**
 ("choose") before showing the **settings form** ("configure"). The module

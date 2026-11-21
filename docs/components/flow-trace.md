@@ -1,12 +1,12 @@
 # FlowTraceCard / FlowTelemetryStrip
 
-The run-telemetry pair for multi-step flows (plan 65.4): `FlowTraceCard`
+The run-telemetry pair for multi-step flows: `FlowTraceCard`
 renders a finished or running run's trace — outcome + stage timeline, a
 per-call LLM ledger table (task, stage, provider+model, tokens in/out,
 latency, prompt version, status) and the applied/rejected ops list — and
 `FlowTelemetryStrip` renders the compact live counters (`N call(s) ·
 tokens in/out · edits`) the progress card polls. Purely presentational +
-controlled (library ADR-006): the app maps its run ledger (e.g. career's
+controlled: the app maps its run ledger (e.g. career's
 `GET /cv/{id}/runs`) onto the library-owned `FlowTrace` schema — **zero
 app data joins** in the component. Mock-provider rows badge themselves as
 `Simulated — no real spend`.

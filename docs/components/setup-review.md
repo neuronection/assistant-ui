@@ -1,6 +1,6 @@
 # SetupReview
 
-Editable pre-flight review (plan 26 §6): **model-select cards** with
+Editable pre-flight review: **model-select cards** with
 capability icons plus gap-fill **switch rows** with `now:` sub-lines and the
 never-removes footnote. Every edit emits the full five-bind options body —
 `{curatedIds, bindChat, bindVision, bindStt, bindDecision}` (D14) —

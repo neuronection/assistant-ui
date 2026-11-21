@@ -1,7 +1,7 @@
 # SecretOnceBlock
 
 The body of a shown-once secret dialog, shared by health's credential
-reveals, career's MCP-server secret and study's token panels (plan 60 D5):
+reveals, career's MCP-server secret and study's token panels:
 the value in a breaking monospace block, the host's warning copy, and a real
 copy button with transient copied feedback.
 
@@ -85,7 +85,7 @@ Health funnels its three existing secret dialogs through one app-local
 `Modal`); career replaces the inline `McpServerSection` secret body; study
 reuses it inside its existing dialog. Keep `client_id` and other
 non-secret identifiers outside the block — it carries exactly one secret.
-The generic `RevealSecretDialog` is out of scope for plan 60 Phase 4.
+The generic `RevealSecretDialog` is out of scope.
 
 ## related
 

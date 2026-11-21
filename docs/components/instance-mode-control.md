@@ -6,7 +6,7 @@ admin transitions — `open → authenticated` (the owner sets credentials in
 the same call) and `authenticated → open` (current password plus an
 explicit acknowledgement) — and the blocked states (server entrypoint,
 other accounts existing) with label-driven reasons. Every change carries
-an audit note. Presentational + controlled (ADR-06): the app fetches the
+an audit note. Presentational + controlled: the app fetches the
 mode, persists the transition and re-supplies `mode`; nothing here talks
 to a network, store or router.
 
