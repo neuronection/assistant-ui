@@ -16,6 +16,11 @@ function setup(overrides: Partial<React.ComponentProps<typeof ChatComposer>> = {
 }
 
 describe('ChatComposer', () => {
+  it('keeps a minimum input width so toolbar slots cannot collapse it', () => {
+    setup()
+    expect(screen.getByRole('textbox')).toHaveClass('min-w-32')
+  })
+
   it('submits on Enter and inserts a newline on Shift+Enter', async () => {
     const user = userEvent.setup()
     const { onSubmit } = setup()

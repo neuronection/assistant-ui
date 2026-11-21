@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { MicOff } from 'lucide-react'
+import { MicOff, X } from 'lucide-react'
 
 import { cn } from '../../lib/utils'
 
@@ -10,13 +10,20 @@ export interface DictationUnavailableProps {
   detail?: string
   /** App-supplied follow-up. A label without a handler or with a blank label renders nothing. */
   action?: { label: string; onClick: () => void }
+  /** When provided, renders a dismiss control (per-user notice dismissal). */
+  onDismiss?: () => void
+  /** Accessible name/tooltip for the dismiss control. English default: 'Dismiss'. */
+  dismissLabel?: string
   className?: string
 }
 
 export const DictationUnavailable = React.forwardRef<
   HTMLDivElement,
   DictationUnavailableProps
->(function DictationUnavailable({ label, detail, action, className }, ref) {
+>(function DictationUnavailable(
+  { label, detail, action, onDismiss, dismissLabel = 'Dismiss', className },
+  ref,
+) {
   return (
     <div
       ref={ref}
@@ -25,11 +32,11 @@ export const DictationUnavailable = React.forwardRef<
       aria-atomic="true"
       data-as="dictation-unavailable"
       className={cn(
-        'flex items-center gap-2 rounded-[var(--as-radius)] border border-dashed border-[var(--as-border)] bg-[var(--as-surface)] px-2.5 py-1.5 text-xs',
+        'flex items-start gap-2 rounded-[var(--as-radius)] border border-dashed border-[var(--as-border)] bg-[var(--as-surface)] px-2.5 py-1.5 text-xs',
         className,
       )}
     >
-      <MicOff className="size-4 shrink-0 text-[var(--as-muted-fg)]" aria-hidden />
+      <MicOff className="mt-0.5 size-4 shrink-0 text-[var(--as-muted-fg)]" aria-hidden />
       <span className="min-w-0 flex-1">
         <span className="font-medium text-[var(--as-fg)]">{label}</span>
         {detail ? (
@@ -45,6 +52,17 @@ export const DictationUnavailable = React.forwardRef<
           onClick={action.onClick}
         >
           {action.label}
+        </button>
+      ) : null}
+      {typeof onDismiss === 'function' ? (
+        <button
+          type="button"
+          aria-label={dismissLabel}
+          title={dismissLabel}
+          className="mt-0.5 shrink-0 rounded-full p-0.5 text-[var(--as-muted-fg)] transition-colors hover:text-[var(--as-fg)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--as-focus-ring)]"
+          onClick={onDismiss}
+        >
+          <X className="size-3.5" aria-hidden />
         </button>
       ) : null}
     </div>

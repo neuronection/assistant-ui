@@ -472,7 +472,7 @@ export const ChatComposer = React.forwardRef<HTMLFormElement, ChatComposerProps>
             onClick={syncCaret}
             onSelect={syncCaret}
             onPaste={(event) => emitFiles(event.clipboardData.files)}
-            className="max-h-40 min-h-[1.5rem] w-full flex-1 resize-none bg-transparent px-1 py-1 text-sm leading-relaxed text-[var(--as-fg)] placeholder:text-[var(--as-muted-fg)] focus-visible:outline-none disabled:cursor-not-allowed"
+            className="max-h-40 min-h-[1.5rem] w-full min-w-32 flex-1 resize-none bg-transparent px-1 py-1 text-sm leading-relaxed text-[var(--as-fg)] placeholder:text-[var(--as-muted-fg)] focus-visible:outline-none disabled:cursor-not-allowed"
           />
           {toolbarEnd ? <div className="flex shrink-0 items-center gap-0.5 pb-0.5">{toolbarEnd}</div> : null}
           {showStop ? (

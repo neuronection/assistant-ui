@@ -61,6 +61,8 @@ without re-renders). Unmount while recording tears the stream down.
 | `label` | `string` | — (required) | Short reason shown first, e.g. *Dictation unavailable*. |
 | `detail` | `string` | — | Optional explanation (the app's assignment/configuration state). |
 | `action` | `{ label: string; onClick: () => void }` | — | Optional follow-up (e.g. open voice settings). Both fields are required; without a handler or with a blank label, no control is rendered. |
+| `onDismiss` | `() => void` | — | Renders a labelled dismiss control. The app owns dismissal state (e.g. per-user storage) and clears it when the capability becomes configured. |
+| `dismissLabel` | `string` | `'Dismiss'` | Accessible name/tooltip for the dismiss control. |
 | `className` | `string` | — | Merged onto the root. |
 
 ## controlled contract
@@ -74,12 +76,19 @@ the app's resolved capability state. It renders a `role="note"` row and a
 native button only when an action handler exists — never a disabled,
 handler-less or blank-labelled control. The app decides between it and
 `DictationButton`; the mic button is not overloaded with an `unavailable`
-status.
+status. With `onDismiss`, a labelled close control is rendered (`dismissLabel`
+defaults to *Dismiss*).
 
 The row is a polite live region (`aria-live="polite"`, `aria-atomic="true"`),
 so a gate that resolves after mount (the normal async assignment check) is
 announced when it replaces the mic. Apps that resolve capability before first
 paint still get the reason in reading order; the live attribute is harmless.
+
+**Placement:** render it in the full-width area above the composer's input row
+(the `suggestions` rail or the panel `banner`), never in `toolbarStart` /
+`toolbarEnd`. A prose row in a toolbar slot has an intrinsic width and will
+squeeze or clip the textarea on narrow rails. Dismiss the notice per user and
+clear the dismissal when the assignment becomes configured.
 
 ## label/i18n contract
 
@@ -112,6 +121,8 @@ Capability gate (app resolves the assignment; unknown/loading keeps the mic):
     label={t('dictation.unavailable')}
     detail={t('dictation.noModelAssigned')}
     action={{ label: t('dictation.openSettings'), onClick: openVoiceSettings }}
+    onDismiss={dismissNotice}
+    dismissLabel={t('dictation.dismiss')}
   />
 ) : (
   <DictationButton status={dictation.status} onStart={() => void dictation.start()} />
