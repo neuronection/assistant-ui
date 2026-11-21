@@ -1,5 +1,55 @@
 # @neuronection/assistant-ui
 
+## 0.89.0
+
+### Minor Changes
+
+- [#137](https://github.com/neuronection/assistant-ui/pull/137) [`18a636e`](https://github.com/neuronection/assistant-ui/commit/18a636e3fd253665c8af00cf947774a12ea229d9) Thanks [@constLiakos](https://github.com/constLiakos)! - `chat-composer` / `dictation`: keep the input usable and let capability
+  notices be dismissed.
+
+  - **`ChatComposer`** textarea gains a `min-w-32` (8rem) floor. Toolbar slots
+    are icon-scale by contract; a prose notice placed in `toolbarStart` /
+    `toolbarEnd` can no longer collapse the input on narrow rails.
+  - **`DictationUnavailable`** gains optional `onDismiss` and `dismissLabel`
+    (default _Dismiss_). When `onDismiss` is provided it renders a labelled
+    close control alongside the reason/action; the app owns the dismissal
+    state. The row aligns top for multi-line prose.
+  - Docs: the composer layout contract and the dictation placement rule
+    (full-width above the input row, never a toolbar slot) are stated in the
+    component pages; narrow-frame stories added.
+
+- [#137](https://github.com/neuronection/assistant-ui/pull/137) [`18a636e`](https://github.com/neuronection/assistant-ui/commit/18a636e3fd253665c8af00cf947774a12ea229d9) Thanks [@constLiakos](https://github.com/constLiakos)! - `multi-select-picker`: bulk select, built once and shared.
+
+  - **`PickerBulkSelect`** (new export) — the tri-state `role="checkbox"` bulk
+    control (`aria-checked="mixed"` when only part of the scope is picked,
+    `count={0}` renders nothing, `label`/`clearLabel`/`pickedCount`/
+    `onToggle` in, one event out). Hosts whose own body already _is_ the
+    browser (a card gallery, a graph, a table) place it directly instead of
+    re-implementing select-all.
+  - **`PickerBrowseModal` `selectAll`** (opt-in, forwardable through
+    `MultiSelectPicker`'s `browseModalProps`) renders that control above the
+    list: one click selects every option matching the active
+    search/category/host filter, and the second click removes exactly those,
+    leaving the rest of the selection untouched.
+  - New labels `selectAllLabel` (rendered as `Select all (N)`) and
+    `clearSelectionLabel`; `PickerBrowseBodyCtx` gains `selectAll` (node),
+    `matching` (the filtered, unpaginated set) and `toggleAll`.
+
+  Off by default, so existing pickers are unchanged.
+
+### Patch Changes
+
+- [#137](https://github.com/neuronection/assistant-ui/pull/137) [`18a636e`](https://github.com/neuronection/assistant-ui/commit/18a636e3fd253665c8af00cf947774a12ea229d9) Thanks [@constLiakos](https://github.com/constLiakos)! - `sidebar-nav`: the collapsed rail's flyout entries highlight on hover again.
+
+  - Flyout children styled their background on `focus` only (no `hover`), so a
+    pointer could never move the highlight: Radix's mount autofocus planted it
+    on the first child and it stayed there while the mouse travelled. They now
+    paint on `hover` and `focus-visible`, matching the inline sub-item style.
+  - A **hover**-opened flyout no longer takes focus at all (nor returns it to
+    the trigger on close): hovering the rail must not move the caret. Click and
+    keyboard opens keep the menu-standard focus handling — first child on open,
+    trigger on close.
+
 ## 0.88.0
 
 ### Minor Changes
