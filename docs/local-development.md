@@ -79,10 +79,12 @@ Without it Vite pre-bundles the linked package into `.vite/deps` and serves a
 
 The playground/gallery loads `dist/styles.css` alone — no Tailwind preflight.
 `.ladle/reset.css` (imported by `.ladle/components.tsx`) provides the small
-form-control baseline apps get from their own preflight, and the
-`Provider` wrapper applies the token font/surface. Keep both in mind when a
-story renders differently in the gallery than in an app: the library itself
-still ships **no** preflight — apps own it (import order in `docs/adoption.md`).
+preflight slice apps get from their own build — form-control resets,
+`box-sizing: border-box`, zeroed heading/paragraph margins and bare list
+markers — and the `Provider` wrapper applies the token font/surface. Keep both
+in mind when a story renders differently in the gallery than in an app: the
+library itself still ships **no** preflight — apps own it (import order in
+`docs/adoption.md`).
 
 ## Troubleshooting
 

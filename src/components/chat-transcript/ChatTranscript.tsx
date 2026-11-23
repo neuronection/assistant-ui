@@ -369,7 +369,7 @@ export const ChatTranscript = React.forwardRef<HTMLDivElement, ChatTranscriptPro
           data-message-id={message.id}
           data-group-pos={pos}
           data-search-flash={message.id === flashId || undefined}
-          className={cn(groupConsecutive && grouped && '-mt-2')}
+          className={cn(groupConsecutive && grouped && '-mt-1.5')}
         >
           {node}
         </div>
@@ -393,6 +393,7 @@ export const ChatTranscript = React.forwardRef<HTMLDivElement, ChatTranscriptPro
       <div
         ref={ref}
         data-as="chat-transcript"
+        data-design={design}
         data-grouped={groupConsecutive || undefined}
         data-fade-top={fadeTop || undefined}
         className={cn('relative flex min-h-0 flex-1 flex-col', className)}
@@ -430,10 +431,10 @@ export const ChatTranscript = React.forwardRef<HTMLDivElement, ChatTranscriptPro
           role="log"
           aria-label={labels?.log ?? 'Conversation'}
           aria-busy={live !== undefined}
-          className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-1 py-2"
+          className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-1 py-3 sm:px-2 sm:py-4"
         >
           {items.length === 0 && live === undefined ? (
-            <div className="flex h-full min-h-40 items-center justify-center p-4 text-sm text-[var(--as-muted-fg)]">
+            <div className="flex h-full min-h-40 items-center justify-center px-3 py-6 text-sm text-[var(--as-muted-fg)]">
               {emptyState ?? (labels?.empty ?? 'Start the conversation')}
             </div>
           ) : virtualized ? (
@@ -447,7 +448,7 @@ export const ChatTranscript = React.forwardRef<HTMLDivElement, ChatTranscriptPro
                     data-index={row.index}
                     ref={virtualizer.measureElement}
                     style={{ position: 'absolute', top: 0, left: 0, width: '100%', transform: `translateY(${row.start}px)` }}
-                    className="px-2 py-1.5"
+                    className="px-1 py-2 sm:px-2"
                   >
                     {node}
                   </div>
@@ -455,7 +456,7 @@ export const ChatTranscript = React.forwardRef<HTMLDivElement, ChatTranscriptPro
               })}
             </div>
           ) : (
-            <div className="flex flex-col gap-3 px-2">
+            <div className="flex flex-col gap-3 px-1 sm:gap-4 sm:px-2">
               {items.map((message, index) => {
                 const rows: React.ReactNode[] = []
                 if (showDateSeparators && index > 0) {
@@ -490,7 +491,7 @@ export const ChatTranscript = React.forwardRef<HTMLDivElement, ChatTranscriptPro
             onClick={onStop}
             aria-label={labels?.stop ?? 'Stop generating'}
             title={labels?.stop ?? 'Stop generating'}
-            className="as-anim-slide-up absolute bottom-3 right-3 flex size-8 items-center justify-center rounded-full border border-[var(--as-border)] bg-[var(--as-surface-raised)] text-[var(--as-fg)] shadow-[var(--as-shadow-2)] transition-colors hover:bg-[var(--as-secondary)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--as-focus-ring)]"
+            className="as-anim-slide-up absolute bottom-4 right-4 flex size-9 items-center justify-center rounded-full border border-[var(--as-border)] bg-[var(--as-surface-raised)] text-[var(--as-fg)] shadow-[var(--as-shadow-2)] transition-colors hover:bg-[var(--as-secondary)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--as-focus-ring)]"
           >
             <Square className="size-3.5" aria-hidden />
           </button>
@@ -501,7 +502,7 @@ export const ChatTranscript = React.forwardRef<HTMLDivElement, ChatTranscriptPro
             onClick={scrollToBottom}
             aria-label={jumpFullLabel}
             title={jumpFullLabel}
-            className="as-anim-slide-up absolute bottom-3 left-1/2 -ml-4 flex size-8 items-center justify-center rounded-full border border-[var(--as-border)] bg-[var(--as-surface-raised)] text-[var(--as-fg)] shadow-[var(--as-shadow-2)] transition-colors hover:bg-[var(--as-secondary)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--as-focus-ring)]"
+            className="as-anim-slide-up absolute bottom-4 left-0 right-0 mx-auto flex size-9 items-center justify-center rounded-full border border-[var(--as-border)] bg-[var(--as-surface-raised)] text-[var(--as-fg)] shadow-[var(--as-shadow-2)] transition-colors hover:bg-[var(--as-secondary)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--as-focus-ring)]"
           >
             <ArrowDown className="size-4" aria-hidden />
             {unread > 0 ? (

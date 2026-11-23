@@ -106,6 +106,24 @@ describe('DictationButton', () => {
     expect(screen.getByRole('button', { name: 'Dictate' })).toBeDisabled()
   })
 
+  it('keeps a muted, discoverable control when dictation is unavailable', async () => {
+    const user = userEvent.setup()
+    const onStart = vi.fn()
+    render(
+      <DictationButton
+        status="idle"
+        onStart={onStart}
+        unavailable
+        unavailableLabel="Dictation unavailable"
+      />,
+    )
+    const button = screen.getByRole('button', { name: 'Dictation unavailable' })
+    expect(button).toHaveAttribute('data-unavailable', 'true')
+    expect(button).not.toBeDisabled()
+    await user.click(button)
+    expect(onStart).not.toHaveBeenCalled()
+  })
+
   it('has no axe violations', async () => {
     const { container } = render(
       <DictationButton status="recording" onStart={() => {}} label="Dictate" />,

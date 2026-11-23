@@ -32,15 +32,15 @@ export const DictationUnavailable = React.forwardRef<
       aria-atomic="true"
       data-as="dictation-unavailable"
       className={cn(
-        'flex items-start gap-2 rounded-[var(--as-radius)] border border-dashed border-[var(--as-border)] bg-[var(--as-surface)] px-2.5 py-1.5 text-xs',
+        'flex items-start gap-2 rounded-[var(--as-radius)] bg-[var(--as-muted)] px-2.5 py-2 text-xs',
         className,
       )}
     >
-      <MicOff className="mt-0.5 size-4 shrink-0 text-[var(--as-muted-fg)]" aria-hidden />
-      <span className="min-w-0 flex-1">
+      <MicOff className="mt-0.5 size-3.5 shrink-0 text-[var(--as-muted-fg)]" aria-hidden />
+      <span className="min-w-0 flex-1 leading-relaxed">
         <span className="font-medium text-[var(--as-fg)]">{label}</span>
         {detail ? (
-          <span className="break-words text-[var(--as-muted-fg)]"> {detail}</span>
+          <span className="text-[var(--as-muted-fg)]"> {detail}</span>
         ) : null}
       </span>
       {action &&
@@ -48,7 +48,7 @@ export const DictationUnavailable = React.forwardRef<
       action.label.trim() !== '' ? (
         <button
           type="button"
-          className="shrink-0 rounded-[var(--as-radius-sm)] px-2 py-1 font-medium text-[var(--as-primary)] hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--as-focus-ring)]"
+          className="shrink-0 rounded-[var(--as-radius-sm)] px-2 py-0.5 font-medium text-[var(--as-primary)] transition-colors hover:bg-[var(--as-surface-raised)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--as-focus-ring)]"
           onClick={action.onClick}
         >
           {action.label}

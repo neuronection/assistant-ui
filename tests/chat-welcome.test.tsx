@@ -39,6 +39,15 @@ describe('ChatWelcome', () => {
     expect(root()).toHaveAttribute('data-variant', 'bubble')
   })
 
+  it('lays page suggestions out in a two-column grid', () => {
+    const { container } = render(
+      <ChatWelcome title="Hello" variant="page" suggestions={<button type="button">Suggest</button>} />,
+    )
+    expect(
+      container.querySelector('[data-as="chat-welcome-suggestions"]')?.className,
+    ).toContain('sm:grid-cols-2')
+  })
+
   it('exposes no focusable elements of its own', () => {
     const { container } = render(<ChatWelcome title="Hello" subtitle="Hi" />)
     expect(container.querySelectorAll('button, a, input, textarea, select, [tabindex]')).toHaveLength(0)

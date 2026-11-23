@@ -47,6 +47,7 @@
     --as-radius-sm: calc(var(--as-radius) - 0.25rem);
     --as-radius: 0.625rem;
     --as-radius-lg: calc(var(--as-radius) + 0.25rem);
+    --as-radius-xl: calc(var(--as-radius) + 0.625rem);
 
     --as-duration-fast: 120ms;
     --as-duration-base: 180ms;
@@ -66,6 +67,7 @@
     --as-shadow-2: 0 2px 4px -1px oklch(0 0 0 / 0.05), 0 4px 12px -2px oklch(0 0 0 / 0.06);
     --as-shadow-3: 0 4px 8px -2px oklch(0 0 0 / 0.06), 0 12px 24px -4px oklch(0 0 0 / 0.08);
     --as-shadow-pop: 0 0 0 1px oklch(0 0 0 / 0.04), 0 4px 12px -2px oklch(0 0 0 / 0.08), 0 16px 40px -8px oklch(0 0 0 / 0.14);
+    --as-shadow-float: 0 0 0 1px oklch(0 0 0 / 0.03), 0 2px 6px -2px oklch(0 0 0 / 0.06), 0 14px 40px -18px oklch(0 0 0 / 0.22);
   }
 }
 
@@ -314,7 +316,9 @@
 
 [data-as='chat-composer-row']:focus-within {
   border-color: var(--as-primary);
-  box-shadow: 0 0 0 3px color-mix(in oklab, var(--as-primary) 14%, transparent);
+  box-shadow:
+    var(--as-shadow-float),
+    0 0 0 3px color-mix(in oklab, var(--as-primary) 14%, transparent);
 }
 
 [data-as='chat-composer-row'][data-dragging='true'] {
@@ -724,12 +728,33 @@
   transform: none;
 }
 
+/* Touch devices have no hover: keep the row visible so copy/edit/
+   regenerate stay reachable on phones and tablets. */
+@media (hover: none) {
+  [data-as='chat-message-actions'] {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 /* transcript (plan 100 S5): thin themed scrollbar (progressive
    enhancement — silently absent where unsupported) + top fade mask
    while the thread is scrolled under the header. */
 [data-as='chat-transcript'] > [role='log'] {
   scrollbar-width: thin;
   scrollbar-color: var(--as-scrollbar-thumb) var(--as-scrollbar-track);
+}
+
+/* chat page surface (plan 102): one whisper of the AI accent behind the
+   header instead of a flat rectangle. Purely decorative, no layout. */
+[data-as='chat-panel'][data-variant='page'] {
+  background:
+    radial-gradient(
+      60rem 26rem at 50% -14rem,
+      color-mix(in oklab, var(--as-ai) 8%, transparent),
+      transparent 70%
+    ),
+    var(--as-surface);
 }
 
 [data-as='chat-transcript'][data-fade-top='true'] > [role='log'] {

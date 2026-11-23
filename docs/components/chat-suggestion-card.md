@@ -1,10 +1,11 @@
 # ChatSuggestionCard
 
 The family suggestion card: the standard action chip for
-`ChatWelcome suggestions` and composer suggestion strips — icon + title
-+ optional trailing hint, left-aligned, with a border/shadow lift on
-hover (no transform utilities: TW3-safe) and a staggered entrance when
-used inside the welcome suggestions container.
+`ChatWelcome suggestions` and composer suggestion strips — an icon in a
+soft token-tinted disc, title, optional trailing hint, left-aligned,
+with a border/shadow lift on hover (no transform utilities: TW3-safe)
+and a staggered entrance when used inside the welcome suggestions
+container.
 
 ## import
 

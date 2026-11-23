@@ -1,12 +1,15 @@
 # ChatMessage
 
-The family chat bubble: role-aligned layout (user right / assistant left /
-system centered), hover+focus action row (copy with copied-feedback morph,
-edit, regenerate, app extras), sibling-variant switcher with automatic
-content crossfade, reasoning and below-content slots, inline
-edit-and-resend, error and interrupted states — each with its entrance
-animation (mount `message-in`, slide-up error/interrupted/editor states).
-Presentational — all state and callbacks stay app-side.
+The family chat message: role-aligned layout (user right / assistant left /
+system centered), a hover+focus action row below the message (copy with
+copied-feedback morph, edit, regenerate, app extras), sibling-variant
+switcher with automatic content crossfade, reasoning and below-content
+slots, inline edit-and-resend, error and interrupted states — each with
+its entrance animation (mount `message-in`, slide-up
+error/interrupted/editor states). `design="flat"` is the modern Airy look:
+assistant content reads as prose beside a small identity node while the
+user keeps a soft tinted bubble. Presentational — all state and callbacks
+stay app-side.
 
 ## import
 
@@ -30,7 +33,7 @@ import { ChatMessage, MessageVariantSwitcher, ChatMessageEditor } from '@neurone
 | `onSelectVariant` | `(id) => void` | Drives the family `select` endpoint. |
 | `meta` / `chips` / `attachments` | `ReactNode` | Badge row / deep-link chips / attachment rail. |
 | `avatar` | `ReactNode` | Identity node beside the bubble — leading for assistants, trailing for users (`data-as="chat-message-avatar"`). With `ChatTranscript groupConsecutive`, render it only for group starts via `renderItem`'s third argument. |
-| `design` | `'bubbles' \| 'flat'` | `bubbles` (default): paired role bubbles. `flat`: assistant content renders as prose on the panel surface (`data-design` styling hook) — user keeps its bubble; reasoning/tool cards unaffected. |
+| `design` | `'bubbles' \| 'flat'` | `bubbles` (default): paired role bubbles. `flat`: assistant content renders as prose on the panel surface (`data-design` styling hook) and the user bubble becomes a soft primary tint (L 10%) instead of a solid fill — reasoning/tool cards unaffected. |
 | `labels` | `Partial<…>` | All user-facing strings, incl. `copied` (default "Copied"). |
 | `compact` | `boolean` | Denser padding (sidebar/bubble surfaces). |
 
@@ -59,13 +62,14 @@ keyboard-reachable prev/next, disabled at the ends, `‹ n/N ›` readout.
 
 ## accessibility
 
-Action row (`data-as="chat-message-actions"`) reveals on hover AND
-`focus-within` (keyboard reachable — reveal owned by `tokens.css`,
-token-timed, disabled under reduced motion); action buttons carry
-`aria-label`s that track the copied state; variant switcher is a labelled
-`role="group"` with labelled prev/next buttons; errors are `role="alert"`;
-the editor labels its textarea, autofocuses it on mount, and documents
-its shortcuts in the labels.
+Action row (`data-as="chat-message-actions"`) sits below the message in
+normal flow (never absolutely offset outside it, so narrow rails cannot
+clip it) and reveals on hover AND `focus-within` (keyboard reachable —
+reveal owned by `tokens.css`, token-timed, disabled under reduced motion);
+action buttons carry `aria-label`s that track the copied state; variant
+switcher is a labelled `role="group"` with labelled prev/next buttons;
+errors are `role="alert"`; the editor labels its textarea, autofocuses it
+on mount, and documents its shortcuts in the labels.
 
 ## related
 

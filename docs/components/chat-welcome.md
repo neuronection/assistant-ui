@@ -1,7 +1,8 @@
 # ChatWelcome
 
-The chat empty-state kit: a breathing `--as-ai` identity
-orb, greeting + subtitle, and staggered suggestion slots. Drop it into
+The chat empty-state kit: a glowing `--as-ai` identity orb, greeting +
+subtitle, and staggered suggestion slots. On the `page` variant the
+suggestions lay out in two columns from `sm` up. Drop it into
 `ChatTranscript emptyState` (or render it app-side above the composer).
 Presentational — suggestion content and targets stay app-side.
 
@@ -17,7 +18,7 @@ import { ChatWelcome } from '@neuronection/assistant-ui/chat-welcome'
 | --- | --- | --- |
 | `title` | `string` | Greeting headline, e.g. "Ask anything about your courses". |
 | `subtitle` | `string` | Muted second line. |
-| `suggestions` | `ReactNode` | Cards / chips inside the stagger container (`data-as="chat-welcome-suggestions"`); children enter 40 ms apart, `--as-duration-base` rise. |
+| `suggestions` | `ReactNode` | Cards / chips inside the stagger container (`data-as="chat-welcome-suggestions"`); `page` switches it to a two-column grid at `sm`; children enter 40 ms apart, `--as-duration-base` rise. |
 | `icon` | `ReactNode` | Node inside the orb. Default: `Sparkles` in `--as-ai-fg`. |
 | `variant` | `'page' \| 'sidebar' \| 'bubble'` | Density: `page` centers generously, `sidebar` is the default, `bubble` is compact. Carried as `data-variant`. |
 | `className` | `string` | Merged onto the root. |

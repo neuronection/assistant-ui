@@ -29,7 +29,8 @@ Key semantic tokens: `--as-primary(-fg)`, `--as-secondary(-fg)`,
 `--as-success/warning/danger(-fg)`, `--as-ai(-fg)`, `--as-focus-ring`,
 `--as-overlay`, `--as-z-modal` / `--as-z-popover` (overlay stacking — raise
 them in `theme.css` when your app chrome sits above the default 50),
-`--as-radius(-sm/-lg)`, `--as-font-sans/mono`, `--as-shadow-1/2/3`.
+`--as-radius(-sm/-lg/-xl)`, `--as-font-sans/mono`,
+`--as-shadow-1/2/3/float` (`float` is the composer/raised-card elevation).
 
 ## Motion tokens
 

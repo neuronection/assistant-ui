@@ -76,6 +76,15 @@ function UnavailableDemo() {
         label="Dictation unavailable"
         detail="No speech-to-text model is assigned."
       />
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <DictationButton
+          unavailable
+          status="idle"
+          onStart={() => undefined}
+          unavailableLabel="Dictation unavailable"
+        />
+        <span style={{ fontSize: 13 }}>Quiet mic — the app opens this hint in a popover.</span>
+      </div>
     </div>
   )
 }
