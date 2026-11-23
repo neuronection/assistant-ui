@@ -63,11 +63,11 @@ Then wire it up:
   visual change — trigger **Actions → CI → Run workflow** (branch
   `main`): the run re-executes `visual` and, **only when it fails**, the
   sequenced `visual-rebaseline` job regenerates baselines on the CI
-  runner, commits them, and fires a cheap `visual_only` CI dispatch for
-  verification (non-visual jobs are skipped for that run). If the
-  dispatched run's `visual` job passed instead, the baselines were still
-  canonical — nothing to do. Never fix CI visual failures by
-  hand-committing locally-shot baselines.
+  runner and opens a `chore(visual): rebaseline gallery` PR. That PR's
+  own `visual` job validates the new baselines; merge it once the
+  required checks pass. If the dispatched run's `visual` job passed
+  instead, the baselines were still canonical — nothing to do. Never fix
+  CI visual failures by hand-committing locally-shot baselines.
 - **Docs page** (`docs/components/<name>.md`): purpose, import line, props
   table (derive it from the component's Props interface — never invent),
   controlled contract, label/i18n contract, minimal + realistic snippets,
