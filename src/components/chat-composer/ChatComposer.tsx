@@ -399,17 +399,17 @@ export const ChatComposer = React.forwardRef<HTMLFormElement, ChatComposerProps>
           event.preventDefault()
           submit()
         }}
-        className={cn('flex w-full flex-col gap-2', className)}
+        className={cn('flex w-full flex-col gap-2.5', className)}
         {...dragCounterHandlers}
       >
-        {suggestions ? <div className="as-anim-slide-up flex flex-wrap gap-1.5">{suggestions}</div> : null}
-        {attachments ? <div className="as-anim-slide-up flex flex-wrap gap-1.5">{attachments}</div> : null}
+        {suggestions ? <div className="as-anim-slide-up flex flex-wrap gap-2">{suggestions}</div> : null}
+        {attachments ? <div className="as-anim-slide-up flex flex-wrap gap-2">{attachments}</div> : null}
         <div
           data-as="chat-composer-row"
           data-multiline={multiline || undefined}
           data-dragging={dragging || undefined}
           className={cn(
-            'relative flex items-end gap-1.5 rounded-[var(--as-radius-lg)] border border-[var(--as-border)] bg-[var(--as-surface)] px-2 py-1.5',
+            'relative flex items-end gap-2 rounded-[var(--as-radius-xl)] border border-[var(--as-border)] bg-[var(--as-surface-raised)] px-2.5 py-2 shadow-[var(--as-shadow-1)]',
             dragging && 'border-dashed border-[var(--as-primary)] bg-[var(--as-primary)]/5',
             disabled && 'opacity-50',
           )}
@@ -420,7 +420,7 @@ export const ChatComposer = React.forwardRef<HTMLFormElement, ChatComposerProps>
               role="listbox"
               aria-label={labels?.commands ?? 'Commands'}
               data-as="chat-composer-commands"
-              className="as-anim-slide-up absolute bottom-full left-0 right-0 z-[var(--as-z-popover)] mb-1.5 max-h-56 overflow-y-auto rounded-[var(--as-radius)] border border-[var(--as-border)] bg-[var(--as-surface-raised)] p-1 shadow-[var(--as-shadow-pop)]"
+              className="as-anim-slide-up absolute bottom-full left-0 right-0 z-[var(--as-z-popover)] mb-2 max-h-56 overflow-y-auto rounded-[var(--as-radius-xl)] border border-[var(--as-border)] bg-[var(--as-surface-raised)] p-1.5 shadow-[var(--as-shadow-pop)]"
             >
               {paletteItems.map((item, index) => (
                 <button
@@ -446,7 +446,7 @@ export const ChatComposer = React.forwardRef<HTMLFormElement, ChatComposerProps>
               ))}
             </div>
           ) : null}
-          {toolbarStart ? <div className="flex shrink-0 items-center gap-0.5 pb-0.5">{toolbarStart}</div> : null}
+          {toolbarStart ? <div className="flex shrink-0 items-center gap-1 pb-1">{toolbarStart}</div> : null}
           <textarea
             ref={setTextarea}
             value={value}
@@ -472,9 +472,9 @@ export const ChatComposer = React.forwardRef<HTMLFormElement, ChatComposerProps>
             onClick={syncCaret}
             onSelect={syncCaret}
             onPaste={(event) => emitFiles(event.clipboardData.files)}
-            className="max-h-40 min-h-[1.5rem] w-full min-w-32 flex-1 resize-none bg-transparent px-1 py-1 text-sm leading-relaxed text-[var(--as-fg)] placeholder:text-[var(--as-muted-fg)] focus-visible:outline-none disabled:cursor-not-allowed"
+            className="max-h-40 min-h-[1.75rem] w-full min-w-32 flex-1 resize-none bg-transparent px-1.5 py-1 text-sm leading-relaxed text-[var(--as-fg)] placeholder:text-[var(--as-muted-fg)] focus-visible:outline-none sm:text-[0.9375rem] disabled:cursor-not-allowed"
           />
-          {toolbarEnd ? <div className="flex shrink-0 items-center gap-0.5 pb-0.5">{toolbarEnd}</div> : null}
+          {toolbarEnd ? <div className="flex shrink-0 items-center gap-1 pb-1">{toolbarEnd}</div> : null}
           {showStop ? (
             <button
               type="button"
@@ -482,7 +482,7 @@ export const ChatComposer = React.forwardRef<HTMLFormElement, ChatComposerProps>
               title={labels?.stop ?? 'Stop generating'}
               onClick={onStop}
               className={cn(
-                'mb-0.5 flex size-7 shrink-0 items-center justify-center rounded-full border border-[var(--as-border)] bg-[var(--as-surface-raised)] text-[var(--as-fg)] transition-colors hover:bg-[var(--as-secondary)] focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[var(--as-focus-ring)]',
+                'mb-0.5 flex size-8 shrink-0 items-center justify-center rounded-full border border-[var(--as-border)] bg-[var(--as-surface-raised)] text-[var(--as-fg)] transition-colors hover:bg-[var(--as-secondary)] focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[var(--as-focus-ring)]',
                 morphTarget === 'stop' && 'as-anim-morph-in',
               )}
             >
@@ -495,7 +495,7 @@ export const ChatComposer = React.forwardRef<HTMLFormElement, ChatComposerProps>
               title={labels?.send ?? 'Send message'}
               disabled={submitBlocked}
               className={cn(
-                'mb-0.5 flex size-7 shrink-0 items-center justify-center rounded-full bg-[var(--as-primary)] text-[var(--as-primary-fg)] transition-opacity hover:opacity-90 disabled:pointer-events-none disabled:opacity-30 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[var(--as-focus-ring)]',
+                'mb-0.5 flex size-8 shrink-0 items-center justify-center rounded-full bg-[linear-gradient(135deg,var(--as-primary),var(--as-ai))] text-[var(--as-primary-fg)] shadow-[0_2px_8px_-2px_color-mix(in_srgb,var(--as-primary)_45%,transparent)] transition-[opacity,filter] duration-[var(--as-duration-fast)] hover:brightness-105 disabled:pointer-events-none disabled:opacity-30 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[var(--as-focus-ring)]',
                 morphTarget === 'send' && 'as-anim-morph-in',
               )}
             >

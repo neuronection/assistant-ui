@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Loader2, Mic, Square, X } from 'lucide-react'
+import { Loader2, Mic, MicOff, Square, X } from 'lucide-react'
 
 import { cn } from '../../lib/utils'
 
@@ -7,44 +7,75 @@ import type { DictationError, DictationStatus } from './useDictation'
 
 const BAR_WEIGHTS = [0.45, 0.62, 0.8, 0.92, 1.05]
 
-export interface DictationButtonProps {
+export interface DictationButtonProps
+  extends Omit<React.ComponentProps<'button'>, 'onStart' | 'children'> {
   status: DictationStatus
   onStart: () => void
   /** Accessible name / tooltip. English default: 'Dictate'. */
   label?: string
   recordingLabel?: string
-  className?: string
+  /**
+   * Speech-to-text is not configured for this user: the button stays
+   * visible and discoverable, renders the muted microphone-off mark, and
+   * does not start recording. Hosts wrap it in a popover to explain how
+   * to assign a model — no persistent banner sits in the composer.
+   */
+  unavailable?: boolean
+  /** Accessible name / tooltip while `unavailable`. Falls back to `label`. */
+  unavailableLabel?: string
 }
 
-export function DictationButton({
-  status,
-  onStart,
-  label = 'Dictate',
-  recordingLabel,
-  className,
-}: DictationButtonProps) {
-  return (
-    <button
-      type="button"
-      title={label}
-      aria-label={label}
-      aria-pressed={status === 'recording' ? true : status === 'transcribing' ? undefined : false}
-      disabled={status === 'transcribing'}
-      data-as="dictation-button"
-      className={cn(
-        'rounded p-1.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--as-focus-ring)]',
-        status === 'recording'
-          ? 'animate-pulse bg-[var(--as-danger)]/10 text-[var(--as-danger)]'
-          : 'text-[var(--as-muted-fg)] hover:text-[var(--as-fg)]',
-        className,
-      )}
-      onClick={onStart}
-    >
-      <Mic className="size-4" aria-hidden />
-      <span className="sr-only">{recordingLabel ?? label}</span>
-    </button>
-  )
-}
+export const DictationButton = React.forwardRef<HTMLButtonElement, DictationButtonProps>(
+  function DictationButton(
+    {
+      status,
+      onStart,
+      label = 'Dictate',
+      recordingLabel,
+      unavailable = false,
+      unavailableLabel,
+      className,
+      onClick,
+      type = 'button',
+      ...props
+    },
+    ref,
+  ) {
+    const accessibleLabel = unavailable ? (unavailableLabel ?? label) : label
+    const Icon = unavailable ? MicOff : Mic
+    return (
+      <button
+        ref={ref}
+        {...props}
+        type={type}
+        title={accessibleLabel}
+        aria-label={accessibleLabel}
+        aria-pressed={status === 'recording' ? true : status === 'transcribing' ? undefined : false}
+        disabled={!unavailable && status === 'transcribing'}
+        data-as="dictation-button"
+        data-unavailable={unavailable || undefined}
+        className={cn(
+          'rounded p-1.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--as-focus-ring)]',
+          unavailable
+            ? 'text-[var(--as-muted-fg)] hover:bg-[var(--as-muted)] hover:text-[var(--as-fg)]'
+            : status === 'recording'
+              ? 'animate-pulse bg-[var(--as-danger)]/10 text-[var(--as-danger)]'
+              : 'text-[var(--as-muted-fg)] hover:text-[var(--as-fg)]',
+          className,
+        )}
+        onClick={(event) => {
+          onClick?.(event)
+          if (!unavailable && !event.defaultPrevented) {
+            onStart()
+          }
+        }}
+      >
+        <Icon className="size-4" aria-hidden />
+        <span className="sr-only">{recordingLabel ?? accessibleLabel}</span>
+      </button>
+    )
+  },
+)
 
 function LevelBars({
   levelRef,

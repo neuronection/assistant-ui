@@ -37,6 +37,7 @@ export const semanticTokens = [
   '--as-radius-sm',
   '--as-radius',
   '--as-radius-lg',
+  '--as-radius-xl',
   '--as-duration-fast',
   '--as-duration-base',
   '--as-duration-slow',
@@ -51,6 +52,7 @@ export const semanticTokens = [
   '--as-shadow-1',
   '--as-shadow-2',
   '--as-shadow-3',
+  '--as-shadow-float',
 ] as const
 
 export type RawTokenName = (typeof rawTokens)[number]

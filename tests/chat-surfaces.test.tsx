@@ -171,9 +171,9 @@ describe('ChatTranscript', () => {
     )
     expect(positions).toEqual(['single', 'start', 'mid', 'end', 'single'])
     const rows = container.querySelectorAll('[data-group-pos]')
-    expect(rows[2]).toHaveClass('-mt-2')
-    expect(rows[3]).toHaveClass('-mt-2')
-    expect(rows[0]).not.toHaveClass('-mt-2')
+    expect(rows[2]).toHaveClass('-mt-1.5')
+    expect(rows[3]).toHaveClass('-mt-1.5')
+    expect(rows[0]).not.toHaveClass('-mt-1.5')
   })
 
   it('hands the group position to a custom renderItem', () => {

@@ -1,11 +1,11 @@
 # ChatComposer
 
-The family chat input: auto-growing IME-safe textarea (Enter sends,
-Shift+Enter newlines, composition never submits), send/stop states with
-a rotate-through morph on the swap, token-timed focus glow, pulsing
-drag-over affordance, sliding attachment/suggestion rails, toolbar
-slots, drag-drop and paste file wiring. Controlled; transports, sessions
-and upload endpoints stay app-side.
+The family chat input: a floating, auto-growing IME-safe textarea (Enter
+sends, Shift+Enter newlines, composition never submits), send/stop states
+with a rotate-through morph on the swap, token-timed focus glow, pulsing
+drag-over affordance, sliding attachment/suggestion rails, toolbar slots,
+drag-drop and paste file wiring. Controlled; transports, sessions and upload
+endpoints stay app-side.
 
 ## import
 
@@ -26,7 +26,7 @@ import { ChatComposer } from '@neuronection/assistant-ui/chat-composer'
 | `commands` | `ChatComposerCommands` | Slash-command / mention palette: `{ trigger? ('/' default), items: { id, label, hint?, icon? }[], maxItems? (8), onSelect }`. Opens while the caret touches a trigger-started word; fuzzy-filtered (`searchScore`); ArrowUp/Down move, Enter/Tab select (never submit while open), Escape dismisses. `onSelect(id, token)` receives the draft offsets (`token.start/end/query`) — the app replaces that span with its insertion. The textarea wires `aria-controls` + `aria-autocomplete="list"` + `aria-activedescendant` into the `role="listbox"` palette. |
 | `history` | `string[]` | Previously sent prompts (oldest → newest). ArrowUp on an empty draft recalls the last one, ArrowUp/ArrowDown walk the stack, ArrowDown past the newest clears the draft. Editing a recalled draft exits the stack. |
 | `maxRows` | `number` | Auto-grow cap fallback (rows of 22px) when the textarea carries no CSS `max-h-*`; a `max-h-*` class always wins. Default `8`. |
-| `toolbarStart` / `toolbarEnd` | `ReactNode` | Icon-scale slots inside the input row — attach menu, equation, draw, dictation… Never prose, notices or settings copy: put those in `suggestions` or the panel `banner`, where they can wrap. The textarea carries a `min-w-32` (8rem) floor so no slot can collapse the input. |
+| `toolbarStart` / `toolbarEnd` | `ReactNode` | Icon-scale slots inside the input row — attach menu, equation, draw, dictation… Never prose, notices or settings copy: put those in `suggestions` or the panel `banner`, where they can wrap. A capability hint rides on its icon's popover (the quiet-mic pattern), not in the row. The textarea carries a `min-w-32` (8rem) floor so no slot can collapse the input. |
 | `attachments` | `ReactNode` | Rail above the input (`FileQueue`, image chips); slides up on mount. |
 | `suggestions` | `ReactNode` | Chips / context strip above everything; slides up on mount. |
 | `onAttachFiles` | `(files: File[]) => void` | Drag-drop + paste wiring (also enables the drop styling). |
@@ -50,8 +50,9 @@ textarea, `toolbarEnd`, then send/stop. The textarea keeps a minimum width
 for icon-size controls only — a prose notice placed there has an intrinsic
 width and will squeeze the textarea or be clipped by the host panel. Render
 notices and capability errors in the full-width `suggestions` area above the
-input row (or the `ChatPanel` `banner` slot); a dismissible capability notice
-belongs there, not in `toolbarEnd`.
+input row (or the `ChatPanel` `banner` slot); a capability hint that explains
+an icon belongs in that icon's popover (quiet-mic pattern), never as a
+permanent row competing with the draft.
 
 ## example (realistic)
 
@@ -63,16 +64,28 @@ belongs there, not in `toolbarEnd`.
   sending={stream.status === 'pending' || stream.status === 'streaming'}
   onStop={() => void stream.stop()}
   toolbarStart={<AttachMenu courseId={courseId} />}
-  toolbarEnd={<DictationButton onText={setDraft} />}
-  suggestions={
+  toolbarEnd={
     sttUnconfigured ? (
-      <DictationUnavailable
-        label={t('dictation.unavailable')}
-        detail={t('dictation.noModelAssigned')}
-        action={{ label: t('dictation.openSettings'), onClick: openVoiceSettings }}
-        onDismiss={dismissNotice}
-      />
-    ) : null
+      <Popover>
+        <PopoverTrigger asChild>
+          <DictationButton
+            unavailable
+            status="idle"
+            onStart={startDictation}
+            unavailableLabel={t('dictation.unavailable')}
+          />
+        </PopoverTrigger>
+        <PopoverContent side="top" align="end" className="w-72 p-2">
+          <DictationUnavailable
+            label={t('dictation.unavailable')}
+            detail={t('dictation.noModelAssigned')}
+            action={{ label: t('dictation.openSettings'), onClick: openVoiceSettings }}
+          />
+        </PopoverContent>
+      </Popover>
+    ) : (
+      <DictationButton status={dictation.status} onStart={startDictation} />
+    )
   }
   attachments={pending.length > 0 ? <FileQueue items={pending} /> : null}
   onAttachFiles={(files) => upload(files)}

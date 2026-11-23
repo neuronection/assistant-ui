@@ -43,22 +43,27 @@ export const ChatPanel = React.forwardRef<HTMLDivElement, ChatPanelProps>(
         {title !== undefined || actions !== undefined ? (
           <div
             data-as="chat-panel-header"
-            className="flex shrink-0 items-center gap-2 border-b border-[var(--as-border)] px-3 py-2"
+            className="flex shrink-0 items-center gap-2 border-b border-[var(--as-border)] px-4 py-3 sm:px-6"
           >
-            <div className="min-w-0 flex-1 truncate text-sm font-semibold">{title}</div>
-            {actions ? <div className="flex shrink-0 items-center gap-0.5">{actions}</div> : null}
+            <div className="min-w-0 flex-1 truncate text-[0.9375rem] font-semibold tracking-[-0.01em]">
+              {title}
+            </div>
+            {actions ? (
+              <div className="flex shrink-0 items-center gap-0.5 overflow-x-auto">{actions}</div>
+            ) : null}
           </div>
         ) : null}
         {banner ? (
           <div
             data-as="chat-panel-banner"
-            className="as-anim-slide-up shrink-0 px-3 py-1.5 text-xs text-[var(--as-muted-fg)]"
+            className="as-anim-slide-up shrink-0 px-4 py-2 text-xs text-[var(--as-muted-fg)] sm:px-6"
           >
             {banner}
           </div>
         ) : null}
         <div className="flex min-h-0 flex-1 flex-col">
           <div
+            data-as="chat-panel-body"
             className={cn(
               'flex min-h-0 w-full flex-1 flex-col',
               variant === 'page' && 'mx-auto max-w-3xl',
@@ -68,12 +73,22 @@ export const ChatPanel = React.forwardRef<HTMLDivElement, ChatPanelProps>(
           </div>
         </div>
         {composer ? (
-          <div className="shrink-0 border-t border-[var(--as-border)] p-2">
+          <div
+            data-as="chat-panel-composer"
+            className={cn(
+              'shrink-0',
+              variant === 'page'
+                ? 'px-3 pb-4 pt-1 sm:px-6 sm:pb-6'
+                : 'border-t border-[var(--as-border)] p-2',
+            )}
+          >
             <div className={cn(variant === 'page' && 'mx-auto w-full max-w-3xl')}>{composer}</div>
           </div>
         ) : null}
         {footer ? (
-          <div className="shrink-0 px-3 pb-2 pt-1 text-center text-[10px] text-[var(--as-muted-fg)]">{footer}</div>
+          <div className="shrink-0 px-4 pb-3 pt-1 text-center text-[10px] text-[var(--as-muted-fg)]">
+            {footer}
+          </div>
         ) : null}
       </div>
     )

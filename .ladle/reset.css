@@ -13,6 +13,37 @@
   color-scheme: light;
 }
 
+/* Tailwind's preflight (which apps ship) makes padding part of the
+   declared width. Without it every padded `w-full` component overflows
+   its container in the gallery, so mirror that one rule. */
+*,
+::before,
+::after {
+  box-sizing: border-box;
+}
+
+/* Preflight also zeroes heading/paragraph margins and list markers;
+   stories otherwise show the UA defaults the apps never see. */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+blockquote,
+figure,
+pre {
+  margin: 0;
+}
+
+ul,
+ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
 /* Overlay surfaces (launcher panels, drawers, modals) portal to
    document.body, so the token font/color must live on body — exactly
    what an app's base CSS provides. */

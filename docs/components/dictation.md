@@ -7,10 +7,10 @@ Speech-to-text dictation: the library owns the **recording state machine**
 No fetching, keys or i18n engine inside the library.
 
 `DictationUnavailable` is the sibling capability state: the app resolves
-whether speech-to-text is assigned and renders either `DictationButton` or
-`DictationUnavailable` with its own reason and optional settings action. The
-library never fetches task assignments, routes, or decides availability;
-`DictationButtonProps` is unchanged.
+whether speech-to-text is assigned and either keeps the mic in its quiet
+`unavailable` form (recommended — click explains how to assign a model) or
+renders `DictationUnavailable` inline. The library never fetches task
+assignments, routes, or decides availability.
 
 ## import
 
@@ -43,6 +43,8 @@ without re-renders). Unmount while recording tears the stream down.
 | `onStart` | `() => void` | — (required) | Typically `() => void dictation.start()`. |
 | `label` | `string` | `'Dictate'` | Accessible name + tooltip. |
 | `recordingLabel` | `string` | = `label` | Visually hidden text while recording. |
+| `unavailable` | `boolean` | `false` | Speech-to-text is not configured: renders the muted mic-off mark, keeps the control focusable and discoverable, and never starts recording. `data-unavailable` is set for styling hooks. |
+| `unavailableLabel` | `string` | = `label` | Accessible name/tooltip while `unavailable`; typically *Dictation unavailable*. |
 | `className` | `string` | — | Merged onto the button. |
 
 ## DictationStrip props
@@ -75,20 +77,24 @@ and an `role="alert"` row while an error is set.
 the app's resolved capability state. It renders a `role="note"` row and a
 native button only when an action handler exists — never a disabled,
 handler-less or blank-labelled control. The app decides between it and
-`DictationButton`; the mic button is not overloaded with an `unavailable`
-status. With `onDismiss`, a labelled close control is rendered (`dismissLabel`
-defaults to *Dismiss*).
+`DictationButton`; the mic button can carry the quiet `unavailable` state and
+open this row in a popover. With `onDismiss`, a labelled close control is
+rendered (`dismissLabel` defaults to *Dismiss*).
 
 The row is a polite live region (`aria-live="polite"`, `aria-atomic="true"`),
 so a gate that resolves after mount (the normal async assignment check) is
-announced when it replaces the mic. Apps that resolve capability before first
+announced if it renders inline. Apps that resolve capability before first
 paint still get the reason in reading order; the live attribute is harmless.
 
-**Placement:** render it in the full-width area above the composer's input row
-(the `suggestions` rail or the panel `banner`), never in `toolbarStart` /
-`toolbarEnd`. A prose row in a toolbar slot has an intrinsic width and will
-squeeze or clip the textarea on narrow rails. Dismiss the notice per user and
-clear the dismissal when the assignment becomes configured.
+**Placement:** the quiet-mic pattern is preferred (2026-11-23): keep the
+labelled muted mic in `toolbarEnd` and render this row inside the mic's
+popover, so the composer stays focused on the draft. When a host chooses a
+persistent notice instead, it belongs in the full-width area above the
+composer's input row (the `suggestions` rail or the panel `banner`), never
+directly in `toolbarStart` / `toolbarEnd`. A prose row in a toolbar slot has
+an intrinsic width and will squeeze or clip the textarea on narrow rails.
+Dismiss a persistent notice per user and clear the dismissal when the
+assignment becomes configured.
 
 ## label/i18n contract
 
@@ -117,13 +123,23 @@ Capability gate (app resolves the assignment; unknown/loading keeps the mic):
 
 ```tsx
 {hasSpeechToText === false ? (
-  <DictationUnavailable
-    label={t('dictation.unavailable')}
-    detail={t('dictation.noModelAssigned')}
-    action={{ label: t('dictation.openSettings'), onClick: openVoiceSettings }}
-    onDismiss={dismissNotice}
-    dismissLabel={t('dictation.dismiss')}
-  />
+  <Popover>
+    <PopoverTrigger asChild>
+      <DictationButton
+        unavailable
+        status={dictation.status}
+        onStart={() => void dictation.start()}
+        unavailableLabel={t('dictation.unavailable')}
+      />
+    </PopoverTrigger>
+    <PopoverContent side="top" align="end" className="w-72 p-2">
+      <DictationUnavailable
+        label={t('dictation.unavailable')}
+        detail={t('dictation.noModelAssigned')}
+        action={{ label: t('dictation.openSettings'), onClick: openVoiceSettings }}
+      />
+    </PopoverContent>
+  </Popover>
 ) : (
   <DictationButton status={dictation.status} onStart={() => void dictation.start()} />
 )}
@@ -132,13 +148,14 @@ Capability gate (app resolves the assignment; unknown/loading keeps the mic):
 ## accessibility
 
 See [accessibility.md](../accessibility.md#inputs): labelled mic toggle with
-`aria-pressed` while recording; strip is `role="status"` while recording /
+`aria-pressed` while recording; the quiet `unavailable` state keeps the label
+(*Dictation unavailable*) and the control focusable so keyboard users can
+open the explanation popover; strip is `role="status"` while recording /
 transcribing and `role="alert"` for errors; Stop/Cancel/Dismiss are labelled
 buttons. `DictationUnavailable` is a `role="note"` row with its reason as
-text and `aria-live="polite"`/`aria-atomic="true"` so an async capability
-gate is announced when it replaces the mic; the optional action is a native
-button reached by Tab and activated by Enter/Space, and an action label
-without a handler (or with a blank label) is never rendered.
+text and `aria-live="polite"`/`aria-atomic="true"`; the optional action is a
+native button reached by Tab and activated by Enter/Space, and an action
+label without a handler (or with a blank label) is never rendered.
 
 ## related
 

@@ -452,15 +452,28 @@ describe('ChatMessage', () => {
     const { container } = render(<ChatMessage role="assistant" content="prose" design="flat" />)
     const root = container.querySelector('[data-as="chat-message"]')
     expect(root).toHaveAttribute('data-design', 'flat')
-    const bubble = root?.querySelector(':scope > div > div, :scope > div')
-    expect(bubble?.className).toContain('bg-transparent')
+    const bubble = container.querySelector('[data-as="chat-message-bubble"]')
+    expect(bubble?.className).toContain('max-w-full')
     expect(bubble?.className).not.toContain('bg-[var(--as-muted)]')
   })
 
   it('keeps the user bubble in flat design', () => {
     const { container } = render(<ChatMessage role="user" content="question" design="flat" />)
-    const bubble = container.querySelector('[data-as="chat-message"] > div')
-    expect(bubble).toHaveClass('bg-[var(--as-primary)]')
+    const bubble = container.querySelector('[data-as="chat-message-bubble"]')
+    expect(bubble?.className).toContain('bg-[color-mix(in_srgb,var(--as-primary)_10%,transparent)]')
+    expect(bubble?.className).not.toContain('bg-[var(--as-primary)]')
+  })
+
+  it('renders the action row outside the bubble so narrow layouts keep it', () => {
+    const { container } = render(
+      <ChatMessage role="assistant" content="answer" actions={{ onCopy: () => {} }} />,
+    )
+    expect(
+      container.querySelector('[data-as="chat-message-bubble"] [data-as="chat-message-actions"]'),
+    ).toBeNull()
+    expect(
+      container.querySelector('[data-as="chat-message"] > [data-as="chat-message-actions"]'),
+    ).not.toBeNull()
   })
 
   it('renders the avatar leading for assistants and trailing for users', () => {

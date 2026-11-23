@@ -82,7 +82,7 @@ export interface ChatMessageProps {
 }
 
 const actionButtonClass =
-  'rounded-[var(--as-radius-sm)] p-1 text-[var(--as-muted-fg)] transition-colors hover:bg-[var(--as-surface-raised)] hover:text-[var(--as-fg)] focus-visible:opacity-100 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[var(--as-focus-ring)]'
+  'rounded-full p-1.5 text-[var(--as-muted-fg)] transition-colors hover:bg-[var(--as-muted)] hover:text-[var(--as-fg)] focus-visible:opacity-100 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[var(--as-focus-ring)]'
 
 const COPIED_FEEDBACK_MS = 1500
 
@@ -166,16 +166,27 @@ export const ChatMessage = React.forwardRef<HTMLDivElement, ChatMessageProps>(
       >
         {attachments ? <div className="mb-1.5 flex w-full flex-wrap justify-end gap-1.5">{attachments}</div> : null}
         {(() => {
+          const flatAssistant = !isUser && design === 'flat'
           const bubble = (
             <div
+              data-as="chat-message-bubble"
               className={cn(
-                'relative flex max-w-[92%] flex-col gap-1.5 rounded-[var(--as-radius)] px-3 py-2 text-sm',
-                compact && 'px-2.5 py-1.5',
+                'relative flex flex-col gap-2',
+                flatAssistant
+                  ? 'max-w-full px-0 py-0 text-[0.9375rem] leading-7 sm:max-w-[42rem]'
+                  : cn(
+                      'max-w-[92%] px-3.5 py-2.5 text-sm sm:max-w-[80%]',
+                      compact && 'px-3 py-2',
+                    ),
                 isUser
-                  ? 'rounded-br-[var(--as-radius-sm)] bg-[var(--as-primary)] font-medium text-[var(--as-primary-fg)]'
-                  : design === 'flat'
-                    ? 'max-w-full rounded-bl-[var(--as-radius-sm)] bg-transparent px-0 py-0'
-                    : 'rounded-bl-[var(--as-radius-sm)] bg-[var(--as-muted)] text-[var(--as-fg)]',
+                  ? cn(
+                      'rounded-[var(--as-radius-xl)] rounded-br-[var(--as-radius-sm)]',
+                      design === 'flat'
+                        ? 'bg-[color-mix(in_srgb,var(--as-primary)_10%,transparent)] text-[var(--as-fg)]'
+                        : 'bg-[var(--as-primary)] font-medium text-[var(--as-primary-fg)]',
+                    )
+                  : !flatAssistant &&
+                      'rounded-[var(--as-radius-xl)] rounded-bl-[var(--as-radius-sm)] bg-[var(--as-muted)] text-[var(--as-fg)]',
               )}
             >
               {reasoning ? <div className="not-prose">{reasoning}</div> : null}
@@ -222,58 +233,11 @@ export const ChatMessage = React.forwardRef<HTMLDivElement, ChatMessageProps>(
               ) : null}
               {chips ? <div className="flex flex-wrap gap-1.5">{chips}</div> : null}
               {children ? <div className="flex flex-col gap-1.5">{children}</div> : null}
-              {showActions && !editing ? (
-                <div
-                  data-as="chat-message-actions"
-                  className={cn(
-                    'absolute top-1 flex items-center gap-0.5 rounded-[var(--as-radius)] border border-[var(--as-border)] bg-[var(--as-surface)] p-0.5 shadow-[var(--as-shadow-1)]',
-                    isUser ? '-left-9' : '-right-9',
-                  )}
-                >
-                  {actions?.onCopy ? (
-                    <button
-                      type="button"
-                      className={actionButtonClass}
-                      aria-label={copied ? (labels?.copied ?? 'Copied') : (labels?.copy ?? 'Copy')}
-                      title={copied ? (labels?.copied ?? 'Copied') : (labels?.copy ?? 'Copy')}
-                      onClick={onCopyClick}
-                    >
-                      {copied ? (
-                        <Check className="as-anim-fade-swap size-3.5 text-[var(--as-success)]" aria-hidden />
-                      ) : (
-                        <Copy className="size-3.5" aria-hidden />
-                      )}
-                    </button>
-                  ) : null}
-                  {actions?.onEdit ? (
-                    <button type="button" className={actionButtonClass} aria-label={labels?.edit ?? 'Edit'} title={labels?.edit ?? 'Edit'} onClick={actions.onEdit}>
-                      <Pencil className="size-3.5" aria-hidden />
-                    </button>
-                  ) : null}
-                  {actions?.onRegenerate ? (
-                    <button type="button" className={actionButtonClass} aria-label={labels?.regenerate ?? 'Regenerate'} title={labels?.regenerate ?? 'Regenerate'} onClick={actions.onRegenerate}>
-                      <RotateCcw className="size-3.5" aria-hidden />
-                    </button>
-                  ) : null}
-                  {actions?.extras?.map((extra) => (
-                    <button
-                      key={extra.key}
-                      type="button"
-                      className={cn(actionButtonClass, extra.danger && 'hover:text-[var(--as-danger)]')}
-                      aria-label={extra.label}
-                      title={extra.label}
-                      onClick={extra.onClick}
-                    >
-                      {extra.icon ? <extra.icon className="size-3.5" aria-hidden /> : <TriangleAlert className="size-3.5" aria-hidden />}
-                    </button>
-                  ))}
-                </div>
-              ) : null}
             </div>
           )
           return avatar !== undefined ? (
-            <div className={cn('flex w-full items-end gap-2', isUser ? 'flex-row-reverse' : 'flex-row')}>
-              <div data-as="chat-message-avatar" className="shrink-0 pb-1">
+            <div className={cn('flex w-full gap-2', isUser ? 'flex-row-reverse items-end' : 'items-start')}>
+              <div data-as="chat-message-avatar" className={cn('shrink-0', isUser ? 'pb-1' : 'pt-0.5')}>
                 {avatar}
               </div>
               {bubble}
@@ -282,7 +246,54 @@ export const ChatMessage = React.forwardRef<HTMLDivElement, ChatMessageProps>(
             bubble
           )
         })()}
-        {meta ? <div className="mt-0.5 flex flex-wrap items-center gap-1.5 px-1 text-[10px] text-[var(--as-muted-fg)]">{meta}</div> : null}
+        {showActions && !editing ? (
+          <div
+            data-as="chat-message-actions"
+            className={cn(
+              'flex items-center gap-0.5',
+              isUser ? 'self-end pr-1' : avatar !== undefined ? 'self-start pl-10' : 'self-start',
+            )}
+          >
+            {actions?.onCopy ? (
+              <button
+                type="button"
+                className={actionButtonClass}
+                aria-label={copied ? (labels?.copied ?? 'Copied') : (labels?.copy ?? 'Copy')}
+                title={copied ? (labels?.copied ?? 'Copied') : (labels?.copy ?? 'Copy')}
+                onClick={onCopyClick}
+              >
+                {copied ? (
+                  <Check className="as-anim-fade-swap size-3.5 text-[var(--as-success)]" aria-hidden />
+                ) : (
+                  <Copy className="size-3.5" aria-hidden />
+                )}
+              </button>
+            ) : null}
+            {actions?.onEdit ? (
+              <button type="button" className={actionButtonClass} aria-label={labels?.edit ?? 'Edit'} title={labels?.edit ?? 'Edit'} onClick={actions.onEdit}>
+                <Pencil className="size-3.5" aria-hidden />
+              </button>
+            ) : null}
+            {actions?.onRegenerate ? (
+              <button type="button" className={actionButtonClass} aria-label={labels?.regenerate ?? 'Regenerate'} title={labels?.regenerate ?? 'Regenerate'} onClick={actions.onRegenerate}>
+                <RotateCcw className="size-3.5" aria-hidden />
+              </button>
+            ) : null}
+            {actions?.extras?.map((extra) => (
+              <button
+                key={extra.key}
+                type="button"
+                className={cn(actionButtonClass, extra.danger && 'hover:text-[var(--as-danger)]')}
+                aria-label={extra.label}
+                title={extra.label}
+                onClick={extra.onClick}
+              >
+                {extra.icon ? <extra.icon className="size-3.5" aria-hidden /> : <TriangleAlert className="size-3.5" aria-hidden />}
+              </button>
+            ))}
+          </div>
+        ) : null}
+        {meta ? <div className="mt-1 flex flex-wrap items-center gap-1.5 px-1 text-[10px] text-[var(--as-muted-fg)]">{meta}</div> : null}
         {variants && variants.count > 1 && onSelectVariant ? (
           <MessageVariantSwitcher variants={variants} onSelect={onSelectVariant} labels={switcherLabels} className="mt-0.5 px-1" />
         ) : null}
