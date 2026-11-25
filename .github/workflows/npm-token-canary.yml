@@ -1,0 +1,31 @@
+name: npm token canary
+
+# W7 (plan 103): NPM_TOKEN is a granular token with an expiry. Without a probe
+# the first symptom of an expired token is a failed release — mid-publish.
+# This asks npm who it thinks we are, weekly and on demand.
+on:
+  schedule:
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  canary:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+      - name: Authenticate and list publishable packages
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          set -euo pipefail
+          who="$(npm whoami)"
+          echo "NPM_TOKEN authenticates as: ${who}"
+          npm access list packages "@neuronection" >/dev/null
+          echo "Token can read the @neuronection scope."

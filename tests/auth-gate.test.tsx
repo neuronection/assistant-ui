@@ -128,7 +128,10 @@ describe('AuthGate', () => {
     const boot = vi.fn().mockResolvedValue(false)
     renderGate({ onStatusChange: (status) => seen.push(status) }, boot)
     await waitFor(() => expect(screen.getByLabelText('Email')).toBeInTheDocument())
-    expect(seen).toEqual(['checking', 'anonymous'])
+    // The form commits one render before the status effect reports `anonymous`
+    // on a loaded runner; assert the sequence, not the render (CI flake,
+    // plan 103 W6).
+    await waitFor(() => expect(seen).toEqual(['checking', 'anonymous']))
   })
 
   it('keeps children focusables keyboard-reachable once authenticated', async () => {
