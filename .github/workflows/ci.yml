@@ -210,10 +210,22 @@ jobs:
       HAS_RELEASE_APP: ${{ secrets.RELEASE_APP_ID != '' && secrets.RELEASE_APP_PRIVATE_KEY != '' }}
     steps:
       # Plan 103 §13: push as a real actor so the baselines PR's own suite counts.
-      - uses: ./.github/actions/require-numeric-app-id
+      - name: The App ID is numeric, not the Client ID
         if: env.HAS_RELEASE_APP == 'true'
-        with:
-          app-id: ${{ secrets.RELEASE_APP_ID }}
+        env:
+          APP_ID: ${{ secrets.RELEASE_APP_ID }}
+        run: |
+          set -euo pipefail
+          if [ -z "${APP_ID}" ]; then
+            echo "::error::RELEASE_APP_ID is empty."
+            exit 1
+          fi
+          case "${APP_ID}" in
+            *[!0-9]*)
+              echo "::error::RELEASE_APP_ID is not the numeric App ID. GitHub rejects the JWT with \"'Issuer' claim ('iss') must be an Integer\" when it holds the App's Client ID (Iv…) or the slug. Copy `App ID` — a number — from the App's settings page."
+              exit 1
+              ;;
+          esac
 
       - uses: actions/create-github-app-token@fee1f7d63c2ff003460e3d139729b119787bc349 # v2.2.2
         id: app-token
