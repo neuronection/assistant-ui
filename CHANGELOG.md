@@ -1,5 +1,22 @@
 # @neuronection/assistant-ui
 
+## 0.91.1
+
+### Patch Changes
+
+- [#146](https://github.com/neuronection/assistant-ui/pull/146) [`a2c3fa0`](https://github.com/neuronection/assistant-ui/commit/a2c3fa0d2f095230679515bd8e09d53e8336a7aa) Thanks [@constLiakos](https://github.com/constLiakos)! - Release plumbing: publishing now waits for the CI run of the same commit instead
+  of racing it, the Version Packages PR gets its own CI run (a branch pushed with
+  `GITHUB_TOKEN` never starts one), the rebaseline job only runs on `main` and
+  produces a screenshots-only PR, `build` no longer repeats the test suite and the
+  smoke matrix packs the built artifact instead of rebuilding it, and every
+  release is signed — `changeset publish` spawns `pnpm publish`, which honours
+  provenance only as a CLI flag, so the release job now injects `--provenance`.
+  A new `publish-smoke` workflow verifies the registry artifact (exports, `.d.ts`,
+  attestation, npm == tag == release) and opens an issue when it fails.
+  `smoke`, `stories`, the React 18 jobs and `visual` are now required checks,
+  mirrored in `.github/required-checks.json` and guarded by
+  `scripts/check-required-checks.mjs`.
+
 ## 0.91.0
 
 ### Minor Changes
