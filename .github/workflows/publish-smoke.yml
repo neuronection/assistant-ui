@@ -66,17 +66,21 @@ jobs:
             "@neuronection/assistant-ui@${VERSION}" react@^19 react-dom@^19
 
       - name: Assert the exports map resolves and ships its types
+        # Run inside the consumer: bare specifiers must resolve to the registry
+        # tarball, not to this repository's own copy.
+        working-directory: /tmp/consumer
         run: |
           set -euo pipefail
           node --input-type=module - <<'JS'
-          import { existsSync } from 'node:fs'
-          import { createRequire } from 'node:module'
+          import { existsSync, readFileSync } from 'node:fs'
           import { dirname, join } from 'node:path'
+          import { fileURLToPath } from 'node:url'
 
-          const require = createRequire('/tmp/consumer/package.json')
-          const manifestPath = require.resolve('@neuronection/assistant-ui/package.json')
-          const manifest = require(manifestPath)
-          const root = dirname(manifestPath)
+          // `require.resolve` cannot be used: the package defines no `require`
+          // condition, and `./package.json` is not in its exports map.
+          let root = dirname(fileURLToPath(import.meta.resolve('@neuronection/assistant-ui')))
+          while (root !== '/' && !existsSync(join(root, 'package.json'))) root = dirname(root)
+          const manifest = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8'))
           const required = ['.', './filters', './chat-core', './styles.css']
           const failures = []
 
