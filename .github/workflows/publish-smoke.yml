@@ -28,7 +28,8 @@ jobs:
   verify:
     if: >-
       github.event_name == 'workflow_dispatch' ||
-      (github.event.workflow_run.conclusion == 'success' &&
+      (github.event.workflow_run.event == 'push' &&
+      github.event.workflow_run.conclusion == 'success' &&
       github.event.workflow_run.head_branch == 'main')
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -52,7 +53,7 @@ jobs:
             # Verify what *this* Release published, not `latest`: dist-tags lag
             # the upload, so listening to `latest` verifies the previous version
             # (issue #155 verified 0.91.0 minutes after 0.91.1 shipped).
-            version="$(gh api "repos/${GITHUB_REPOSITORY}/tags?per_page=100" \
+            version="$(gh api --paginate "repos/${GITHUB_REPOSITORY}/tags?per_page=100" \
               --jq ".[] | select(.commit.sha == \"${RELEASE_SHA}\") | .name" \
               | sed -n 's/^v\([0-9][^ ]*\)$/\1/p' | sort -V | tail -1)"
             if [ -z "${version}" ]; then

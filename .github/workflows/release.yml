@@ -16,12 +16,11 @@ permissions:
   contents: write
   pull-requests: write
   id-token: write
-  # to kick CI on the bot-created Version Packages branch (see last step)
-  actions: write
 
 jobs:
   release:
     if: >-
+      github.event.workflow_run.event == 'push' &&
       github.event.workflow_run.conclusion == 'success' &&
       github.event.workflow_run.head_branch == 'main'
     runs-on: ubuntu-latest
@@ -89,14 +88,58 @@ jobs:
       - name: Build the published artifacts
         run: pnpm build
 
+      # The CI conclusion alone is not enough: `scan` (gitleaks) is a separate
+      # workflow that finishes later, and the ruleset's required set is the
+      # contract, not this workflow's trigger. Assert every context is green on
+      # this exact commit before anything is published.
+      - name: Every required check is green for this commit
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token || github.token }}
+          SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          set -euo pipefail
+          node -e "console.log(require('./.github/required-checks.json').contexts.join('\n'))" \
+            > "${RUNNER_TEMP}/required.txt"
+          pending=""
+          for attempt in $(seq 1 30); do
+            pending=""
+            while IFS= read -r context; do
+              report="$(gh api \
+                "repos/${GITHUB_REPOSITORY}/commits/${SHA}/check-runs?filter=latest&per_page=100" \
+                --jq ".check_runs[] | select(.name == \"${context}\") | .status + \"/\" + (.conclusion // \"pending\")" \
+                || true)"
+              state="$(printf '%s\n' "${report}" | sed -n '1p')"
+              case "${state}" in
+                completed/success) ;;
+                *) pending="${pending}\n  ${context}: ${state:-not reported}" ;;
+              esac
+            done < "${RUNNER_TEMP}/required.txt"
+            if [ -z "${pending}" ]; then
+              echo "all required checks are green on ${SHA}"
+              exit 0
+            fi
+            echo "waiting for required checks (attempt ${attempt})"
+            sleep 20
+          done
+          printf '::error::required checks not green on %s:%b\n' "${SHA}" "${pending}"
+          exit 1
+
       # W7 (plan 103): a stray pre-mode would publish a prerelease and move the
       # `latest` dist-tag under every consumer's feet. Refuse instead.
-      - name: Refuse pre-mode
+      - name: Refuse pre-mode or a prerelease version
         run: |
+          set -euo pipefail
           if [ -f .changeset/pre.json ]; then
             echo "::error::.changeset/pre.json is present — refusing to publish from main while in pre-mode."
             exit 1
           fi
+          version="$(node -p "require('./package.json').version")"
+          case "${version}" in
+            *-*)
+              echo "::error::package.json version ${version} is a prerelease; publishing it would move the latest dist-tag. Refusing."
+              exit 1
+              ;;
+          esac
 
       # W3b (plan 103): `changeset publish` shells out to `pnpm publish`, and
       # pnpm only honours provenance as a CLI flag — neither
@@ -124,7 +167,7 @@ jobs:
           echo "$shim" >> "$GITHUB_PATH"
           echo "shim -> $real"
 
-      - uses: changesets/action@ce079ea084e08a340947ed4d6ecedb2433c8f293 # v1.9.0
+      - uses: changesets/action@a45c4d594aa4e2c509dc14a9f2b3b67ba3780d0d # v1.9.0
         id: changesets
         with:
           version: pnpm changeset version
@@ -134,21 +177,7 @@ jobs:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      # W1: a branch pushed with GITHUB_TOKEN never starts workflows, so the
-      # Version Packages PR shows 0 jobs and its required checks can never
-      # report. `workflow_dispatch` is exempt from that suppression; kick CI
-      # on the bot branch so the PR validates itself.
-      - name: Kick CI for the Version Packages PR
-        # Only when no App token is configured: with one, the push itself starts
-        # the PR's suite, and a dispatch would duplicate ~4 minutes of runners.
-        if: steps.changesets.outputs.published != 'true' && steps.app-token.outputs.token == ''
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          branch="changeset-release/main"
-          if gh api "repos/${GITHUB_REPOSITORY}/branches/${branch}" >/dev/null 2>&1; then
-            gh workflow run ci.yml --ref "$branch"
-            echo "::notice::CI dispatched for $branch"
-          else
-            echo "No Version Packages branch present; nothing to dispatch."
-          fi
+      # No CI dispatch step on purpose: the App token above makes the Version
+      # Packages branch push start its own suite, and a dispatch would only add
+      # a duplicate run. Without the App secrets, a human commit is required —
+      # see docs/publishing.md.
