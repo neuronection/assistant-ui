@@ -105,6 +105,16 @@ token with it (`actions/create-github-app-token`) and push as the App, so the
 Version Packages and baselines PRs run their own required checks. Without the
 two secrets behaviour is unchanged: `GITHUB_TOKEN` plus a CI dispatch.
 
+Verify the credentials at any time — and prove the App's push really starts CI:
+
+```bash
+gh workflow run bot-identity.yml                      # token mints, repo reachable
+gh workflow run bot-identity.yml -f probe_pr=true     # + throwaway PR, checks appear, cleanup
+```
+
+`bot-identity.yml` also runs weekly: an expired or rotated private key fails
+there, instead of surfacing mid-release.
+
 ## Recovering a bot PR that shows 0 jobs
 
 Only needed when the App secrets above are absent.
