@@ -6,10 +6,16 @@ Nobody publishes from a laptop. Every release goes through CI.
 
 ```text
 change src/ → PR with a changeset → merge →
-changesets/action opens "Version Packages" PR → merge that →
-CI runs lint/typecheck/test/build → changeset publish →
-@neuronection/assistant-ui@x.y.z on npm (with provenance)
+CI green on main → Release (workflow_run, same SHA) → build →
+changesets/action opens "Version Packages" PR →
+CI on that PR (dispatched by the job) → merge it →
+Release publishes → publish-smoke verifies the registry artifact
 ```
+
+The Release workflow is triggered by **CI completing successfully on
+`main`** and checks out that exact SHA — it never publishes a commit CI has
+not validated, and it re-checks out the bot branch's CI so the Version
+Packages PR gets real required checks.
 
 1. Make your changes (component + tests + Ladle story).
 2. `pnpm changeset` — pick the bump:
@@ -21,7 +27,8 @@ CI runs lint/typecheck/test/build → changeset publish →
    React×Tailwind smoke matrix, stories build).
 4. Merge. The Release workflow opens a **Version Packages** PR that bumps the
    version and writes `CHANGELOG.md`.
-5. Merge the Version Packages PR — that merge publishes.
+5. Merge the Version Packages PR — that merge publishes (CI runs on the merge
+   commit, then Release publishes).
 
 ## Versioning policy
 
@@ -44,8 +51,76 @@ CI runs lint/typecheck/test/build → changeset publish →
   → "Allow GitHub Actions to create and approve pull requests" (for the
   Version Packages PR).
 - `pnpm/packageManager` in package.json pins pnpm for `pnpm/action-setup`.
-- Provenance: `NPM_CONFIG_PROVENANCE: true` + `id-token: write` — the npm
-  page shows a build attestation.
+- **Provenance** is attached: the Release job puts a shim first on `PATH` that
+  passes `--provenance` to the `pnpm publish` that `changeset publish` spawns.
+  pnpm honours provenance only as a CLI flag — `NPM_CONFIG_PROVENANCE` and
+  `.npmrc: provenance=true` are ignored, which is why 0.90.0 and 0.91.0 shipped
+  unsigned. `id-token: write` on the job supplies the OIDC identity.
+  Verify with
+  `curl -s -o /dev/null -w '%{http_code}' https://registry.npmjs.org/-/npm/v1/attestations/@neuronection%2fassistant-ui@<version>`
+  — it must be `200`, not `404`. The `publish-smoke` workflow asserts this.
+
+## Verifying a published version
+
+`publish-smoke` (`workflow_run` on Release, or `workflow_dispatch` with a
+`version`) installs the registry tarball into a scratch consumer and asserts:
+
+- the exports map resolves for `.`, `./filters`, `./chat-core` and
+  `./styles.css`, with the `.d.ts` files present in the tarball;
+- the packages actually import;
+- an npm provenance attestation exists, and `npm audit signatures` passes;
+- npm's version, the `v<version>` tag and the GitHub release all agree (a
+  partial publish — npm ok, tag push failed — is otherwise silent).
+
+It opens an issue when it fails on a real Release. Re-run it for any historical
+version: `gh workflow run publish-smoke.yml -f version=0.91.0`.
+
+
+## Recovering a bot PR that shows 0 jobs
+
+A branch pushed with `GITHUB_TOKEN` never starts workflows: the PR appears with
+**0 checks**, and required checks can never report. In order of preference:
+
+1. **Re-run the workflow** (`gh run rerun <id> --failed`) if a run exists.
+2. **Dispatch CI** — `gh workflow run ci.yml --ref <branch>`. The Release and
+   `visual-rebaseline` jobs do this automatically now; do it by hand only for
+   pre-Plan-103 branches.
+3. **Empty commit** on the branch (last resort; it must still be a real push by
+   a human identity).
+
+## Rolling back a release
+
+- `npm dist-tag add @neuronection/assistant-ui@<previous> latest` — consumers
+  get the previous version on the next install.
+- **Do not** `npm unpublish` from CI; it is a manual owner decision (72 h
+  window) and breaks anyone who already installed the version.
+- A partial publish (npm ok, tag/GitHub release missing) is detected by the
+  `publish-smoke` parity check; create the missing tag/release, never re-publish
+  the same version.
+
+## When publish smoke fails
+
+The version is already on npm — this is an **alert, not a rollback**.
+
+1. **Artifact incomplete** (missing `.d.ts`, broken export): fix forward with a
+   patch release. Do not re-publish the same version.
+2. **Unusable or wrong contents**: move the tag first —
+   `npm dist-tag add @neuronection/assistant-ui@<previous> latest` — then fix
+   forward. `npm unpublish` is an owner decision, never a CI step.
+3. **Only the parity check failed** (npm ok, tag or GitHub release missing):
+   create the missing tag/release; never re-publish the version.
+4. **Missing attestation**: the publish ran without `--provenance`. Check the
+   Release log for the "Make the publish tool sign its artifacts" step and that
+   `id-token: write` is still on the job.
+
+## Required checks
+
+The required contexts for `main` live in repository settings, mirrored in
+`.github/required-checks.json`. `scripts/check-required-checks.mjs` (run by
+`lint` and `pnpm verify`) fails if a mirrored context no longer matches a job
+display name in `.github/workflows/` — a renamed job, especially a matrix row
+such as `smoke (react18-tailwind3)`, would otherwise make every PR unmergeable.
+Change the ruleset and the mirror in the same step.
 
 ## When a publish run is red
 
