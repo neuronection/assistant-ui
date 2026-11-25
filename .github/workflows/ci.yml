@@ -210,6 +210,11 @@ jobs:
       HAS_RELEASE_APP: ${{ secrets.RELEASE_APP_ID != '' && secrets.RELEASE_APP_PRIVATE_KEY != '' }}
     steps:
       # Plan 103 §13: push as a real actor so the baselines PR's own suite counts.
+      - uses: ./.github/actions/require-numeric-app-id
+        if: env.HAS_RELEASE_APP == 'true'
+        with:
+          app-id: ${{ secrets.RELEASE_APP_ID }}
+
       - uses: actions/create-github-app-token@fee1f7d63c2ff003460e3d139729b119787bc349 # v2.2.2
         id: app-token
         if: env.HAS_RELEASE_APP == 'true'

@@ -115,6 +115,11 @@ gh workflow run bot-identity.yml -f probe_pr=true     # + throwaway PR, checks a
 `bot-identity.yml` also runs weekly: an expired or rotated private key fails
 there, instead of surfacing mid-release.
 
+If the token step fails with **`'Issuer' claim ('iss') must be an Integer`**,
+`RELEASE_APP_ID` holds the App's *Client ID* (`Iv23…`) rather than its numeric
+**App ID**. A composite guard (`require-numeric-app-id`) now fails first with
+that message.
+
 ## Recovering a bot PR that shows 0 jobs
 
 Only needed when the App secrets above are absent.
