@@ -51,6 +51,11 @@ Packages PR gets real required checks.
   → "Allow GitHub Actions to create and approve pull requests" (for the
   Version Packages PR).
 - `pnpm/packageManager` in package.json pins pnpm for `pnpm/action-setup`.
+- Every workflow action is pinned to a commit SHA with its tag in a comment;
+  Dependabot's `github-actions` update keeps the pins current. The gitleaks
+  tarball is checked against the release's `checksums.txt` before it runs, and
+  `npm-token-canary.yml` (weekly) fails when `NPM_TOKEN` expires or loses the
+  `@neuronection` scope, so a release is never the first to find out.
 - **Provenance** is attached: the Release job puts a shim first on `PATH` that
   passes `--provenance` to the `pnpm publish` that `changeset publish` spawns.
   pnpm honours provenance only as a CLI flag — `NPM_CONFIG_PROVENANCE` and

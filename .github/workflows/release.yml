@@ -27,15 +27,15 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           # the SHA CI validated, not the (possibly newer) branch head
           ref: ${{ github.event.workflow_run.head_sha }}
           fetch-depth: 0
 
-      - uses: pnpm/action-setup@v6
+      - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6
 
-      - uses: actions/setup-node@v7
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
         with:
           node-version: 22
           registry-url: https://registry.npmjs.org
@@ -49,6 +49,15 @@ jobs:
       - name: Build the published artifacts
         run: pnpm build
 
+      # W7 (plan 103): a stray pre-mode would publish a prerelease and move the
+      # `latest` dist-tag under every consumer's feet. Refuse instead.
+      - name: Refuse pre-mode
+        run: |
+          if [ -f .changeset/pre.json ]; then
+            echo "::error::.changeset/pre.json is present — refusing to publish from main while in pre-mode."
+            exit 1
+          fi
+
       # W3b (plan 103): `changeset publish` shells out to `pnpm publish`, and
       # pnpm only honours provenance as a CLI flag — neither
       # NPM_CONFIG_PROVENANCE nor `.npmrc: provenance=true` reaches it, which is
@@ -59,19 +68,23 @@ jobs:
         run: |
           set -euo pipefail
           real="$(command -v pnpm)"
-          mkdir -p .provenance-shim
-          cat > .provenance-shim/pnpm <<SH
+          # Outside the work tree on purpose: changesets/action runs `git add .`
+          # for the Version Packages commit, and a shim in the repo root would
+          # be committed into it.
+          shim="${RUNNER_TEMP}/provenance-shim"
+          mkdir -p "$shim"
+          cat > "$shim/pnpm" <<SH
           #!/usr/bin/env bash
           if [ "\$1" = "publish" ]; then
             exec "$real" publish --provenance "\${@:2}"
           fi
           exec "$real" "\$@"
           SH
-          chmod +x .provenance-shim/pnpm
-          echo "$PWD/.provenance-shim" >> "$GITHUB_PATH"
+          chmod +x "$shim/pnpm"
+          echo "$shim" >> "$GITHUB_PATH"
           echo "shim -> $real"
 
-      - uses: changesets/action@v1
+      - uses: changesets/action@ce079ea084e08a340947ed4d6ecedb2433c8f293 # v1.9.0
         id: changesets
         with:
           version: pnpm changeset version
