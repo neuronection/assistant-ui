@@ -101,7 +101,9 @@ jobs:
             count="$(gh pr checks "${PR}" --json name --jq 'length' 2>/dev/null || true)"
             if [ -n "${count}" ] && [ "${count}" -gt 0 ]; then
               echo "::notice::PR #${PR} reports ${count} checks — the App push starts CI"
-              gh pr checks "${PR}" | head -14
+              # `gh pr checks` exits 8 while anything is pending and 1 on failure;
+              # this step is about the checks *existing*, not their verdict.
+              gh pr checks "${PR}" || true
               exit 0
             fi
             echo "no checks yet (attempt ${attempt})"
