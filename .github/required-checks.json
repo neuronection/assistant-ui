@@ -1,0 +1,16 @@
+{
+  "//": "Mirror of the `main protection` ruleset's required_status_checks (repo settings, not in the tree). Keep it in sync when the ruleset changes: scripts/check-required-checks.mjs fails if a context here does not correspond to a job display name in .github/workflows/, so a renamed job (especially a matrix-generated one) cannot silently make every PR unmergeable.",
+  "contexts": [
+    "build",
+    "lint",
+    "scan",
+    "smoke (react18-tailwind3)",
+    "smoke (react19-tailwind4)",
+    "stories",
+    "test",
+    "test-react18",
+    "typecheck-react18",
+    "typecheck-react19",
+    "visual"
+  ]
+}

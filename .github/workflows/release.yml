@@ -1,7 +1,13 @@
 name: Release
 
+# W0 (plan 103): publish only after CI on the same commit succeeded.
+# `workflow_run` gives us the CI verdict for this exact SHA; the previous
+# `push` trigger raced CI and could publish a red commit (0.91.0 published
+# 3 minutes before its own CI finished).
 on:
-  push:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
     branches: [main]
 
 concurrency: release
@@ -10,23 +16,63 @@ permissions:
   contents: write
   pull-requests: write
   id-token: write
+  # to kick CI on the bot-created Version Packages branch (see last step)
+  actions: write
 
 jobs:
   release:
+    if: >-
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.head_branch == 'main'
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v7
         with:
+          # the SHA CI validated, not the (possibly newer) branch head
+          ref: ${{ github.event.workflow_run.head_sha }}
           fetch-depth: 0
+
       - uses: pnpm/action-setup@v6
+
       - uses: actions/setup-node@v7
         with:
           node-version: 22
           registry-url: https://registry.npmjs.org
           cache: pnpm
+
       - run: pnpm install --frozen-lockfile
-      - run: pnpm lint && pnpm typecheck && pnpm test && pnpm build
+
+      # `dist/` is gitignored and `files` ships it, so the published tarball
+      # needs a build in this job. Tests/lint/typecheck are NOT repeated here:
+      # W0 gates on the CI run for this SHA.
+      - name: Build the published artifacts
+        run: pnpm build
+
+      # W3b (plan 103): `changeset publish` shells out to `pnpm publish`, and
+      # pnpm only honours provenance as a CLI flag — neither
+      # NPM_CONFIG_PROVENANCE nor `.npmrc: provenance=true` reaches it, which is
+      # why 0.90.0 and 0.91.0 are unsigned despite the old env var. A shim first
+      # on PATH injects the flag into that one child process, so releases are
+      # signed without patching @changesets/cli.
+      - name: Make the publish tool sign its artifacts
+        run: |
+          set -euo pipefail
+          real="$(command -v pnpm)"
+          mkdir -p .provenance-shim
+          cat > .provenance-shim/pnpm <<SH
+          #!/usr/bin/env bash
+          if [ "\$1" = "publish" ]; then
+            exec "$real" publish --provenance "\${@:2}"
+          fi
+          exec "$real" "\$@"
+          SH
+          chmod +x .provenance-shim/pnpm
+          echo "$PWD/.provenance-shim" >> "$GITHUB_PATH"
+          echo "shim -> $real"
+
       - uses: changesets/action@v1
+        id: changesets
         with:
           version: pnpm changeset version
           publish: pnpm ci:publish
@@ -34,4 +80,20 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-          NPM_CONFIG_PROVENANCE: true
+
+      # W1: a branch pushed with GITHUB_TOKEN never starts workflows, so the
+      # Version Packages PR shows 0 jobs and its required checks can never
+      # report. `workflow_dispatch` is exempt from that suppression; kick CI
+      # on the bot branch so the PR validates itself.
+      - name: Kick CI for the Version Packages PR
+        if: steps.changesets.outputs.published != 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          branch="changeset-release/main"
+          if gh api "repos/${GITHUB_REPOSITORY}/branches/${branch}" >/dev/null 2>&1; then
+            gh workflow run ci.yml --ref "$branch"
+            echo "::notice::CI dispatched for $branch"
+          else
+            echo "No Version Packages branch present; nothing to dispatch."
+          fi

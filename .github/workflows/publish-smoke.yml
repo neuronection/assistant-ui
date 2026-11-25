@@ -1,0 +1,166 @@
+name: Publish smoke
+
+# W3 (plan 103): verify the *published* artifact, not the working tree.
+# `smoke` in CI packs a local tarball; nothing ever installed what the registry
+# actually serves, so a `files` mistake or a missing `.d.ts` would ship silently.
+#
+# There is deliberately no `publish` step in this workflow, and it never runs
+# `changeset publish`: adding that here would make publishing invocable on any
+# ref (the reason this is not a job inside release.yml).
+on:
+  workflow_run:
+    workflows: [Release]
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to verify (defaults to the registry `latest` tag)'
+        required: false
+        type: string
+
+concurrency: publish-smoke
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  verify:
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.head_branch == 'main')
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+
+      - name: Resolve the version to verify
+        id: version
+        env:
+          REQUESTED_VERSION: ${{ inputs.version }}
+        run: |
+          set -euo pipefail
+          version="${REQUESTED_VERSION:-$(npm view @neuronection/assistant-ui version)}"
+          published="$(npm view "@neuronection/assistant-ui@${version}" version)"
+          if [ "${published}" != "${version}" ]; then
+            echo "::error::registry reports ${published} for ${version}"
+            exit 1
+          fi
+          echo "version=${version}" >> "$GITHUB_OUTPUT"
+          echo "verifying @neuronection/assistant-ui@${version} from the registry"
+
+      - name: Install the published package into a scratch consumer
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/consumer
+          cd /tmp/consumer
+          npm init -y >/dev/null
+          npm install --no-audit --no-fund \
+            "@neuronection/assistant-ui@${VERSION}" react@^19 react-dom@^19
+
+      - name: Assert the exports map resolves and ships its types
+        run: |
+          set -euo pipefail
+          node --input-type=module - <<'JS'
+          import { existsSync } from 'node:fs'
+          import { createRequire } from 'node:module'
+          import { dirname, join } from 'node:path'
+
+          const require = createRequire('/tmp/consumer/package.json')
+          const manifestPath = require.resolve('@neuronection/assistant-ui/package.json')
+          const manifest = require(manifestPath)
+          const root = dirname(manifestPath)
+          const required = ['.', './filters', './chat-core', './styles.css']
+          const failures = []
+
+          for (const subpath of required) {
+            const entry = manifest.exports?.[subpath]
+            if (!entry) {
+              failures.push(`${subpath}: missing from exports`)
+              continue
+            }
+            const targets =
+              typeof entry === 'string'
+                ? { import: entry }
+                : { import: entry.import, types: entry.types }
+            for (const [kind, target] of Object.entries(targets)) {
+              if (!target) {
+                failures.push(`${subpath}: no ${kind} target`)
+                continue
+              }
+              if (!existsSync(join(root, target))) {
+                failures.push(`${subpath}: ${kind} target ${target} is not in the tarball`)
+              }
+            }
+          }
+
+          await import('@neuronection/assistant-ui/filters')
+          await import('@neuronection/assistant-ui')
+
+          if (failures.length > 0) {
+            console.error('published artifact is incomplete:')
+            for (const failure of failures) console.error(`  · ${failure}`)
+            process.exit(1)
+          }
+          console.log(`resolved ${required.join(', ')} from ${manifest.version}`)
+          JS
+
+      - name: Assert npm attached a provenance attestation
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          set -euo pipefail
+          url="https://registry.npmjs.org/-/npm/v1/attestations/@neuronection%2fassistant-ui@${VERSION}"
+          code="$(curl -sS -o /tmp/attestations.json -w '%{http_code}' "${url}")"
+          if [ "${code}" != "200" ]; then
+            echo "::error::no provenance attestation for ${VERSION} (HTTP ${code}). Publishing must pass --provenance to pnpm."
+            exit 1
+          fi
+          count="$(node -e "console.log((require('/tmp/attestations.json').attestations||[]).length)")"
+          echo "${VERSION} carries ${count} attestation(s)"
+
+      - name: Verify registry signatures with npm
+        working-directory: /tmp/consumer
+        run: npm audit signatures
+
+      - name: Assert npm version, git tag and GitHub release agree
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          set -euo pipefail
+          git ls-remote --exit-code --tags origin "refs/tags/v${VERSION}" >/dev/null \
+            || { echo "::error::npm has ${VERSION} but there is no v${VERSION} tag"; exit 1; }
+          gh release view "v${VERSION}" --json tagName >/dev/null \
+            || { echo "::error::npm has ${VERSION} but there is no GitHub release v${VERSION}"; exit 1; }
+          echo "npm ${VERSION} == tag v${VERSION} == GitHub release v${VERSION}"
+
+      # "Alert, not rollback": the version is already on npm, so the runbook's
+      # `npm dist-tag add <previous> latest` is the lever, not unpublish.
+      - name: Open an issue when verification fails
+        if: failure() && github.event_name == 'workflow_run'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.version.outputs.version }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          title="publish-smoke failed for v${VERSION:-unknown}"
+          existing="$(gh issue list --state open --search "${title} in:title" --json number --jq '.[0].number // empty')"
+          body="Post-publish verification failed: ${RUN_URL}
+
+          The version is already on npm. Do not unpublish from CI. Follow
+          docs/publishing.md ('When publish smoke fails'): fix forward with a
+          patch, or move the \`latest\` dist-tag back to the previous version."
+          if [ -n "${existing}" ]; then
+            gh issue comment "${existing}" --body "${body}"
+          else
+            gh issue create --title "${title}" --body "${body}"
+          fi
