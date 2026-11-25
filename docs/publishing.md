@@ -121,6 +121,16 @@ If the token step fails with **`'Issuer' claim ('iss') must be an Integer`**,
 that message (it cannot be a local composite action: those require a checkout,
 and the token is minted before checkout).
 
+| Symptom | Cause |
+|---|---|
+| `Issuer claim ('iss') must be an Integer` | `RELEASE_APP_ID` holds the Client ID (`Iv23…`) or the slug — an inline shape check now names which |
+| `Not Found … get-a-repository-installation` | the App is **not installed** on this repository, or is installed with "only select repositories" that exclude it |
+| `404` from the Install App page for an org | the App is user-owned and set to **Only on this account**; either switch to **Any account** or own the App from the org |
+
+Verified 2026-11-25: `bot-identity.yml -f probe_pr=true` pushed as
+`neuronection-release-bot`, opened a PR, and its 9 checks reported in the PR
+rollup — the thing `GITHUB_TOKEN` and `workflow_dispatch` both fail at.
+
 ## Recovering a bot PR that shows 0 jobs
 
 Only needed when the App secrets above are absent.
