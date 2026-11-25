@@ -52,28 +52,49 @@ omitted).
 | `activeCount` | `number` | — | number of facets away from their default |
 | `summary` | `ReactNode` | — | host-formatted, end-aligned (e.g. “12 of 300”) |
 | `searchThreshold` | `number` | `8` | options above this get a search box |
+| `showActivePills` | `boolean` | `true` | passed to every chip |
+| `formatCount` | `(count) => ReactNode` | runtime locale | passed to every chip |
+| `showHidden` / `onShowHiddenChange` | `boolean` / `(next) => void` | uncontrolled | control the More/Fewer disclosure — e.g. auto-reveal a facet restored with an active value |
 | `labels` | `FilterBarLabels` | English defaults | `more`, `fewer`, `clearAll` + every `FacetChipLabels` key |
 
 ## FacetChip props
+
+Extends `React.ComponentPropsWithoutRef<'div'>` (`onChange`/`defaultValue`
+omitted).
 
 | prop | type | default | notes |
 |---|---|---|---|
 | `facet` | `FilterFacet` | — | one facet |
 | `value` | `FilterValue` | — | current value |
-| `onValueChange` | `(value: FilterValue) => void` | — | the chip computes the next value (add/remove/toggle/clear) |
+| `onValueChange` | `(value: FilterValue) => void` | — | replacement value; the chip computes it (add/remove/toggle/clear) |
+| `onToggleOption` | `(optionValue, nextPressed) => void` | — | **preferred** intent seam, burst-safe; facet id for `toggle` facets |
 | `options` | `FilterOption[]` | `facet.options` | lets the host supply filtered/derived options |
 | `showActivePills` | `boolean` | `true` | removable row of the current selection |
 | `searchThreshold` | `number` | `8` | option count that turns on the popover search |
-| `labels` | `FacetChipLabels` | English defaults | `noOptions`, `noMatches`, `searchPlaceholder`, `searchAriaLabel`, `selectedCount(count)`, `removeNamed(label)` |
+| `formatCount` | `(count: number) => ReactNode` | runtime locale | count badge text, for an app-locale formatter |
+| `labels` | `FacetChipLabels` | English defaults | `noOptions`, `noMatches`, `searchPlaceholder`, `searchAriaLabel`, `selectedCount(count)`, `removeNamed(label)`, `optionWithCount(label, count)` |
+
+Active-value pills render for `multi` facets only; a `single` facet already
+shows its value on the trigger.
 
 ## controlled contract
 
-`values` in, `onChange` out. The host owns the facet set, option resolution
-(client or server), counts, and the active-facet count. `FacetChip` computes
-the *next* value itself — the host never has to know whether a facet is
-single- or multi-select. `defaultFor(facet)` (used by the bar when a facet has
-no entry) is the neutral value: `toggle → false`, `single → ''`,
-`multi → []`.
+`values` in, `onChange` out. The host owns the facet set, the option list
+(resolved however it likes — the popover *search* itself is client-side over the
+options you pass, so a server-driven list must be resolved before render), the
+counts, and the active-facet count.
+
+`FacetChip` computes the next value from the current one. For hosts whose state
+lives in a store or reducer, pass **`onToggleOption(optionValue, nextPressed)`**
+instead: it reports the intent, so two activations made before the next render
+both survive (the replacement form would compute both from the same stale
+value). `optionValue` is the option's value, or the facet id for a `toggle`
+facet.
+
+Exported helpers mirror the neutral value: `defaultFilterValue(facet)`
+(`toggle → false`, `single → ''`, `multi → []`) and
+`isDefaultValue(value)` — use them for `activeCount` rather than duplicating the
+rule.
 
 ## labels & i18n
 
@@ -128,10 +149,14 @@ realistic (host-resolved counts + a folded facet + a summary):
 
 ## accessibility
 
-See [accessibility.md](../accessibility.md#composite-widgets): the trigger is a
-`<button aria-expanded>`; the popover is a labelled `role="group"` of native
-`<button aria-pressed>` options (no roving-menu contract); active pills expose
-their remove button with an app-provided accessible name.
+See [accessibility.md](../accessibility.md#inputs): the trigger is a
+`<button aria-expanded>`; the popover is a named `role="dialog"` (labelled with
+the facet name) holding a labelled `role="group"` of native
+`<button aria-pressed>` options — no roving-menu contract, so Tab + Enter/Space
+is the whole keyboard surface. Keyboard (Enter to open, Tab to the first option,
+Enter to activate, Escape to close and return focus) and axe-closed /
+**axe-open** are asserted in `tests/filters.test.tsx`. Active pills expose their
+remove button with an app-provided accessible name.
 
 ## related
 

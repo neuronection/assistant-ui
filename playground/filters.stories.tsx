@@ -78,7 +78,6 @@ export const FiltersBar = () => {
         onClearAll={() => setValues(initial)}
         activeCount={activeCount}
         summary={`${activeCount === 0 ? 300 : 162} of 300`}
-        labels={{}}
       />
     </div>
   )
@@ -86,7 +85,7 @@ export const FiltersBar = () => {
 
 export const FiltersWithSearch = () => {
   const [values, setValues] = useState<Record<string, FilterValue>>({
-    lab: { kind: 'multi', values: [] } as FilterValue,
+    lab: { kind: 'multi', values: [] },
   })
   const labSelected = values.lab?.kind === 'multi' ? values.lab.values.length : 0
   const lab: FilterFacet = {
@@ -110,7 +109,7 @@ export const FiltersWithSearch = () => {
     <div style={{ padding: 24, maxWidth: 520 }}>
       <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
         <span style={{ fontSize: 12, color: 'var(--as-muted-fg)' }}>
-          <CalendarDays className="size-3" aria-hidden /> 9 options → search appears
+          <CalendarDays className="size-3" aria-hidden /> 10 options → search appears
         </span>
       </div>
       <div style={{ marginTop: 12 }}>

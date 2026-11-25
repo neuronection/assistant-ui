@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { MoreHorizontal, X } from 'lucide-react'
 import { cn } from '../../lib/utils'
-import { FacetChip, type FacetChipLabels } from './FacetChip'
+import { FacetChip, defaultFilterValue, type FacetChipLabels } from './FacetChip'
 import type { FilterFacet, FilterValue } from './types'
 
 export interface FilterBarLabels extends FacetChipLabels {
@@ -23,6 +23,13 @@ export interface FilterBarProps
   summary?: React.ReactNode
   /** Options count above which a popover gains a search box. */
   searchThreshold?: number
+  /** Passed to every chip; `false` hides the active-value pills row. */
+  showActivePills?: boolean
+  /** Format a count badge in every chip. */
+  formatCount?: (count: number) => React.ReactNode
+  /** Controlled “More” disclosure; omit to let the bar own it. */
+  showHidden?: boolean
+  onShowHiddenChange?: (next: boolean) => void
   labels?: FilterBarLabels
 }
 
@@ -35,13 +42,22 @@ export const FilterBar = React.forwardRef<HTMLDivElement, FilterBarProps>(functi
     activeCount,
     summary,
     searchThreshold,
+    showActivePills,
+    formatCount,
+    showHidden,
+    onShowHiddenChange,
     labels,
     className,
     ...props
   },
   ref,
 ) {
-  const [showHidden, setShowHidden] = React.useState(false)
+  const [uncontrolledShowHidden, setUncontrolledShowHidden] = React.useState(false)
+  const hiddenOpen = showHidden ?? uncontrolledShowHidden
+  const setHiddenOpen = (next: boolean) => {
+    if (showHidden === undefined) setUncontrolledShowHidden(next)
+    onShowHiddenChange?.(next)
+  }
 
   const { visible, hidden } = React.useMemo(() => {
     const shown: FilterFacet[] = []
@@ -54,9 +70,11 @@ export const FilterBar = React.forwardRef<HTMLDivElement, FilterBarProps>(functi
     <FacetChip
       key={facet.id}
       facet={facet}
-      value={values[facet.id] ?? defaultFor(facet)}
+      value={values[facet.id] ?? defaultFilterValue(facet)}
       onValueChange={(value) => onChange(facet.id, value)}
       searchThreshold={searchThreshold}
+      showActivePills={showActivePills}
+      formatCount={formatCount}
       labels={labels}
     />
   )
@@ -72,15 +90,15 @@ export const FilterBar = React.forwardRef<HTMLDivElement, FilterBarProps>(functi
 
       {hidden.length > 0 && (
         <>
-          {showHidden && hidden.map(renderFacet)}
+          {hiddenOpen && hidden.map(renderFacet)}
           <button
             type="button"
-            onClick={() => setShowHidden((current) => !current)}
-            aria-expanded={showHidden}
+            onClick={() => setHiddenOpen(!hiddenOpen)}
+            aria-expanded={hiddenOpen}
             className="flex items-center gap-1.5 whitespace-nowrap rounded-full border border-[var(--as-border)] bg-[var(--as-surface)] px-3.5 py-1.5 text-sm font-medium text-[var(--as-muted-fg)] transition-colors hover:border-[color-mix(in_srgb,var(--as-primary)_40%,var(--as-border))] hover:text-[var(--as-fg)] focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[var(--as-focus-ring)]"
           >
             <MoreHorizontal className="size-4" aria-hidden />
-            <span>{showHidden ? (labels?.fewer ?? 'Fewer') : (labels?.more ?? 'More')}</span>
+            <span>{hiddenOpen ? (labels?.fewer ?? 'Fewer') : (labels?.more ?? 'More')}</span>
           </button>
         </>
       )}
@@ -96,7 +114,7 @@ export const FilterBar = React.forwardRef<HTMLDivElement, FilterBarProps>(functi
         </button>
       )}
 
-      {summary !== undefined && (
+      {summary != null && (
         <span className="ml-auto whitespace-nowrap text-xs font-medium tabular-nums text-[var(--as-muted-fg)]">
           {summary}
         </span>
@@ -104,9 +122,3 @@ export const FilterBar = React.forwardRef<HTMLDivElement, FilterBarProps>(functi
     </div>
   )
 })
-
-function defaultFor(facet: FilterFacet): FilterValue {
-  if (facet.kind === 'toggle') return { kind: 'toggle', on: false }
-  if (facet.kind === 'single') return { kind: 'single', value: '' }
-  return { kind: 'multi', values: [] }
-}

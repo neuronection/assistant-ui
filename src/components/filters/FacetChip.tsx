@@ -16,20 +16,35 @@ export interface FacetChipLabels {
   selectedCount?: (count: number) => React.ReactNode
   /** Accessible name of an active pill's remove button. */
   removeNamed?: (optionLabel: string) => string
+  /** Accessible name of an option row that carries a count. */
+  optionWithCount?: (optionLabel: string, count: number) => string
 }
 
 export interface FacetChipProps
   extends Omit<React.ComponentPropsWithoutRef<'div'>, 'onChange' | 'defaultValue'> {
   facet: FilterFacet
   value: FilterValue
-  /** Emits the whole next value for this facet. */
+  /**
+   * Emits the whole next value. Used when `onToggleOption` is not supplied —
+   * prefer `onToggleOption` for hosts that keep their state in a store or
+   * reducer, because a replacement value computed from a stale `value` prop
+   * loses a burst of activations made before the next render.
+   */
   onValueChange: (value: FilterValue) => void
+  /**
+   * Emits an intent instead of a replacement value — burst-safe, and the
+   * preferred seam for a host whose state lives in a store/reducer.
+   * `optionValue` is the option's value, or the facet id for a `toggle` facet.
+   */
+  onToggleOption?: (optionValue: string, nextPressed: boolean) => void
   /** Resolved options; defaults to `facet.options`. */
   options?: FilterOption[]
   /** Render the removable row of the current selection. Default `true`. */
   showActivePills?: boolean
   /** Options count above which the popover gains a search box. Default `8`. */
   searchThreshold?: number
+  /** Format a count badge; defaults to the runtime locale. */
+  formatCount?: (count: number) => React.ReactNode
   labels?: FacetChipLabels
 }
 
@@ -45,10 +60,17 @@ const TRIGGER_ACTIVE =
 const PILL =
   'inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-[color-mix(in_srgb,var(--as-primary)_12%,transparent)] py-1 pl-2.5 pr-1 text-[11px] font-medium text-[var(--as-primary)]'
 
-function isDefaultValue(facet: FilterFacet, value: FilterValue): boolean {
+export function isDefaultValue(value: FilterValue): boolean {
   if (value.kind === 'toggle') return !value.on
   if (value.kind === 'single') return value.value === ''
   return value.values.length === 0
+}
+
+/** The neutral value of a facet — the one a host uses when it has no entry. */
+export function defaultFilterValue(facet: FilterFacet): FilterValue {
+  if (facet.kind === 'toggle') return { kind: 'toggle', on: false }
+  if (facet.kind === 'single') return { kind: 'single', value: '' }
+  return { kind: 'multi', values: [] }
 }
 
 function selectedValues(value: FilterValue): string[] {
@@ -79,9 +101,11 @@ export const FacetChip = React.forwardRef<HTMLDivElement, FacetChipProps>(functi
     facet,
     value,
     onValueChange,
+    onToggleOption,
     options,
     showActivePills = true,
     searchThreshold = 8,
+    formatCount,
     labels,
     className,
     ...props
@@ -96,7 +120,7 @@ export const FacetChip = React.forwardRef<HTMLDivElement, FacetChipProps>(functi
     [options, facet.options],
   )
   const selected = selectedValues(value)
-  const active = !isDefaultValue(facet, value)
+  const active = !isDefaultValue(value)
 
   const filtered = React.useMemo(() => {
     const needle = query.trim().toLowerCase()
@@ -112,8 +136,18 @@ export const FacetChip = React.forwardRef<HTMLDivElement, FacetChipProps>(functi
     return labels?.selectedCount?.(selected.length) ?? `${selected.length} selected`
   })()
 
-  const removeNamed =
-    labels?.removeNamed ?? ((optionLabel: string) => `Remove ${optionLabel}`)
+  const removeNamed = labels?.removeNamed ?? ((optionLabel: string) => `Remove ${optionLabel}`)
+  const countText = (count: number) =>
+    formatCount?.(count) ?? count.toLocaleString()
+
+  const activate = (optionValue: string) => {
+    const pressed = selected.includes(optionValue)
+    if (onToggleOption) {
+      onToggleOption(optionValue, !pressed)
+      return
+    }
+    onValueChange(nextValue(facet, value, optionValue))
+  }
 
   if (facet.kind === 'toggle') {
     const on = value.kind === 'toggle' ? value.on : false
@@ -122,7 +156,9 @@ export const FacetChip = React.forwardRef<HTMLDivElement, FacetChipProps>(functi
         <button
           type="button"
           aria-pressed={on}
-          onClick={() => onValueChange({ kind: 'toggle', on: !on })}
+          onClick={() =>
+            onToggleOption ? onToggleOption(facet.id, !on) : onValueChange({ kind: 'toggle', on: !on })
+          }
           className={cn(TRIGGER_BASE, on ? TRIGGER_ACTIVE : TRIGGER_IDLE)}
         >
           {facet.icon ?? <SlidersHorizontal className="size-4 opacity-70" aria-hidden />}
@@ -133,7 +169,12 @@ export const FacetChip = React.forwardRef<HTMLDivElement, FacetChipProps>(functi
   }
 
   return (
-    <div ref={ref} data-as="facet-chip" className={cn('flex min-w-0 items-center gap-2', className)} {...props}>
+    <div
+      ref={ref}
+      data-as="facet-chip"
+      className={cn('flex min-w-0 items-center gap-2', className)}
+      {...props}
+    >
       <Popover
         open={open}
         onOpenChange={(next) => {
@@ -145,6 +186,7 @@ export const FacetChip = React.forwardRef<HTMLDivElement, FacetChipProps>(functi
           <button
             type="button"
             aria-expanded={open}
+            aria-label={selectedLabel ? `${facet.label}: ${selectedLabel}` : undefined}
             className={cn(TRIGGER_BASE, active ? TRIGGER_ACTIVE : TRIGGER_IDLE)}
           >
             <span className="flex items-center gap-2">
@@ -161,6 +203,7 @@ export const FacetChip = React.forwardRef<HTMLDivElement, FacetChipProps>(functi
         <PopoverContent
           align="start"
           sideOffset={8}
+          aria-label={facet.label}
           className="w-64 overflow-hidden rounded-[var(--as-radius-lg)] border border-[var(--as-border)] bg-[var(--as-surface-raised)] p-0 shadow-[var(--as-shadow-pop)]"
           onOpenAutoFocus={(event) => event.preventDefault()}
         >
@@ -191,7 +234,13 @@ export const FacetChip = React.forwardRef<HTMLDivElement, FacetChipProps>(functi
                     key={option.value}
                     type="button"
                     aria-pressed={checked}
-                    onClick={() => onValueChange(nextValue(facet, value, option.value))}
+                    aria-label={
+                      option.count !== undefined
+                        ? (labels?.optionWithCount?.(option.label, option.count) ??
+                          `${option.label}, ${countText(option.count)}`)
+                        : undefined
+                    }
+                    onClick={() => activate(option.value)}
                     className={cn(
                       'flex w-full items-center justify-between gap-3 rounded-[var(--as-radius-sm)] px-3 py-2 text-left text-sm transition-colors',
                       checked
@@ -205,8 +254,11 @@ export const FacetChip = React.forwardRef<HTMLDivElement, FacetChipProps>(functi
                     </span>
                     <span className="flex shrink-0 items-center gap-2">
                       {option.count !== undefined && (
-                        <span className="rounded-full bg-[var(--as-secondary)] px-2 py-0.5 text-[10px] font-semibold tabular-nums text-[var(--as-muted-fg)]">
-                          {option.count.toLocaleString()}
+                        <span
+                          aria-hidden
+                          className="rounded-full bg-[var(--as-secondary)] px-2 py-0.5 text-[10px] font-semibold tabular-nums text-[var(--as-muted-fg)]"
+                        >
+                          {countText(option.count)}
                         </span>
                       )}
                       {checked && <Check className="size-4 text-[var(--as-primary)]" aria-hidden />}
@@ -219,8 +271,8 @@ export const FacetChip = React.forwardRef<HTMLDivElement, FacetChipProps>(functi
         </PopoverContent>
       </Popover>
 
-      {showActivePills && selected.length > 0 && (
-        <div className="flex max-w-[400px] flex-wrap items-center gap-1.5 overflow-hidden">
+      {showActivePills && facet.kind === 'multi' && selected.length > 0 && (
+        <div className="flex max-w-[400px] flex-wrap items-center gap-1.5">
           {selected.map((entry) => {
             const option = resolvedOptions.find((candidate) => candidate.value === entry)
             const optionLabel = option?.label ?? entry
@@ -230,7 +282,7 @@ export const FacetChip = React.forwardRef<HTMLDivElement, FacetChipProps>(functi
                 <span>{optionLabel}</span>
                 <button
                   type="button"
-                  onClick={() => onValueChange(nextValue(facet, value, entry))}
+                  onClick={() => activate(entry)}
                   aria-label={removeNamed(optionLabel)}
                   className="rounded-full p-1 transition-colors hover:bg-[color-mix(in_srgb,var(--as-primary)_18%,transparent)] focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[var(--as-focus-ring)]"
                 >
