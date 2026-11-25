@@ -48,7 +48,13 @@ jobs:
           fi
           case "${APP_ID}" in
             *[!0-9]*)
-              echo "::error::RELEASE_APP_ID is not the numeric App ID. GitHub rejects the JWT with \"'Issuer' claim ('iss') must be an Integer\" when it holds the App's Client ID (Iv…) or the slug. Copy `App ID` — a number — from the App's settings page."
+              hint=""
+              case "${APP_ID}" in
+                Iv*) hint=" It starts with 'Iv' — that is the Client ID." ;;
+                *[[:space:]]*) hint=" It contains whitespace — strip it." ;;
+                *) hint=" Expected the number shown as 'App ID' in the App's settings." ;;
+              esac
+              echo "::error::RELEASE_APP_ID is not the numeric App ID (GitHub then fails the JWT with: Issuer claim iss must be an Integer).${hint}"
               exit 1
               ;;
           esac
