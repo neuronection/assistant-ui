@@ -36,6 +36,11 @@ jobs:
       # PR rollup. An App installation token is the actor that makes the PR's
       # own suite count. Absent the secrets, everything falls back to
       # GITHUB_TOKEN plus the dispatch step below.
+      - uses: ./.github/actions/require-numeric-app-id
+        if: env.HAS_RELEASE_APP == 'true'
+        with:
+          app-id: ${{ secrets.RELEASE_APP_ID }}
+
       - uses: actions/create-github-app-token@fee1f7d63c2ff003460e3d139729b119787bc349 # v2.2.2
         id: app-token
         if: env.HAS_RELEASE_APP == 'true'
