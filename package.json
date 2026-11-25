@@ -546,6 +546,10 @@
     "./languages": {
       "types": "./dist/languages.d.ts",
       "import": "./dist/languages.js"
+    },
+    "./filters": {
+      "types": "./dist/filters.d.ts",
+      "import": "./dist/filters.js"
     }
   },
   "scripts": {

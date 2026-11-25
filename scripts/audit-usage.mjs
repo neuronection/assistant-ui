@@ -93,6 +93,8 @@ const LIBRARY_COMPONENTS = [
   'FlowTrace',
   'ExpandableSearch',
   'FieldLabel',
+  'FilterBar',
+  'FacetChip',
   'FormModal',
   'InfoButton',
   'Input',
