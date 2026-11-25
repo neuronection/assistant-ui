@@ -6,4 +6,11 @@ export {
   type FacetChipProps,
 } from './FacetChip'
 export { FilterBar, type FilterBarLabels, type FilterBarProps } from './FilterBar'
-export type { FilterFacet, FilterFacetKind, FilterOption, FilterValue } from './types'
+export { FilterPills, type FilterPillsProps } from './FilterPills'
+export type {
+  FilterFacet,
+  FilterFacetKind,
+  FilterOption,
+  FilterPillItem,
+  FilterValue,
+} from './types'

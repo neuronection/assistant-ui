@@ -6,6 +6,7 @@ import { axe } from 'jest-axe'
 import { Activity } from 'lucide-react'
 import { FacetChip, defaultFilterValue, isDefaultValue } from '../src/components/filters/FacetChip'
 import { FilterBar } from '../src/components/filters/FilterBar'
+import { FilterPills } from '../src/components/filters/FilterPills'
 import type { FilterFacet, FilterValue } from '../src/components/filters/types'
 
 const categories: FilterFacet = {
@@ -107,7 +108,6 @@ describe('FacetChip', () => {
       <FacetChip
         facet={categories}
         value={{ kind: 'multi', values: [] }}
-        onValueChange={vi.fn()}
         onToggleOption={onToggleOption}
       />,
     )
@@ -247,7 +247,6 @@ describe('FacetChip', () => {
       <FacetChip
         facet={categories}
         value={{ kind: 'multi', values: [] }}
-        onValueChange={vi.fn()}
         onToggleOption={onToggleOption}
       />,
     )
@@ -385,6 +384,88 @@ describe('FilterBar', () => {
 
   it('has no axe violations', async () => {
     const { container } = renderBar()
+    expect(await axe(container)).toHaveNoViolations()
+  })
+})
+
+describe('FacetChip — inline variant', () => {
+  type InlineOverrides = Partial<Omit<ComponentProps<typeof FacetChip>, 'onValueChange' | 'onToggleOption'>>
+
+  function renderInline(overrides: InlineOverrides = {}) {
+    const onToggleOption = vi.fn()
+    const utils = render(
+      <FacetChip
+        facet={categories}
+        value={{ kind: 'multi', values: ['labs'] }}
+        onToggleOption={onToggleOption}
+        variant="inline"
+        testId="kinds"
+        optionTestId={(value) => `kind-${value}`}
+        {...overrides}
+      />,
+    )
+    return { onToggleOption, ...utils }
+  }
+
+  it('renders the options as an always-visible pill row with pressed state', () => {
+    renderInline()
+    const row = screen.getByTestId('kinds')
+    expect(row).toHaveAttribute('data-as', 'facet-chip')
+    expect(screen.getByTestId('kind-labs')).toHaveAttribute('aria-pressed', 'true')
+    expect(screen.getByTestId('kind-imaging')).toHaveAttribute('aria-pressed', 'false')
+    expect(screen.queryByRole('button', { name: /^Category/ })).not.toBeInTheDocument()
+  })
+
+  it('emits the intent and never opens a popover', async () => {
+    const user = userEvent.setup()
+    const { onToggleOption } = renderInline()
+    await user.click(screen.getByTestId('kind-imaging'))
+    expect(onToggleOption).toHaveBeenCalledWith('imaging', true)
+    expect(screen.queryByRole('group', { name: 'Category' })).not.toBeInTheDocument()
+  })
+
+  it('has no axe violations', async () => {
+    const { container } = renderInline()
+    expect(await axe(container)).toHaveNoViolations()
+  })
+})
+
+describe('FilterPills', () => {
+  const items = [
+    { key: 'q', label: 'nurse' },
+    { key: 'saved', label: 'Saved only' },
+  ]
+
+  it('renders nothing without items', () => {
+    const { container } = render(<FilterPills items={[]} onRemove={vi.fn()} />)
+    expect(container).toBeEmptyDOMElement()
+  })
+
+  it('renders one removable pill per item with an accessible name and test hooks', async () => {
+    const user = userEvent.setup()
+    const onRemove = vi.fn()
+    render(
+      <FilterPills
+        items={items}
+        onRemove={onRemove}
+        testId="applied"
+        itemTestId={(key) => `applied-${key}`}
+        removeLabel={(label) => `Clear ${label}`}
+      />,
+    )
+    expect(screen.getByTestId('applied')).toHaveAttribute('data-as', 'filter-pills')
+    expect(screen.getByRole('button', { name: 'Clear nurse' })).toBeInTheDocument()
+    await user.click(screen.getByTestId('applied-saved'))
+    expect(onRemove).toHaveBeenCalledWith('saved')
+  })
+
+  it('defaults the remove label to the pill label', () => {
+    render(<FilterPills items={items} onRemove={vi.fn()} />)
+    expect(screen.getByRole('button', { name: 'Remove nurse' })).toBeInTheDocument()
+  })
+
+  it('has no axe violations', async () => {
+    const { container } = render(<FilterPills items={items} onRemove={vi.fn()} />)
     expect(await axe(container)).toHaveNoViolations()
   })
 })

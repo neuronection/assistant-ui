@@ -33,3 +33,9 @@ export type FilterValue =
   | { kind: 'toggle'; on: boolean }
   | { kind: 'single'; value: string }
   | { kind: 'multi'; values: string[] }
+
+/** One applied-filter chip in a standalone removable row. */
+export interface FilterPillItem {
+  key: string
+  label: string
+}

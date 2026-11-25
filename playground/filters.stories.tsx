@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { Activity, Building2, CalendarDays, Stethoscope } from 'lucide-react'
+import { FacetChip } from '../src/components/filters/FacetChip'
 import { FilterBar } from '../src/components/filters/FilterBar'
+import { FilterPills } from '../src/components/filters/FilterPills'
 import type { FilterFacet, FilterValue } from '../src/components/filters/types'
 
 const facets: FilterFacet[] = [
@@ -121,6 +123,35 @@ export const FiltersWithSearch = () => {
           activeCount={labSelected > 0 ? 1 : 0}
         />
       </div>
+    </div>
+  )
+}
+
+const inlineFacet: FilterFacet = {
+  id: 'kind',
+  label: 'Kind',
+  kind: 'multi',
+  options: [
+    { value: 'labs', label: 'Laboratory' },
+    { value: 'imaging', label: 'Imaging' },
+    { value: 'notes', label: 'Notes' },
+  ],
+}
+
+export const InlineChips = () => {
+  const [values, setValues] = useState<string[]>(['labs'])
+  return (
+    <div style={{ padding: 24, display: 'flex', flexDirection: 'column', gap: 12 }}>
+      <FacetChip
+        facet={inlineFacet}
+        variant="inline"
+        value={{ kind: 'multi', values }}
+        onValueChange={(value) => setValues(value.kind === 'multi' ? value.values : [])}
+      />
+      <FilterPills
+        items={values.map((value) => ({ key: value, label: value }))}
+        onRemove={(key) => setValues((current) => current.filter((entry) => entry !== key))}
+      />
     </div>
   )
 }

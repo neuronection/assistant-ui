@@ -95,6 +95,7 @@ const LIBRARY_COMPONENTS = [
   'FieldLabel',
   'FilterBar',
   'FacetChip',
+  'FilterPills',
   'FormModal',
   'InfoButton',
   'Input',

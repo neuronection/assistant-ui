@@ -20,23 +20,10 @@ export interface FacetChipLabels {
   optionWithCount?: (optionLabel: string, count: number) => string
 }
 
-export interface FacetChipProps
+interface FacetChipBaseProps
   extends Omit<React.ComponentPropsWithoutRef<'div'>, 'onChange' | 'defaultValue'> {
   facet: FilterFacet
   value: FilterValue
-  /**
-   * Emits the whole next value. Used when `onToggleOption` is not supplied —
-   * prefer `onToggleOption` for hosts that keep their state in a store or
-   * reducer, because a replacement value computed from a stale `value` prop
-   * loses a burst of activations made before the next render.
-   */
-  onValueChange: (value: FilterValue) => void
-  /**
-   * Emits an intent instead of a replacement value — burst-safe, and the
-   * preferred seam for a host whose state lives in a store/reducer.
-   * `optionValue` is the option's value, or the facet id for a `toggle` facet.
-   */
-  onToggleOption?: (optionValue: string, nextPressed: boolean) => void
   /** Resolved options; defaults to `facet.options`. */
   options?: FilterOption[]
   /** Render the removable row of the current selection. Default `true`. */
@@ -45,8 +32,40 @@ export interface FacetChipProps
   searchThreshold?: number
   /** Format a count badge; defaults to the runtime locale. */
   formatCount?: (count: number) => React.ReactNode
+  /**
+   * `popover` (default) opens options in a popover; `inline` renders the
+   * options as an always-visible pill row — for compact filter strips.
+   */
+  variant?: 'popover' | 'inline'
+  /** `data-testid` of the root element. */
+  testId?: string
+  /** `data-testid` of one option (inline pills and popover rows alike). */
+  optionTestId?: (optionValue: string) => string
   labels?: FacetChipLabels
 }
+
+/**
+ * Exactly one event seam: the intent form (`onToggleOption`) is burst-safe and
+ * preferred for store/reducer hosts; the replacement form (`onValueChange`)
+ * is the simple default.
+ */
+export type FacetChipEventProps =
+  | {
+      /** Emits the whole next value, computed from the current `value` prop. */
+      onValueChange: (value: FilterValue) => void
+      onToggleOption?: never
+    }
+  | {
+      /**
+       * Emits an intent instead of a replacement value — burst-safe.
+       * `optionValue` is the option's value, or the facet id for a `toggle`
+       * facet.
+       */
+      onToggleOption: (optionValue: string, nextPressed: boolean) => void
+      onValueChange?: never
+    }
+
+export type FacetChipProps = FacetChipBaseProps & FacetChipEventProps
 
 const TRIGGER_BASE =
   'flex items-center justify-between gap-2 whitespace-nowrap rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[var(--as-focus-ring)] disabled:cursor-not-allowed disabled:opacity-50'
@@ -106,6 +125,9 @@ export const FacetChip = React.forwardRef<HTMLDivElement, FacetChipProps>(functi
     showActivePills = true,
     searchThreshold = 8,
     formatCount,
+    variant = 'popover',
+    testId,
+    optionTestId,
     labels,
     className,
     ...props
@@ -146,18 +168,20 @@ export const FacetChip = React.forwardRef<HTMLDivElement, FacetChipProps>(functi
       onToggleOption(optionValue, !pressed)
       return
     }
-    onValueChange(nextValue(facet, value, optionValue))
+    onValueChange!(nextValue(facet, value, optionValue))
   }
 
   if (facet.kind === 'toggle') {
     const on = value.kind === 'toggle' ? value.on : false
     return (
-      <div ref={ref} data-as="facet-chip" className={cn('inline-flex', className)} {...props}>
+      <div ref={ref} data-as="facet-chip" data-testid={testId} className={cn('inline-flex', className)} {...props}>
         <button
           type="button"
           aria-pressed={on}
           onClick={() =>
-            onToggleOption ? onToggleOption(facet.id, !on) : onValueChange({ kind: 'toggle', on: !on })
+            onToggleOption
+              ? onToggleOption(facet.id, !on)
+              : onValueChange!({ kind: 'toggle', on: !on })
           }
           className={cn(TRIGGER_BASE, on ? TRIGGER_ACTIVE : TRIGGER_IDLE)}
         >
@@ -168,10 +192,45 @@ export const FacetChip = React.forwardRef<HTMLDivElement, FacetChipProps>(functi
     )
   }
 
+  if (variant === 'inline') {
+    return (
+      <div
+        ref={ref}
+        data-as="facet-chip"
+        data-testid={testId}
+        className={cn('flex flex-wrap gap-1.5', className)}
+        {...props}
+      >
+        {resolvedOptions.map((option) => {
+          const checked = selected.includes(option.value)
+          return (
+            <button
+              key={option.value}
+              type="button"
+              aria-pressed={checked}
+              data-testid={optionTestId?.(option.value)}
+              onClick={() => activate(option.value)}
+              className={cn(
+                'cursor-pointer rounded-full border px-2 py-0.5 text-xs transition-colors focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[var(--as-focus-ring)]',
+                checked
+                  ? 'border-[var(--as-primary)] bg-[var(--as-primary)] text-[var(--as-primary-fg)]'
+                  : 'border-[var(--as-border)] text-[var(--as-muted-fg)] hover:text-[var(--as-fg)]',
+              )}
+            >
+              {option.icon}
+              {option.label}
+            </button>
+          )
+        })}
+      </div>
+    )
+  }
+
   return (
     <div
       ref={ref}
       data-as="facet-chip"
+      data-testid={testId}
       className={cn('flex min-w-0 items-center gap-2', className)}
       {...props}
     >
@@ -234,6 +293,7 @@ export const FacetChip = React.forwardRef<HTMLDivElement, FacetChipProps>(functi
                     key={option.value}
                     type="button"
                     aria-pressed={checked}
+                    data-testid={optionTestId?.(option.value)}
                     aria-label={
                       option.count !== undefined
                         ? (labels?.optionWithCount?.(option.label, option.count) ??

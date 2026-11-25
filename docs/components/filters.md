@@ -7,8 +7,19 @@ active-value pills. No data access, no global state, no i18n engine.
 ## import
 
 ```ts
-import { FilterBar, FacetChip } from '@neuronection/assistant-ui/filters'
-import type { FilterFacet, FilterOption, FilterValue } from '@neuronection/assistant-ui/filters'
+import {
+  FilterBar,
+  FacetChip,
+  FilterPills,
+  defaultFilterValue,
+  isDefaultValue,
+} from '@neuronection/assistant-ui/filters'
+import type {
+  FilterFacet,
+  FilterOption,
+  FilterPillItem,
+  FilterValue,
+} from '@neuronection/assistant-ui/filters'
 ```
 
 ## types
@@ -72,10 +83,26 @@ omitted).
 | `showActivePills` | `boolean` | `true` | removable row of the current selection |
 | `searchThreshold` | `number` | `8` | option count that turns on the popover search |
 | `formatCount` | `(count: number) => ReactNode` | runtime locale | count badge text, for an app-locale formatter |
+| `variant` | `'popover' \| 'inline'` | `'popover'` | `inline` renders the options as an always-visible pill row (compact filter strips, no popover) |
+| `testId` | `string` | — | `data-testid` of the root |
+| `optionTestId` | `(value) => string` | — | `data-testid` of one option (inline pill or popover row) |
 | `labels` | `FacetChipLabels` | English defaults | `noOptions`, `noMatches`, `searchPlaceholder`, `searchAriaLabel`, `selectedCount(count)`, `removeNamed(label)`, `optionWithCount(label, count)` |
 
 Active-value pills render for `multi` facets only; a `single` facet already
 shows its value on the trigger.
+
+## FilterPills props
+
+Extends `React.ComponentPropsWithoutRef<'div'>` (`onRemove` omitted). Renders
+`null` when `items` is empty.
+
+| prop | type | default | notes |
+|---|---|---|---|
+| `items` | `FilterPillItem[]` (`{ key, label }`) | — | applied filters, host-labelled |
+| `onRemove` | `(key) => void` | — | removal reports the key |
+| `removeLabel` | `(label) => string` | `Remove <label>` | per-pill accessible name |
+| `testId` | `string` | — | `data-testid` of the row |
+| `itemTestId` | `(key) => string` | — | `data-testid` of one pill |
 
 ## controlled contract
 
@@ -90,6 +117,9 @@ instead: it reports the intent, so two activations made before the next render
 both survive (the replacement form would compute both from the same stale
 value). `optionValue` is the option's value, or the facet id for a `toggle`
 facet.
+
+The two seams are **exclusive** (`FacetChipProps` is a union): pass either
+`onToggleOption` or `onValueChange`, never both.
 
 Exported helpers mirror the neutral value: `defaultFilterValue(facet)`
 (`toggle → false`, `single → ''`, `multi → []`) and
