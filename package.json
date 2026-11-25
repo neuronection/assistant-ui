@@ -279,6 +279,10 @@
       "types": "./dist/file-queue.d.ts",
       "import": "./dist/file-queue.js"
     },
+    "./filters": {
+      "types": "./dist/filters.d.ts",
+      "import": "./dist/filters.js"
+    },
     "./flow-status": {
       "types": "./dist/flow-status.d.ts",
       "import": "./dist/flow-status.js"
@@ -546,6 +550,10 @@
     "./languages": {
       "types": "./dist/languages.d.ts",
       "import": "./dist/languages.js"
+    },
+    "./filters": {
+      "types": "./dist/filters.d.ts",
+      "import": "./dist/filters.js"
     }
   },
   "scripts": {

@@ -117,6 +117,7 @@ export const entry: Record<string, string> = {
   'secret-once-block': 'src/components/secret-once-block/index.ts',
   'capability-chips': 'src/components/capability-chips/index.ts',
   'model-registry': 'src/components/model-registry/index.ts',
+  'filters': 'src/components/filters/index.ts',
   'segmented-tabs': 'src/components/segmented-tabs/index.ts',
   'selection-bar': 'src/components/selection-bar/index.ts',
   'skeleton': 'src/components/skeleton/index.ts',

@@ -429,6 +429,23 @@ export {
   type ExpandableSearchProps,
 } from './components/expandable-search'
 export { FieldLabel, type FieldLabelProps } from './components/field-label'
+export {
+  FacetChip,
+  FilterBar,
+  FilterPills,
+  defaultFilterValue,
+  isDefaultValue,
+  type FacetChipLabels,
+  type FacetChipProps,
+  type FilterBarLabels,
+  type FilterBarProps,
+  type FilterFacet,
+  type FilterFacetKind,
+  type FilterOption,
+  type FilterPillItem,
+  type FilterPillsProps,
+  type FilterValue,
+} from './components/filters'
 export { FormModal, type FormModalProps } from './components/form-modal'
 export { InfoButton, type InfoButtonProps } from './components/info-button'
 export { Input, type InputProps } from './components/input'
