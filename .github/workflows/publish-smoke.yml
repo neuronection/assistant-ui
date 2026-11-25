@@ -26,10 +26,12 @@ permissions:
 
 jobs:
   verify:
+    # `workflow_run.event` here is the *Release* run's event, which is
+    # `workflow_run` — checking for 'push' skipped this job entirely.
+    # Release is already restricted to a push on main, so its success is enough.
     if: >-
       github.event_name == 'workflow_dispatch' ||
-      (github.event.workflow_run.event == 'push' &&
-      github.event.workflow_run.conclusion == 'success' &&
+      (github.event.workflow_run.conclusion == 'success' &&
       github.event.workflow_run.head_branch == 'main')
     runs-on: ubuntu-latest
     timeout-minutes: 10
