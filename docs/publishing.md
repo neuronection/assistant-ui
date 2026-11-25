@@ -6,16 +6,18 @@ Nobody publishes from a laptop. Every release goes through CI.
 
 ```text
 change src/ → PR with a changeset → merge →
-CI green on main → Release (workflow_run, same SHA) → build →
-changesets/action opens "Version Packages" PR →
-CI on that PR (dispatched by the job) → merge it →
+CI green on main → Release (workflow_run of a push to main, same SHA) →
+every required check green (scan included) → build →
+changesets/action opens "Version Packages" PR (pushed as the GitHub App) →
+that PR runs its own CI → merge it →
 Release publishes → publish-smoke verifies the registry artifact
 ```
 
-The Release workflow is triggered by **CI completing successfully on
-`main`** and checks out that exact SHA — it never publishes a commit CI has
-not validated, and it re-checks out the bot branch's CI so the Version
-Packages PR gets real required checks.
+The Release workflow runs only for a **push** whose CI succeeded, and checks out
+that exact commit. It then asserts that *every* context the ruleset requires is
+green on that commit — `scan` lives in a separate workflow and would otherwise
+finish after a publish. A `pull_request` event never triggers it (a fork branch
+called `main` would otherwise look identical to a push).
 
 1. Make your changes (component + tests + Ladle story).
 2. `pnpm changeset` — pick the bump:
@@ -77,8 +79,9 @@ Packages PR gets real required checks.
 - npm's version, the `v<version>` tag and the GitHub release all agree (a
   partial publish — npm ok, tag push failed — is otherwise silent).
 
-It opens an issue when it fails on a real Release. Re-run it for any historical
-version: `gh workflow run publish-smoke.yml -f version=0.91.0`.
+It opens an issue when it fails on a real Release. Re-run it for any version:
+`gh workflow run publish-smoke.yml -f version=0.91.1`. Versions published before
+the provenance fix (0.90.0, 0.91.0) fail the attestation assertion by design.
 
 
 ## Bot identity (why the App exists)
@@ -96,14 +99,20 @@ The fix is an actor that is not `GITHUB_TOKEN`. Create once:
      read & write**. Nothing else — neither writer touches
      `.github/workflows/`, and `workflows: write` would let a compromised
      workflow rewrite its own gates.
-   - "Only on this account"; install it on `neuronection/assistant-ui`.
+   - **Where can this GitHub App be installed?** — an org-owned App can keep
+     *Only on this account*; a **user-owned** App must be *Any account*, or no
+     organization can install it at all (the mistake recorded in the failure table above).
+     Owning the App from the `neuronection` org is the tidier option.
+   - Install it on `neuronection/assistant-ui`.
 2. Generate a private key and store two repository secrets:
    `RELEASE_APP_ID` (the App's ID) and `RELEASE_APP_PRIVATE_KEY` (the `.pem`).
 
 `release.yml` and the `visual-rebaseline` job mint a short-lived installation
 token with it (`actions/create-github-app-token`) and push as the App, so the
-Version Packages and baselines PRs run their own required checks. Without the
-two secrets behaviour is unchanged: `GITHUB_TOKEN` plus a CI dispatch.
+Version Packages and baselines PRs run their own required checks. `release.yml`
+has no CI-dispatch step: the App push starts the suite, and a dispatch would be
+a duplicate run. Without the two secrets, a human commit is required — see
+below.
 
 Verify the credentials at any time — and prove the App's push really starts CI:
 
@@ -137,7 +146,8 @@ Only needed when the App secrets above are absent.
 
 1. **Re-run the workflow** (`gh run rerun <id> --failed`) if a run exists.
 2. **Dispatch CI** — `gh workflow run ci.yml --ref <branch>`. The jobs will run
-   and pass, but they do **not** satisfy the merge gate; step 3 is still
+   and pass, but GitHub excludes a `workflow_dispatch` suite from the PR's
+   status rollup, so they do **not** satisfy the merge gate; step 3 is still
    required.
 3. **Empty commit** on the branch (a real push by a human identity) — the only
    step that unblocks the merge.
@@ -175,6 +185,13 @@ The required contexts for `main` live in repository settings, mirrored in
 display name in `.github/workflows/` — a renamed job, especially a matrix row
 such as `smoke (react18-tailwind3)`, would otherwise make every PR unmergeable.
 Change the ruleset and the mirror in the same step.
+
+## Flaky required checks
+
+A required check that fails and then passes on re-run is a **flake**: re-run it
+**once**. If it fails again, treat it as a real race and fix it — the
+`auth-gate` status-transition flake was fixed that way. Retrying a second time
+hides a bug that will return during a release, when it costs a version.
 
 ## When a publish run is red
 

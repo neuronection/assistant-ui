@@ -64,8 +64,8 @@ Then wire it up:
   `main`): the run re-executes `visual` and, **only when it fails**, the
   sequenced `visual-rebaseline` job checks out `main`, regenerates the
   baselines on the CI runner, opens a `chore(visual): rebaseline gallery` PR
-  that contains **only** `tests/visual/__screenshots__`, and dispatches CI on
-  that branch so its checks actually report. Merge it once the required checks
+  that contains **only** `tests/visual/__screenshots__`, and pushes it as the
+  release GitHub App so its own checks report and count. Merge it once the required checks
   pass. The job refuses to run off `main` — a feature-branch dispatch would
   produce a "baselines PR" carrying feature work. If the dispatched run's
   `visual` job passed instead, the baselines were still canonical — nothing to
