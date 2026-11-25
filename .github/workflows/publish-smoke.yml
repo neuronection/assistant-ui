@@ -164,7 +164,22 @@ jobs:
 
       - name: Verify registry signatures with npm
         working-directory: /tmp/consumer
-        run: npm audit signatures
+        run: |
+          set -euo pipefail
+          # `npm audit signatures` covers every installed package, and third
+          # parties break it regularly (e.g. @tiptap/extension-ordered-list
+          # shipped attestations with no resolvable public key). Only a failure
+          # that names our package is a release problem.
+          if out="$(npm audit signatures 2>&1)"; then
+            printf '%s\n' "$out"
+            exit 0
+          fi
+          printf '%s\n' "$out"
+          if printf '%s' "$out" | grep -q "@neuronection/assistant-ui"; then
+            echo "::error::signature verification failed for @neuronection/assistant-ui"
+            exit 1
+          fi
+          echo "::warning::npm audit signatures reported third-party problems; our package was not named"
 
       - name: Assert npm version, git tag and GitHub release agree
         env:
