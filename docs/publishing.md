@@ -81,17 +81,40 @@ It opens an issue when it fails on a real Release. Re-run it for any historical
 version: `gh workflow run publish-smoke.yml -f version=0.91.0`.
 
 
+## Bot identity (why the App exists)
+
+A branch pushed with `GITHUB_TOKEN` starts **no workflow**: the PR shows 0
+checks. Dispatching the workflow instead runs the jobs, but GitHub excludes a
+`workflow_dispatch` suite from the pull request's status rollup, so the required
+checks still never count (measured on the 0.91.1 Version PR).
+
+The fix is an actor that is not `GITHUB_TOKEN`. Create once:
+
+1. **Settings → Developer settings → GitHub Apps → New GitHub App**
+   - Homepage URL: the repository URL; webhook: off.
+   - Repository permissions: **Contents: read & write**, **Pull requests:
+     read & write**. Nothing else — neither writer touches
+     `.github/workflows/`, and `workflows: write` would let a compromised
+     workflow rewrite its own gates.
+   - "Only on this account"; install it on `neuronection/assistant-ui`.
+2. Generate a private key and store two repository secrets:
+   `RELEASE_APP_ID` (the App's ID) and `RELEASE_APP_PRIVATE_KEY` (the `.pem`).
+
+`release.yml` and the `visual-rebaseline` job mint a short-lived installation
+token with it (`actions/create-github-app-token`) and push as the App, so the
+Version Packages and baselines PRs run their own required checks. Without the
+two secrets behaviour is unchanged: `GITHUB_TOKEN` plus a CI dispatch.
+
 ## Recovering a bot PR that shows 0 jobs
 
-A branch pushed with `GITHUB_TOKEN` never starts workflows: the PR appears with
-**0 checks**, and required checks can never report. In order of preference:
+Only needed when the App secrets above are absent.
 
 1. **Re-run the workflow** (`gh run rerun <id> --failed`) if a run exists.
-2. **Dispatch CI** — `gh workflow run ci.yml --ref <branch>`. The Release and
-   `visual-rebaseline` jobs do this automatically now; do it by hand only for
-   pre-Plan-103 branches.
-3. **Empty commit** on the branch (last resort; it must still be a real push by
-   a human identity).
+2. **Dispatch CI** — `gh workflow run ci.yml --ref <branch>`. The jobs will run
+   and pass, but they do **not** satisfy the merge gate; step 3 is still
+   required.
+3. **Empty commit** on the branch (a real push by a human identity) — the only
+   step that unblocks the merge.
 
 ## Rolling back a release
 
