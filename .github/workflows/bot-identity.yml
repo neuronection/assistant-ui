@@ -1,0 +1,98 @@
+name: bot identity
+
+# Verifies the release App's credentials and, on demand, proves that a branch
+# pushed *as the App* starts CI and counts toward the pull request's checks —
+# the thing GITHUB_TOKEN and `workflow_dispatch` both fail to do (plan 103 §13).
+on:
+  workflow_dispatch:
+    inputs:
+      probe_pr:
+        description: 'Push a throwaway branch as the App, open a PR, assert its checks appear, then clean up'
+        type: boolean
+        default: false
+  schedule:
+    - cron: '0 5 * * 1'
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  identity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/create-github-app-token@fee1f7d63c2ff003460e3d139729b119787bc349 # v2.2.2
+        id: app-token
+        with:
+          app-id: ${{ secrets.RELEASE_APP_ID }}
+          private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
+
+      - name: The App can reach this repository
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+        run: |
+          set -euo pipefail
+          echo "app slug: ${{ steps.app-token.outputs.app-slug }}"
+          echo "installation: ${{ steps.app-token.outputs.installation-id }}"
+          repos="$(gh api /installation/repositories --jq '.repositories[].full_name')"
+          printf 'installed on:\n%s\n' "${repos}"
+          grep -qx "${GITHUB_REPOSITORY}" <<< "${repos}" \
+            || { echo "::error::the App is not installed on ${GITHUB_REPOSITORY}"; exit 1; }
+
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        if: inputs.probe_pr
+        with:
+          ref: main
+          fetch-depth: 0
+          token: ${{ steps.app-token.outputs.token }}
+
+      - name: Push a throwaway branch as the App
+        if: inputs.probe_pr
+        id: probe
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          APP_SLUG: ${{ steps.app-token.outputs.app-slug }}
+        run: |
+          set -euo pipefail
+          branch="chore/bot-identity-${GITHUB_RUN_ID}"
+          echo "branch=${branch}" >> "$GITHUB_OUTPUT"
+          git checkout -q -B "${branch}"
+          git -c user.name="${APP_SLUG}[bot]" \
+              -c user.email="${APP_SLUG}[bot]@users.noreply.github.com" \
+              commit -q --allow-empty -m "chore: bot identity probe"
+          git push -q -u origin "${branch}"
+          url="$(gh pr create --base main --head "${branch}" \
+            --title "chore: bot identity probe (auto-closed)" \
+            --body "Pushed by the release App to prove bot branches run their own checks. Closed automatically by the same workflow run.")"
+          echo "pr=${url##*/}" >> "$GITHUB_OUTPUT"
+          echo "opened ${url}"
+
+      - name: The App's PR reports checks
+        if: inputs.probe_pr
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR: ${{ steps.probe.outputs.pr }}
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 36); do
+            count="$(gh pr checks "${PR}" --json name --jq 'length' 2>/dev/null || true)"
+            if [ -n "${count}" ] && [ "${count}" -gt 0 ]; then
+              echo "::notice::PR #${PR} reports ${count} checks — the App push starts CI"
+              gh pr checks "${PR}" | head -14
+              exit 0
+            fi
+            echo "no checks yet (attempt ${attempt})"
+            sleep 10
+          done
+          echo "::error::no checks appeared on the App's PR within ~6 minutes"
+          exit 1
+
+      - name: Clean up the probe
+        if: always() && inputs.probe_pr && steps.probe.outputs.pr != ''
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          PR: ${{ steps.probe.outputs.pr }}
+          BRANCH: ${{ steps.probe.outputs.branch }}
+        run: |
+          gh pr close "${PR}" --delete-branch || gh api -X DELETE "repos/${GITHUB_REPOSITORY}/git/refs/heads/${BRANCH}" || true
