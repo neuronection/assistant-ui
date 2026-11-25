@@ -1,6 +1,7 @@
 export {
   FacetChip,
   defaultFilterValue,
+  filterValueKey,
   isDefaultValue,
   type FacetChipLabels,
   type FacetChipProps,
@@ -11,6 +12,7 @@ export type {
   FilterFacet,
   FilterFacetKind,
   FilterOption,
+  FilterOptionAction,
   FilterPillItem,
   FilterValue,
 } from './types'
