@@ -4,7 +4,8 @@ name: Visual rebaseline (branch)
 # the fonts match the visual job. Removed before merge; main keeps the
 # main-only rebaseline job.
 on:
-  workflow_dispatch:
+  push:
+    branches: [feat/filters-exclude]
 
 permissions:
   contents: write
