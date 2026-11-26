@@ -20,3 +20,6 @@ catalogs-export/
 
 # Python tooling (docs scripts)
 .venv/
+# Local tooling artifacts (OpenChamber, security-check logs — never commit)
+.openchamber/
+logs/

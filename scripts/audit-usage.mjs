@@ -96,6 +96,8 @@ const LIBRARY_COMPONENTS = [
   'FilterBar',
   'FacetChip',
   'FilterPills',
+  'FilterRail',
+  'FilterSection',
   'FormModal',
   'InfoButton',
   'Input',
