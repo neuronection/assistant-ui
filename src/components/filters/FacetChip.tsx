@@ -179,7 +179,7 @@ export const FacetChip = React.forwardRef<HTMLDivElement, FacetChipProps>(functi
   const [query, setQuery] = React.useState('')
   const [openMenuKey, setOpenMenuKey] = React.useState<string | null>(null)
   const triggerRef = React.useRef<HTMLButtonElement>(null)
-  const rootRef = React.useRef<HTMLDivElement>(null)
+  const rootRef = React.useRef<HTMLDivElement | null>(null)
   const pillRefs = React.useRef(new Map<string, HTMLButtonElement>())
   const pendingFocusRef = React.useRef<string | null>(null)
 
@@ -187,7 +187,7 @@ export const FacetChip = React.forwardRef<HTMLDivElement, FacetChipProps>(functi
     (node: HTMLDivElement | null) => {
       rootRef.current = node
       if (typeof ref === 'function') ref(node)
-      else if (ref) ref.current = node
+      else if (ref) (ref as React.MutableRefObject<HTMLDivElement | null>).current = node
     },
     [ref],
   )
