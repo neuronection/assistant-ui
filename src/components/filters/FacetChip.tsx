@@ -430,8 +430,10 @@ export const FacetChip = React.forwardRef<HTMLDivElement, FacetChipProps>(functi
         aria-hidden
         className="rounded-full bg-[var(--as-secondary)] px-2 py-0.5 text-[10px] font-semibold tabular-nums text-[var(--as-muted-fg)]"
       >
-        {option.countAtLeast ? '\u2265' : null}
-        {countText(option.count)}
+        <bdi dir="ltr">
+          {option.countAtLeast ? '\u2265' : null}
+          {countText(option.count)}
+        </bdi>
       </span>
     ) : null
 
@@ -455,7 +457,7 @@ export const FacetChip = React.forwardRef<HTMLDivElement, FacetChipProps>(functi
             type="button"
             aria-label={optionMenuNamed(displayLabel(option))}
             data-testid={optionTestIdValue ? `${optionTestIdValue}-menu` : undefined}
-            className={cn(MENU_TRIGGER, compact ? 'size-5' : 'size-7')}
+            className={cn(MENU_TRIGGER, compact ? 'size-5 max-sm:min-h-11 max-sm:w-11' : 'size-7')}
           >
             <MoreHorizontal className={compact ? 'size-3' : 'size-4'} aria-hidden />
           </button>
@@ -485,36 +487,42 @@ export const FacetChip = React.forwardRef<HTMLDivElement, FacetChipProps>(functi
         className={cn('flex flex-wrap items-center gap-1.5', className)}
         {...props}
       >
-        {resolvedOptions.map((option) => {
-          const state = stateFor(option.value)
-          return (
-            <span key={filterValueKey(option.value)} className="inline-flex items-center">
-              <div
-                role="checkbox"
-                tabIndex={0}
-                aria-checked={state !== 'none'}
-                aria-label={optionName(option, state)}
-                data-testid={optionTestId?.(option.value)}
-                onClick={() => activate(option.value)}
-                onKeyDown={(event) => onOptionKeyDown(event, option.value)}
-                className={cn(
-                  'inline-flex cursor-pointer items-center gap-1 rounded-full border px-2 py-0.5 text-xs transition-colors focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[var(--as-focus-ring)]',
-                  state === 'include'
-                    ? 'border-[var(--as-primary)] bg-[var(--as-primary)] text-[var(--as-primary-fg)]'
-                    : state === 'exclude'
-                      ? 'border-[var(--as-danger)] bg-[color-mix(in_srgb,var(--as-danger)_12%,transparent)] text-[var(--as-danger)]'
-                      : 'border-[var(--as-border)] text-[var(--as-muted-fg)] hover:text-[var(--as-fg)]',
-                )}
-              >
-                {option.icon}
-                {displayLabel(option)}
-                {countBadge(option)}
-                {state === 'exclude' ? <Minus className="size-3" aria-hidden /> : null}
-              </div>
-              {optionMenu(option, state, true)}
-            </span>
-          )
-        })}
+        <div
+          role={facet.kind === 'single' ? 'radiogroup' : 'group'}
+          aria-label={facet.label}
+          className="flex flex-wrap items-center gap-1.5"
+        >
+          {resolvedOptions.map((option) => {
+            const state = stateFor(option.value)
+            return (
+              <span key={filterValueKey(option.value)} className="inline-flex items-center">
+                <div
+                  role={facet.kind === 'single' ? 'radio' : 'checkbox'}
+                  tabIndex={0}
+                  aria-checked={state !== 'none'}
+                  aria-label={optionName(option, state)}
+                  data-testid={optionTestId?.(option.value)}
+                  onClick={() => activate(option.value)}
+                  onKeyDown={(event) => onOptionKeyDown(event, option.value)}
+                  className={cn(
+                    'inline-flex cursor-pointer items-center gap-1 rounded-full border px-2 py-0.5 text-xs transition-colors max-sm:min-h-11 max-sm:px-3 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[var(--as-focus-ring)]',
+                    state === 'include'
+                      ? 'border-[var(--as-primary)] bg-[var(--as-primary)] text-[var(--as-primary-fg)]'
+                      : state === 'exclude'
+                        ? 'border-[var(--as-danger)] bg-[color-mix(in_srgb,var(--as-danger)_12%,transparent)] text-[var(--as-danger)]'
+                        : 'border-[var(--as-border)] text-[var(--as-muted-fg)] hover:text-[var(--as-fg)]',
+                  )}
+                >
+                  {option.icon}
+                  {displayLabel(option)}
+                  {countBadge(option)}
+                  {state === 'exclude' ? <Minus className="size-3" aria-hidden /> : null}
+                </div>
+                {optionMenu(option, state, true)}
+              </span>
+            )
+          })}
+        </div>
         {activePills}
       </div>
     )

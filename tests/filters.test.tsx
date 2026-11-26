@@ -1,6 +1,6 @@
 import { useState, type ComponentProps } from 'react'
 import { describe, expect, it, vi } from 'vitest'
-import { render, screen, within } from '@testing-library/react'
+import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { axe } from 'jest-axe'
 import { Activity } from 'lucide-react'
@@ -12,6 +12,8 @@ import {
 } from '../src/components/filters/FacetChip'
 import { FilterBar } from '../src/components/filters/FilterBar'
 import { FilterPills } from '../src/components/filters/FilterPills'
+import { FilterRail, type FilterRailProps } from '../src/components/filters/FilterRail'
+import { FilterSection } from '../src/components/filters/FilterSection'
 import type { FilterFacet, FilterValue } from '../src/components/filters/types'
 
 const categories: FilterFacet = {
@@ -237,6 +239,7 @@ describe('FacetChip', () => {
     const group = screen.getByRole('group', { name: 'Phase' })
 
     expect(within(group).getByText('≥200')).toBeInTheDocument()
+    expect(within(group).getByText('≥200')).toHaveAttribute('dir', 'ltr')
     expect(within(group).getByRole('checkbox', { name: 'Phase 2, ≥200' })).toBeInTheDocument()
     expect(within(group).getByText('0')).toBeInTheDocument()
 
@@ -646,7 +649,49 @@ describe('FacetChip — inline variant', () => {
     const { onToggleOption } = renderInline()
     await user.click(screen.getByTestId(`kind-${filterValueKey('imaging')}`))
     expect(onToggleOption).toHaveBeenCalledWith('imaging', 'include')
-    expect(screen.queryByRole('group', { name: 'Category' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+  })
+
+  it('mirrors the popover roles: a labelled group of checkboxes, a radiogroup of radios', () => {
+    const { rerender } = render(
+      <FacetChip
+        facet={categories}
+        value={multi(['labs'])}
+        onValueChange={vi.fn()}
+        variant="inline"
+      />,
+    )
+    const group = screen.getByRole('group', { name: 'Category' })
+    expect(within(group).getAllByRole('checkbox')).toHaveLength(3)
+    expect(within(group).getByRole('checkbox', { name: 'Labs, 12' })).toHaveAttribute(
+      'aria-checked',
+      'true',
+    )
+
+    rerender(
+      <FacetChip
+        facet={source}
+        value={{ kind: 'single', value: 'manual' }}
+        onValueChange={vi.fn()}
+        variant="inline"
+      />,
+    )
+    const radiogroup = screen.getByRole('radiogroup', { name: 'Source' })
+    expect(within(radiogroup).getAllByRole('radio')).toHaveLength(3)
+    expect(within(radiogroup).getByRole('radio', { name: 'Manual' })).toHaveAttribute(
+      'aria-checked',
+      'true',
+    )
+    expect(within(radiogroup).queryByRole('checkbox')).not.toBeInTheDocument()
+  })
+
+  it('keeps the inline option row and its menu trigger 44px tall at 390', () => {
+    renderInline({ value: multi([]) })
+    const row = screen.getByTestId(`kind-${filterValueKey('labs')}`)
+    expect(row).toHaveClass('max-sm:min-h-11')
+    const trigger = screen.getByRole('button', { name: 'More actions for Labs' })
+    expect(trigger).toHaveClass('max-sm:min-h-11')
+    expect(trigger).toHaveClass('max-sm:w-11')
   })
 
   it('shows include and exclude states and offers the row menu', async () => {
@@ -759,5 +804,379 @@ describe('FilterPills', () => {
   it('has no axe violations', async () => {
     const { container } = render(<FilterPills items={items} onRemove={vi.fn()} />)
     expect(await axe(container)).toHaveNoViolations()
+  })
+})
+
+describe('FilterSection', () => {
+  it('collapses an active section and keeps aria-expanded truthful', async () => {
+    const user = userEvent.setup()
+    render(
+      <FilterSection title="Phase" active count={89} defaultOpen>
+        <p>Section body</p>
+      </FilterSection>,
+    )
+    const header = screen.getByRole('button', { name: /^Phase/ })
+    const section = header.closest('[data-as="filter-section"]')
+    expect(header).toHaveAttribute('aria-expanded', 'true')
+    expect(section).toHaveAttribute('data-active', 'true')
+    expect(section?.querySelector('[data-as="filter-section-dot"]')).not.toBeNull()
+    expect(header).toHaveAccessibleName(/filtered/)
+    expect(screen.getByText('Section body')).toBeVisible()
+
+    const contentId = header.getAttribute('aria-controls')
+    expect(contentId).toBeTruthy()
+    const content = document.getElementById(contentId!)
+    expect(content).not.toBeNull()
+    expect(content).toHaveAttribute('data-as', 'filter-section-content')
+    expect(content).not.toHaveAttribute('hidden')
+
+    await user.click(header)
+    expect(header).toHaveAttribute('aria-expanded', 'false')
+    expect(section).toHaveAttribute('data-active', 'true')
+    expect(header).toHaveAccessibleName(/filtered/)
+    expect(document.getElementById(contentId!)).toHaveAttribute('hidden')
+    expect(screen.getByText('Section body')).not.toBeVisible()
+
+    await user.click(header)
+    expect(header).toHaveAttribute('aria-expanded', 'true')
+    expect(screen.getByText('Section body')).toBeVisible()
+  })
+
+  it('defers to a controlled open flag and reports every change', async () => {
+    const user = userEvent.setup()
+    const onOpenChange = vi.fn()
+    const { rerender } = render(
+      <FilterSection title="Phase" open={false} onOpenChange={onOpenChange}>
+        <p>Section body</p>
+      </FilterSection>,
+    )
+    const header = screen.getByRole('button', { name: /^Phase/ })
+    await user.click(header)
+    expect(onOpenChange).toHaveBeenCalledWith(true)
+    expect(header).toHaveAttribute('aria-expanded', 'false')
+
+    rerender(
+      <FilterSection title="Phase" open onOpenChange={onOpenChange}>
+        <p>Section body</p>
+      </FilterSection>,
+    )
+    expect(header).toHaveAttribute('aria-expanded', 'true')
+    await user.click(header)
+    expect(onOpenChange).toHaveBeenLastCalledWith(false)
+    expect(header).toHaveAttribute('aria-expanded', 'true')
+  })
+
+  it('renders 0, renders ≥N and hands the truncation marker to formatCount', () => {
+    const formatCount = vi.fn((count: number, truncated?: boolean) =>
+      truncated ? `~${count}` : String(count),
+    )
+    const { rerender } = render(
+      <FilterSection title="Phase" count={0} defaultOpen formatCount={formatCount}>
+        <p>Section body</p>
+      </FilterSection>,
+    )
+    const header = screen.getByRole('button', { name: /^Phase/ })
+    expect(within(header).getByText('0')).toBeInTheDocument()
+    expect(header).toHaveAccessibleName(/none match now/)
+    expect(formatCount).toHaveBeenCalledWith(0, false)
+
+    rerender(
+      <FilterSection title="Phase" count={200} countAtLeast defaultOpen formatCount={formatCount}>
+        <p>Section body</p>
+      </FilterSection>,
+    )
+    expect(within(header).getByText('~200')).toBeInTheDocument()
+    expect(formatCount).toHaveBeenLastCalledWith(200, true)
+  })
+
+  it('renders ≥N by default, ignores countAtLeast at zero and omits the badge without a count', () => {
+    const formatCount = vi.fn((count: number, truncated?: boolean) =>
+      truncated ? `~${count}` : String(count),
+    )
+    const { container, rerender } = render(
+      <FilterSection title="Phase" count={200} countAtLeast defaultOpen>
+        <p>Section body</p>
+      </FilterSection>,
+    )
+    expect(screen.getByText('\u2265200')).toBeInTheDocument()
+    expect(screen.getByText('\u2265200')).toHaveAttribute('dir', 'ltr')
+
+    rerender(
+      <FilterSection title="Phase" count={0} countAtLeast defaultOpen formatCount={formatCount}>
+        <p>Section body</p>
+      </FilterSection>,
+    )
+    expect(screen.getByText('0')).toBeInTheDocument()
+    expect(screen.queryByText('\u22650')).not.toBeInTheDocument()
+    expect(formatCount).toHaveBeenLastCalledWith(0, false)
+
+    rerender(
+      <FilterSection title="Phase" defaultOpen>
+        <p>Section body</p>
+      </FilterSection>,
+    )
+    expect(container.querySelector('[data-as="filter-section-count"]')).toBeNull()
+  })
+
+  it('toggles from the keyboard with Enter and Space', async () => {
+    const user = userEvent.setup()
+    render(
+      <FilterSection title="Phase">
+        <p>Section body</p>
+      </FilterSection>,
+    )
+    const header = screen.getByRole('button', { name: /^Phase/ })
+    header.focus()
+    await user.keyboard('{Enter}')
+    expect(header).toHaveAttribute('aria-expanded', 'true')
+    await user.keyboard(' ')
+    expect(header).toHaveAttribute('aria-expanded', 'false')
+    expect(document.activeElement).toBe(header)
+  })
+
+  it('exposes the 44px header, the reduced-motion guard and the RTL chevron', () => {
+    const { rerender } = render(
+      <FilterSection title="Phase">
+        <p>Section body</p>
+      </FilterSection>,
+    )
+    const header = screen.getByRole('button', { name: /^Phase/ })
+    expect(header).toHaveClass('min-h-[44px]')
+    const chevron = header.querySelector('svg')
+    expect(chevron).toHaveClass('motion-reduce:transition-none')
+    expect(chevron).toHaveClass('rtl:rotate-180')
+    expect(chevron).not.toHaveClass('rotate-90')
+
+    rerender(
+      <FilterSection title="Phase" open>
+        <p>Section body</p>
+      </FilterSection>,
+    )
+    expect(header.querySelector('svg')).toHaveClass('rotate-90')
+  })
+
+  it('takes the expand, collapse, active and none-match strings from labels', async () => {
+    const user = userEvent.setup()
+    render(
+      <FilterSection
+        title="Phase"
+        active
+        count={0}
+        labels={{
+          expand: 'Aufklappen',
+          collapse: 'Zuklappen',
+          noneMatch: 'kein Treffer',
+          active: 'gefiltert',
+        }}
+      >
+        <p>Section body</p>
+      </FilterSection>,
+    )
+    const header = screen.getByRole('button', { name: /^Phase/ })
+    expect(header).toHaveAttribute('title', 'Aufklappen')
+    expect(header).toHaveAccessibleName(/gefiltert/)
+    expect(header).toHaveAccessibleName(/kein Treffer/)
+    await user.click(header)
+    expect(header).toHaveAttribute('title', 'Zuklappen')
+  })
+
+  it('has no axe violations', async () => {
+    const { container } = render(
+      <FilterSection title="Phase" active count={89} defaultOpen>
+        <FacetChip facet={honesty} value={multi(['PHASE_3'])} onValueChange={vi.fn()} variant="inline" />
+      </FilterSection>,
+    )
+    expect(await axe(container)).toHaveNoViolations()
+  })
+})
+
+describe('FilterRail', () => {
+  const defaultChildren = (
+    <FilterSection title="Phase" count={89} defaultOpen>
+      <p>Rail body</p>
+    </FilterSection>
+  )
+
+  function renderRail(overrides: Partial<FilterRailProps> = {}) {
+    const onClear = vi.fn()
+    const utils = render(
+      <FilterRail layout="rail" title="Filters" activeCount={2} onClear={onClear} {...overrides}>
+        {overrides.children ?? defaultChildren}
+      </FilterRail>,
+    )
+    return { onClear, ...utils }
+  }
+
+  function renderCompact(overrides: Partial<FilterRailProps> = {}) {
+    const onClear = vi.fn()
+    const utils = render(
+      <FilterRail layout="compact" title="Filters" activeCount={2} onClear={onClear} {...overrides}>
+        {overrides.children ?? defaultChildren}
+      </FilterRail>,
+    )
+    return { onClear, ...utils }
+  }
+
+  it('renders the rail as a labelled aside holding its children and the clear action', async () => {
+    const user = userEvent.setup()
+    const { onClear, container } = renderRail({
+      search: <input type="search" aria-label="Filter search" />,
+    })
+    const rail = screen.getByRole('complementary', { name: 'Filters' })
+    expect(rail.tagName).toBe('ASIDE')
+    expect(rail).toHaveAttribute('data-as', 'filter-rail')
+    expect(rail).toHaveAttribute('data-layout', 'rail')
+    expect(within(rail).getByText('Rail body')).toBeVisible()
+    expect(within(rail).getByRole('searchbox', { name: 'Filter search' })).toBeInTheDocument()
+    expect(container.querySelector('[data-as="filter-rail-count"]')).toHaveTextContent('2')
+
+    await user.click(within(rail).getByRole('button', { name: 'Clear all' }))
+    expect(onClear).toHaveBeenCalledTimes(1)
+  })
+
+  it('renders a zero facet count, shows “0” for an empty active count and hides clear-all', () => {
+    const { container } = renderRail({
+      activeCount: 0,
+      children: (
+        <FilterSection title="Phase" count={0} defaultOpen>
+          <p>Nothing matches</p>
+        </FilterSection>
+      ),
+    })
+    expect(container.querySelector('[data-as="filter-rail-count"]')).toHaveTextContent('0')
+    const sectionCount = container.querySelector('[data-as="filter-section-count"]')
+    expect(sectionCount).toHaveTextContent('0')
+    expect(sectionCount).not.toHaveAttribute('hidden')
+    expect(sectionCount?.closest('button')).toBeVisible()
+    expect(screen.queryByRole('button', { name: 'Clear all' })).not.toBeInTheDocument()
+  })
+
+  it('omits the badge entirely when the active count is unknown', () => {
+    const { container } = renderRail({ activeCount: undefined })
+    expect(container.querySelector('[data-as="filter-rail-count"]')).toBeNull()
+  })
+
+  it('renders a truncated section count as ≥N inside the rail', () => {
+    renderRail({
+      children: (
+        <FilterSection title="Phase" count={200} countAtLeast defaultOpen>
+          <p>Rail body</p>
+        </FilterSection>
+      ),
+    })
+    expect(screen.getByText('\u2265200')).toBeInTheDocument()
+  })
+
+  it('formats the rail active count and isolates it in a bdi', () => {
+    const { container } = renderRail({ formatCount: (count) => `${count}×` })
+    const badge = container.querySelector('[data-as="filter-rail-count"]')
+    expect(badge).toHaveTextContent('2×')
+    const bdi = badge?.querySelector('bdi')
+    expect(bdi).toHaveAttribute('dir', 'ltr')
+    expect(bdi).toHaveTextContent('2×')
+  })
+
+  it('opens the compact sheet, traps focus and returns focus to the trigger on Escape', async () => {
+    const user = userEvent.setup()
+    renderCompact()
+    const trigger = screen.getByRole('button', { name: 'Filters (2)' })
+    expect(trigger).toHaveAttribute('aria-haspopup', 'dialog')
+    expect(trigger).toHaveAttribute('aria-expanded', 'false')
+    expect(trigger).toHaveClass('min-h-[44px]')
+
+    await user.click(trigger)
+    const dialog = await screen.findByRole('dialog')
+    expect(trigger).toHaveAttribute('aria-expanded', 'true')
+    expect(within(dialog).getByText('Rail body')).toBeVisible()
+    expect(within(dialog).getByRole('heading', { name: 'Filters' })).toBeInTheDocument()
+
+    for (let step = 0; step < 6; step += 1) {
+      await user.tab()
+      expect(dialog.contains(document.activeElement)).toBe(true)
+    }
+
+    await user.keyboard('{Escape}')
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
+    expect(trigger).toHaveAttribute('aria-expanded', 'false')
+    expect(trigger).toHaveFocus()
+  })
+
+  it('closes the compact sheet from the default Done footer', async () => {
+    const user = userEvent.setup()
+    renderCompact()
+    await user.click(screen.getByRole('button', { name: 'Filters (2)' }))
+    await screen.findByRole('dialog')
+    await user.click(screen.getByRole('button', { name: 'Done' }))
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
+  })
+
+  it('resets an uncontrolled section when the compact sheet unmounts', async () => {
+    const user = userEvent.setup()
+    render(
+      <FilterRail layout="compact" title="Filters">
+        <FilterSection title="Phase" defaultOpen>
+          <p>Rail body</p>
+        </FilterSection>
+      </FilterRail>,
+    )
+    await user.click(screen.getByRole('button', { name: 'Filters' }))
+    await screen.findByRole('dialog')
+    await user.click(screen.getByRole('button', { name: /^Phase/ }))
+    expect(screen.getByRole('button', { name: /^Phase/ })).toHaveAttribute('aria-expanded', 'false')
+
+    await user.click(screen.getByRole('button', { name: 'Done' }))
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
+
+    await user.click(screen.getByRole('button', { name: 'Filters' }))
+    await screen.findByRole('dialog')
+    expect(screen.getByRole('button', { name: /^Phase/ })).toHaveAttribute('aria-expanded', 'true')
+  })
+
+  it('takes the compact strings and footer from the host', async () => {
+    const user = userEvent.setup()
+    const footer = vi.fn()
+    renderCompact({
+      activeCount: undefined,
+      footer: (
+        <button type="button" onClick={footer}>
+          Apply filters
+        </button>
+      ),
+      labels: { filters: 'Filtres', close: 'Fermer', clearAll: 'Tout effacer' },
+      search: <input type="search" aria-label="Search facets" />,
+    })
+    const trigger = screen.getByRole('button', { name: 'Filtres' })
+    expect(screen.getByRole('searchbox', { name: 'Search facets' })).toBeInTheDocument()
+
+    await user.click(trigger)
+    await screen.findByRole('dialog')
+    expect(screen.getByRole('button', { name: 'Fermer' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Done' })).not.toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Apply filters' }))
+    expect(footer).toHaveBeenCalledTimes(1)
+  })
+
+  it('requires layout at the type level', () => {
+    // @ts-expect-error `layout` is required on FilterRail
+    const props: FilterRailProps = { title: 'Filters' }
+    expect(props.layout).toBeUndefined()
+  })
+
+  it('has no axe violations as a rail', async () => {
+    const { container } = renderRail()
+    expect(await axe(container)).toHaveNoViolations()
+  })
+
+  it('has no axe violations compact and closed', async () => {
+    const { container } = renderCompact()
+    expect(await axe(container)).toHaveNoViolations()
+  })
+
+  it('has no axe violations compact and open', async () => {
+    const user = userEvent.setup()
+    renderCompact()
+    await user.click(screen.getByRole('button', { name: 'Filters (2)' }))
+    await screen.findByRole('dialog')
+    expect(await openStateViolations()).toHaveNoViolations()
   })
 })

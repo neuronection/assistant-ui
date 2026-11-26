@@ -433,6 +433,8 @@ export {
   FacetChip,
   FilterBar,
   FilterPills,
+  FilterRail,
+  FilterSection,
   defaultFilterValue,
   filterValueKey,
   isDefaultValue,
@@ -446,6 +448,11 @@ export {
   type FilterOptionAction,
   type FilterPillItem,
   type FilterPillsProps,
+  type FilterRailLabels,
+  type FilterRailLayout,
+  type FilterRailProps,
+  type FilterSectionLabels,
+  type FilterSectionProps,
   type FilterValue,
 } from './components/filters'
 export { FormModal, type FormModalProps } from './components/form-modal'
