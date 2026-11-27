@@ -1,6 +1,6 @@
 import { useState, type ComponentProps } from 'react'
 import { describe, expect, it, vi } from 'vitest'
-import { render, screen, waitFor, within } from '@testing-library/react'
+import { cleanup, render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { axe } from 'jest-axe'
 import { Activity } from 'lucide-react'
@@ -134,6 +134,46 @@ describe('FacetChip', () => {
     expect(onValueChange).toHaveBeenLastCalledWith(multi([]))
   })
 
+  it('cycles include to clear on an include-only facet instead of excluding', async () => {
+    const user = userEvent.setup()
+    const onValueChange = vi.fn()
+    const includeOnly: FilterFacet = { ...categories, allowExclude: false }
+    const { rerender } = render(
+      <FacetChip facet={includeOnly} value={multi([])} onValueChange={onValueChange} />,
+    )
+    await user.click(screen.getByRole('button', { name: /^Category/ }))
+    const group = screen.getByRole('group', { name: 'Category' })
+    expect(
+      within(group).queryByRole('button', { name: 'More actions for Labs' }),
+    ).not.toBeInTheDocument()
+
+    await user.click(within(group).getByRole('checkbox', { name: 'Labs, 12' }))
+    expect(onValueChange).toHaveBeenLastCalledWith(multi(['labs']))
+
+    rerender(<FacetChip facet={includeOnly} value={multi(['labs'])} onValueChange={onValueChange} />)
+    await user.click(
+      within(screen.getByRole('group', { name: 'Category' })).getByRole('checkbox', {
+        name: 'Labs, 12',
+      }),
+    )
+    expect(onValueChange).toHaveBeenLastCalledWith(multi([]))
+    expect(onValueChange).not.toHaveBeenCalledWith(multi([], ['labs']))
+  })
+
+  it('keeps a stale exclusion clearable on an include-only facet', async () => {
+    const user = userEvent.setup()
+    const onValueChange = vi.fn()
+    render(
+      <FacetChip
+        facet={{ ...categories, allowExclude: false }}
+        value={multi(['notes'], ['labs'])}
+        onValueChange={onValueChange}
+      />,
+    )
+    await user.click(screen.getByRole('button', { name: 'Remove Labs (excluded)' }))
+    expect(onValueChange).toHaveBeenCalledWith(multi(['notes']))
+  })
+
   it('keeps the include and exclude lists disjoint when a value moves between them', async () => {
     const user = userEvent.setup()
     const onValueChange = vi.fn()
@@ -258,6 +298,51 @@ describe('FacetChip', () => {
       name: 'Phase 4',
     })
     expect(row.querySelector('.tabular-nums')).toBeNull()
+  })
+
+  it('withholds every option count while countsState is not ready', async () => {
+    const user = userEvent.setup()
+    const onValueChange = vi.fn()
+    const { rerender } = render(
+      <FacetChip
+        facet={{ ...honesty, countsState: 'loading' }}
+        value={multi([])}
+        onValueChange={onValueChange}
+      />,
+    )
+    const chip = screen.getByRole('button', { name: /^Phase/ }).closest('[data-as="facet-chip"]')
+    expect(chip).toHaveAttribute('aria-busy', 'true')
+
+    await user.click(screen.getByRole('button', { name: /^Phase/ }))
+    const groupEl = screen.getByRole('group', { name: 'Phase' })
+    const group = within(groupEl)
+    expect(group.queryByText('\u2265200')).not.toBeInTheDocument()
+    expect(group.queryByText('0')).not.toBeInTheDocument()
+    expect(group.getByRole('checkbox', { name: 'Phase 3' })).toBeInTheDocument()
+    expect(group.getByRole('checkbox', { name: 'Phase 1' })).toHaveAccessibleName('Phase 1')
+    expect(groupEl.querySelectorAll('.tabular-nums')).toHaveLength(0)
+
+    rerender(
+      <FacetChip
+        facet={{ ...honesty, countsState: 'error' }}
+        value={multi([])}
+        onValueChange={onValueChange}
+      />,
+    )
+    expect(chip).not.toHaveAttribute('aria-busy')
+    expect(
+      within(screen.getByRole('group', { name: 'Phase' })).getByRole('checkbox', {
+        name: 'Phase 3',
+      }),
+    ).toBeInTheDocument()
+    expect(screen.queryByText('\u2265200')).not.toBeInTheDocument()
+
+    rerender(<FacetChip facet={honesty} value={multi([])} onValueChange={onValueChange} />)
+    expect(chip).not.toHaveAttribute('aria-busy')
+    const readyGroup = within(screen.getByRole('group', { name: 'Phase' }))
+    expect(readyGroup.getByRole('checkbox', { name: 'Phase 3, 89' })).toBeInTheDocument()
+    expect(readyGroup.getByRole('checkbox', { name: 'Phase 1, 0, none match now' })).toBeInTheDocument()
+    expect(readyGroup.getByText('0')).toBeInTheDocument()
   })
 
   it('synthesizes a removable pill for a selected value absent from empty options', async () => {
@@ -761,6 +846,44 @@ describe('FacetChip — inline variant', () => {
     expect(document.activeElement).toBe(screen.getByTestId(`kind-${filterValueKey('labs')}`))
   })
 
+  it('cycles include to clear on an include-only facet instead of excluding', async () => {
+    const user = userEvent.setup()
+    const { onToggleOption, rerender } = renderInline({
+      facet: { ...categories, allowExclude: false },
+      value: multi([]),
+    })
+    await user.click(screen.getByTestId(`kind-${filterValueKey('labs')}`))
+    expect(onToggleOption).toHaveBeenLastCalledWith('labs', 'include')
+    expect(screen.queryByRole('button', { name: 'More actions for Labs' })).not.toBeInTheDocument()
+
+    rerender(
+      <FacetChip
+        facet={{ ...categories, allowExclude: false }}
+        value={multi(['labs'])}
+        onToggleOption={onToggleOption}
+        variant="inline"
+        testId="kinds"
+        optionTestId={(value) => `kind-${filterValueKey(value)}`}
+      />,
+    )
+    await user.click(screen.getByTestId(`kind-${filterValueKey('labs')}`))
+    expect(onToggleOption).toHaveBeenLastCalledWith('labs', 'clear')
+    expect(onToggleOption).not.toHaveBeenCalledWith('labs', 'exclude')
+  })
+
+  it('withholds the inline count badge while counts are not ready', () => {
+    renderInline({ facet: { ...categories, countsState: 'loading' }, value: multi([]) })
+    const labs = screen.getByTestId(`kind-${filterValueKey('labs')}`)
+    expect(labs).toHaveAccessibleName('Labs')
+    expect(within(labs).queryByText('12')).not.toBeInTheDocument()
+    expect(screen.getByTestId('kinds')).toHaveAttribute('aria-busy', 'true')
+
+    cleanup()
+    renderInline({ facet: categories, value: multi([]) })
+    expect(screen.getByTestId(`kind-${filterValueKey('labs')}`)).toHaveAccessibleName('Labs, 12')
+    expect(screen.getByTestId('kinds')).not.toHaveAttribute('aria-busy')
+  })
+
   it('has no axe violations', async () => {
     const { container } = renderInline()
     expect(await axe(container)).toHaveNoViolations()
@@ -1154,6 +1277,69 @@ describe('FilterRail', () => {
     expect(screen.queryByRole('button', { name: 'Done' })).not.toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: 'Apply filters' }))
     expect(footer).toHaveBeenCalledTimes(1)
+  })
+
+  it('gives a function footer a close callback that closes the compact sheet', async () => {
+    const user = userEvent.setup()
+    const onFooterAction = vi.fn()
+    renderCompact({
+      footer: (close) => (
+        <button
+          type="button"
+          onClick={() => {
+            onFooterAction()
+            close()
+          }}
+        >
+          Show 128 results
+        </button>
+      ),
+    })
+    await user.click(screen.getByRole('button', { name: 'Filters (2)' }))
+    await screen.findByRole('dialog')
+    expect(screen.queryByRole('button', { name: 'Done' })).not.toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Show 128 results' }))
+    expect(onFooterAction).toHaveBeenCalledTimes(1)
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
+    expect(screen.getByRole('button', { name: 'Filters (2)' })).toHaveFocus()
+  })
+
+  it('renders a function footer in the rail with a callable no-op close', async () => {
+    const user = userEvent.setup()
+    const closeSpy = vi.fn()
+    const { container } = renderRail({
+      footer: (close) => (
+        <button
+          type="button"
+          onClick={() => {
+            closeSpy(close)
+            close()
+          }}
+        >
+          Apply filters
+        </button>
+      ),
+    })
+    const footer = container.querySelector('[data-as="filter-rail-footer"]')
+    expect(footer).not.toBeNull()
+    await user.click(screen.getByRole('button', { name: 'Apply filters' }))
+    expect(closeSpy).toHaveBeenCalledTimes(1)
+    expect(typeof closeSpy.mock.calls[0]![0]).toBe('function')
+    expect(container.querySelector('[data-as="filter-rail"]')).toBeInTheDocument()
+  })
+
+  it('announces the active count with aria-live in the rail badge and the compact trigger', () => {
+    const { container } = renderRail()
+    const badge = container.querySelector('[data-as="filter-rail-count"]')
+    expect(badge).toHaveAttribute('aria-live', 'polite')
+
+    cleanup()
+    renderCompact()
+    const trigger = screen.getByRole('button', { name: 'Filters (2)' })
+    const live = trigger.querySelector('[aria-live="polite"]')
+    expect(live).not.toBeNull()
+    expect(live).toHaveTextContent('Filters (2)')
   })
 
   it('requires layout at the type level', () => {

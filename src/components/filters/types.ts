@@ -30,6 +30,11 @@ export interface FilterFacet {
   allowExclude?: boolean
   /** Resolved options. Omit for `toggle` facets. */
   options?: FilterOption[]
+  /**
+   * Whether the option counts are trustworthy right now. Anything but `ready`
+   * withholds every count — a stale number is worse than none. Default `ready`.
+   */
+  countsState?: 'ready' | 'loading' | 'error'
   /** File under the bar's “More” disclosure. */
   hidden?: boolean
 }
