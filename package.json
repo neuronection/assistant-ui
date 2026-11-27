@@ -628,7 +628,7 @@
     "eslint-plugin-react-hooks": "^7.1.1",
     "globals": "^17.11.0",
     "jest-axe": "^11.0.0",
-    "jsdom": "^30.0.1",
+    "jsdom": "^31.0.1",
     "lucide-react": "^1.31.0",
     "postcss": "^8.5.3",
     "react": "^19.3.0",
