@@ -1,0 +1,34 @@
+name: Visual rebaseline (branch)
+on:
+  push:
+    branches: [feat/filters-093]
+permissions:
+  contents: write
+concurrency:
+  group: visual-branch-rebaseline-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  rebaseline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: ${{ github.ref_name }}
+          fetch-depth: 0
+      - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm exec playwright test --update-snapshots
+      - name: Commit baselines to this branch
+        run: |
+          set -euo pipefail
+          if [[ -z "$(git status --porcelain tests/visual/__screenshots__)" ]]; then echo "canonical"; exit 0; fi
+          git config user.name "neuronection-bot"; git config user.email "bot@neuronection.com"
+          git add tests/visual/__screenshots__
+          git commit -m "chore(visual): rebaseline from the CI runner (feature branch)"
+          git push origin HEAD:${{ github.ref_name }}
