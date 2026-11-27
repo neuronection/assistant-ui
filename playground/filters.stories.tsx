@@ -422,15 +422,19 @@ export const FiltersCompactRtl = () => (
   </Frame>
 )
 
-function CompactSheetOpener() {
+function AutoOpenSheet({ children }: { children: ReactNode }) {
   const holder = useRef<HTMLDivElement>(null)
   useEffect(() => {
     holder.current?.querySelector<HTMLButtonElement>('button[aria-haspopup="dialog"]')?.click()
   }, [])
+  return <div ref={holder}>{children}</div>
+}
+
+function CompactSheetOpener() {
   return (
-    <div ref={holder}>
+    <AutoOpenSheet>
       <CompactDemo />
-    </div>
+    </AutoOpenSheet>
   )
 }
 
@@ -439,6 +443,91 @@ export const FiltersCompactOpenSheet = () => (
     <CompactSheetOpener />
   </Frame>
 )
+
+const footerButtonStyle = {
+  minHeight: 44,
+  padding: '0 16px',
+  borderRadius: 'var(--as-radius)',
+  border: 'none',
+  background: 'var(--as-primary)',
+  color: 'var(--as-primary-fg)',
+  fontSize: 14,
+  fontWeight: 600,
+  cursor: 'pointer',
+} as const
+
+function FunctionFooterDemo() {
+  const [values, setValues] = useState(railInitial)
+  const setValue = (id: string) => (value: FilterValue) =>
+    setValues((current) => ({ ...current, [id]: value }))
+  const shown = activeCountOf(values) === 0 ? 300 : 162
+  return (
+    <FilterRail
+      layout="compact"
+      title="Filters"
+      activeCount={activeCountOf(values)}
+      onClear={() => setValues(railInitial)}
+      footer={(close) => (
+        <div
+          style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}
+        >
+          <span style={{ fontSize: 12, color: 'var(--as-muted-fg)' }}>{shown} of 300 results</span>
+          <button type="button" onClick={close} style={footerButtonStyle}>
+            Show {shown} results
+          </button>
+        </div>
+      )}
+    >
+      <FilterSection title="Category" active={sectionActive(values.category)} count={73} defaultOpen>
+        <FacetChip
+          facet={railCategory}
+          value={values.category ?? defaultFilterValue(railCategory)}
+          onValueChange={setValue('category')}
+          variant="inline"
+        />
+      </FilterSection>
+      <FilterSection title="Phase" active={sectionActive(values.phase)} count={200} countAtLeast>
+        <FacetChip
+          facet={railPhase}
+          value={values.phase ?? defaultFilterValue(railPhase)}
+          onValueChange={setValue('phase')}
+          variant="inline"
+        />
+      </FilterSection>
+    </FilterRail>
+  )
+}
+
+export const FiltersFunctionFooter = () => (
+  <Frame width={390} label="Compact · 390 · function footer">
+    <AutoOpenSheet>
+      <FunctionFooterDemo />
+    </AutoOpenSheet>
+  </Frame>
+)
+
+const pendingPhase: FilterFacet = { ...railPhase, countsState: 'loading' }
+
+export const FiltersCountsLoading = () => {
+  const [value, setValue] = useState<FilterValue>({
+    kind: 'multi',
+    include: ['PHASE_3'],
+    exclude: [],
+  })
+  return (
+    <div
+      style={{ padding: 24, maxWidth: 720, display: 'flex', flexDirection: 'column', gap: 12 }}
+    >
+      <span style={{ fontSize: 12, color: 'var(--as-muted-fg)' }}>
+        <CalendarDays className="size-3" aria-hidden /> countsState="loading" — every option count is
+        withheld (and the chip is aria-busy) until the facet query answers; a stale number would lie
+      </span>
+      <FilterSection title="Phase" active defaultOpen>
+        <FacetChip facet={pendingPhase} value={value} onValueChange={setValue} variant="inline" />
+      </FilterSection>
+    </div>
+  )
+}
 
 export const FiltersReducedMotion = () => (
   <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 390, maxWidth: '100%' }}>

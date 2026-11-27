@@ -149,9 +149,13 @@ function applyAction(
   return { kind: 'multi', include, exclude }
 }
 
-function cycleAction(value: FilterValue, optionValue: string | null): FilterOptionAction {
+function cycleAction(
+  value: FilterValue,
+  optionValue: string | null,
+  excludeEnabled: boolean,
+): FilterOptionAction {
   const current = multiOf(value)
-  if (current.include.includes(optionValue)) return 'exclude'
+  if (current.include.includes(optionValue)) return excludeEnabled ? 'exclude' : 'clear'
   if (current.exclude.includes(optionValue)) return 'clear'
   return 'include'
 }
@@ -200,6 +204,9 @@ export const FacetChip = React.forwardRef<HTMLDivElement, FacetChipProps>(functi
   const excludeValues = value.kind === 'multi' ? value.exclude : []
   const active = !isDefaultValue(value)
   const excludeEnabled = facet.kind === 'multi' && (facet.allowExclude ?? true)
+  const countsState = facet.countsState ?? 'ready'
+  const countsReady = countsState === 'ready'
+  const countsBusy = countsState === 'loading'
 
   const excludedWord = labels?.excluded ?? 'excluded'
   const noneMatchWord = labels?.noneMatch ?? 'none match now'
@@ -250,7 +257,7 @@ export const FacetChip = React.forwardRef<HTMLDivElement, FacetChipProps>(functi
 
   const optionName = (option: FilterOption, state: OptionState) => {
     let name = displayLabel(option)
-    if (option.count !== undefined) {
+    if (countsReady && option.count !== undefined) {
       name = option.countAtLeast
         ? `${name}, \u2265${countToString(option.count)}`
         : (labels?.optionWithCount?.(displayLabel(option), option.count) ??
@@ -293,7 +300,7 @@ export const FacetChip = React.forwardRef<HTMLDivElement, FacetChipProps>(functi
       onValueChange!({ kind: 'single', value: next })
       return
     }
-    choose(optionValue, cycleAction(value, optionValue))
+    choose(optionValue, cycleAction(value, optionValue, excludeEnabled))
   }
 
   const onOptionKeyDown = (event: React.KeyboardEvent<HTMLElement>, optionValue: string | null) => {
@@ -425,7 +432,7 @@ export const FacetChip = React.forwardRef<HTMLDivElement, FacetChipProps>(functi
   }
 
   const countBadge = (option: FilterOption) =>
-    option.count !== undefined ? (
+    countsReady && option.count !== undefined ? (
       <span
         aria-hidden
         className="rounded-full bg-[var(--as-secondary)] px-2 py-0.5 text-[10px] font-semibold tabular-nums text-[var(--as-muted-fg)]"
@@ -484,6 +491,7 @@ export const FacetChip = React.forwardRef<HTMLDivElement, FacetChipProps>(functi
         tabIndex={-1}
         data-as="facet-chip"
         data-testid={testId}
+        aria-busy={countsBusy || undefined}
         className={cn('flex flex-wrap items-center gap-1.5', className)}
         {...props}
       >
@@ -533,6 +541,7 @@ export const FacetChip = React.forwardRef<HTMLDivElement, FacetChipProps>(functi
       ref={setRootRef}
       data-as="facet-chip"
       data-testid={testId}
+      aria-busy={countsBusy || undefined}
       className={cn('flex min-w-0 items-center gap-2', className)}
       {...props}
     >

@@ -28,8 +28,11 @@ export interface FilterRailProps {
   onClear?: () => void
   /** Host search control; rendered under the rail header and in the compact toolbar. */
   search?: React.ReactNode
-  /** Replaces the compact sheet footer (and the rail footer slot). */
-  footer?: React.ReactNode
+  /**
+   * Replaces the compact sheet footer (and the rail footer slot). A function
+   * receives `close`, which closes the compact sheet — a no-op in the rail.
+   */
+  footer?: React.ReactNode | ((close: () => void) => React.ReactNode)
   children?: React.ReactNode
   className?: string
   'data-testid'?: string
@@ -68,6 +71,13 @@ export const FilterRail = React.forwardRef<HTMLElement, FilterRailProps>(functio
   const countNode =
     activeCount === undefined ? null : (formatCount?.(activeCount) ?? activeCount.toLocaleString())
   const showClear = Boolean(onClear) && (activeCount === undefined || activeCount > 0)
+
+  const closeSheet = () => setOpen(false)
+  const closeRail = () => {}
+  const renderFooter = (
+    node: React.ReactNode | ((close: () => void) => React.ReactNode),
+    close: () => void,
+  ) => (typeof node === 'function' ? node(close) : node)
 
   const body = (
     <div data-as="filter-rail-body" className="flex min-w-0 flex-col gap-2">
@@ -113,7 +123,9 @@ export const FilterRail = React.forwardRef<HTMLElement, FilterRailProps>(functio
           className="inline-flex min-h-[44px] shrink-0 items-center gap-2 whitespace-nowrap rounded-[var(--as-radius)] border border-[var(--as-border)] bg-[var(--as-surface)] px-4 text-sm font-medium text-[var(--as-fg)] transition-colors hover:border-[color-mix(in_srgb,var(--as-primary)_40%,var(--as-border))] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--as-focus-ring)]"
         >
           <SlidersHorizontal className="size-4 text-[var(--as-muted-fg)]" aria-hidden="true" />
-          <span>{countText === null ? filtersLabel : `${filtersLabel} (${countText})`}</span>
+          <span aria-live="polite">
+            {countText === null ? filtersLabel : `${filtersLabel} (${countText})`}
+          </span>
         </button>
         <PanelModal
           open={open}
@@ -122,7 +134,7 @@ export const FilterRail = React.forwardRef<HTMLElement, FilterRailProps>(functio
           title={title}
           closeLabel={labels?.close ?? 'Close'}
           bodyClassName="flex min-h-0 flex-1 flex-col gap-3 p-5 sm:p-6"
-          footer={footer ?? defaultFooter}
+          footer={footer ? renderFooter(footer, closeSheet) : defaultFooter}
           onCloseAutoFocus={(event) => {
             event.preventDefault()
             triggerRef.current?.focus()
@@ -153,6 +165,7 @@ export const FilterRail = React.forwardRef<HTMLElement, FilterRailProps>(functio
         {countNode !== null ? (
           <span
             data-as="filter-rail-count"
+            aria-live="polite"
             className="inline-flex shrink-0 items-center justify-center rounded-full bg-[var(--as-secondary)] px-2 py-0.5 text-[11px] font-semibold tabular-nums text-[var(--as-muted-fg)]"
           >
             <span className="sr-only">{filtersLabel}: </span>
@@ -172,7 +185,7 @@ export const FilterRail = React.forwardRef<HTMLElement, FilterRailProps>(functio
       </div>
       {search ? <div data-as="filter-rail-search">{search}</div> : null}
       {body}
-      {footer ? <div data-as="filter-rail-footer">{footer}</div> : null}
+      {footer ? <div data-as="filter-rail-footer">{renderFooter(footer, closeRail)}</div> : null}
     </aside>
   )
 })

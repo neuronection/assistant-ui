@@ -63,6 +63,7 @@ interface FilterFacet {
   icon?: ReactNode
   allowExclude?: boolean     // include/exclude/clear rows; default true for multi
   options?: FilterOption[]   // omit for `toggle`
+  countsState?: 'ready' | 'loading' | 'error'  // not `ready` = render no option count
   hidden?: boolean           // folded behind the bar's More/Fewer
 }
 
@@ -153,7 +154,7 @@ button's `aria-controls` points at the content element.
 | `formatCount` | `(count: number) => ReactNode` | runtime locale | formats the rail's active-count badge; the compact trigger keeps the plain number |
 | `onClear` | `() => void` | — | rail Clear all; also the compact sheet's default-footer clear action |
 | `search` | `ReactNode` | — | host **page-level** search control, not facet-option search (see below) |
-| `footer` | `ReactNode` | — | replaces the compact sheet's default footer; in the rail it renders below the body |
+| `footer` | `ReactNode \| ((close: () => void) => ReactNode)` | — | replaces the compact sheet's default footer (the function form receives a `close` that closes the sheet); in the rail it renders below the body with a no-op `close` |
 | `children` | `ReactNode` | — | the sections (or any host content) |
 | `className` / `data-testid` | `string` | — | forwarded to the layout root |
 
@@ -200,7 +201,21 @@ The rail adds no sticky, width or scroll CSS; the app owns that.
   header.
 - **`footer`.** In `compact`, a host `footer` replaces the default footer
   entirely (the default is Clear all — while active — plus a *Done* button
-  that closes the sheet). In `rail`, `footer` renders after the body.
+  that closes the sheet). In `rail`, `footer` renders after the body. Both
+  forms are allowed: a node, or a function `(close) => node` so a host can
+  render its own way out of the sheet — the classic *Show 128 results* button.
+  `close` closes the compact sheet and is a no-op in the rail.
+- **`countsState`.** `ready` (default) renders counts as before. `loading` and
+  `error` withhold every option count — no number, no `0`, and no count in the
+  option's accessible name — because a stale number is worse than none; a
+  zero-count option then reads as a plain value with no *none match now*.
+  `loading` also marks the chip `aria-busy`. The state is per facet, so one
+  slow field never blanks the rest of the bar. `FacetChip` also accepts its
+  own `options`, which is the usual place to drop counts for a single facet.
+- **Include-only facets.** With `allowExclude={false}` a plain click (or
+  Space) cycles include → clear instead of include → exclude; the row menu is
+  not rendered and Shift+Enter does nothing. Any stale exclusion the host
+  still holds stays removable from its pill.
 - **Uncontrolled sections reset when the compact sheet closes.** `PanelModal`
   unmounts its content, so a `FilterSection` using `defaultOpen` returns to
   that initial state on the next open. Control `open` / `onOpenChange` (or
@@ -274,13 +289,45 @@ compact (page search in the toolbar, filter sheet behind the trigger):
 </FilterRail>
 ```
 
+compact with a host footer that applies and closes (the `close` callback is
+what the default *Done* button uses):
+
+```tsx
+<FilterRail
+  layout="compact"
+  title={t('filters.title')}
+  activeCount={activeCount}
+  footer={(close) => (
+    <Button type="button" onClick={close} className="min-h-[44px]">
+      {t('filters.show_results', { count: resultCount })}
+    </Button>
+  )}
+>
+  {sections}
+</FilterRail>
+```
+
+loading facet (counts withheld until the facet query answers):
+
+```tsx
+<FilterSection title={t('filters.phase')} active={phaseActive}>
+  <FacetChip
+    facet={{ ...phaseFacet, countsState: countsPending ? 'loading' : 'ready' }}
+    value={values.phase ?? defaultFilterValue(phaseFacet)}
+    onValueChange={(value) => setFacet('phase', value)}
+    variant="inline"
+  />
+</FilterSection>
+```
+
 ## accessibility
 
 See [accessibility.md](../accessibility.md#inputs).
 
 - **Rail:** `layout="rail"` is a `<aside>` landmark (complementary), named by
   its `title`; the active count badge carries a visually hidden
-  “Filters:” prefix and a `<bdi dir="ltr">` number, and is omitted entirely
+  “Filters:” prefix and a `<bdi dir="ltr">` number, is wrapped in
+  `aria-live="polite"` so a change is announced, and is omitted entirely
   when `activeCount` is `undefined`.
 - **Sections:** the header is a real `<button>` with `aria-expanded` and
   `aria-controls` pointing at the existing content element (which is
@@ -288,12 +335,21 @@ See [accessibility.md](../accessibility.md#inputs).
   *filtered* (`labels.active`) is announced in the header's accessible name.
   Counts render `0` / `≥N` / no badge at all; a zero count adds
   `none match now` (`labels.noneMatch`) to the accessible name and stays
-  selectable.
+  selectable. On a facet whose `countsState` is not `ready`, the section count
+  is the host's to withhold too — pass `count` only when it is trustworthy.
 - **Compact sheet:** the trigger is a `<button>` with
-  `aria-haspopup="dialog"` and `aria-expanded`; `PanelModal` supplies the
-  labelled dialog, the focus trap and Escape handling, and focus returns to
-  the trigger on close. The close button is named by `labels.close`. The
-  default *Done* footer closes the sheet; a host `footer` replaces it.
+  `aria-haspopup="dialog"` and `aria-expanded`; its label (including the
+  count) sits in a polite live region so a filter change is announced while
+  the sheet is closed. `PanelModal` supplies the labelled dialog, the focus
+  trap and Escape handling, and focus returns to the trigger on close. The
+  close button is named by `labels.close`. The default *Done* footer closes
+  the sheet; a host `footer` replaces it, and the function form receives the
+  same `close` — so a *Show N results* button is a plain `<button>` inside
+  the host footer.
+- **Option counts:** counts are `aria-hidden` badges; the row's accessible
+  name carries the count (and *none match now* at zero) instead. When
+  `countsState` is `loading` the chip is `aria-busy="true"` and no count is
+  rendered or named; `error` renders no count either, without `aria-busy`.
 - **Target size:** the section header, the compact trigger, the rail clear
   action and the inline option row (with its per-row menu trigger) are 44px
   tall. The inline row's 44px treatment applies at `max-sm` (390px); popover
@@ -327,6 +383,9 @@ the Ladle gallery, so the browser viewport caps what is visible locally — a
 local screenshot there is not 1024-wide evidence. Each story records the
 intended CI frame (1280×900) in `parameters.frame`; the visual suite can use
 that in CI. The reduced-motion story is illustrative only (see above).
+`FiltersFunctionFooter` opens the compact sheet on mount so the host
+*Show N results* footer is in the capture; `FiltersCountsLoading` shows a
+facet with `countsState="loading"`, i.e. the same options with no counts.
 
 ## related
 
